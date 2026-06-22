@@ -1,0 +1,14 @@
+{
+  "name": "chauhans-co-store",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chauhan's & Co jewellery storefront. Static site - serve as-is.",
+  "scripts": {
+    "build": "node build/site.js",
+    "seed": "node build/seed-products.js",
+    "dev": "npx --yes serve -l 8753 ."
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
