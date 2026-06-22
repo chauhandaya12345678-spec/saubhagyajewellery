@@ -106,6 +106,15 @@ footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
   .hero h1{font-size:36px}.ph h1{font-size:34px}
   .band,.hero,.ph,.prose,.seo,.crumb,.grid-wrap{padding-left:20px;padding-right:20px}
 }
-@media(max-width:560px){
-  .grid,.ccards,.rgrid,.fwrap{grid-template-columns:1fr}
+@media(max-width:640px){
+  .grid,.ccards,.rgrid,.fwrap{grid-template-columns:1fr!important}
+  /* Override all inline 3-column and 4-column grids on mobile */
+  div[style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr!important}
+  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
+  /* Hero section mobile */
+  div[style*="height:560px"]{height:280px!important;border-radius:12px!important}
+  h1[style*="font-size:50px"]{font-size:32px!important}
+  h2[style*="font-size:36px"]{font-size:26px!important}
+  h2[style*="font-size:34px"]{font-size:24px!important}
+  h2[style*="font-size:30px"]{font-size:24px!important}
 }

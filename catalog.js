@@ -66,9 +66,9 @@
   function publish(catalog) {
     window.CHAUHAN_CATALOG = catalog;
     window.CHAUHAN_HERO = [
-      { image: 'images/necklace/necklace-05.webp', tone: 'emerald',  kicker: 'SOUTH INDIAN',  title: 'Temple & Antique Gold' },
-      { image: 'images/choker/202606051335.webp',  tone: 'maroon',   kicker: 'NORTH INDIAN',  title: 'Kundan & Polki Bridal' },
-      { image: 'images/pendant/pendant-05.webp',   tone: 'charcoal', kicker: 'MUMBAI MODERN', title: 'American Diamond Edit' }
+      { image: 'images/banners/Website_hero_banner_concept_art._202606221611.jpeg', tone: 'charcoal',  kicker: 'CHAUHAN\'S & CO',  title: 'Designer Earrings Collection' },
+      { image: 'images/banners/Website_hero_image_for_Chauhan_202606221620.jpeg', tone: 'emerald',   kicker: 'CHAUHAN\'S & CO',  title: 'Where Tradition Meets Design' },
+      { image: 'images/banners/gold necklacer._A_202606221636.jpeg',  tone: 'maroon',    kicker: 'CHAUHAN\'S & CO',  title: 'Gold Necklace Edit' }
     ];
     window.CHAUHAN_SETTINGS = {
       shippingNote: 'FREE INSURED SHIPPING ACROSS INDIA · GST INCLUDED ON EVERY ORDER',
