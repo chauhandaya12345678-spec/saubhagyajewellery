@@ -42,14 +42,29 @@
   <p class="lede">Your confirmation and tracking details are sent by email and WhatsApp as soon as your piece ships.</p>
 </section>
 <section class="prose">
+  <h2>Quick track</h2>
+  <p>Enter your AWB number (from the shipping email or WhatsApp message) to open the live tracking page.</p>
+  <div style="display:flex; gap:10px; max-width:480px; margin:18px 0 28px;">
+    <input id="awb" placeholder="AWB / Tracking number" style="flex:1; height:46px; padding:0 14px; border:1px solid #ddd6c6; font-size:14px; outline:none;">
+    <button id="trackBtn" style="height:46px; padding:0 22px; background:#0B3C26; color:#fff; border:none; font-size:12px; letter-spacing:1.5px; cursor:pointer;">TRACK</button>
+  </div>
   <h2>How to track</h2>
-  <p>Use the tracking link in your shipping email, or message us your order number (it begins with “CC”) on WhatsApp and we will share live status.</p>
+  <p>Use the tracking link in your shipping email or WhatsApp message, or paste your AWB above. If you cannot find it, message us your order number (begins with &ldquo;CC&rdquo;) on WhatsApp and we will share live status.</p>
   <h2>Dispatch timelines</h2>
   <p>Ready pieces dispatch within 2 to 4 business days. Made-to-order bridal sets ship within 10 to 14 days. All shipments are fully insured in transit.</p>
-  
+
   <a class="btn" href="https://wa.me/910000000000">Chat on WhatsApp</a>
   <div class="back"><a href="index.html">&larr; Back to shopping</a></div>
 </section>
+<script>
+  /* Shiprocket tracking base — set in PAYMENTS-SETUP.md step 3 once Shiprocket connected. */
+  var SHIPROCKET_TRACK_BASE = 'https://shiprocket.co/tracking/';
+  document.getElementById('trackBtn').addEventListener('click', function () {
+    var v = (document.getElementById('awb').value || '').trim();
+    if (!v) { alert('Enter your AWB or tracking number first.'); return; }
+    window.open(SHIPROCKET_TRACK_BASE + encodeURIComponent(v), '_blank');
+  });
+</script>
 </main>
 <footer class="site">
   <div class="fwrap">

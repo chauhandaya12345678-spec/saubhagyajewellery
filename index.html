@@ -20,6 +20,27 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="catalog.js?v=3"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  /* ============================================================
+   * RAZORPAY + SHIPROCKET CONFIG — replace placeholders after KYC.
+   * See PAYMENTS-SETUP.md for full instructions.
+   * ============================================================ */
+  window.CC_PAYMENTS = {
+    /* Razorpay Key ID (public). Test mode starts with rzp_test_, live with rzp_live_. */
+    razorpayKeyId: 'rzp_test_REPLACE_ME',
+
+    /* Backend endpoint that signs the order amount with key_secret and returns { id, amount, currency }.
+     * Cloudflare Worker (free) or any /api/orders endpoint. Until ready, leave null → uses client-only fallback (test mode only). */
+    createOrderUrl: null,
+
+    /* Shiprocket public tracking page. Format: https://shiprocket.co/tracking/<AWB> */
+    shiprocketTrackBase: 'https://shiprocket.co/tracking/',
+
+    /* Use Razorpay Magic Checkout (1-click login+address+pay) when live. Until enabled in dashboard, use standard Checkout. */
+    useMagicCheckout: false
+  };
+</script>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -1255,7 +1276,69 @@ class Component extends DCLogic {
   goCheckout() { history.pushState({page:'checkout'}, ''); this.setState({ page: 'checkout', cartOpen: false, placed: false }); this.top(); }
   payNow() {
     if (!this.state.cartItems.length) return;
-    alert('Payment gateway is being integrated. Please check back soon. Your cart items are saved.');
+    const cfg = window.CC_PAYMENTS || {};
+    const cat = window.CHAUHAN_CATALOG || [];
+    const lines = this.state.cartItems.map(ci => {
+      const p = cat.find(x => x.id === ci.id) || {};
+      return { id: ci.id, name: p.name, price: p.price, qty: ci.qty };
+    });
+    const subtotal = lines.reduce((s, l) => s + (l.price || 0) * l.qty, 0);
+    const discount = this.state.discountApplied && this.state.co.discount.trim() ? Math.round(subtotal * 0.1) : 0;
+    const amountPaise = Math.max(0, subtotal - discount) * 100;
+    if (!cfg.razorpayKeyId || cfg.razorpayKeyId.includes('REPLACE_ME')) {
+      alert('Razorpay key not configured yet. Add your key_id in CC_PAYMENTS (top of index.html).');
+      return;
+    }
+    if (typeof Razorpay === 'undefined') {
+      alert('Razorpay script failed to load. Check internet.');
+      return;
+    }
+    const co = this.state.co;
+    const openCheckout = (orderId) => {
+      const opts = {
+        key: cfg.razorpayKeyId,
+        amount: amountPaise,
+        currency: 'INR',
+        name: "Chauhan's & Co",
+        description: lines.map(l => l.name).join(', ').slice(0, 200),
+        image: 'images/banners/chauhans-logo.png',
+        order_id: orderId || undefined,
+        prefill: {
+          name: (co.first + ' ' + co.last).trim(),
+          email: co.email,
+          contact: co.phone
+        },
+        notes: {
+          shipping_address: [co.address, co.apt, co.city, co.state, co.pin].filter(Boolean).join(', '),
+          cart: lines.map(l => l.id + 'x' + l.qty).join(',')
+        },
+        theme: { color: '#0B3C26' },
+        handler: (resp) => {
+          const oid = resp.razorpay_payment_id || ('CC' + Date.now().toString(36).toUpperCase());
+          this.saveCart([]);
+          this.setState({ cartItems: [], placed: true, orderId: oid });
+          this.top();
+        },
+        modal: {
+          ondismiss: () => { /* user closed without paying — cart still saved */ }
+        }
+      };
+      if (cfg.useMagicCheckout) opts.one_click_checkout = true;
+      try { new Razorpay(opts).open(); }
+      catch (e) { alert('Could not open payment window: ' + e.message); }
+    };
+    if (cfg.createOrderUrl) {
+      fetch(cfg.createOrderUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amountPaise, currency: 'INR', cart: lines })
+      })
+        .then(r => r.json())
+        .then(d => openCheckout(d.id))
+        .catch(() => openCheckout(null));
+    } else {
+      openCheckout(null);
+    }
   }
   continueShopping() {
     history.pushState({page:'home'}, '');
