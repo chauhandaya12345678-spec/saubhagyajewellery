@@ -1383,7 +1383,7 @@ class Component extends DCLogic {
     const tagDefs = {
       sale: { title: 'Sale', blurb: 'Limited markdowns on premium imitation jewellery, while stocks last.', test: p => p.mrp > p.price && (p.mrp - p.price) / p.mrp >= 0.25 },
       new: { title: 'New In', blurb: 'The latest handcrafted arrivals across all three regions.', test: p => p.badge === 'NEW' },
-      earrings: { title: 'Earrings', blurb: 'Matte jhumkas, studs and statement drops.', test: p => /jhumka|earring|stud|drop/i.test(p.category) },
+      earrings: { title: 'Earrings', blurb: 'Matte jhumkas, studs and statement drops.', test: p => /jhumka|earring|stud|drop/i.test(p.category) || (p.image && p.image.indexOf('/Earrings/') !== -1) },
       necklaces: { title: 'Necklaces', blurb: 'Haarams, mala, rani haar and pendant sets.', test: p => /necklace|haaram|mala|rani|haar|pendant/i.test(p.category) },
       gifting: { title: 'Gifting', blurb: 'Beautifully boxed imitation jewellery, ready to gift.', test: p => p.price <= 3000 },
       vintage: { title: 'Vintage & Antique', blurb: 'Heritage-inspired antique-finish pieces.', test: p => /Antique|Vintage|Heritage|Mughal|Regal/i.test(p.name) },
