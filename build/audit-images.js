@@ -17,7 +17,7 @@ const hero = [
   'images/pendant/pendant-05.webp',
   'images/choker/202606051333.webp',
   'images/pendant/pendant-01.webp',
-  'images/necklace/necklace-01.webp'
+  'images/necklace/20260605_111058.webp'
 ];
 hero.forEach(h => usedPrimary.add(h));
 const allUsed = new Set([...usedPrimary, ...usedAlt]);
