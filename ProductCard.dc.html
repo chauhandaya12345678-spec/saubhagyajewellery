@@ -52,7 +52,7 @@ class Component extends DCLogic {
   renderVals() {
     const p = this.props.product || {};
     const h = this.state.hover;
-    const tag = p.badge ? (p.city ? p.badge + ' · ' + p.city : p.badge) : (p.city || '');
+    const tag = p.badge || '';
     const stripeF = 'repeating-linear-gradient(135deg,#f1efe9 0 16px,#e9e6dd 16px 32px)';
     return {
       name: p.name || '', tag,
