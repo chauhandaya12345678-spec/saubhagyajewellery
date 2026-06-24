@@ -54,15 +54,13 @@ class Component extends DCLogic {
     const h = this.state.hover;
     const tag = p.badge ? (p.city ? p.badge + ' · ' + p.city : p.badge) : (p.city || '');
     const stripeF = 'repeating-linear-gradient(135deg,#f1efe9 0 16px,#e9e6dd 16px 32px)';
-    const stripeA = 'repeating-linear-gradient(135deg,#e7e2d6 0 16px,#ddd6c6 16px 32px)';
-    const alt = p.altImage || p.image;
     return {
       name: p.name || '', tag,
       priceText: this.fmt(p.price),
       noImage: !p.image,
       frontBg: p.image ? "#efece4 url('" + p.image + "') center/cover no-repeat" : stripeF,
-      altBg: alt ? "#efece4 url('" + alt + "') center/cover no-repeat" : stripeA,
-      scale: h ? 1.06 : 1, frontOpacity: h ? 0 : 1, altOpacity: h ? 1 : 0,
+      altBg: 'transparent',
+      scale: h ? 1.04 : 1, frontOpacity: 1, altOpacity: 0,
       onEnter: () => this.setState({ hover: true }),
       onLeave: () => this.setState({ hover: false }),
       onClick: () => this.props.onOpen && this.props.onOpen(p.id)

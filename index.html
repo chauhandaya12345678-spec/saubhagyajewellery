@@ -221,9 +221,6 @@
 
 <div style="font-family:'Montserrat',sans-serif; color:#1A1A1A; background:#FAFAFA;" class="m-p24">
 
-  <!-- ===================== SHIPPING BANNER ===================== -->
-  <div style="text-align:center; padding:9px 0; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1.5px; color:#0B3C26; background:#fff; border-bottom:1px solid rgba(197,160,89,.22);">FREE INSURED SHIPPING ACROSS INDIA&nbsp;&nbsp;&middot;&nbsp;&nbsp;GST INCLUDED ON EVERY ORDER</div>
-
   <!-- ===================== STICKY NAV ===================== -->
   <div onMouseLeave="{{ clearMega }}" style="position:sticky; top:0; z-index:50;">
     <div style="display:flex; align-items:center; gap:24px; padding:18px 48px; background:rgba(255,255,255,.86); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid rgba(197,160,89,.18);" class="m-stack m-gap12 m-p24">
@@ -313,9 +310,9 @@
               <span onClick="{{ openMegaCollection }}" style="font-family:'Montserrat',sans-serif; font-size:13px; color:#3a3a3a; cursor:pointer;" style-hover="color:#0B3C26;">{{ m }}</span>
             </sc-for>
           </div>
-          <div onClick="{{ openMegaCollection }}" style="position:relative; background:#06281a; min-height:160px; overflow:hidden; cursor:pointer;">
-            <div style="position:absolute; inset:0; background:repeating-linear-gradient(135deg,#0d3324 0 20px,#0a2c1f 20px 40px);"></div>
-            <div style="position:absolute; left:18px; bottom:16px; color:#fff;">
+          <div onClick="{{ openMegaCollection }}" style="position:relative; background:{{ megaFeatureBg }}; min-height:200px; overflow:hidden; cursor:pointer; border-radius:8px;">
+            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(6,40,26,.85) 0%, rgba(6,40,26,0) 55%);"></div>
+            <div style="position:absolute; left:18px; bottom:16px; right:18px; color:#fff;">
               <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059;">FEATURED</div>
               <div style="font-family:'Cormorant Garamond',serif; font-size:20px; margin-top:2px;">{{ megaFeature }}</div>
             </div>
@@ -424,7 +421,7 @@
             <div style="display:flex; justify-content:space-between; font-family:'Montserrat',sans-serif; font-size:13px; color:#1A1A1A;">
               <span>Subtotal</span><span style="font-weight:600;">{{ cartSubtotalText }}</span>
             </div>
-            <div style="font-family:'Montserrat',sans-serif; font-size:11px; color:#9a9a9a; margin-top:5px;">Free insured shipping &middot; Inclusive of all taxes (GST)</div>
+            <div style="font-family:'Montserrat',sans-serif; font-size:11px; color:#9a9a9a; margin-top:5px;">Shipping and taxes calculated at checkout</div>
             <button onClick="{{ goCheckout }}" style="width:100%; margin-top:16px; height:52px; background:#0B3C26; color:#fff; border:none; font-size:12px; letter-spacing:2px; cursor:pointer; transition:background .4s ease;" style-hover="background:#06281a;">PROCEED TO CHECKOUT</button>
             <div onClick="{{ closeCart }}" style="text-align:center; margin-top:14px; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; color:#7a7a7a; cursor:pointer;">Continue shopping</div>
           </div>
@@ -525,7 +522,7 @@
       </div>
       <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:28px;">
         <div onClick="{{ openSouth }}" style="cursor:pointer;">
-          <div style="position:relative; height:420px; background:#06281a url('images/choker/202606051333.webp') center/cover no-repeat; overflow:hidden;">
+          <div style="position:relative; height:420px; background:#06281a url('images/choker/202606051333.webp') center/cover no-repeat; overflow:hidden; border-radius:12px;">
             <div style="position:absolute; inset:0; transition:transform 1.1s cubic-bezier(.22,1,.36,1);" style-hover="transform:scale(1.05);"></div>
             <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(4,28,18,.78) 0%, rgba(4,28,18,0) 55%);"></div>
             <div style="position:absolute; left:26px; bottom:26px; right:26px; color:#fff;">
@@ -535,7 +532,7 @@
           </div>
         </div>
         <div onClick="{{ openModern }}" style="cursor:pointer;">
-          <div style="position:relative; height:420px; background:#1A1A1A url('images/pendant/pendant-01.webp') center/cover no-repeat; overflow:hidden;">
+          <div style="position:relative; height:420px; background:#1A1A1A url('images/pendant/pendant-01.webp') center/cover no-repeat; overflow:hidden; border-radius:12px;">
             <div style="position:absolute; inset:0; transition:transform 1.1s cubic-bezier(.22,1,.36,1);" style-hover="transform:scale(1.05);"></div>
             <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(10,10,10,.8) 0%, rgba(10,10,10,0) 55%);"></div>
             <div style="position:absolute; left:26px; bottom:26px; right:26px; color:#fff;">
@@ -545,7 +542,7 @@
           </div>
         </div>
         <div onClick="{{ openBridal }}" style="cursor:pointer;">
-          <div style="position:relative; height:420px; background:#4A0E17 url('images/necklace/necklace-01.webp') center/cover no-repeat; overflow:hidden;">
+          <div style="position:relative; height:420px; background:#4A0E17 url('images/necklace/necklace-05.webp') center/cover no-repeat; overflow:hidden; border-radius:12px;">
             <div style="position:absolute; inset:0; transition:transform 1.1s cubic-bezier(.22,1,.36,1);" style-hover="transform:scale(1.05);"></div>
             <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(40,7,12,.8) 0%, rgba(40,7,12,0) 55%);"></div>
             <div style="position:absolute; left:26px; bottom:26px; right:26px; color:#fff;">
@@ -669,7 +666,7 @@
           <span style="font-family:'Montserrat',sans-serif; font-size:15px; color:#b3aa98; text-decoration:line-through;">{{ pMrpText }}</span>
           <span style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; color:#0B3C26; background:rgba(11,60,38,.07); padding:4px 9px;">{{ pSaveText }}</span>
         </div>
-        <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a;">Inclusive of all taxes (GST)</div>
+        <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a;">Shipping and taxes calculated at checkout</div>
 
         <p style="font-family:'Montserrat',sans-serif; font-weight:300; font-size:14px; line-height:1.85; color:#4a4a4a; margin:26px 0 0; max-width:460px;">A premium imitation jewellery piece, sculpted in Rhino CAD and hand-finished in matte antique gold, this {{ pCategoryLower }} is engineered to drape with weightless balance, built for the occasion and the everyday after.</p>
 
@@ -697,7 +694,7 @@
             <sc-if value="{{ delivered }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex; gap:9px; align-items:center; margin-top:14px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13h11V6H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
-                <span>Free insured delivery by <strong style="font-weight:600;">{{ deliveryDate }}</strong> &middot; GST included</span>
+                <span>Estimated delivery by <strong style="font-weight:600;">{{ deliveryDate }}</strong></span>
               </div>
             </sc-if>
           </div>
@@ -900,7 +897,7 @@
 
           <div style="border-top:1px solid #eae5d8; padding-top:16px; margin-top:6px; display:flex; flex-direction:column; gap:10px;">
             <div style="display:flex; justify-content:space-between; font-family:'Montserrat',sans-serif; font-size:13px; color:#4a4a4a;"><span>Subtotal</span><span>{{ cartSubtotalText }}</span></div>
-            <div style="display:flex; justify-content:space-between; font-family:'Montserrat',sans-serif; font-size:13px; color:#4a4a4a;"><span>Shipping</span><span style="color:#0B3C26;">Free</span></div>
+            <div style="display:flex; justify-content:space-between; font-family:'Montserrat',sans-serif; font-size:13px; color:#4a4a4a;"><span>Shipping</span><span style="color:#7a7a7a;">Calculated at checkout</span></div>
             <div style="display:flex; justify-content:space-between; align-items:baseline; border-top:1px solid #eae5d8; padding-top:14px; margin-top:4px;">
               <span style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#1A1A1A;">Total</span>
               <span style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:600; color:#0B3C26;">{{ grandTotalText }}</span>
@@ -1362,9 +1359,9 @@ class Component extends DCLogic {
       bridal: 'Kundan & Polki craftsmanship: complete bridal looks for the modern North Indian bride.'
     };
     const megaData = {
-      south: { title: 'South Indian Traditional', blurb: 'Matte antique-gold temple work, modelled in Rhino CAD and cast for bridal weight.', a: ['Temple Necklaces', 'Lakshmi Haaram', 'Matte Jhumkas'], b: ['Vanki / Armlets', 'Maang Tikka', 'Complete Bridal Sets'], feature: 'Lakshmi Haaram' },
-      modern: { title: 'Mumbai Modern', blurb: 'Contemporary American Diamond pieces with a clean, high-shine finish.', a: ['AD Necklaces', 'Cocktail Rings', 'Solitaire Studs'], b: ['Tennis Bracelets', 'The Office Edit', 'Statement Pieces'], feature: 'AD Solitaire Choker' },
-      bridal: { title: 'North Indian Bridal', blurb: 'Kundan & Polki craftsmanship for the modern North Indian bride.', a: ['Kundan Sets', 'Polki Chokers', 'Rani Haar'], b: ['Nath', 'Passa / Jhoomar', 'Complete Bridal'], feature: 'Polki Statement Set' }
+      south: { title: 'South Indian Traditional', blurb: 'Matte antique-gold temple work, modelled in Rhino CAD and cast for bridal weight.', a: ['Temple Necklaces', 'Lakshmi Haaram', 'Matte Jhumkas'], b: ['Vanki / Armlets', 'Maang Tikka', 'Complete Bridal Sets'], feature: 'Lakshmi Haaram', image: 'images/choker/202606051333.webp' },
+      modern: { title: 'Mumbai Modern', blurb: 'Contemporary American Diamond pieces with a clean, high-shine finish.', a: ['AD Necklaces', 'Cocktail Rings', 'Solitaire Studs'], b: ['Tennis Bracelets', 'The Office Edit', 'Statement Pieces'], feature: 'AD Solitaire Choker', image: 'images/pendant/pendant-01.webp' },
+      bridal: { title: 'North Indian Bridal', blurb: 'Kundan & Polki craftsmanship for the modern North Indian bride.', a: ['Kundan Sets', 'Polki Chokers', 'Rani Haar'], b: ['Nath', 'Passa / Jhoomar', 'Complete Bridal'], feature: 'Polki Statement Set', image: 'images/necklace/necklace-05.webp' }
     };
     const md = s.mega ? megaData[s.mega] : null;
 
@@ -1372,7 +1369,7 @@ class Component extends DCLogic {
     const catNavDefs = [
       { label: 'Sale', key: 'sale', sale: true }, { label: 'New In', key: 'new' },
       { label: 'Earrings', key: 'earrings' }, { label: 'Necklaces', key: 'necklaces' },
-      { label: 'Bracelets', key: 'bracelets' }, { label: 'Gifting', key: 'gifting' },
+      { label: 'Gifting', key: 'gifting' },
       { label: 'Vintage', key: 'vintage' }, { label: 'Collections', key: 'collections' },
       { label: 'Bestsellers', key: 'bestsellers' }, { label: 'Traditional', key: 'traditional' },
       { label: 'Choker', key: 'choker' }, { label: 'Temple', key: 'temple' },
@@ -1386,9 +1383,8 @@ class Component extends DCLogic {
     const tagDefs = {
       sale: { title: 'Sale', blurb: 'Limited markdowns on premium imitation jewellery, while stocks last.', test: p => p.mrp > p.price && (p.mrp - p.price) / p.mrp >= 0.25 },
       new: { title: 'New In', blurb: 'The latest handcrafted arrivals across all three regions.', test: p => p.badge === 'NEW' },
-      earrings: { title: 'Earrings', blurb: 'Matte jhumkas, studs and statement drops.', test: p => /jhumka|earring|stud/i.test(p.category) },
-      necklaces: { title: 'Necklaces', blurb: 'Haarams, chokers, mala and rani haar.', test: p => /necklace|haaram|choker|mala|rani|haar/i.test(p.category) },
-      bracelets: { title: 'Bracelets & Armlets', blurb: 'Tennis bracelets, vanki and armlets.', test: p => /bracelet|vanki|armlet/i.test(p.category) },
+      earrings: { title: 'Earrings', blurb: 'Matte jhumkas, studs and statement drops.', test: p => /jhumka|earring|stud|drop/i.test(p.category) },
+      necklaces: { title: 'Necklaces', blurb: 'Haarams, mala, rani haar and pendant sets.', test: p => /necklace|haaram|mala|rani|haar|pendant/i.test(p.category) },
       gifting: { title: 'Gifting', blurb: 'Beautifully boxed imitation jewellery, ready to gift.', test: p => p.price <= 3000 },
       vintage: { title: 'Vintage & Antique', blurb: 'Heritage-inspired antique-finish pieces.', test: p => /Antique|Vintage|Heritage|Mughal|Regal/i.test(p.name) },
       collections: { title: 'All Collections', blurb: 'Browse the complete Chauhan’s & Co imitation jewellery catalogue.', test: () => true },
@@ -1467,7 +1463,7 @@ class Component extends DCLogic {
     const accData = [
       { key: 'guarantee', label: 'BESPOKE QUALITY GUARANTEE', body: 'Each piece is made-to-order and inspected before dispatch. Change-of-mind returns are not accepted; only verified manufacturing defects qualify for repair or replacement, protecting every client from event-wear fraud.' },
       { key: 'unboxing', label: 'THE UNBOXING PROTOCOL', body: 'To authorise any transit-damage claim, record one continuous, uncut video from before the seal is broken through the full reveal of the piece, and share it via WhatsApp within 48 hours of delivery.' },
-      { key: 'shipping', label: 'FREE INSURED SHIPPING TIMELINE', body: 'Ready pieces dispatch within 2–4 business days; made-to-order bridal sets within 10–14 days. All shipments are fully insured in transit and delivered across India with GST included.' }
+      { key: 'shipping', label: 'SHIPPING TIMELINE', body: 'Ready pieces dispatch within 2–4 business days; made-to-order bridal sets within 10–14 days. Shipping charges and applicable taxes are calculated at checkout.' }
     ];
     const accordion = accData.map(a => ({
       label: a.label, body: a.body,
@@ -1540,7 +1536,7 @@ class Component extends DCLogic {
           ['p', 'Born in the lanes of Zaveri Bazaar, we pair traditional Indian craftsmanship with modern CAD design. Every piece is modelled in Rhino, hand-finished in matte antique gold or high-shine AD, and individually inspected before it leaves the atelier.'],
           ['p', 'Our mission is simple: high-quality artificial jewellery that looks and feels like fine jewellery, at a fraction of the price, so you can wear something extraordinary to every occasion.'],
           ['h', 'Our Promise'],
-          ['p', 'Free insured shipping across India, GST included on every invoice, and a bespoke quality guarantee on every handcrafted piece.']
+          ['p', 'Pan-India dispatch with order tracking and a bespoke quality guarantee on every handcrafted piece.']
         ],
         links: [{ label: 'Explore Collections', onClick: linkTo.south }, { label: 'Our Standards', onClick: linkTo.trust }]
       },
@@ -1596,7 +1592,7 @@ class Component extends DCLogic {
           ['h', 'Exchange'],
           ['p', 'Because every piece is made-to-order and individually inspected, we are unable to accept change-of-mind returns. Verified manufacturing defects are repaired or replaced, supported by the continuous unboxing video described in our standards.'],
           ['h', 'Shipping'],
-          ['p', 'Free insured shipping across India on every order, with GST included. Ready pieces dispatch in 2 to 4 business days; bridal sets in 10 to 14 days.']
+          ['p', 'Pan-India dispatch with full tracking. Ready pieces dispatch in 2 to 4 business days; bridal sets in 10 to 14 days. Shipping charges and applicable taxes are calculated at checkout.']
         ],
         links: [{ label: 'Read our full standards', onClick: linkTo.trust }]
       },
@@ -1684,6 +1680,7 @@ class Component extends DCLogic {
       showMega: !!s.mega,
       megaTitle: md ? md.title : '', megaBlurb: md ? md.blurb : '',
       megaColA: md ? md.a : [], megaColB: md ? md.b : [], megaFeature: md ? md.feature : '',
+      megaFeatureBg: md && md.image ? "#06281a url('" + md.image + "') center/cover no-repeat" : '#06281a',
       megaSouth: () => this.setState({ mega: 'south' }), megaModern: () => this.setState({ mega: 'modern' }), megaBridal: () => this.setState({ mega: 'bridal' }),
       clearMega: () => this.setState({ mega: null }),
       openMegaCollection: () => this.openCollection(s.mega || 'south'),

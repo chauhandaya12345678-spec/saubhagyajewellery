@@ -71,18 +71,28 @@
       { image: 'images/banners/gold necklacer._A_202606221636.jpeg',  tone: 'maroon',    kicker: 'CHAUHAN\'S & CO',  title: 'Gold Necklace Edit' }
     ];
     window.CHAUHAN_SETTINGS = {
-      shippingNote: 'FREE INSURED SHIPPING ACROSS INDIA · GST INCLUDED ON EVERY ORDER',
+      shippingNote: '',
       payments: ['UPI', 'Cards', 'Net Banking', 'Cash on Delivery', 'No-Cost EMI']
     };
     window.dispatchEvent(new CustomEvent('catalog-ready'));
   }
 
+  // Block products from the catalog by exact SKU or exact name. Used to remove
+  // items the owner does not want sold. Edit this list to hide more.
+  var BLOCKED_SKUS = ['CC-NB-002'];
+  var BLOCKED_NAMES = ['Regal Lakshmi Haaram', 'Regal Bridal Set', 'Antique Rani Haar'];
+
+  function isBlocked(p) {
+    if (BLOCKED_SKUS.indexOf(p.sku) !== -1) return true;
+    if (BLOCKED_NAMES.indexOf(p.name) !== -1) return true;
+    return false;
+  }
+
   function applyOverrides(base, ov) {
     // products.json may be a flat map { 'CC-SI-001': {...}, ... } OR
     // wrapped as { products: { 'CC-SI-001': {...} }, _README: '...' }.
-    if (!ov || typeof ov !== 'object') return base;
-    var map = ov.products && typeof ov.products === 'object' ? ov.products : ov;
-    return base.map(function (p) {
+    var src = (!ov || typeof ov !== 'object') ? base : base.map(function (p) {
+      var map = ov.products && typeof ov.products === 'object' ? ov.products : ov;
       var o = map[p.sku];
       if (!o || typeof o !== 'object') return p;
       var merged = Object.assign({}, p);
@@ -94,19 +104,20 @@
       if (o.badge !== undefined) merged.badge = o.badge;
       return merged;
     });
+    return src.filter(function (p) { return !isBlocked(p); });
   }
 
   var base = buildBase();
 
-  // Try to load runtime overrides (products.json). Cache-busting via timestamp
-  // so newly-edited files show up on the next reload without manual cache clears.
+  // Publish base immediately so home page never renders blank if products.json fetch is slow.
+  // Re-publish later once overrides arrive — components re-listen on the catalog-ready event.
+  publish(base.filter(function (p) { return !isBlocked(p); }));
+
   var url = 'products.json?t=' + Date.now();
   if (typeof fetch === 'function') {
     fetch(url, { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (ov) { publish(applyOverrides(base, ov)); })
-      .catch(function () { publish(base); });
-  } else {
-    publish(base);
+      .then(function (ov) { if (ov) publish(applyOverrides(base, ov)); })
+      .catch(function () { /* base already published */ });
   }
 })();

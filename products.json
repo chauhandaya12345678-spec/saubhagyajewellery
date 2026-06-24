@@ -2,96 +2,96 @@
   "_README": "Edit this file to change prices, images and names. After editing, commit and push - Cloudflare deploys in ~30 seconds.  Each SKU can have any of these keys: image, altImage, price, mrp, name, badge.   - image:    main product photo (path like \"images/necklace/necklace-05.webp\")   - altImage: a second photo shown on hover (optional)   - price:    selling price in rupees, e.g. 5200   - mrp:      struck-through original price, e.g. 7200   - name:     override the auto-generated product name   - badge:    \"BESTSELLER\" | \"NEW\" | \"TRENDING\" | \"\" (empty to hide)  SKU map: CC-SI-001..050 (South Indian), CC-MM-001..050 (Mumbai Modern), CC-NB-001..050 (North Indian Bridal).  To add a NEW image: drop it into images/<category>/ (Earrings, choker, necklace, pendant, waist-chain) and reference it here. To re-seed from scratch from the current /images contents, run: node build/seed-products.js",
   "products": {
     "CC-SI-001": {
-      "image": "images/Earrings/20260528_115256.jpg",
-      "altImage": "images/Earrings/jewel24.png"
+      "image": "images/Earrings/20260528_115256.webp",
+      "altImage": "images/Earrings/jewel24.webp"
     },
     "CC-SI-008": {
-      "image": "images/Earrings/20260528_120749.jpg",
-      "altImage": "images/Earrings/jewel25.png"
+      "image": "images/Earrings/20260528_120749.webp",
+      "altImage": "images/Earrings/jewel25.webp"
     },
     "CC-SI-013": {
-      "image": "images/Earrings/20260528_121252.jpg"
+      "image": "images/Earrings/20260528_121252.webp"
     },
     "CC-SI-026": {
-      "image": "images/Earrings/20260528_121549.jpg"
+      "image": "images/Earrings/20260528_121549.webp"
     },
     "CC-SI-029": {
-      "image": "images/Earrings/20260528_121823.jpg"
+      "image": "images/Earrings/20260528_121823.webp"
     },
     "CC-SI-030": {
-      "image": "images/Earrings/20260528_122139.jpg"
+      "image": "images/Earrings/20260528_122139.webp"
     },
     "CC-SI-031": {
-      "image": "images/Earrings/20260528_122236.jpg"
+      "image": "images/Earrings/20260528_122236.webp"
     },
     "CC-SI-037": {
-      "image": "images/Earrings/20260528_122426.jpg"
+      "image": "images/Earrings/20260528_122426.webp"
     },
     "CC-SI-038": {
-      "image": "images/Earrings/20260528_122517.jpg"
+      "image": "images/Earrings/20260528_122517.webp"
     },
     "CC-MM-010": {
-      "image": "images/Earrings/20260528_122811.jpg"
+      "image": "images/Earrings/20260528_122811.webp"
     },
     "CC-MM-013": {
-      "image": "images/Earrings/20260528_123207.jpg"
+      "image": "images/Earrings/20260528_123207.webp"
     },
     "CC-MM-015": {
-      "image": "images/Earrings/20260528_123439.jpg"
+      "image": "images/Earrings/20260528_123439.webp"
     },
     "CC-MM-036": {
-      "image": "images/Earrings/20260528_123742.jpg"
+      "image": "images/Earrings/20260528_123742.webp"
     },
     "CC-MM-043": {
-      "image": "images/Earrings/20260528_123856.jpg"
+      "image": "images/Earrings/20260528_123856.webp"
     },
     "CC-NB-006": {
-      "image": "images/Earrings/20260528_123959.jpg"
+      "image": "images/Earrings/20260528_123959.webp"
     },
     "CC-NB-007": {
-      "image": "images/Earrings/20260528_124512.jpg"
+      "image": "images/Earrings/20260528_124512.webp"
     },
     "CC-NB-013": {
-      "image": "images/Earrings/20260528_124810.jpg"
+      "image": "images/Earrings/20260528_124810.webp"
     },
     "CC-NB-014": {
-      "image": "images/Earrings/20260528_125028.jpg"
+      "image": "images/Earrings/20260528_125028.webp"
     },
     "CC-NB-017": {
-      "image": "images/Earrings/20260528_125422.jpg"
+      "image": "images/Earrings/20260528_125422.webp"
     },
     "CC-NB-019": {
-      "image": "images/Earrings/20260528_125720.jpg"
+      "image": "images/Earrings/20260528_125720.webp"
     },
     "CC-NB-020": {
-      "image": "images/Earrings/20260528_130137.jpg"
+      "image": "images/Earrings/20260528_130137.webp"
     },
     "CC-NB-021": {
-      "image": "images/Earrings/20260528_130305.jpg"
+      "image": "images/Earrings/20260528_130305.webp"
     },
     "CC-NB-022": {
-      "image": "images/Earrings/20260528_130740.jpg"
+      "image": "images/Earrings/20260528_130740.webp"
     },
     "CC-NB-024": {
-      "image": "images/Earrings/20260528_130918.jpg"
+      "image": "images/Earrings/20260528_130918.webp"
     },
     "CC-NB-026": {
-      "image": "images/Earrings/20260528_131103.jpg"
+      "image": "images/Earrings/20260528_131103.webp"
     },
     "CC-NB-027": {
-      "image": "images/Earrings/20260528_131303.jpg"
+      "image": "images/Earrings/20260528_131303.webp"
     },
     "CC-NB-035": {
-      "image": "images/Earrings/20260528_131400.jpg"
+      "image": "images/Earrings/20260528_131400.webp"
     },
     "CC-NB-038": {
-      "image": "images/Earrings/20260528_131500.jpg"
+      "image": "images/Earrings/20260528_131500.webp"
     },
     "CC-NB-048": {
-      "image": "images/Earrings/20260528_131603.jpg"
+      "image": "images/Earrings/20260528_131603.webp"
     },
     "CC-NB-050": {
-      "image": "images/Earrings/jewel22.jpg"
+      "image": "images/Earrings/jewel22.webp"
     },
     "CC-MM-001": {
       "image": "images/choker/1202606051334.webp"
@@ -199,16 +199,16 @@
       "image": "images/necklace/20260605_111933.webp"
     },
     "CC-SI-032": {
-      "image": "images/necklace/necklace-01.webp"
+      "image": "images/necklace/20260605_111058.webp"
     },
     "CC-SI-033": {
-      "image": "images/necklace/necklace-02.webp"
+      "image": "images/necklace/20260605_111224.webp"
     },
     "CC-SI-034": {
-      "image": "images/necklace/necklace-03.webp"
+      "image": "images/necklace/20260605_111336.webp"
     },
     "CC-SI-035": {
-      "image": "images/necklace/necklace-04.webp"
+      "image": "images/necklace/20260605_111447.webp"
     },
     "CC-SI-036": {
       "image": "images/necklace/necklace-05.webp"
@@ -274,16 +274,16 @@
       "image": "images/necklace/20260605_111933.webp"
     },
     "CC-NB-001": {
-      "image": "images/necklace/necklace-01.webp"
+      "image": "images/necklace/20260605_111058.webp"
     },
     "CC-NB-002": {
-      "image": "images/necklace/necklace-02.webp"
+      "image": "images/necklace/20260605_111224.webp"
     },
     "CC-NB-003": {
-      "image": "images/necklace/necklace-03.webp"
+      "image": "images/necklace/20260605_111336.webp"
     },
     "CC-NB-004": {
-      "image": "images/necklace/necklace-04.webp"
+      "image": "images/necklace/20260605_111447.webp"
     },
     "CC-NB-005": {
       "image": "images/necklace/necklace-05.webp"
@@ -349,10 +349,10 @@
       "image": "images/necklace/20260605_111933.webp"
     },
     "CC-NB-046": {
-      "image": "images/necklace/necklace-01.webp"
+      "image": "images/necklace/20260605_111058.webp"
     },
     "CC-NB-047": {
-      "image": "images/necklace/necklace-02.webp"
+      "image": "images/necklace/20260605_111224.webp"
     },
     "CC-MM-002": {
       "image": "images/pendant/pendant-01.webp"
