@@ -1,8 +1,8 @@
 {
-  "name": "chauhans-co-store",
+  "name": "saubhagya-jewellery",
   "version": "1.0.0",
   "private": true,
-  "description": "Chauhan's & Co jewellery storefront. Static site - serve as-is.",
+  "description": "Saubhagya jewellery storefront. Static site - serve as-is.",
   "scripts": {
     "build": "node build/site.js",
     "seed": "node build/seed-products.js",

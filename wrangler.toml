@@ -1,0 +1,26 @@
+# ============================================================
+#  wrangler.toml – Saubhagya Jewellery (Cloudflare Pages + D1 + R2)
+# ============================================================
+#  To deploy after setup:
+#    wrangler pages deploy . --project-name saubhagyajewellery
+# ============================================================
+
+name = "saubhagyajewellery"
+pages_build_output_dir = "."
+compatibility_date = "2026-06-25"
+compatibility_flags = ["nodejs_compat"]
+
+# ── D1 Database ──────────────────────────────────────────────
+# Create: wrangler d1 create saubhagya-db
+# Schema: wrangler d1 execute saubhagya-db --file=build/schema-d1.sql
+# Seed:   wrangler d1 execute saubhagya-db --file=build/seed-d1.sql
+[[d1_databases]]
+binding = "DB"
+database_name = "saubhagya-db"
+database_id = "PUT_YOUR_DATABASE_ID_HERE"  # ← Replace after `wrangler d1 create`
+
+# ── R2 Bucket (Product Images) ──────────────────────────────
+# Create: wrangler r2 bucket create saubhagya-images
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "saubhagya-images"

@@ -1,11 +1,12 @@
 # Cloudflare Pages cache rules.
 # Format: glob, then one or more header lines, indented.
 
-# products.json - cached briefly so price edits go live within a minute.
-/products.json
+# API responses - cache briefly so price edits go live within a minute.
+/api/products*
   Cache-Control: public, max-age=60, must-revalidate
 
 # Product photos - immutable, cache for a year (filename changes if content changes).
+# Images will move to R2 in future; local fallback still cached aggressively.
 /images/*
   Cache-Control: public, max-age=31536000, immutable
 
@@ -20,6 +21,10 @@
 # HTML pages - revalidate every few minutes so deploys reach users quickly.
 /*.html
   Cache-Control: public, max-age=300, must-revalidate
+
+# Build artifacts (fallback catalog JSON) - private, no cache.
+/build/*
+  Cache-Control: private, no-cache, no-store, must-revalidate
 
 # Security headers, applied to everything.
 /*

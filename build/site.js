@@ -1,5 +1,5 @@
 /* ============================================================
- *  Chauhan's & Co - static SEO page generator
+ *  Saubhagya - static SEO page generator
  *  ------------------------------------------------------------
  *  Builds real, separately-served HTML pages (Home, the three
  *  collections, About, Contact, Standards, and the policy pages)
@@ -19,7 +19,7 @@ const fs = require('fs');
 const path = require('path');
 
 const OUT = path.join(__dirname, '..');
-const BASE_URL = 'https://www.chauhansandco.example'; // <-- replace with your real domain
+const BASE_URL = 'https://saubhagyajewellery.com'; // <-- replace with your real domain
 const APP = 'index.html'; // the dynamic shopping app (cart / checkout / product detail) — also the home page
 const WHATSAPP = 'https://wa.me/910000000000';
 
@@ -101,7 +101,7 @@ function header(active) {
   <div class="nav">
     <nav class="navlinks">${links}</nav>
     <a class="logo" href="index.html">
-      <span class="logo-name">CHAUHAN&rsquo;S &amp; CO</span>
+      <span class="logo-name">SAUBHAGYA</span>
       <span class="logo-sub">FINE JEWELLERY</span>
     </a>
     <div class="nav-icons">
@@ -127,7 +127,7 @@ function footer() {
   return `<footer class="site">
   <div class="fwrap">
     <div class="fbrand">
-      <div class="logo-name">CHAUHAN&rsquo;S &amp; CO</div>
+      <div class="logo-name">SAUBHAGYA</div>
       <div class="logo-sub">FINE JEWELLERY</div>
       <p>Premium designer imitation jewellery: temple, Kundan/Polki and American Diamond. High-quality artificial jewellery, handcrafted and dispatched insured across India.</p>
     </div>
@@ -140,7 +140,7 @@ function footer() {
     </div>
   </div>
   <div class="fbar">
-    <span>&copy; 2026 Chauhan&rsquo;s &amp; Co Jewellery &middot; High-quality imitation jewellery &middot; GST included &middot; SSL secured</span>
+    <span>&copy; 2026 Saubhagya Jewellery &middot; High-quality imitation jewellery &middot; GST included &middot; SSL secured</span>
     <span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span>
   </div>
 </footer>`;
@@ -160,7 +160,7 @@ function page({ slug, title, desc, h1, jsonld, body, active }) {
 <link rel="canonical" href="${u}">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Chauhan's & Co">
+<meta property="og:site_name" content="Saubhagya">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${u}">
@@ -209,7 +209,7 @@ function productCard(p) {
 const COLLECTIONS = {
   south: {
     slug: 'south-indian-traditional.html', region: 'south', label: 'South Indian Traditional', navtone: 'emerald',
-    title: 'South Indian Temple Jewellery Online | Chauhan’s & Co',
+    title: 'South Indian Temple Jewellery Online | Saubhagya',
     desc: 'Shop handcrafted South Indian temple imitation jewellery: matte antique-gold haarams, Lakshmi necklaces, jhumkas and complete bridal sets. Free insured shipping across India, GST included.',
     intro: [
       'Matte antique-gold temple jewellery, modelled in Rhino CAD and cast for bridal weight. Our South Indian collection brings the grandeur of Chennai and Madurai craftsmanship to high-quality imitation jewellery you can wear to every occasion.',
@@ -218,7 +218,7 @@ const COLLECTIONS = {
   },
   modern: {
     slug: 'mumbai-modern.html', region: 'modern', label: 'Mumbai Modern', navtone: 'charcoal',
-    title: 'American Diamond (AD) Jewellery Online | Chauhan’s & Co',
+    title: 'American Diamond (AD) Jewellery Online | Saubhagya',
     desc: 'Shop Mumbai Modern imitation jewellery: AD necklaces, bridal pendants, solitaire studs, designer drops, pendant sets and statement chokers. Free insured shipping across India, GST included.',
     intro: [
       'Contemporary American Diamond pieces with a clean, high-shine finish, for evening and everyday. The Mumbai Modern edit pairs sparkle with restraint, designed for the office, the party and everything in between.',
@@ -227,7 +227,7 @@ const COLLECTIONS = {
   },
   bridal: {
     slug: 'north-indian-bridal.html', region: 'bridal', label: 'North Indian Bridal', navtone: 'maroon',
-    title: 'Kundan & Polki Bridal Jewellery Online | Chauhan’s & Co',
+    title: 'Kundan & Polki Bridal Jewellery Online | Saubhagya',
     desc: 'Shop North Indian bridal imitation jewellery: Kundan sets, Polki chokers, rani haar, nath, passa and complete bridal looks. Handcrafted, free insured shipping across India, GST included.',
     intro: [
       'Kundan and Polki craftsmanship: complete bridal looks for the modern North Indian bride. From statement chokers and rani haar to nath and passa, our bridal collection is built for the big day and the heirloom years after.',
@@ -276,13 +276,13 @@ function homePage() {
     return `<a class="ccard ccard-${c.navtone}" href="${c.slug}"><span class="ccard-k">${esc(c.label.split(' ')[0].toUpperCase())}</span><span class="ccard-t">${esc(line)}</span></a>`;
   };
   const ld = {
-    '@context': 'https://schema.org', '@type': 'JewelryStore', name: "Chauhan's & Co Jewellery",
+    '@context': 'https://schema.org', '@type': 'JewelryStore', name: "Saubhagya Jewellery",
     description: 'Premium designer imitation jewellery: temple, Kundan/Polki and American Diamond. High-quality artificial jewellery with secure shipping across India.',
     url: BASE_URL + '/', priceRange: '₹₹₹',
     address: { '@type': 'PostalAddress', streetAddress: '14 Zaveri Bazaar', addressLocality: 'Mumbai', postalCode: '400003', addressRegion: 'Maharashtra', addressCountry: 'IN' }
   };
   const body = `<section class="hero">
-  <div class="kicker">MODERN HERITAGE &middot; EST. CHAUHAN&rsquo;S &amp; CO</div>
+  <div class="kicker">MODERN HERITAGE &middot; EST. SAUBHAGYA</div>
   <h1>Premium Designer Imitation Jewellery</h1>
   <p class="lede">Handcrafted temple, Kundan/Polki and American Diamond jewellery. High-quality artificial jewellery with free insured shipping across India and GST included on every order.</p>
   <div class="cta-row">
@@ -308,7 +308,7 @@ ${trending.map(productCard).join('\n')}
 </section>
 <section class="seo">
   <h2>Buy High-Quality Imitation Jewellery Online</h2>
-  <p>Chauhan&rsquo;s &amp; Co is a Mumbai atelier crafting premium designer imitation jewellery for weddings, festivals and every day. Browse South Indian temple jewellery, Mumbai Modern American Diamond pieces and North Indian Kundan and Polki bridal sets, all handcrafted, GST included, and shipped insured across India.</p>
+  <p>Saubhagya is a Mumbai atelier crafting premium designer imitation jewellery for weddings, festivals and every day. Browse South Indian temple jewellery, Mumbai Modern American Diamond pieces and North Indian Kundan and Polki bridal sets, all handcrafted, GST included, and shipped insured across India.</p>
 </section>
 <section class="reviews">
   <div class="kicker center gold">HAPPY CUSTOMERS</div>
@@ -319,7 +319,7 @@ ${trending.map(productCard).join('\n')}
 </section>`;
   return page({
     slug: 'index.html', active: 'index.html',
-    title: "Chauhan's & Co | Premium Designer Imitation Jewellery Online (Temple, Kundan, AD)",
+    title: "Saubhagya | Premium Designer Imitation Jewellery Online (Temple, Kundan, AD)",
     desc: 'Buy premium designer imitation jewellery online: South Indian temple, North Indian Kundan/Polki bridal and Mumbai Modern American Diamond. Handcrafted, GST included, free insured shipping across India.',
     jsonld: ld, body
   });
@@ -328,10 +328,10 @@ ${trending.map(productCard).join('\n')}
 /* ---------- content pages ---------- */
 const CONTENT = [
   {
-    slug: 'about.html', kicker: 'OUR STORY', title: 'About Us | Chauhan’s & Co',
-    desc: 'Chauhan’s & Co is a Mumbai atelier crafting premium designer imitation jewellery: temple, Kundan/Polki and American Diamond, handcrafted and shipped insured across India.',
+    slug: 'about.html', kicker: 'OUR STORY', title: 'About Us | Saubhagya',
+    desc: 'Saubhagya is a Mumbai atelier crafting premium designer imitation jewellery: temple, Kundan/Polki and American Diamond, handcrafted and shipped insured across India.',
     h1: 'About Us',
-    lede: 'Chauhan’s & Co is a Mumbai atelier crafting premium designer imitation jewellery: temple, Kundan/Polki and American Diamond, for weddings, festivals and every day in between.',
+    lede: 'Saubhagya is a Mumbai atelier crafting premium designer imitation jewellery: temple, Kundan/Polki and American Diamond, for weddings, festivals and every day in between.',
     blocks: [
       ['h', 'The House'],
       ['p', 'Born in the lanes of Zaveri Bazaar, we pair traditional Indian craftsmanship with modern CAD design. Every piece is modelled in Rhino, hand-finished in matte antique gold or high-shine AD, and individually inspected before it leaves the atelier.'],
@@ -341,26 +341,26 @@ const CONTENT = [
     ]
   },
   {
-    slug: 'contact.html', kicker: 'WE ARE HERE TO HELP', title: 'Contact Us & Store Location | Chauhan’s & Co',
-    desc: 'Contact Chauhan’s & Co on WhatsApp or email, or visit our flagship atelier at 14 Zaveri Bazaar, Mumbai. Client care Monday to Saturday.',
+    slug: 'contact.html', kicker: 'WE ARE HERE TO HELP', title: 'Contact Us & Store Location | Saubhagya',
+    desc: 'Contact Saubhagya on WhatsApp or email, or visit our flagship atelier at 14 Zaveri Bazaar, Mumbai. Client care Monday to Saturday.',
     h1: 'Contact Us',
     lede: 'Questions about a piece, your order, or a custom bridal commission? Reach us through any of the channels below.',
     blocks: [
       ['h', 'Client Care'],
-      ['p', 'WhatsApp and phone: +91 22 0000 0000. Email: care@chauhansandco.example. We typically reply within a few hours, Monday to Saturday.'],
+      ['p', 'WhatsApp and phone: +91 22 0000 0000. Email: care@saubhagyajewellery.com. We typically reply within a few hours, Monday to Saturday.'],
       ['h', 'Flagship Atelier'],
       ['p', '14 Zaveri Bazaar, Mumbai 400003, Maharashtra. Open Monday to Saturday, 11:00 am to 7:30 pm. Private bridal consultations are by appointment. GSTIN 27ABCDE1234F1Z5.']
     ],
     whatsapp: true
   },
   {
-    slug: 'trust.html', kicker: 'CLIENT CARE &middot; OUR STANDARDS', title: 'Our Standards: Quality Guarantee & Unboxing Protocol | Chauhan’s & Co',
-    desc: 'Our quality guarantee, the unboxing protocol for transit-insurance claims, and the trust details behind every Chauhan’s & Co order.',
+    slug: 'trust.html', kicker: 'CLIENT CARE &middot; OUR STANDARDS', title: 'Our Standards: Quality Guarantee & Unboxing Protocol | Saubhagya',
+    desc: 'Our quality guarantee, the unboxing protocol for transit-insurance claims, and the trust details behind every Saubhagya order.',
     h1: 'A Promise of Flawless Craft',
     lede: 'Buy high-quality imitation jewellery with secure shipping across India. Our guardrails exist to protect the integrity of every handcrafted piece, and your confidence in it.',
     blocks: [
       ['h', 'Bespoke Quality Guarantee'],
-      ['p', 'Every Chauhan’s & Co piece is made-to-order and individually inspected before it leaves our atelier. Because our jewellery is created for weddings and events, we are unable to accept change-of-mind returns or exchanges. This policy protects all clients from wardrobing, the wearing of an item to an occasion before returning it, and keeps every piece dispatched to you in pristine, unworn condition.'],
+      ['p', 'Every Saubhagya piece is made-to-order and individually inspected before it leaves our atelier. Because our jewellery is created for weddings and events, we are unable to accept change-of-mind returns or exchanges. This policy protects all clients from wardrobing, the wearing of an item to an occasion before returning it, and keeps every piece dispatched to you in pristine, unworn condition.'],
       ['p', 'Should a piece arrive with a genuine manufacturing defect, we will repair or replace it without question. Defect claims are honoured when supported by the continuous unboxing video described below.'],
       ['h', 'The Unboxing Protocol'],
       ['p', 'Record continuously: begin filming before the outer seal is broken, in a single uncut take with no pauses or edits.'],
@@ -370,10 +370,10 @@ const CONTENT = [
     whatsapp: true
   },
   {
-    slug: 'blogs.html', kicker: 'THE JOURNAL', title: 'The Journal | Chauhan’s & Co',
-    desc: 'Styling notes, craft stories and bridal inspiration from the Chauhan’s & Co atelier.',
+    slug: 'blogs.html', kicker: 'THE JOURNAL', title: 'The Journal | Saubhagya',
+    desc: 'Styling notes, craft stories and bridal inspiration from the Saubhagya atelier.',
     h1: 'Blogs',
-    lede: 'Styling notes, craft stories and bridal inspiration from the Chauhan’s & Co atelier.',
+    lede: 'Styling notes, craft stories and bridal inspiration from the Saubhagya atelier.',
     blocks: [
       ['h', 'Coming soon'],
       ['p', 'Our journal is being written. Soon you will find guides on styling temple jewellery, caring for matte antique-gold finishes, and choosing a bridal set for the big day.'],
@@ -381,8 +381,8 @@ const CONTENT = [
     ]
   },
   {
-    slug: 'track-orders.html', kicker: 'ORDER STATUS', title: 'Track Your Order | Chauhan’s & Co',
-    desc: 'Track your Chauhan’s & Co order. Confirmation and tracking are sent by email and WhatsApp as soon as your piece ships.',
+    slug: 'track-orders.html', kicker: 'ORDER STATUS', title: 'Track Your Order | Saubhagya',
+    desc: 'Track your Saubhagya order. Confirmation and tracking are sent by email and WhatsApp as soon as your piece ships.',
     h1: 'Track Orders',
     lede: 'Your confirmation and tracking details are sent by email and WhatsApp as soon as your piece ships.',
     blocks: [
@@ -394,7 +394,7 @@ const CONTENT = [
     whatsapp: true
   },
   {
-    slug: 'shipping-and-returns.html', kicker: 'POLICY', title: 'Shipping, Delivery & Returns | Chauhan’s & Co',
+    slug: 'shipping-and-returns.html', kicker: 'POLICY', title: 'Shipping, Delivery & Returns | Saubhagya',
     desc: 'Free insured shipping across India with GST included. Read our delivery timelines and our made-to-order returns and defect policy.',
     h1: 'Shipping & Returns',
     lede: 'Free insured shipping across India on every order, with GST included.',
@@ -407,7 +407,7 @@ const CONTENT = [
     related: [['Read our standards', 'trust.html']]
   },
   {
-    slug: 'es-policy.html', kicker: 'POLICY', title: 'E & S Policy (Exchange & Shipping) | Chauhan’s & Co',
+    slug: 'es-policy.html', kicker: 'POLICY', title: 'E & S Policy (Exchange & Shipping) | Saubhagya',
     desc: 'Our Exchange & Shipping policy in plain language: how exchanges work and how we ship insured across India.',
     h1: 'E & S Policy',
     lede: 'Our Exchange & Shipping policy, in plain language.',
@@ -420,21 +420,21 @@ const CONTENT = [
     related: [['Read our standards', 'trust.html']]
   },
   {
-    slug: 'grievances.html', kicker: 'WE ARE LISTENING', title: 'Grievances | Chauhan’s & Co',
-    desc: 'How to raise a concern with Chauhan’s & Co. Contact our Grievance Officer by email or WhatsApp; we respond within 48 hours.',
+    slug: 'grievances.html', kicker: 'WE ARE LISTENING', title: 'Grievances | Saubhagya',
+    desc: 'How to raise a concern with Saubhagya. Contact our Grievance Officer by email or WhatsApp; we respond within 48 hours.',
     h1: 'Grievances',
     lede: 'If something is not right, we want to make it right. Here is how to raise a concern.',
     blocks: [
       ['h', 'Raise a concern'],
-      ['p', 'Write to our Grievance Officer at care@chauhansandco.example, or message us on WhatsApp with your order number and a short description. For defect claims, please include your continuous unboxing video.'],
+      ['p', 'Write to our Grievance Officer at care@saubhagyajewellery.com, or message us on WhatsApp with your order number and a short description. For defect claims, please include your continuous unboxing video.'],
       ['h', 'Our commitment'],
       ['p', 'We acknowledge every grievance within 48 hours and aim to resolve it within 7 working days.']
     ],
     whatsapp: true
   },
   {
-    slug: 'terms.html', kicker: 'THE FINE PRINT', title: 'Terms of Service | Chauhan’s & Co',
-    desc: 'The terms of service for shopping with Chauhan’s & Co: orders, pricing, products and use of this website.',
+    slug: 'terms.html', kicker: 'THE FINE PRINT', title: 'Terms of Service | Saubhagya',
+    desc: 'The terms of service for shopping with Saubhagya: orders, pricing, products and use of this website.',
     h1: 'Terms of Service',
     lede: 'By using this website and placing an order, you agree to the terms below.',
     blocks: [
@@ -443,24 +443,24 @@ const CONTENT = [
       ['h', 'Products'],
       ['p', 'Our jewellery is premium designer imitation (artificial) jewellery. Colours and finishes may vary slightly from screen to piece due to the handcrafted nature of each item.'],
       ['h', 'Use of site'],
-      ['p', 'Content on this site is owned by Chauhan’s & Co and may not be reproduced without permission. This is placeholder boilerplate; please have it reviewed before going live.']
+      ['p', 'Content on this site is owned by Saubhagya and may not be reproduced without permission. This is placeholder boilerplate; please have it reviewed before going live.']
     ]
   },
   {
-    slug: 'offer-terms.html', kicker: 'PROMOTIONS', title: 'Offer Terms & Conditions | Chauhan’s & Co',
-    desc: 'Terms that apply to discounts, coupons and promotional offers at Chauhan’s & Co.',
+    slug: 'offer-terms.html', kicker: 'PROMOTIONS', title: 'Offer Terms & Conditions | Saubhagya',
+    desc: 'Terms that apply to discounts, coupons and promotional offers at Saubhagya.',
     h1: 'Offer T&C',
     lede: 'Terms that apply to discounts, coupons and promotional offers.',
     blocks: [
       ['h', 'General'],
       ['p', 'Offers cannot be combined unless stated, apply while stocks last, and may be withdrawn at any time. Discount codes apply to eligible items only.'],
       ['h', 'Eligibility'],
-      ['p', 'One use per customer unless specified. Chauhan’s & Co reserves the right to disqualify orders that misuse a promotion. This is placeholder boilerplate; please have it reviewed before going live.']
+      ['p', 'One use per customer unless specified. Saubhagya reserves the right to disqualify orders that misuse a promotion. This is placeholder boilerplate; please have it reviewed before going live.']
     ]
   },
   {
-    slug: 'privacy-policy.html', kicker: 'YOUR DATA', title: 'Privacy Policy | Chauhan’s & Co',
-    desc: 'How Chauhan’s & Co collects, uses and protects your data when you shop with us.',
+    slug: 'privacy-policy.html', kicker: 'YOUR DATA', title: 'Privacy Policy | Saubhagya',
+    desc: 'How Saubhagya collects, uses and protects your data when you shop with us.',
     h1: 'Privacy Policy',
     lede: 'We respect your privacy and collect only what we need to fulfil your order and improve your experience.',
     blocks: [
@@ -469,7 +469,7 @@ const CONTENT = [
       ['h', 'How we use it'],
       ['p', 'To process orders, arrange insured delivery, provide support, and (only with your consent) send offers. We do not sell your personal data.'],
       ['h', 'Your choices'],
-      ['p', 'You can ask us to access or delete your data any time by writing to care@chauhansandco.example. This is placeholder boilerplate; please have it reviewed before going live.']
+      ['p', 'You can ask us to access or delete your data any time by writing to care@saubhagyajewellery.com. This is placeholder boilerplate; please have it reviewed before going live.']
     ]
   }
 ];

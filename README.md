@@ -1,4 +1,4 @@
-# Chauhan's & Co - jewellery storefront
+# Saubhagya - jewellery storefront
 
 A static-first jewellery website. **No backend, no database.** Every file is plain HTML/CSS/JS/JSON/images that Cloudflare Pages (or any static host) serves directly from a global CDN.
 
@@ -168,7 +168,7 @@ That is the entire setup. From then on, every `git push` automatically rebuilds 
 
 **Custom domain:** in Cloudflare Pages -> your project -> Custom domains -> Set up a domain. Cloudflare handles SSL automatically.
 
-**Important:** open `build/site.js` and change the `BASE_URL` constant from the placeholder to your real domain (e.g. `https://www.chauhansandco.com`). The canonical URLs, Open Graph URLs and sitemap entries are built from this.
+**Important:** open `build/site.js` and change the `BASE_URL` constant from the placeholder to your real domain (e.g. `https://saubhagyajewellery.com`). The canonical URLs, Open Graph URLs and sitemap entries are built from this.
 
 ---
 
@@ -221,5 +221,5 @@ Get these reviewed by someone familiar with Indian e-commerce and the Consumer P
 
 Also update placeholder contact details across `contact.html`, `trust.html`, the footer, and the JSON-LD in `index.html`:
 - WhatsApp/phone (currently `+91 22 0000 0000`)
-- Email (`care@chauhansandco.example`)
+- Email (`care@saubhagyajewellery.com`)
 - GSTIN (`27ABCDE1234F1Z5`)
