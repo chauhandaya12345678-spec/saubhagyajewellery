@@ -281,6 +281,8 @@ function homePage() {
     url: BASE_URL + '/', priceRange: '₹₹₹',
     address: { '@type': 'PostalAddress', streetAddress: '14 Zaveri Bazaar', addressLocality: 'Mumbai', postalCode: '400003', addressRegion: 'Maharashtra', addressCountry: 'IN' }
   };
+  const ldWeb = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'Saubhagya Jewellery', url: BASE_URL + '/' };
+  const ldOrg = { '@context': 'https://schema.org', '@type': 'Organization', name: 'Saubhagya Jewellery', url: BASE_URL + '/', logo: BASE_URL + '/images/banners/saubhagya-logo.png' };
   const body = `<section class="hero">
   <div class="kicker">MODERN HERITAGE &middot; EST. SAUBHAGYA</div>
   <h1>Premium Designer Imitation Jewellery</h1>
@@ -321,7 +323,7 @@ ${trending.map(productCard).join('\n')}
     slug: 'index.html', active: 'index.html',
     title: "Saubhagya | Premium Designer Imitation Jewellery Online (Temple, Kundan, AD)",
     desc: 'Buy premium designer imitation jewellery online: South Indian temple, North Indian Kundan/Polki bridal and Mumbai Modern American Diamond. Handcrafted, GST included, free insured shipping across India.',
-    jsonld: ld, body
+    jsonld: [ld, ldWeb, ldOrg], body
   });
 }
 
@@ -624,9 +626,44 @@ CONTENT.forEach(d => written.push(write(d.slug, contentPage(d))));
 // sitemap + robots
 const pageSlugs = ['index.html', ...['south', 'modern', 'bridal'].map(k => COLLECTIONS[k].slug), ...CONTENT.map(d => d.slug)];
 const today = new Date().toISOString().slice(0, 10);
+// Priority map: higher for main pages, lower for policy pages
+const PRIORITIES = {
+  'index.html': 1.0,
+  'south-indian-traditional.html': 0.9,
+  'mumbai-modern.html': 0.9,
+  'north-indian-bridal.html': 0.9,
+  'about.html': 0.7,
+  'contact.html': 0.7,
+  'trust.html': 0.7,
+  'blogs.html': 0.7,
+  'track-orders.html': 0.5,
+  'shipping-and-returns.html': 0.4,
+  'es-policy.html': 0.4,
+  'grievances.html': 0.4,
+  'terms.html': 0.3,
+  'offer-terms.html': 0.3,
+  'privacy-policy.html': 0.3
+};
+const CHANGEFREQ = {
+  'index.html': 'weekly',
+  'south-indian-traditional.html': 'weekly',
+  'mumbai-modern.html': 'weekly',
+  'north-indian-bridal.html': 'weekly',
+  'about.html': 'monthly',
+  'contact.html': 'monthly',
+  'trust.html': 'monthly',
+  'blogs.html': 'weekly',
+  'track-orders.html': 'monthly',
+  'shipping-and-returns.html': 'monthly'
+};
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pageSlugs.map(s => `  <url><loc>${urlOf(s)}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
+${pageSlugs.map(s => {
+  const slug = s === 'index.html' ? '/' : '/' + s;
+  const p = PRIORITIES[s] || 0.5;
+  const cf = CHANGEFREQ[s] || 'monthly';
+  return `  <url><loc>${urlOf(s)}</loc><lastmod>${today}</lastmod><changefreq>${cf}</changefreq><priority>${p.toFixed(1)}</priority></url>`;
+}).join('\n')}
 </urlset>
 `;
 written.push(write('sitemap.xml', sitemap));
