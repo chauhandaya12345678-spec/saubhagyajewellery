@@ -17,10 +17,11 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "saubhagya-db"
-database_id = "PUT_YOUR_DATABASE_ID_HERE"  # ← Replace after `wrangler d1 create`
+database_id = "e0b5e020-eb86-445d-baae-09a949dd4c0e"
 
 # ── R2 Bucket (Product Images) ──────────────────────────────
+# Enable R2 in Cloudflare Dashboard first, then uncomment:
 # Create: wrangler r2 bucket create saubhagya-images
-[[r2_buckets]]
-binding = "IMAGES"
-bucket_name = "saubhagya-images"
+#[[r2_buckets]]
+#binding = "IMAGES"
+#bucket_name = "saubhagya-images"
