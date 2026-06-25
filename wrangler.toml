@@ -22,6 +22,6 @@ database_id = "e0b5e020-eb86-445d-baae-09a949dd4c0e"
 # ── R2 Bucket (Product Images) ──────────────────────────────
 # Enable R2 in Cloudflare Dashboard first, then uncomment:
 # Create: wrangler r2 bucket create saubhagya-images
-#[[r2_buckets]]
-#binding = "IMAGES"
-#bucket_name = "saubhagya-images"
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "saubhagya-images"
