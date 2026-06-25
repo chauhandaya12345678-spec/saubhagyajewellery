@@ -109,3 +109,16 @@ footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
 @media(max-width:560px){
   .grid,.ccards,.rgrid,.fwrap{grid-template-columns:1fr}
 }
+/* PDP mobile - override inline 2-column grid */
+@media(max-width:768px){
+  div[style*="1fr 1fr"][style*="gap:"] {
+    grid-template-columns:1fr !important;
+    gap:24px !important;
+    padding:20px !important;
+  }
+  div[style*="position:sticky"][style*="150px"] {
+    position:static !important;
+  }
+  .ph h1{font-size:28px !important}
+  div[style*="font-size:42px"][style*="Cormorant"]{font-size:28px !important}
+}
