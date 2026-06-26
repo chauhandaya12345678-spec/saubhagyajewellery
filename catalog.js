@@ -31,9 +31,9 @@
   function publish(catalog) {
     window.CHAUHAN_CATALOG = catalog;
     window.CHAUHAN_HERO = [
-      { image: 'images/banners/Website_hero_banner_concept_art._202606221611.jpeg', tone: 'charcoal',  kicker: "SAUBHAGYA",  title: 'Designer Earrings Collection' },
-      { image: 'images/banners/Website_hero_image_for_Saubhagya_202606221620.jpeg', tone: 'emerald',   kicker: "SAUBHAGYA",  title: 'Where Tradition Meets Design' },
-      { image: 'images/banners/gold necklacer._A_202606221636.jpeg',  tone: 'maroon',    kicker: "SAUBHAGYA",  title: 'Gold Necklace Edit' }
+      { image: 'images/banners/Website_hero_banner_concept_art._202606221611.webp', tone: 'charcoal',  kicker: "SAUBHAGYA",  title: 'Designer Earrings Collection' },
+      { image: 'images/banners/Website_hero_image_for_Saubhagya_202606221620.webp', tone: 'emerald',   kicker: "SAUBHAGYA",  title: 'Where Tradition Meets Design' },
+      { image: 'images/banners/gold necklacer._A_202606221636.webp',  tone: 'maroon',    kicker: "SAUBHAGYA",  title: 'Gold Necklace Edit' }
     ];
     window.CHAUHAN_SETTINGS = {
       shippingNote: '',
