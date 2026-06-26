@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BFMQ8LVSF3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BFMQ8LVSF3');
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="HOM1ZDpKGJ9AM_W94zqul2Uk0dYZ3HgblDx6Z4u4hKI" />
@@ -121,6 +130,8 @@
     [style*="height: 340"]{aspect-ratio:1/1!important;height:auto!important;border-radius:10px!important}
     [style*="height: 300"]:not([style*="grid"]){aspect-ratio:1/1!important;height:auto!important}
     [style*="aspect-ratio: 4/5"]{aspect-ratio:1/1!important}
+    /* PDP image: smaller on mobile */
+    div[style*="flex:1"][style*="position:relative"][style*="aspect-ratio"]{max-height:38vh!important;width:auto!important}
     /* Padding: compress all 48px horizontal section padding */
     section[style*="padding: 54"]{padding:26px 14px 22px!important}
     section[style*="padding: 70"]{padding:28px 14px!important}
