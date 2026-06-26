@@ -21,7 +21,7 @@ const path = require('path');
 const OUT = path.join(__dirname, '..');
 const BASE_URL = 'https://saubhagyajewellery.com'; // <-- replace with your real domain
 const APP = 'index.html'; // the dynamic shopping app (cart / checkout / product detail) — also the home page
-const WHATSAPP = 'https://wa.me/910000000000';
+const WHATSAPP = 'https://wa.me/919987008435';
 
 /* ---------- catalog: same deterministic algorithm as catalog.js ---------- */
 function buildCatalog() {
@@ -96,7 +96,7 @@ const NAV = [
 
 function header(active) {
   const links = NAV.map(n => `<a class="navlink${n.slug === active ? ' is-active' : ''}" href="${n.slug}">${esc(n.label)}</a>`).join('');
-  return `<div class="ann">FREE INSURED SHIPPING ACROSS INDIA &middot; GST INCLUDED ON EVERY ORDER</div>
+  return `<div class="ann">FREE INSURED SHIPPING ACROSS INDIA</div>
 <header class="site">
   <div class="nav">
     <nav class="navlinks">${links}</nav>
@@ -135,12 +135,12 @@ function footer() {
     ${col('POLICY', policy)}
     <div class="fcol">
       <div class="fhead">THE ATELIER</div>
-      <p class="fatelier">14 Zaveri Bazaar<br>Mumbai 400003<br>GSTIN 27ABCDE1234F1Z5</p>
+      <p class="fatelier">Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101<br>Phone: +91 99870 08435</p>
       <a class="fwa" href="${WHATSAPP}">WhatsApp Support &rarr;</a>
     </div>
   </div>
   <div class="fbar">
-    <span>&copy; 2026 Saubhagya Jewellery &middot; High-quality imitation jewellery &middot; GST included &middot; SSL secured</span>
+    <span>&copy; 2026 Saubhagya Jewellery &middot; High-quality imitation jewellery &middot; SSL secured</span>
     <span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span>
   </div>
 </footer>`;
@@ -201,7 +201,7 @@ function productCard(p) {
   return `<a class="card" href="${APP}?product=${encodeURIComponent(p.id)}">
   <div class="card-img${p.image ? ' card-img-photo' : ''}">${tag ? `<span class="card-tag">${esc(tag)}</span>` : ''}${img}</div>
   <div class="card-name">${esc(p.name)}</div>
-  <div class="card-price">${inr(p.price)} <small>incl. GST</small></div>
+  <div class="card-price">${inr(p.price)}</div>
 </a>`;
 }
 
@@ -210,7 +210,7 @@ const COLLECTIONS = {
   south: {
     slug: 'south-indian-traditional.html', region: 'south', label: 'South Indian Traditional', navtone: 'emerald',
     title: 'South Indian Temple Jewellery Online | Saubhagya',
-    desc: 'Shop handcrafted South Indian temple imitation jewellery: matte antique-gold haarams, Lakshmi necklaces, jhumkas and complete bridal sets. Free insured shipping across India, GST included.',
+    desc: 'Shop handcrafted South Indian temple imitation jewellery: matte antique-gold haarams, Lakshmi necklaces, jhumkas and complete bridal sets. Free insured shipping across India.',
     intro: [
       'Matte antique-gold temple jewellery, modelled in Rhino CAD and cast for bridal weight. Our South Indian collection brings the grandeur of Chennai and Madurai craftsmanship to high-quality imitation jewellery you can wear to every occasion.',
       'From Lakshmi haarams and kasu malas to matte jhumkas, vanki and maang tikka, each piece is hand-finished and inspected before it ships, fully insured, across India.'
@@ -219,19 +219,19 @@ const COLLECTIONS = {
   modern: {
     slug: 'mumbai-modern.html', region: 'modern', label: 'Mumbai Modern', navtone: 'charcoal',
     title: 'American Diamond (AD) Jewellery Online | Saubhagya',
-    desc: 'Shop Mumbai Modern imitation jewellery: AD necklaces, bridal pendants, solitaire studs, designer drops, pendant sets and statement chokers. Free insured shipping across India, GST included.',
+    desc: 'Shop Mumbai Modern imitation jewellery: AD necklaces, bridal pendants, solitaire studs, designer drops, pendant sets and statement chokers. Free insured shipping across India.',
     intro: [
       'Contemporary American Diamond pieces with a clean, high-shine finish, for evening and everyday. The Mumbai Modern edit pairs sparkle with restraint, designed for the office, the party and everything in between.',
-      'Explore AD necklaces, bridal pendants, solitaire studs, designer drops and statement pieces, all GST-included and dispatched insured across India.'
+      'Explore AD necklaces, bridal pendants, solitaire studs, designer drops and statement pieces, all dispatched insured across India.'
     ]
   },
   bridal: {
     slug: 'north-indian-bridal.html', region: 'bridal', label: 'North Indian Bridal', navtone: 'maroon',
     title: 'Kundan & Polki Bridal Jewellery Online | Saubhagya',
-    desc: 'Shop North Indian bridal imitation jewellery: Kundan sets, Polki chokers, rani haar, nath, passa and complete bridal looks. Handcrafted, free insured shipping across India, GST included.',
+    desc: 'Shop North Indian bridal imitation jewellery: Kundan sets, Polki chokers, rani haar, nath, passa and complete bridal looks. Handcrafted, free insured shipping across India.',
     intro: [
       'Kundan and Polki craftsmanship: complete bridal looks for the modern North Indian bride. From statement chokers and rani haar to nath and passa, our bridal collection is built for the big day and the heirloom years after.',
-      'Every set is made-to-order, individually inspected and shipped insured across India, with GST included on every invoice.'
+      'Every set is made-to-order, individually inspected and shipped insured across India.'
     ]
   }
 };
@@ -279,12 +279,12 @@ function homePage() {
     '@context': 'https://schema.org', '@type': 'JewelryStore', name: "Saubhagya Jewellery",
     description: 'Premium designer imitation jewellery: temple, Kundan/Polki and American Diamond. High-quality artificial jewellery with secure shipping across India.',
     url: BASE_URL + '/', priceRange: '₹₹₹',
-    address: { '@type': 'PostalAddress', streetAddress: '14 Zaveri Bazaar', addressLocality: 'Mumbai', postalCode: '400003', addressRegion: 'Maharashtra', addressCountry: 'IN' }
+    address: { '@type': 'PostalAddress', streetAddress: 'Tanaji Nagar Rd, opp Vishwakarma Mandir, Hanuman Nagar, Kandivali East', addressLocality: 'Mumbai', postalCode: '400101', addressRegion: 'Maharashtra', addressCountry: 'IN' }, telephone: '+91-99870-08435'
   };
   const body = `<section class="hero">
   <div class="kicker">MODERN HERITAGE &middot; EST. SAUBHAGYA</div>
   <h1>Premium Designer Imitation Jewellery</h1>
-  <p class="lede">Handcrafted temple, Kundan/Polki and American Diamond jewellery. High-quality artificial jewellery with free insured shipping across India and GST included on every order.</p>
+  <p class="lede">Handcrafted temple, Kundan/Polki and American Diamond jewellery. High-quality artificial jewellery with free insured shipping across India.</p>
   <div class="cta-row">
     <a class="btn" href="${APP}">EXPLORE COLLECTIONS</a>
     <a class="btn btn-ghost" href="${APP}?collection=south">SHOP BESTSELLERS</a>
@@ -308,7 +308,7 @@ ${trending.map(productCard).join('\n')}
 </section>
 <section class="seo">
   <h2>Buy High-Quality Imitation Jewellery Online</h2>
-  <p>Saubhagya is a Mumbai atelier crafting premium designer imitation jewellery for weddings, festivals and every day. Browse South Indian temple jewellery, Mumbai Modern American Diamond pieces and North Indian Kundan and Polki bridal sets, all handcrafted, GST included, and shipped insured across India.</p>
+  <p>Saubhagya is a Mumbai atelier crafting premium designer imitation jewellery for weddings, festivals and every day. Browse South Indian temple jewellery, Mumbai Modern American Diamond pieces and North Indian Kundan and Polki bridal sets, all handcrafted and shipped insured across India.</p>
 </section>
 <section class="reviews">
   <div class="kicker center gold">HAPPY CUSTOMERS</div>
@@ -320,7 +320,7 @@ ${trending.map(productCard).join('\n')}
   return page({
     slug: 'index.html', active: 'index.html',
     title: "Saubhagya | Premium Designer Imitation Jewellery Online (Temple, Kundan, AD)",
-    desc: 'Buy premium designer imitation jewellery online: South Indian temple, North Indian Kundan/Polki bridal and Mumbai Modern American Diamond. Handcrafted, GST included, free insured shipping across India.',
+    desc: 'Buy premium designer imitation jewellery online: South Indian temple, North Indian Kundan/Polki bridal and Mumbai Modern American Diamond. Handcrafted, free insured shipping across India.',
     jsonld: ld, body
   });
 }
@@ -334,22 +334,22 @@ const CONTENT = [
     lede: 'Saubhagya is a Mumbai atelier crafting premium designer imitation jewellery: temple, Kundan/Polki and American Diamond, for weddings, festivals and every day in between.',
     blocks: [
       ['h', 'The House'],
-      ['p', 'Born in the lanes of Zaveri Bazaar, we pair traditional Indian craftsmanship with modern CAD design. Every piece is modelled in Rhino, hand-finished in matte antique gold or high-shine AD, and individually inspected before it leaves the atelier.'],
+      ['p', 'We pair traditional Indian craftsmanship with modern CAD design. Every piece is modelled in Rhino, hand-finished in matte antique gold or high-shine AD, and individually inspected before it leaves the atelier.'],
       ['p', 'Our mission is simple: high-quality artificial jewellery that looks and feels like fine jewellery, at a fraction of the price, so you can wear something extraordinary to every occasion.'],
       ['h', 'Our Promise'],
-      ['p', 'Free insured shipping across India, GST included on every invoice, and a bespoke quality guarantee on every handcrafted piece.']
+      ['p', 'Free insured shipping across India and a bespoke quality guarantee on every handcrafted piece.']
     ]
   },
   {
     slug: 'contact.html', kicker: 'WE ARE HERE TO HELP', title: 'Contact Us & Store Location | Saubhagya',
-    desc: 'Contact Saubhagya on WhatsApp or email, or visit our flagship atelier at 14 Zaveri Bazaar, Mumbai. Client care Monday to Saturday.',
+    desc: 'Contact Saubhagya on WhatsApp or phone, or visit us at Kandivali East, Mumbai. Client care Monday to Saturday.',
     h1: 'Contact Us',
     lede: 'Questions about a piece, your order, or a custom bridal commission? Reach us through any of the channels below.',
     blocks: [
       ['h', 'Client Care'],
-      ['p', 'WhatsApp and phone: +91 22 0000 0000. Email: care@saubhagyajewellery.com. We typically reply within a few hours, Monday to Saturday.'],
+      ['p', 'WhatsApp and phone: +91 99870 08435. Email: care@saubhagyajewellery.com. We typically reply within a few hours, Monday to Saturday.'],
       ['h', 'Flagship Atelier'],
-      ['p', '14 Zaveri Bazaar, Mumbai 400003, Maharashtra. Open Monday to Saturday, 11:00 am to 7:30 pm. Private bridal consultations are by appointment. GSTIN 27ABCDE1234F1Z5.']
+      ['p', 'Saubhagya Jewellery, Tanaji Nagar Rd, opp Vishwakarma Mandir, Hanuman Nagar, Kandivali East, Mumbai 400101, Maharashtra. Open Monday to Saturday, 11:00 am to 7:30 pm. Private bridal consultations are by appointment.']
     ],
     whatsapp: true
   },
@@ -395,12 +395,12 @@ const CONTENT = [
   },
   {
     slug: 'shipping-and-returns.html', kicker: 'POLICY', title: 'Shipping, Delivery & Returns | Saubhagya',
-    desc: 'Free insured shipping across India with GST included. Read our delivery timelines and our made-to-order returns and defect policy.',
+    desc: 'Free insured shipping across India. Read our delivery timelines and our made-to-order returns and defect policy.',
     h1: 'Shipping & Returns',
-    lede: 'Free insured shipping across India on every order, with GST included.',
+    lede: 'Free insured shipping across India on every order.',
     blocks: [
       ['h', 'Shipping & Delivery'],
-      ['p', 'Ready pieces dispatch within 2 to 4 business days; made-to-order bridal sets within 10 to 14 days. Every shipment is fully insured in transit and delivered across India with GST included.'],
+      ['p', 'Ready pieces dispatch within 2 to 4 business days; made-to-order bridal sets within 10 to 14 days. Every shipment is fully insured in transit and delivered across India.'],
       ['h', 'Returns'],
       ['p', 'Because every piece is made-to-order and individually inspected, we are unable to accept change-of-mind returns. Verified manufacturing defects are repaired or replaced, supported by the continuous unboxing video described in our standards.']
     ],
@@ -415,7 +415,7 @@ const CONTENT = [
       ['h', 'Exchange'],
       ['p', 'Because every piece is made-to-order and individually inspected, we are unable to accept change-of-mind returns. Verified manufacturing defects are repaired or replaced, supported by the continuous unboxing video described in our standards.'],
       ['h', 'Shipping'],
-      ['p', 'Free insured shipping across India on every order, with GST included. Ready pieces dispatch in 2 to 4 business days; bridal sets in 10 to 14 days.']
+      ['p', 'Free insured shipping across India on every order. Ready pieces dispatch in 2 to 4 business days; bridal sets in 10 to 14 days.']
     ],
     related: [['Read our standards', 'trust.html']]
   },
@@ -439,7 +439,7 @@ const CONTENT = [
     lede: 'By using this website and placing an order, you agree to the terms below.',
     blocks: [
       ['h', 'Orders & pricing'],
-      ['p', 'All prices are in Indian Rupees and include GST. We reserve the right to correct pricing errors and to decline or cancel any order.'],
+      ['p', 'All prices are in Indian Rupees. We reserve the right to correct pricing errors and to decline or cancel any order.'],
       ['h', 'Products'],
       ['p', 'Our jewellery is premium designer imitation (artificial) jewellery. Colours and finishes may vary slightly from screen to piece due to the handcrafted nature of each item.'],
       ['h', 'Use of site'],

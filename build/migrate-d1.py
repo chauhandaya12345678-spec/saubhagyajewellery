@@ -42,6 +42,25 @@ BADGES = ['', '', '', '', 'BESTSELLER', 'NEW', 'TRENDING']
 BLOCKED_SKUS = ['CC-NB-002']
 BLOCKED_NAMES = ['Regal Lakshmi Haaram', 'Regal Bridal Set', 'Antique Rani Haar']
 
+# ── Real retail pricing (₹), derived from wholesale + all costs ─────
+# Sell price per category. Honest "Compare at" anchor = ~25% above sell
+# (NOT an inflated MRP). Keep in sync with build/site.js CATEGORY_PRICES.
+CATEGORY_PRICES = {
+    # South Indian
+    'Temple Necklace': 799, 'Lakshmi Haaram': 999, 'Matte Jhumkas': 399,
+    'Vanki': 599, 'Maang Tikka': 299, 'Kasu Mala': 899, 'Bridal Set': 1599,
+    # Mumbai Modern
+    'AD Necklace': 849, 'Bridal Pendant': 249, 'Solitaire Studs': 299,
+    'Designer Drop': 349, 'Pendant Set': 1299, 'Statement Choker': 449,
+    # North Indian Bridal
+    'Kundan Set': 1599, 'Polki Choker': 499, 'Rani Haar': 999,
+    'Nath': 299, 'Passa': 349, 'Meenakari Set': 1499,
+}
+
+def compare_at(price):
+    """Honest 'Compare at' anchor: ~25% above the real selling price."""
+    return int(math.ceil(price / 0.75 / 10) * 10)
+
 def rng(seed):
     x = math.sin(seed) * 10000
     return x - math.floor(x)
@@ -54,8 +73,8 @@ def build_base():
             seed = ri * 1000 + i
             cat = R['cats'][int(math.floor(rng(seed) * len(R['cats'])))]
             adj = ADJ[int(math.floor(rng(seed * 1.7) * len(ADJ)))]
-            price = round((1200 + rng(seed * 2.3) * 8800) / 50) * 50
-            mrp = round(price * (1.18 + rng(seed * 3.1) * 0.24) / 50) * 50
+            price = CATEGORY_PRICES.get(cat, 799)
+            mrp = compare_at(price)
             sku = 'CC-' + PREFIX[reg_key] + '-' + str(i).zfill(3)
             city = R['cities'][int(math.floor(rng(seed * 4.2) * len(R['cities'])))]
             badge = BADGES[int(math.floor(rng(seed * 5.5) * len(BADGES)))]
@@ -130,7 +149,7 @@ def main():
     out_json = os.path.join(BASE, 'build', 'complete-catalog.json')
     with open(out_json, 'w') as f:
         json.dump(merged, f, indent=2)
-    print(f"\n✅ JSON written: {out_json}")
+    print(f"\nOK JSON written: {out_json}")
     
     # Output 2: SQL seed file
     out_sql = os.path.join(BASE, 'build', 'seed-d1.sql')
@@ -138,7 +157,7 @@ def main():
     with open(out_sql, 'w') as f:
         f.write(sql)
         f.write("\n")
-    print(f"✅ SQL written:  {out_sql}")
+    print(f"OK SQL written:  {out_sql}")
     
     with_img = sum(1 for p in merged if p['image'])
     print(f"\nSummary: {len(merged)} products, {with_img} with images")
