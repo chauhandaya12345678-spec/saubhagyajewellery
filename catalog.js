@@ -54,12 +54,21 @@
     }
   }
 
-  // Fetch products from D1-backed API
+  // Fetch products from D1-backed API (localhost: skip, not available)
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    loadFallback(); return;
+  }
   var apiUrl = '/api/products?t=' + Date.now();
   if (typeof fetch === 'function') {
+    var _didLoad = false;
+    var _timer = setTimeout(function () {
+      if (!_didLoad) { _didLoad = true; loadFallback(); }
+    }, 3000);
     fetch(apiUrl, { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
+        if (_didLoad) return;
+        clearTimeout(_timer); _didLoad = true;
         if (data && Array.isArray(data) && data.length) {
           publish(data);
         } else {
@@ -67,6 +76,8 @@
         }
       })
       .catch(function () {
+        if (_didLoad) return;
+        clearTimeout(_timer); _didLoad = true;
         loadFallback();
       });
   }

@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BFMQ8LVSF3"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-BFMQ8LVSF3');
-</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="HOM1ZDpKGJ9AM_W94zqul2Uk0dYZ3HgblDx6Z4u4hKI" />
@@ -130,8 +121,6 @@
     [style*="height: 340"]{aspect-ratio:1/1!important;height:auto!important;border-radius:10px!important}
     [style*="height: 300"]:not([style*="grid"]){aspect-ratio:1/1!important;height:auto!important}
     [style*="aspect-ratio: 4/5"]{aspect-ratio:1/1!important}
-    /* PDP image: smaller on mobile */
-    div[style*="flex:1"][style*="position:relative"][style*="aspect-ratio"]{max-height:38vh!important;width:auto!important}
     /* Padding: compress all 48px horizontal section padding */
     section[style*="padding: 54"]{padding:26px 14px 22px!important}
     section[style*="padding: 70"]{padding:28px 14px!important}
@@ -606,11 +595,19 @@
     <!-- CUSTOMER REVIEWS -->
     <section data-reveal style="background:#06281a; padding:78px 48px; opacity:0; transform:translateY(24px); transition:opacity .9s ease, transform .9s cubic-bezier(.22,1,.36,1);">
       <div style="max-width:1280px; margin:0 auto;">
-        <div style="text-align:center;">
-          <div style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:4px; color:#C5A059; margin-bottom:14px;">CUSTOMER REVIEWS</div>
-          <h2 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:34px; color:#fff; margin:0 0 22px;">Reviews</h2>
-          <p style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:20px; color:rgba(243,237,224,.85); margin:0 0 28px;">Be the first to write a review</p>
-          <button onClick="{{ writeReview }}" style="font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; padding:15px 36px; background:#C5A059; color:#06281a; border:none; cursor:pointer; font-weight:600;">WRITE A REVIEW</button>
+        <div style="text-align:center; margin-bottom:48px;">
+          <div style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:4px; color:#C5A059; margin-bottom:14px;">HAPPY CUSTOMERS</div>
+          <h2 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:34px; color:#fff; margin:0;">Worn &amp; Loved Across India</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px;">
+          <sc-for list="{{ reviews }}" as="rv" hint-placeholder-count="3">
+            <div style="background:rgba(255,255,255,.04); border:1px solid rgba(197,160,89,.25); padding:32px 28px;">
+              <div style="color:#C5A059; font-size:14px; letter-spacing:3px;">{{ rv.stars }}</div>
+              <p style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; line-height:1.5; color:#f3ede0; margin:18px 0 22px;">&ldquo;{{ rv.quote }}&rdquo;</p>
+              <div style="font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:.5px; color:#fff;">{{ rv.name }}</div>
+              <div style="font-family:'Montserrat',sans-serif; font-size:11px; color:rgba(255,255,255,.5); margin-top:3px;">{{ rv.meta }}</div>
+            </div>
+          </sc-for>
         </div>
       </div>
     </section>
@@ -673,6 +670,7 @@
             <div style="position:absolute; inset:0; background:radial-gradient(100% 100% at 50% 45%, rgba(11,60,38,.08) 0%, rgba(6,40,26,.5) 100%);"></div>
             <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:'Montserrat',monospace; font-size:10px; letter-spacing:2px; color:rgba(197,160,89,.55); border:1px dashed rgba(197,160,89,.45); padding:10px 16px; text-align:center; white-space:nowrap;">{{ mainCaption }}</div>
           </sc-if>
+          <div style="position:absolute; top:14px; right:14px; background:rgba(197,160,89,.95); color:#06281a; font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:1.5px; padding:5px 10px;">HIGH-PRIORITY · LCP</div>
         </div>
       </div>
 
@@ -688,7 +686,9 @@
         </div>
         <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a;">Shipping and taxes calculated at checkout</div>
 
-        <div style="display:flex; gap:14px; align-items:stretch; margin-top:22px;">
+        <p style="font-family:'Montserrat',sans-serif; font-weight:300; font-size:14px; line-height:1.85; color:#4a4a4a; margin:26px 0 0; max-width:460px;">A premium imitation jewellery piece, sculpted in Rhino CAD and hand-finished in matte antique gold, this {{ pCategoryLower }} is engineered to drape with weightless balance, built for the occasion and the everyday after.</p>
+
+        <div style="display:flex; gap:14px; align-items:stretch; margin-top:32px;">
           <div style="display:flex; align-items:center; border:1px solid #ddd6c6;">
             <span onClick="{{ qtyMinus }}" style="width:42px; height:54px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:#0B3C26; user-select:none;">&minus;</span>
             <span style="width:40px; text-align:center; font-family:'Montserrat',sans-serif; font-size:14px;">{{ qty }}</span>
@@ -702,52 +702,62 @@
           </button>
         </div>
 
-        <button onClick="{{ buyNow }}" style="width:100%; margin-top:14px; height:54px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; color:#0B3C26; background:#fff; border:1px solid #0B3C26; cursor:pointer; font-weight:600; transition:all .3s ease;" style-hover="background:#0B3C26; color:#fff;">BUY IT NOW</button>
-
-        <!-- Delivery timeline -->
-        <div style="margin-top:30px; border:1px solid #eae5d8; background:#fff; padding:24px 24px 8px;">
-          <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:20px;">DELIVERY TIMELINE</div>
-          <sc-for list="{{ timeline }}" as="tl" hint-placeholder-count="3">
-            <div style="display:flex; gap:14px; align-items:flex-start;">
-              <div style="display:flex; flex-direction:column; align-items:center; flex:none;">
-                <div style="width:11px; height:11px; border-radius:50%; background:{{ tl.dot }};"></div>
-                <div style="width:1px; height:{{ tl.lineH }}; background:#e2dccd;"></div>
-              </div>
-              <div style="padding-bottom:18px;">
-                <div style="font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; color:#1A1A1A;">{{ tl.date }}</div>
-                <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a; margin-top:3px;">{{ tl.label }}</div>
-              </div>
+        <div style="margin-top:26px; border:1px solid #eae5d8; background:#fff;">
+          <div style="padding:18px 20px; border-bottom:1px solid #f0ece1;">
+            <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:12px;">DELIVERY</div>
+            <div style="display:flex; gap:10px;">
+              <input value="{{ pin }}" onInput="{{ onPin }}" placeholder="Enter delivery pincode" maxlength="6" style="flex:1; height:44px; padding:0 14px; border:1px solid #ddd6c6; font-size:13px; color:#1A1A1A; outline:none; background:#FAFAFA;">
+              <button onClick="{{ checkPin }}" style="height:44px; padding:0 22px; background:#0B3C26; color:#fff; border:none; font-size:11px; letter-spacing:1.5px; cursor:pointer;">CHECK</button>
             </div>
-          </sc-for>
+            <sc-if value="{{ delivered }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; gap:9px; align-items:center; margin-top:14px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13h11V6H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+                <span>Estimated delivery by <strong style="font-weight:600;">{{ deliveryDate }}</strong></span>
+              </div>
+            </sc-if>
+          </div>
+          <div style="padding:18px 20px;">
+            <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:13px;">PAYMENT METHODS</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <sc-for list="{{ payments }}" as="pay" hint-placeholder-count="5">
+                <span style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.5px; color:#3a3a3a; border:1px solid #e2dccd; padding:7px 12px;">{{ pay }}</span>
+              </sc-for>
+            </div>
+          </div>
         </div>
 
-        <!-- Product description -->
-        <div style="margin-top:30px;">
-          <h3 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:23px; color:#1A1A1A; margin:0 0 12px;">Product Description</h3>
-          <p style="font-family:'Montserrat',sans-serif; font-weight:300; font-size:14px; line-height:1.85; color:#4a4a4a; margin:0; max-width:480px;">{{ pDescription }}</p>
+        <div style="margin-top:18px; display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:14px; padding:16px 18px; background:#fff; border:1px solid rgba(197,160,89,.3);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B3C26" stroke-width="1.4" style="flex:none; margin-top:1px;"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+            <div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#1A1A1A;">Bespoke Quality Guarantee</div>
+              <div style="font-family:'Montserrat',sans-serif; font-size:12px; line-height:1.7; color:#7a7a7a; margin-top:3px;">Each piece is inspected and dispatched flawless. As event-wear is made-to-order, change-of-mind returns are not accepted: only verified manufacturing defects.</div>
+            </div>
+          </div>
+          <div onClick="{{ goTrust }}" style="display:flex; gap:14px; padding:16px 18px; background:#fff; border:1px solid rgba(197,160,89,.3); cursor:pointer;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B3C26" stroke-width="1.4" style="flex:none; margin-top:1px;"><rect x="3" y="7" width="14" height="11" rx="1"/><path d="M17 10l4-2v8l-4-2"/></svg>
+            <div>
+              <div style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#1A1A1A;">The Unboxing Protocol</div>
+              <div style="font-family:'Montserrat',sans-serif; font-size:12px; line-height:1.7; color:#7a7a7a; margin-top:3px;">To ensure your handcrafted piece arrives flawlessly, please record a continuous unboxing video for transit-insurance verification. <span style="color:#0B3C26; border-bottom:1px solid #C5A059;">Read the protocol &rarr;</span></div>
+            </div>
+          </div>
         </div>
 
-        <!-- Product details -->
-        <div style="margin-top:28px;">
-          <h3 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:23px; color:#1A1A1A; margin:0 0 8px;">Product Details</h3>
-          <sc-for list="{{ pDetails }}" as="d" hint-placeholder-count="5">
-            <div style="display:flex; justify-content:space-between; gap:16px; padding:11px 0; border-bottom:1px solid #f0ece1; font-family:'Montserrat',sans-serif; font-size:13px;">
-              <span style="color:#9a9a9a;">{{ d.k }}</span>
-              <span style="color:#1A1A1A; text-align:right;">{{ d.v }}</span>
+        <div style="margin-top:30px; border-top:1px solid #eae5d8;">
+          <sc-for list="{{ accordion }}" as="a" hint-placeholder-count="3">
+            <div style="border-bottom:1px solid #eae5d8;">
+              <div onClick="{{ a.onClick }}" style="display:flex; align-items:center; justify-content:space-between; padding:18px 2px; cursor:pointer;">
+                <span style="font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:1.5px; color:#1A1A1A;">{{ a.label }}</span>
+                <span style="font-family:'Montserrat',sans-serif; font-size:18px; color:#C5A059; transition:transform .3s ease; transform:rotate({{ a.rot }}deg);">+</span>
+              </div>
+              <div style="max-height:{{ a.h }}; overflow:hidden; transition:max-height .5s cubic-bezier(.22,1,.36,1);">
+                <p style="font-family:'Montserrat',sans-serif; font-weight:300; font-size:13px; line-height:1.8; color:#6a6a6a; margin:0 2px 20px;">{{ a.body }}</p>
+              </div>
             </div>
           </sc-for>
         </div>
       </div>
     </div>
-
-    <!-- CUSTOMER REVIEWS (PDP) -->
-    <section style="max-width:1280px; margin:0 auto; padding:10px 48px 20px;">
-      <div style="border-top:1px solid #eae5d8; padding-top:40px;">
-        <h2 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:30px; color:#1A1A1A; margin:0 0 8px;">Customer Reviews</h2>
-        <div style="font-family:'Montserrat',sans-serif; font-size:14px; color:#7a7a7a; margin-bottom:22px;">Be the first to write a review</div>
-        <button onClick="{{ writeReview }}" style="font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; padding:15px 34px; background:#0B3C26; color:#fff; border:none; cursor:pointer; transition:background .3s ease;" style-hover="background:#06281a;">WRITE A REVIEW</button>
-      </div>
-    </section>
 
     <!-- YOU'LL LOVE THIS (PDP) -->
     <section style="max-width:1280px; margin:0 auto; padding:20px 48px 84px;">
@@ -890,14 +900,8 @@
               <div style="flex:1;">
                 <div style="font-family:'Cormorant Garamond',serif; font-size:15px; color:#1A1A1A; line-height:1.25;">{{ li.name }}</div>
                 <div style="font-family:'Montserrat',sans-serif; font-size:10px; color:#9a9a9a; margin-top:3px;">{{ li.sku }}</div>
-                <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
-                  <span onClick="{{ li.dec }}" style="width:26px; height:26px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; cursor:pointer; font-size:13px; border-radius:4px;">−</span>
-                  <span style="font-size:12px; min-width:18px; text-align:center;">{{ li.qty }}</span>
-                  <span onClick="{{ li.inc }}" style="width:26px; height:26px; display:flex; align-items:center; justify-content:center; border:1px solid #ccc; cursor:pointer; font-size:13px; border-radius:4px;">+</span>
-                  <span onClick="{{ li.remove }}" style="font-family:'Montserrat',sans-serif; font-size:10px; color:#9e2a2b; cursor:pointer; margin-left:8px;">REMOVE</span>
-                </div>
               </div>
-              <div style="font-family:'Montserrat',sans-serif; font-size:13px; font-weight:500; color:#0B3C26; white-space:nowrap;">{{ li.lineText }}</div>
+              <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#1A1A1A;">{{ li.lineText }}</div>
             </div>
           </sc-for>
 
@@ -1268,22 +1272,9 @@ class Component extends DCLogic {
         const ex = items.find(i => i.id === id);
         if (ex) ex.qty += (qty || 1); else items.push({ id, qty: qty || 1 });
         this.saveCart(items);
-        return { cartItems: items, adding: false };
+        return { cartItems: items, adding: false, cartOpen: true };
       });
     }, 850);
-  }
-  buyNow(id, qty) {
-    this.setState(s => {
-      const items = s.cartItems.slice();
-      const ex = items.find(i => i.id === id);
-      if (ex) ex.qty += (qty || 1); else items.push({ id, qty: qty || 1 });
-      this.saveCart(items);
-      return { cartItems: items };
-    });
-    this.goCheckout();
-  }
-  writeReview() {
-    window.open('https://wa.me/919987008435?text=' + encodeURIComponent('Hi Saubhagya, I would like to write a review for my recent purchase.'), '_blank');
   }
   changeQty(id, delta) {
     this.setState(s => {
@@ -1299,15 +1290,6 @@ class Component extends DCLogic {
   goCheckout() { history.pushState({page:'checkout'}, ''); this.setState({ page: 'checkout', cartOpen: false, placed: false }); this.top(); }
   payNow() {
     if (!this.state.cartItems.length) return;
-    const c = this.state.co;
-    const miss = [];
-    if (!(c.first || '').trim() || !(c.last || '').trim()) miss.push('Full name');
-    if (!/^\S+@\S+\.\S+$/.test((c.email || '').trim())) miss.push('Valid email address');
-    if (!/^\d{10}$/.test((c.phone || '').replace(/\D/g, ''))) miss.push('10-digit mobile number');
-    if (!(c.address || '').trim()) miss.push('Delivery address');
-    if (!(c.city || '').trim()) miss.push('City');
-    if (!/^\d{6}$/.test((c.pin || '').replace(/\D/g, ''))) miss.push('6-digit pincode');
-    if (miss.length) { alert('Please complete your delivery details before paying:\n\n• ' + miss.join('\n• ')); return; }
     const cfg = window.CC_PAYMENTS || {};
     const cat = window.CHAUHAN_CATALOG || [];
     const lines = this.state.cartItems.map(ci => {
@@ -1512,22 +1494,6 @@ class Component extends DCLogic {
     const pdpRecs = cat.filter(p => p.id !== prod.id && (p.badge === 'BESTSELLER' || p.region === prod.region)).slice(0, 4);
     const dd = new Date(Date.now() + 5 * 86400000);
     const deliveryDate = dd.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
-    const _today = new Date();
-    const _dFmt = (dt) => dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-    const _plus = (n) => new Date(_today.getTime() + n * 86400000);
-    const timeline = [
-      { date: _dFmt(_today), label: 'Order placed', dot: '#0B3C26', lineH: '40px' },
-      { date: _dFmt(_plus(2)) + ' – ' + _dFmt(_plus(3)), label: 'Order shipped', dot: '#C5A059', lineH: '40px' },
-      { date: _dFmt(_plus(5)) + ' – ' + _dFmt(_plus(6)), label: 'Estimated delivery', dot: '#ddd6c6', lineH: '0' }
-    ];
-    const pDescription = 'A premium imitation jewellery piece, sculpted in Rhino CAD and hand-finished in matte antique gold. This ' + (prod.category || 'piece').toLowerCase() + ' is designed to drape with weightless balance, built for the occasion and the everyday after. Nickel-free, skin-safe, and individually quality-checked before dispatch.';
-    const pDetails = [
-      { k: 'Category', v: prod.category || '—' },
-      { k: 'Collection', v: prod.regionLabel || '—' },
-      { k: 'Finish', v: 'Matte Antique Gold' },
-      { k: 'Material', v: 'Brass alloy · nickel-free' },
-      { k: 'SKU', v: prod.sku || prod.id }
-    ];
     const payments = (s.settings.payments && s.settings.payments.length) ? s.settings.payments : ['UPI', 'Cards', 'Net Banking', 'Cash on Delivery', 'No-Cost EMI'];
     const stripeMini = 'repeating-linear-gradient(135deg,#0d3324 0 10px,#0a2c1f 10px 20px)';
 
@@ -1552,7 +1518,8 @@ class Component extends DCLogic {
     const grandTotal = Math.max(0, subtotal - discountVal);
     const includedTax = grandTotal * (0.03 / 1.03);
     const payMethods = [
-      { key: 'razorpay', label: 'Razorpay Secure (UPI, Cards, Wallets)', badges: 'UPI · VISA · Mastercard +18' }
+      { key: 'razorpay', label: 'Razorpay Secure (UPI, Cards, Wallets)', badges: 'UPI · VISA · Mastercard +18' },
+      { key: 'easebuzz', label: 'Easebuzz', badges: 'VISA · Mastercard · Net Banking' }
     ].map(m => ({
       label: m.label, badges: m.badges, selected: s.co.pay === m.key,
       bg: s.co.pay === m.key ? 'rgba(11,60,38,.04)' : '#fff',
@@ -1565,7 +1532,11 @@ class Component extends DCLogic {
     const isSignup = s.authMode === 'signup';
 
     // ---- reviews ----
-    const reviews = [];
+    const reviews = [
+      { stars: '★★★★★', quote: 'The matte temple haaram looked exactly like real antique gold. Got endless compliments at my sister’s wedding.', name: 'Ananya R.', meta: 'Chennai' },
+      { stars: '★★★★★', quote: 'Packaging was stunning and the unboxing video process made me feel secure. The AD choker sparkles beautifully.', name: 'Priya M.', meta: 'Mumbai' },
+      { stars: '★★★★★', quote: 'My Kundan bridal set was the highlight of my reception. Lightweight yet so regal, worth every rupee.', name: 'Simran K.', meta: 'Delhi' }
+    ];
 
     // ---- footer info pages ----
     const linkTo = {
@@ -1756,8 +1727,6 @@ class Component extends DCLogic {
       mainCaption: '[ 3D ASSET / VIDEO · ' + thumbCaps[s.mainImg] + ' ]',
       openProductRegion: () => this.openCollection(prod.region),
       thumbs, accordion, pdpRecs,
-      buyNow: () => this.buyNow(prod.id, s.qty), writeReview: () => this.writeReview(),
-      timeline, pDescription, pDetails,
       qty: s.qty, qtyPlus: () => this.setState(st => ({ qty: st.qty + 1 })), qtyMinus: () => this.setState(st => ({ qty: Math.max(1, st.qty - 1) })),
       addOrView, adding: s.adding, cartBtnLabel, cartBtnBg, miniShift: s.miniBar ? '0%' : '120%',
       pin: s.pin, onPin: (e) => this.setState({ pin: e.target.value.replace(/[^0-9]/g, '') }),
@@ -1809,5 +1778,5 @@ class Component extends DCLogic {
   }
 }
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a11a1949ab69fd1b',t:'MTc4MjQ1NDc0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
