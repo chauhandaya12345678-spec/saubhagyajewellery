@@ -216,9 +216,6 @@
     footer > div:last-child > div:last-child{display:none!important}
     /* PDP mini bar bottom */
     [style*="padding: 14px 48"] button{padding:0 18px!important;height:42px!important;font-size:11px!important}
-    /* Trust bar: horizontal scroll on mobile */
-    .m-trustbar{gap:18px!important;padding:8px 14px!important;overflow-x:auto!important;justify-content:flex-start!important;flex-wrap:nowrap!important;-webkit-overflow-scrolling:touch!important;font-size:10px!important}
-    .m-trustbar span{white-space:nowrap!important;flex:none!important}
     /* Checkout: grid collapse + summary on top, tighter form */
     .m-checkout-grid{grid-template-columns:1fr!important;gap:18px!important}
     .m-checkout-summary{order:-1!important;position:relative!important;top:0!important;padding:14px!important}
@@ -236,14 +233,17 @@
       .checkout-sticky-pay{display:none!important}
     }
     /* PDP: qty +/- and add-to-cart side by side on mobile */
-    /* PDP qty + add-to-cart side by side — match exact inline style (no spaces after colons) */
-    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"]{flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:10px!important}
-    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > div{flex:none!important;height:46px!important}
-    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > div > span{height:46px!important;width:38px!important;font-size:16px!important}
-    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > div > span:nth-child(2){width:32px!important}
-    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > button{flex:1!important;min-width:120px!important;font-size:11px!important;letter-spacing:1.5px!important;padding:0 10px!important;height:46px!important}
+    /* PDP qty + add-to-cart side by side, Buy It Now below */
+    .pdp-qtyrow{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:8px!important;margin-top:18px!important}
+    .pdp-qty{flex:none!important;height:46px!important}
+    .pdp-qty > span{height:46px!important}
+    .pdp-qty > span:first-child,.pdp-qty > span:last-child{width:34px!important;font-size:18px!important}
+    .pdp-qty > span:nth-child(2){width:30px!important;font-size:13px!important}
+    .pdp-add{flex:1 1 auto!important;min-width:0!important;height:46px!important;font-size:11px!important;letter-spacing:1.5px!important;padding:0 8px!important;white-space:nowrap!important}
+    .pdp-buynow{height:46px!important;margin-top:10px!important;font-size:11px!important;letter-spacing:1.5px!important}
     /* Hide sticky bottom mini bar on mobile - user wants btn beside qty, not at bottom */
     [style*="position: fixed"][style*="bottom: 0"][style*="z-index: 40"]{display:none!important}
+    .pdp-minibar{display:none!important}
     /* Hide BUY IT NOW on mobile - only show qty+addtocart below price */
     section[style*="max-width:1280px"][style*="align-items:start"] button[style*="width:100%"][style*="margin-top:14px"]{display:none!important}
     /* Product image zoom on hover */
@@ -332,7 +332,11 @@
       <div style="flex:1; min-width:0; display:flex; gap:22px; align-items:center; justify-content:flex-end; color:#1A1A1A;">
         <svg onClick="{{ openSearch }}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="cursor:pointer;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
         <sc-if value="{{ loggedIn }}">
-          <span onClick="{{ openAccount }}" style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.5px; color:#0B3C26; cursor:pointer; white-space:nowrap;">{{ navUserLabel }}</span>
+          <span onClick="{{ openAccount }}" style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.5px; color:#0B3C26; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+            {{ navUserLabel }}
+          </span>
+          <svg onClick="{{ logout }}" aria-label="Sign out" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9e2a2b" stroke-width="1.5" style="cursor:pointer;"><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/><path d="M13 21H5a2 2 0 01-2-2V5a2 2 0 012-2h8"/></svg>
         </sc-if>
         <sc-if value="{{ notLoggedIn }}">
         <svg onClick="{{ openAuth }}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="cursor:pointer;"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
@@ -415,14 +419,6 @@
         </div>
       </div>
     </sc-if>
-  </div>
-
-  <!-- TRUST BAR (non-sticky) -->
-  <div class="m-trustbar" style="display:flex; align-items:center; justify-content:center; gap:36px; padding:9px 48px; background:#fff; border-bottom:1px solid rgba(197,160,89,.18); font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.6px; color:#4a4a4a;">
-    <span style="display:flex; align-items:center; gap:7px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B3C26" stroke-width="1.6"><path d="M3 7h11v8H3zM14 10h4l3 3v2h-7"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>Free insured shipping</span>
-    <span style="display:flex; align-items:center; gap:7px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B3C26" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>COD available</span>
-    <span style="display:flex; align-items:center; gap:7px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B3C26" stroke-width="1.6"><path d="M3 12a9 9 0 1015 6"/><path d="M3 4v6h6"/></svg>7-day easy returns</span>
-    <span style="display:flex; align-items:center; gap:7px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0B3C26" stroke-width="1.6"><path d="M12 2l9 4v6c0 5-4 9-9 10-5-1-9-5-9-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Quality assured</span>
   </div>
 
   <!-- ===================== SEARCH OVERLAY ===================== -->
@@ -795,13 +791,13 @@
           </a>
         </div>
 
-        <div style="display:flex; gap:14px; align-items:stretch; margin-top:22px;">
-          <div style="display:flex; align-items:center; border:1px solid #ddd6c6;">
-            <span onClick="{{ qtyMinus }}" style="width:42px; height:54px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:#0B3C26; user-select:none;">&minus;</span>
-            <span style="width:40px; text-align:center; font-family:'Montserrat',sans-serif; font-size:14px;">{{ qty }}</span>
-            <span onClick="{{ qtyPlus }}" style="width:42px; height:54px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:#0B3C26; user-select:none;">+</span>
+        <div class="pdp-qtyrow" style="display:flex; gap:12px; align-items:stretch; margin-top:22px;">
+          <div class="pdp-qty" style="display:flex; align-items:center; border:1px solid #ddd6c6; flex:none; height:50px;">
+            <span onClick="{{ qtyMinus }}" style="width:38px; height:50px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:#0B3C26; user-select:none;">&minus;</span>
+            <span style="width:34px; text-align:center; font-family:'Montserrat',sans-serif; font-size:14px;">{{ qty }}</span>
+            <span onClick="{{ qtyPlus }}" style="width:38px; height:50px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:#0B3C26; user-select:none;">+</span>
           </div>
-          <button onClick="{{ addOrView }}" style="flex:1; height:54px; display:flex; align-items:center; justify-content:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; color:#fff; border:none; cursor:pointer; font-weight:500; transition:background .4s ease; background:{{ cartBtnBg }};">
+          <button onClick="{{ addOrView }}" class="pdp-add" style="flex:1; height:50px; min-width:140px; display:flex; align-items:center; justify-content:center; gap:10px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; color:#fff; border:none; cursor:pointer; font-weight:500; transition:background .4s ease; background:{{ cartBtnBg }};">
             <sc-if value="{{ adding }}" hint-placeholder-val="{{ false }}">
               <span style="width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:ccSpin .7s linear infinite;"></span>
             </sc-if>
@@ -809,22 +805,7 @@
           </button>
         </div>
 
-        <button onClick="{{ buyNow }}" style="width:100%; margin-top:14px; height:54px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; color:#0B3C26; background:#fff; border:1px solid #0B3C26; cursor:pointer; font-weight:600; transition:all .3s ease;" style-hover="background:#0B3C26; color:#fff;">BUY IT NOW</button>
-
-        <!-- PIN serviceability -->
-        <div style="margin-top:22px; background:#fff; border:1px solid #eae5d8; padding:14px 16px;">
-          <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:8px;">CHECK DELIVERY</div>
-          <div style="display:flex; gap:8px;">
-            <input value="{{ pin }}" onInput="{{ onPin }}" placeholder="Enter 6-digit PIN code" maxlength="6" style="flex:1; height:42px; padding:0 12px; font-size:13px; outline:none; background:#FAFAFA; border:1px solid #ddd6c6;">
-            <button onClick="{{ checkPin }}" style="height:42px; padding:0 18px; background:#0B3C26; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; cursor:pointer;">CHECK</button>
-          </div>
-          <sc-if value="{{ delivered }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex; align-items:center; gap:8px; margin-top:10px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
-              <span>Delivers to <strong>{{ pin }}</strong> by <strong>{{ deliveryDate }}</strong> · Free insured shipping</span>
-            </div>
-          </sc-if>
-        </div>
+        <button onClick="{{ buyNow }}" class="pdp-buynow" style="width:100%; margin-top:12px; height:50px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; color:#0B3C26; background:#fff; border:1px solid #0B3C26; cursor:pointer; font-weight:600; transition:all .3s ease;" style-hover="background:#0B3C26; color:#fff;">BUY IT NOW</button>
 
         <!-- Delivery timeline horizontal -->
         <div style="margin-top:30px; border:1px solid #eae5d8; background:#fff; padding:20px 20px 16px;">
@@ -931,7 +912,7 @@
       </section>
     </sc-if>
 
-    <div style="position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgba(255,255,255,.92); backdrop-filter:blur(14px); border-top:1px solid rgba(197,160,89,.3); box-shadow:0 -10px 30px -18px rgba(0,0,0,.25); transition:transform .45s cubic-bezier(.22,1,.36,1); transform:translateY({{ miniShift }});">
+    <div class="pdp-minibar" style="position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgba(255,255,255,.92); backdrop-filter:blur(14px); border-top:1px solid rgba(197,160,89,.3); box-shadow:0 -10px 30px -18px rgba(0,0,0,.25); transition:transform .45s cubic-bezier(.22,1,.36,1); transform:translateY({{ miniShift }});">
       <div style="max-width:1280px; margin:0 auto; padding:14px 48px; display:flex; align-items:center; justify-content:space-between;">
         <div style="display:flex; align-items:center; gap:16px;">
           <div style="width:44px; height:54px; background:{{ pMiniBg }};"></div>
@@ -1571,6 +1552,18 @@ class Component extends DCLogic {
     } catch (e) { this.setState({ cartItems: [] }); }
   }
   saveCart(items) { try { localStorage.setItem('cc_cart', JSON.stringify(items)); } catch (e) {} }
+  setUser(user) {
+    try { sessionStorage.setItem('cc_user', JSON.stringify(user)); } catch(e) {}
+    this.setState({ loggedInUser: user });
+  }
+  clearUser() {
+    try { sessionStorage.removeItem('cc_user'); sessionStorage.removeItem('cc_token'); sessionStorage.removeItem('cc_lastorder'); } catch(e) {}
+    this.setState({ loggedInUser: null, userOrders: [], wishlist: [], lastOrder: null });
+  }
+  setLastOrder(lo) {
+    try { sessionStorage.setItem('cc_lastorder', JSON.stringify(lo)); } catch(e) {}
+    this.setState({ lastOrder: lo });
+  }
   loadRecentlyViewed() {
     try { const raw = localStorage.getItem('cc_recent'); return raw ? JSON.parse(raw) : []; } catch (e) { return []; }
   }
@@ -1621,6 +1614,15 @@ class Component extends DCLogic {
     this.loadCart();
     this.setState({ recentlyViewed: this.loadRecentlyViewed(), savedAddresses: this.loadSavedAddresses() });
     try { this.setState({ cookieAck: !!localStorage.getItem('cc_cookie_ok') }); } catch(e) {}
+    try {
+      const u = sessionStorage.getItem('cc_user');
+      if (u) { const user = JSON.parse(u); this.setState({ loggedInUser: user }); setTimeout(() => this.fetchUserOrders(), 100); }
+    } catch(e) {}
+    try {
+      const lo = sessionStorage.getItem('cc_lastorder');
+      const oid = sessionStorage.getItem('cc_lastorderid');
+      if (lo) this.setState({ lastOrder: JSON.parse(lo), orderId: oid || '' });
+    } catch(e) {}
     this.applyDeepLink();
     this.heroPlay();
     this._onScroll = () => {
@@ -1790,8 +1792,7 @@ class Component extends DCLogic {
     this.setState(s => { const items = s.cartItems.filter(i => i.id !== id); this.saveCart(items); return { cartItems: items }; });
   }
   logout() {
-    sessionStorage.removeItem('cc_token');
-    this.setState({ loggedInUser: null, userOrders: [], wishlist: [] });
+    this.clearUser();
     this.goHome();
   }
   toggleWishlist(sku) {
@@ -1894,7 +1895,9 @@ class Component extends DCLogic {
         address: [co.address, co.apt, co.city, co.state, co.pin].filter(Boolean).join(', ')
       };
       this.saveCart([]);
-      this.setState({ cartItems: [], placed: true, orderId: codOrderId, lastOrder });
+      this.setState({ cartItems: [], placed: true, orderId: codOrderId });
+      this.setLastOrder(lastOrder);
+      try { sessionStorage.setItem('cc_lastorderid', codOrderId); } catch(e) {}
       this.top();
       fetch('/api/orders/save', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1908,7 +1911,7 @@ class Component extends DCLogic {
       }).then(r => r.json()).then(d => {
         if (d && d.success) {
           if (d.session_token) sessionStorage.setItem('cc_token', d.session_token);
-          if (d.user_id) this.setState({ loggedInUser: { id: d.user_id, name, email: co.email, phone: co.phone } });
+          if (d.user_id) this.setUser({ id: d.user_id, name, email: co.email, phone: co.phone });
         }
       }).catch(() => {});
       return;
@@ -1971,7 +1974,9 @@ class Component extends DCLogic {
             address: [co.address, co.apt, co.city, co.state, co.pin].filter(Boolean).join(', ')
           };
           // Show confirmation immediately
-          this.setState({ cartItems: [], placed: true, orderId: oid, lastOrder });
+          this.setState({ cartItems: [], placed: true, orderId: oid });
+          this.setLastOrder(lastOrder);
+          try { sessionStorage.setItem('cc_lastorderid', oid); } catch(e) {}
           this.top();
           // Save order to D1 in background
           fetch('/api/orders/save', {
@@ -1992,7 +1997,7 @@ class Component extends DCLogic {
           }).then(r => r.json()).then(d => {
             if (d.success) {
               if (d.session_token) sessionStorage.setItem('cc_token', d.session_token);
-              if (d.user_id) this.setState({ loggedInUser: { id: d.user_id, name: name, email: co.email, phone: co.phone } });
+              if (d.user_id) this.setUser({ id: d.user_id, name: name, email: co.email, phone: co.phone });
             }
           }).catch(() => {});
           this.top();
@@ -2507,7 +2512,7 @@ class Component extends DCLogic {
           }
           if (d.success) {
             if (d.token) sessionStorage.setItem('cc_token', d.token);
-            this.setState({ loggedInUser: d.user, otpSent: false, otpPhone: '', otpCode: '' });
+            this.setUser(d.user); this.setState({ otpSent: false, otpPhone: '', otpCode: '' });
             this.openAccount();
           } else { alert(d.error || 'Sign-in failed'); }
         } catch(e) { alert('Server error: ' + e.message); }
@@ -2534,7 +2539,7 @@ class Component extends DCLogic {
             const d = await r.json();
             if (!d.success) { alert(d.error); return; }
             if (d.token) sessionStorage.setItem('cc_token', d.token);
-            this.setState({ loggedInUser: d.user, fieldErrors: {} });
+            this.setUser(d.user); this.setState({ fieldErrors: {} });
             this.openAccount();
           } else {
             const r = await fetch('/api/auth/signup', {
@@ -2544,7 +2549,7 @@ class Component extends DCLogic {
             const d = await r.json();
             if (!d.success) { alert(d.error); return; }
             if (d.token) sessionStorage.setItem('cc_token', d.token);
-            this.setState({ loggedInUser: d.user, fieldErrors: {} });
+            this.setUser(d.user); this.setState({ fieldErrors: {} });
             this.openAccount();
           }
         } catch(e) { alert('Server error: ' + e.message); }
