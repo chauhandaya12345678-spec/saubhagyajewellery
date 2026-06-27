@@ -42,9 +42,14 @@ export async function onRequest(context) {
 
     if (email || phone) {
       const identifier = email || phone;
-      const existingUser = email
-        ? await db.prepare('SELECT id, name FROM users WHERE email = ?').bind(email).first()
-        : await db.prepare('SELECT id, name FROM users WHERE phone = ?').bind(phone).first();
+      // Check by email first, then by phone
+      let existingUser = null;
+      if (email) {
+        existingUser = await db.prepare('SELECT id, name FROM users WHERE email = ?').bind(email).first();
+      }
+      if (!existingUser && phone) {
+        existingUser = await db.prepare('SELECT id, name FROM users WHERE phone = ?').bind(phone).first();
+      }
 
       if (existingUser) {
         userId = existingUser.id;
