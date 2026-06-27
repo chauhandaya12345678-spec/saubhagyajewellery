@@ -21,7 +21,7 @@ export async function onRequest(context) {
   }
 
   try {
-    const { amount, currency, cart } = await request.json();
+    const { amount, currency, cart, name, email, phone, address } = await request.json();
     if (!amount || amount <= 0) {
       return new Response(JSON.stringify({ error: 'Invalid amount' }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
     }
@@ -45,7 +45,13 @@ export async function onRequest(context) {
         amount,
         currency: currency || 'INR',
         receipt,
-        notes: { cart: JSON.stringify(cart || []) },
+        notes: {
+          cart: JSON.stringify(cart || []),
+          shipping_address: address || '',
+          customer_name: name || '',
+          customer_email: email || '',
+          customer_phone: phone || ''
+        },
       }),
     });
 

@@ -239,6 +239,12 @@
     [style*="position: fixed"][style*="bottom: 0"][style*="z-index: 40"]{display:none!important}
     /* Hide BUY IT NOW on mobile - only show qty+addtocart below price */
     section[style*="max-width:1280px"][style*="align-items:start"] button[style*="width:100%"][style*="margin-top:14px"]{display:none!important}
+    /* Product image zoom on hover */
+    [style*="aspect-ratio: 4/5"][style*="overflow: hidden"]:hover [style*="background:"]{transform:scale(1.3)!important;transition:transform .5s cubic-bezier(.22,1,.36,1)!important}
+    /* Desktop PDP image max height */
+    @media(min-width:901px){
+      [style*="display:grid"][style*="1fr 1fr"][style*="gap: 64"] > div:first-child [style*="aspect-ratio: 4/5"]{max-height:70vh!important}
+    }
     /* Lede max-width */
     p[style*="max-width: 560"]{max-width:100%!important}
     p[style*="max-width: 620"]{max-width:100%!important}
@@ -318,7 +324,12 @@
       </div>
       <div style="flex:1; min-width:0; display:flex; gap:22px; align-items:center; justify-content:flex-end; color:#1A1A1A;">
         <svg onClick="{{ openSearch }}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="cursor:pointer;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <sc-if value="{{ loggedIn }}">
+          <span onClick="{{ openAccount }}" style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.5px; color:#0B3C26; cursor:pointer; white-space:nowrap;">{{ navUserLabel }}</span>
+        </sc-if>
+        <sc-if value="{{ notLoggedIn }}">
         <svg onClick="{{ openAuth }}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="cursor:pointer;"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
+        </sc-if>
         <div onClick="{{ openCart }}" style="position:relative; cursor:pointer;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg>
           <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ false }}">
@@ -414,7 +425,10 @@
           <sc-if value="{{ hasSearchResults }}" hint-placeholder-val="{{ false }}">
             <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:24px; max-height:60vh; overflow:auto;">
               <sc-for list="{{ searchResults }}" as="item" hint-placeholder-count="4">
+                <div style="position:relative;">
                 <dc-import name="ProductCard" product="{{ item }}" on-open="{{ openProduct }}" hint-size="100%,440px"></dc-import>
+                <span onClick="{{ item.wishClick }}" style="position:absolute; top:14px; right:14px; z-index:5; cursor:pointer; font-size:20px; line-height:1; background:rgba(255,255,255,.85); backdrop-filter:blur(4px); width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.1);">{{ item.wishIcon }}</span>
+                </div>
               </sc-for>
             </div>
           </sc-if>
@@ -645,7 +659,10 @@
       </div>
       <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:24px;">
         <sc-for list="{{ trending }}" as="item" hint-placeholder-count="8">
-          <dc-import name="ProductCard" product="{{ item }}" on-open="{{ openProduct }}" hint-size="100%,440px"></dc-import>
+          <div style="position:relative;">
+            <dc-import name="ProductCard" product="{{ item }}" on-open="{{ openProduct }}" hint-size="100%,440px"></dc-import>
+            <span onClick="{{ item.wishClick }}" style="position:absolute; top:14px; right:14px; z-index:5; cursor:pointer; font-size:20px; line-height:1; background:rgba(255,255,255,.85); backdrop-filter:blur(4px); width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.1);">{{ item.wishIcon }}</span>
+          </div>
         </sc-for>
       </div>
     </section>
@@ -689,7 +706,10 @@
     <section style="max-width:1280px; margin:0 auto; padding:40px 48px 30px;">
       <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:24px 24px;">
         <sc-for list="{{ visibleProducts }}" as="item" hint-placeholder-count="12">
+          <div style="position:relative;">
           <dc-import name="ProductCard" product="{{ item }}" on-open="{{ openProduct }}" hint-size="100%,440px"></dc-import>
+          <span onClick="{{ item.wishClick }}" style="position:absolute; top:14px; right:14px; z-index:5; cursor:pointer; font-size:20px; line-height:1; background:rgba(255,255,255,.85); backdrop-filter:blur(4px); width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.1);">{{ item.wishIcon }}</span>
+          </div>
         </sc-for>
       </div>
       <sc-if value="{{ hasMore }}" hint-placeholder-val="{{ true }}">
@@ -735,6 +755,13 @@
         </div>
         <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a;">Shipping and taxes calculated at checkout</div>
 
+        <!-- SHARE BUTTONS -->
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <a href="{{ waShareUrl }}" target="_blank" style="display:inline-flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:.5px; color:#0B3C26; text-decoration:none; border:1px solid #ddd6c6; padding:6px 12px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 00-8.6 15l-1.4 5 5.1-1.3A10 10 0 1012 2z"/></svg>Share
+          </a>
+        </div>
+
         <div style="display:flex; gap:14px; align-items:stretch; margin-top:22px;">
           <div style="display:flex; align-items:center; border:1px solid #ddd6c6;">
             <span onClick="{{ qtyMinus }}" style="width:42px; height:54px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:#0B3C26; user-select:none;">&minus;</span>
@@ -751,21 +778,19 @@
 
         <button onClick="{{ buyNow }}" style="width:100%; margin-top:14px; height:54px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; color:#0B3C26; background:#fff; border:1px solid #0B3C26; cursor:pointer; font-weight:600; transition:all .3s ease;" style-hover="background:#0B3C26; color:#fff;">BUY IT NOW</button>
 
-        <!-- Delivery timeline -->
-        <div style="margin-top:30px; border:1px solid #eae5d8; background:#fff; padding:24px 24px 8px;">
-          <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:20px;">DELIVERY TIMELINE</div>
-          <sc-for list="{{ timeline }}" as="tl" hint-placeholder-count="3">
-            <div style="display:flex; gap:14px; align-items:flex-start;">
-              <div style="display:flex; flex-direction:column; align-items:center; flex:none;">
-                <div style="width:11px; height:11px; border-radius:50%; background:{{ tl.dot }};"></div>
-                <div style="width:1px; height:{{ tl.lineH }}; background:#e2dccd;"></div>
+        <!-- Delivery timeline horizontal -->
+        <div style="margin-top:30px; border:1px solid #eae5d8; background:#fff; padding:20px 20px 16px;">
+          <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:16px;">DELIVERY TIMELINE</div>
+          <div style="display:flex; align-items:flex-start; gap:0;">
+            <sc-for list="{{ timeline }}" as="tl" hint-placeholder-count="3">
+              <div style="flex:1; text-align:center;">
+                <div style="width:12px; height:12px; border-radius:50%; background:{{ tl.dot }}; margin:0 auto;"></div>
+                <div style="width:80%; height:2px; background:#e2dccd; margin:0 auto; transform:translateY(-7px); z-index:-1; position:relative;"></div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; color:#1A1A1A; margin-top:4px;">{{ tl.date }}</div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:10px; color:#7a7a7a; margin-top:2px;">{{ tl.label }}</div>
               </div>
-              <div style="padding-bottom:18px;">
-                <div style="font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; color:#1A1A1A;">{{ tl.date }}</div>
-                <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a; margin-top:3px;">{{ tl.label }}</div>
-              </div>
-            </div>
-          </sc-for>
+            </sc-for>
+          </div>
         </div>
 
         <!-- Product description -->
@@ -790,9 +815,43 @@
     <!-- CUSTOMER REVIEWS (PDP) -->
     <section style="max-width:1280px; margin:0 auto; padding:10px 48px 20px;">
       <div style="border-top:1px solid #eae5d8; padding-top:40px;">
-        <h2 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:30px; color:#1A1A1A; margin:0 0 8px;">Customer Reviews</h2>
-        <div style="font-family:'Montserrat',sans-serif; font-size:14px; color:#7a7a7a; margin-bottom:22px;">Be the first to write a review</div>
-        <button onClick="{{ writeReview }}" style="font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; padding:15px 34px; background:#0B3C26; color:#fff; border:none; cursor:pointer; transition:background .3s ease;" style-hover="background:#06281a;">WRITE A REVIEW</button>
+        <h2 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:30px; color:#1A1A1A; margin:0 0 4px;">Customer Reviews</h2>
+        <div style="font-family:'Montserrat',sans-serif; font-size:13px; color:#7a7a7a; margin-bottom:20px;">
+          <span style="color:#C5A059;">{{ reviewStars }}</span> {{ reviewAvgText }}
+        </div>
+        <sc-if value="{{ pdpHasReviews }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ pdpReviews }}" as="rv" hint-placeholder-count="2">
+            <div style="background:#FAFAFA; border:1px solid #eae5d8; padding:18px 20px; margin-bottom:14px;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <span style="font-family:'Montserrat',sans-serif; font-size:11px; font-weight:600; color:#1A1A1A;">{{ rv.name }}</span>
+                <span style="font-family:'Montserrat',sans-serif; font-size:10px; color:#9a9a9a;">{{ rv.date }}</span>
+              </div>
+              <div style="color:#C5A059; font-size:14px; margin:4px 0;">{{ rv.stars }}</div>
+              <p style="font-family:'Montserrat',sans-serif; font-weight:300; font-size:13px; line-height:1.7; color:#4a4a4a; margin:4px 0 0;">{{ rv.text }}</p>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ pdpNoReviews }}" hint-placeholder-val="{{ true }}">
+          <p style="font-family:'Montserrat',sans-serif; font-size:13px; color:#9a9a9a; margin:0 0 16px;">Be the first to write a review</p>
+        </sc-if>
+        <sc-if value="{{ reviewFormOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border:1px solid #C5A059; padding:20px; margin-top:14px; max-width:440px;">
+            <div style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1.5px; color:#0B3C26; margin-bottom:12px;">WRITE A REVIEW</div>
+            <div style="margin-bottom:10px;">
+              <span style="font-family:'Montserrat',sans-serif; font-size:11px; color:#7a7a7a;">Rating: </span>
+              <span onClick="{{ setRat1 }}" style="cursor:pointer; font-size:18px; color:#C5A059;">{{ r1 }}</span>
+              <span onClick="{{ setRat2 }}" style="cursor:pointer; font-size:18px; color:#C5A059;">{{ r2 }}</span>
+              <span onClick="{{ setRat3 }}" style="cursor:pointer; font-size:18px; color:#C5A059;">{{ r3 }}</span>
+              <span onClick="{{ setRat4 }}" style="cursor:pointer; font-size:18px; color:#C5A059;">{{ r4 }}</span>
+              <span onClick="{{ setRat5 }}" style="cursor:pointer; font-size:18px; color:#C5A059;">{{ r5 }}</span>
+            </div>
+            <textarea value="{{ reviewText }}" onInput="{{ onReviewText }}" placeholder="Share your experience with this piece..." style="width:100%; height:80px; padding:10px; border:1px solid #ddd6c6; font-size:13px; outline:none; resize:none;"></textarea>
+            <button onClick="{{ submitPdpReview }}" style="margin-top:10px; padding:10px 24px; background:#0B3C26; color:#fff; border:none; font-size:11px; letter-spacing:1.5px; cursor:pointer;">SUBMIT</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ reviewFormClosed }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openReviewForm }}" style="font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; padding:14px 30px; background:#0B3C26; color:#fff; border:none; cursor:pointer;">WRITE A REVIEW</button>
+        </sc-if>
       </div>
     </section>
 
@@ -1022,6 +1081,85 @@
   </main>
   </sc-if>
 
+  <!-- ===================== PAGE: ACCOUNT ===================== -->
+  <sc-if value="{{ isAccount }}" hint-placeholder-val="{{ false }}">
+  <main>
+    <section style="max-width:720px; margin:0 auto; padding:50px 32px 80px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:32px;">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:#1A1A1A;">Hello, {{ accName }}</div>
+          <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#9a9a9a; margin-top:4px;">{{ accEmail }}</div>
+        </div>
+        <span onClick="{{ logout }}" style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; color:#9e2a2b; cursor:pointer; border-bottom:1px solid #9e2a2b; padding-bottom:2px;">SIGN OUT</span>
+      </div>
+
+      <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:18px;">YOUR WISHLIST ({{ wishlistCount }})</div>
+      <sc-if value="{{ wishlistHas }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:30px;">
+          <sc-for list="{{ wishlistItems }}" as="w" hint-placeholder-count="2">
+            <div onClick="{{ w.onClick }}" style="cursor:pointer; background:#fff; border:1px solid #eae5d8; padding:14px; display:flex; gap:12px; align-items:center;">
+              <div style="width:50px; height:60px; flex:none; background:#efece4; border-radius:6px;"></div>
+              <div>
+                <div style="font-family:'Cormorant Garamond',serif; font-size:15px; color:#1A1A1A; line-height:1.2;">{{ w.name }}</div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26; margin-top:2px;">{{ w.price }}</div>
+              </div>
+              <span onClick="{{ w.remove }}" style="margin-left:auto; font-size:16px; cursor:pointer; color:#9e2a2b;">✕</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <div style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:18px;">YOUR ORDERS</div>
+
+      <sc-if value="{{ accHasOrders }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ accOrdersList }}" as="o" hint-placeholder-count="2">
+          <div style="background:#fff; border:1px solid #eae5d8; padding:20px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#1A1A1A;">{{ o.id }}</span>
+              <span style="font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; padding:4px 10px; background:{{ o.bg }}; color:#fff;">{{ o.status }}</span>
+            </div>
+            <!-- Items -->
+            <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a; line-height:1.6; margin-bottom:8px;">
+              {{ o.items }} &middot; <strong style="color:#0B3C26;">{{ o.total }}</strong>
+            </div>
+            <!-- Delivery Timeline Horizontal -->
+            <div style="display:flex; align-items:center; gap:0; margin:14px 0; padding:12px 0; border-top:1px solid #f0ece1; border-bottom:1px solid #f0ece1;">
+              <div style="flex:1; text-align:center; position:relative;">
+                <div style="width:10px; height:10px; border-radius:50%; background:#0B3C26; margin:0 auto 4px;"></div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:9px; color:#0B3C26; font-weight:600;">Confirmed</div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:8px; color:#9a9a9a;">{{ o.date }}</div>
+              </div>
+              <div style="flex:1; text-align:center;">
+                <div style="width:10px; height:10px; border-radius:50%; background:{{ o.shipDot }}; margin:0 auto 4px;"></div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:9px; color:{{ o.shipColor }};">Shipped</div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:8px; color:#9a9a9a;">{{ o.shipDate }}</div>
+              </div>
+              <div style="flex:1; text-align:center;">
+                <div style="width:10px; height:10px; border-radius:50%; background:#ddd6c6; margin:0 auto 4px;"></div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:9px; color:#9a9a9a;">Delivery</div>
+                <div style="font-family:'Montserrat',sans-serif; font-size:8px; color:#9a9a9a;">{{ o.deliveryDate }}</div>
+              </div>
+            </div>
+            <!-- Payment Details -->
+            <div style="font-family:'Montserrat',sans-serif; font-size:10px; line-height:1.6; color:#9a9a9a;">
+              Payment: {{ o.paymentId }} &middot; Razorpay
+            </div>
+            <!-- AWB -->
+            <sc-if value="{{ o.hasAWB }}" hint-placeholder-val="{{ false }}">
+              <a href="{{ o.awbUrl }}" target="_blank" style="display:inline-block; margin-top:6px; font-family:'Montserrat',sans-serif; font-size:11px; color:#0B3C26; border-bottom:1px solid #C5A059; text-decoration:none;">Track via Shiprocket &rarr;</a>
+            </sc-if>
+          </div>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ accNoOrders }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center; padding:40px; font-family:'Montserrat',sans-serif; font-size:13px; color:#9a9a9a;">No orders yet. Start shopping to see your order history here.</div>
+      </sc-if>
+
+      <div onClick="{{ goHome }}" style="text-align:center; margin-top:28px; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; color:#0B3C26; cursor:pointer; border-bottom:1px solid #C5A059; display:inline-block; padding-bottom:3px;">&larr; Continue Shopping</div>
+    </section>
+  </main>
+  </sc-if>
+
   <!-- ===================== PAGE: TRUST HUB ===================== -->
   <sc-if value="{{ isTrust }}" hint-placeholder-val="{{ false }}">
   <main>
@@ -1243,6 +1381,7 @@ class Component extends DCLogic {
     authMode: 'signin', infoKey: 'about',
     placed: false, orderId: '',
     discountApplied: false, testMode: false, fieldErrors: {},
+    loggedInUser: null, userOrders: [], wishlist: [], reviews: [], reviewForm: false, reviewRating: 5, reviewText: '',
     trackPhone: '', trackResults: null, trackLoading: false,
     co: { email: '', first: '', last: '', address: '', apt: '', city: '', state: 'Maharashtra', pin: '', phone: '', pay: 'razorpay', billSame: true, discount: '' }
   };
@@ -1344,8 +1483,15 @@ class Component extends DCLogic {
   openNecklaces() { this.openTag('necklaces'); }
   openChoker() { this.openTag('choker'); }
   openWaist() { this.openTag('waist'); }
-  openProduct(id) { history.pushState({page:'pdp'}, ''); this.setState({ page: 'pdp', selectedId: id, mega: null, miniBar: false, searchOpen: false, cartOpen: false, qty: 1, mainImg: 0, delivered: false, pin: '' }); this.top(); }
-  openAuth() { history.pushState({page:'auth'}, ''); this.setState({ page: 'auth', mega: null, searchOpen: false, cartOpen: false }); this.top(); }
+  openProduct(id) { history.pushState({page:'pdp'}, ''); this.setState({ page: 'pdp', selectedId: id, mega: null, miniBar: false, searchOpen: false, cartOpen: false, qty: 1, mainImg: 0, delivered: false, pin: '', reviewForm: false }); this.loadReviews(id); this.top(); }
+  openAuth() { history.pushState({page:'auth'}, ''); this.setState({ page: 'auth', mega: null, searchOpen: false, cartOpen: false, authMode: 'signin' }); this.top(); }
+  openAccount() {
+    history.pushState({page:'account'}, '');
+    this.setState({ page: 'account', mega: null, searchOpen: false, cartOpen: false });
+    this.fetchUserOrders();
+    this.fetchWishlist();
+    this.top();
+  }
   openInfo(key) { history.pushState({page:'info'}, ''); this.setState({ page: 'info', infoKey: key, mega: null, miniBar: false, searchOpen: false, cartOpen: false }); this.top(); }
 
   openCart() { this.setState({ cartOpen: true, mega: null, searchOpen: false }); }
@@ -1398,6 +1544,17 @@ class Component extends DCLogic {
       else { alert(d.error); this.setState({ trackResults: [], trackLoading: false }); }
     } catch(e) { alert('Error: ' + e.message); this.setState({ trackResults: [], trackLoading: false }); }
   }
+  async fetchUserOrders() {
+    const user = this.state.loggedInUser;
+    if (!user || !(user.email || user.phone)) return;
+    const q = user.email || user.phone;
+    const url = user.email ? '/api/orders/track?email=' + encodeURIComponent(q) : '/api/orders/track?phone=' + encodeURIComponent(q);
+    try {
+      const r = await fetch(url);
+      const d = await r.json();
+      if (d.success) this.setState({ userOrders: d.orders || [] });
+    } catch(e) {}
+  }
   changeQty(id, delta) {
     this.setState(s => {
       let items = s.cartItems.map(i => i.id === id ? { id: i.id, qty: i.qty + delta } : i).filter(i => i.qty > 0);
@@ -1407,6 +1564,51 @@ class Component extends DCLogic {
   }
   removeItem(id) {
     this.setState(s => { const items = s.cartItems.filter(i => i.id !== id); this.saveCart(items); return { cartItems: items }; });
+  }
+  logout() {
+    sessionStorage.removeItem('cc_token');
+    this.setState({ loggedInUser: null, userOrders: [], wishlist: [] });
+    this.goHome();
+  }
+  toggleWishlist(sku) {
+    const user = this.state.loggedInUser;
+    if (!user) { this.openAuth(); return; }
+    const has = this.state.wishlist.includes(sku);
+    const items = has ? this.state.wishlist.filter(s => s !== sku) : [...this.state.wishlist, sku];
+    this.setState({ wishlist: items });
+    fetch('/api/wishlist', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ user_id: user.id, product_sku: sku, action: has ? 'remove' : 'add' })
+    }).catch(() => {});
+  }
+  fetchWishlist() {
+    const user = this.state.loggedInUser;
+    if (!user) return;
+    fetch('/api/wishlist?user_id=' + user.id).then(r=>r.json()).then(d => {
+      if (d.success) this.setState({ wishlist: d.items.map(i => i.product_sku) });
+    }).catch(() => {});
+  }
+  submitReview(sku) {
+    const { reviewRating, reviewText, loggedInUser } = this.state;
+    if (!reviewText.trim()) { alert('Please write a review.'); return; }
+    fetch('/api/reviews', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        product_sku: sku,
+        user_id: loggedInUser ? loggedInUser.id : null,
+        name: loggedInUser ? loggedInUser.name : 'Anonymous',
+        rating: reviewRating,
+        review_text: reviewText.trim()
+      })
+    }).then(r=>r.json()).then(d => {
+      if (d.success) { this.setState({ reviewForm: false, reviewRating: 5, reviewText: '' }); this.loadReviews(sku); }
+    }).catch(() => {});
+  }
+  loadReviews(sku) {
+    if (!sku) return;
+    fetch('/api/reviews?sku=' + encodeURIComponent(sku)).then(r=>r.json()).then(d => {
+      if (d.success) this.setState({ reviews: d.reviews || [], reviewAvg: d.average || 0, reviewCount: d.count || 0 });
+    }).catch(() => {});
   }
 
   goCheckout() { history.pushState({page:'checkout'}, ''); this.setState({ page: 'checkout', cartOpen: false, placed: false }); this.top(); }
@@ -1496,7 +1698,10 @@ class Component extends DCLogic {
               test_mode: isTestMode
             })
           }).then(r => r.json()).then(d => {
-            if (d.success && d.session_token) sessionStorage.setItem('cc_token', d.session_token);
+            if (d.success) {
+              if (d.session_token) sessionStorage.setItem('cc_token', d.session_token);
+              if (d.user_id) this.setState({ loggedInUser: { id: d.user_id, name: name, email: co.email, phone: co.phone } });
+            }
           }).catch(() => {});
           this.top();
         },
@@ -1512,7 +1717,15 @@ class Component extends DCLogic {
       fetch(cfg.createOrderUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: amountPaise, currency: 'INR', cart: lines })
+        body: JSON.stringify({
+          amount: amountPaise,
+          currency: 'INR',
+          cart: lines,
+          name: (co.first + ' ' + co.last).trim(),
+          email: co.email,
+          phone: co.phone,
+          address: [co.address, co.apt, co.city, co.state, co.pin].filter(Boolean).join(', ')
+        })
       })
         .then(r => r.json())
         .then(d => openCheckout(d.id))
@@ -1596,6 +1809,9 @@ class Component extends DCLogic {
     // ---- trending ----
     const trending = [];
     if (cat.length) for (let i = 0; i < 3; i++) [cat[i], cat[50 + i], cat[100 + i]].forEach(p => { if (p) trending.push(p); });
+    const wl = s.wishlist || [];
+    const addWish = (p) => ({ ...p, wishIcon: wl.includes(p.id) ? '❤️' : '🤍', wishClick: (e) => { e.stopPropagation(); this.toggleWishlist(p.id); } });
+    const trendingW = trending.map(addWish);
 
     // ---- collection ----
     let collTitle, collBlurb, baseList;
@@ -1614,6 +1830,7 @@ class Component extends DCLogic {
     else if (s.sort === 'price-desc') list.sort((a, b) => b.price - a.price);
     else if (s.sort === 'new') list.reverse();
     const visibleProducts = list.slice(0, s.visibleCount);
+    const visibleW = visibleProducts.map(addWish);
     const hasMore = s.visibleCount < total;
     const shown = Math.min(s.visibleCount, total);
     const sortDefs = [
@@ -1629,6 +1846,7 @@ class Component extends DCLogic {
     const q = s.searchQ.trim().toLowerCase();
     let searchResults = [];
     if (q.length) searchResults = cat.filter(p => (p.name + ' ' + p.category + ' ' + (p.regionLabel || '')).toLowerCase().includes(q)).slice(0, 8);
+    const searchW = searchResults.map(addWish);
     const searchCountText = q.length ? (searchResults.length + ' result' + (searchResults.length === 1 ? '' : 's') + ' for “' + s.searchQ + '”') : 'Start typing to search the catalogue…';
 
     // ---- PDP ----
@@ -1820,15 +2038,15 @@ class Component extends DCLogic {
       heroSlides, heroDots, heroTrackWidth: (hn * 100) + '%', heroSlideWidth: (100 / hn) + '%', heroShift: '-' + (hi * (100 / hn)) + '%',
       heroNext: () => this.heroNext(), heroPrev: () => this.heroPrev(), heroPause: () => this.heroPause(), heroPlay: () => this.heroPlay(),
 
-      trending, reviews,
+      trending: trendingW, reviews,
 
       // collection
       collTitle, collBlurb, showingText: 'Showing ' + shown + ' of ' + total + ' pieces',
-      sortOptions, visibleProducts, hasMore, loadMore: () => this.setState(st => ({ visibleCount: st.visibleCount + 12 })),
+      sortOptions, visibleProducts: visibleW, hasMore, loadMore: () => this.setState(st => ({ visibleCount: st.visibleCount + 12 })),
 
       // search
       searchOpen: s.searchOpen, searchQ: s.searchQ, onSearch: (e) => this.setState({ searchQ: e.target.value }),
-      searchResults, hasSearchResults: searchResults.length > 0, noSearchResults: q.length > 0 && searchResults.length === 0, searchCountText,
+      searchResults: searchW, hasSearchResults: searchResults.length > 0, noSearchResults: q.length > 0 && searchResults.length === 0, searchCountText,
 
       // pdp
       pName: prod.name, pSku: prod.sku, pRegionLabel: prod.regionLabel || regionLabels[prod.region],
@@ -1842,6 +2060,27 @@ class Component extends DCLogic {
       openProductRegion: () => this.openCollection(prod.region),
       thumbs, accordion, pdpRecs,
       buyNow: () => this.buyNow(prod.id, s.qty), writeReview: () => this.writeReview(),
+      // Reviews
+      pdpReviews: (s.reviews || []).map(rv => ({
+        name: rv.name, date: new Date(rv.created_at).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'}),
+        stars: '★'.repeat(rv.rating) + '☆'.repeat(5 - rv.rating), text: rv.review_text
+      })),
+      pdpHasReviews: (s.reviews || []).length > 0,
+      pdpNoReviews: (s.reviews || []).length === 0,
+      reviewStars: '★'.repeat(Math.round(s.reviewAvg || 0)) + '☆'.repeat(5 - Math.round(s.reviewAvg || 0)),
+      reviewAvgText: (s.reviewCount || 0) > 0 ? ((s.reviewAvg || 0) + ' (' + s.reviewCount + ' review' + (s.reviewCount === 1 ? '' : 's') + ')') : 'No reviews yet',
+      reviewFormOpen: s.reviewForm, reviewFormClosed: !s.reviewForm,
+      reviewText: s.reviewText, onReviewText: (e) => this.setState({ reviewText: e.target.value }),
+      openReviewForm: () => this.setState({ reviewForm: true }),
+      setRat1: () => this.setState({ reviewRating: 1 }), setRat2: () => this.setState({ reviewRating: 2 }),
+      setRat3: () => this.setState({ reviewRating: 3 }), setRat4: () => this.setState({ reviewRating: 4 }),
+      setRat5: () => this.setState({ reviewRating: 5 }),
+      r1: s.reviewRating >= 1 ? '★' : '☆', r2: s.reviewRating >= 2 ? '★' : '☆',
+      r3: s.reviewRating >= 3 ? '★' : '☆', r4: s.reviewRating >= 4 ? '★' : '☆',
+      r5: s.reviewRating >= 5 ? '★' : '☆',
+      submitPdpReview: () => this.submitReview(prod.id),
+      // WhatsApp share
+      waShareUrl: 'https://wa.me/?text=' + encodeURIComponent('Check out this ' + prod.name + ' from Saubhagya Jewellery: https://saubhagyajewellery.com/?product=' + prod.id),
       timeline, pDescription, pDetails,
       qty: s.qty, qtyPlus: () => this.setState(st => ({ qty: st.qty + 1 })), qtyMinus: () => this.setState(st => ({ qty: Math.max(1, st.qty - 1) })),
       addOrView, adding: s.adding, cartBtnLabel, cartBtnBg, miniShift: s.miniBar ? '0%' : '120%',
@@ -1888,9 +2127,11 @@ class Component extends DCLogic {
         const emailOrPhone = inp[0] ? inp[0].value.trim() : '';
         const pass = inp[1] ? inp[1].value.trim() : '';
         const name = inp.length > 2 ? inp[2].value.trim() : '';
-        if (s.authMode === 'signup' && !name) { alert('Full name required.'); return; }
-        if (!emailOrPhone) { alert('Email or mobile number required.'); return; }
-        if (!pass || pass.length < 4) { alert('Password (min 4 chars) required.'); return; }
+        const errs = {};
+        if (s.authMode === 'signup' && !name) errs.name = 'Full name required';
+        if (!emailOrPhone) errs.email = 'Email or phone required';
+        if (!pass || pass.length < 4) errs.pass = 'Password (min 4 chars)';
+        if (Object.keys(errs).length) { this.setState({ fieldErrors: errs }); return; }
         const isEmail = /\S+@\S+\.\S+/.test(emailOrPhone);
         try {
           if (s.authMode === 'signin') {
@@ -1899,23 +2140,64 @@ class Component extends DCLogic {
               body: JSON.stringify(isEmail ? {email:emailOrPhone, password:pass} : {phone:emailOrPhone, password:pass})
             });
             const d = await r.json();
-            if (!d.success) { alert(d.error || 'Sign in failed.'); return; }
-            this.goHome();
+            if (!d.success) { alert(d.error); return; }
+            if (d.token) sessionStorage.setItem('cc_token', d.token);
+            this.setState({ loggedInUser: d.user, fieldErrors: {} });
+            this.openAccount();
           } else {
             const r = await fetch('/api/auth/signup', {
               method:'POST', headers:{'Content-Type':'application/json'},
               body: JSON.stringify(isEmail ? {name, email:emailOrPhone, password:pass} : {name, phone:emailOrPhone, password:pass})
             });
             const d = await r.json();
-            if (!d.success) { alert(d.error || 'Account creation failed.'); return; }
-            alert('Account created! Welcome to Saubhagya.');
-            this.goHome();
+            if (!d.success) { alert(d.error); return; }
+            if (d.token) sessionStorage.setItem('cc_token', d.token);
+            this.setState({ loggedInUser: d.user, fieldErrors: {} });
+            this.openAccount();
           }
-        } catch(e) { alert('Server error. Please try again: ' + e.message); }
+        } catch(e) { alert('Server error: ' + e.message); }
       },
 
       // footer info pages
       isInfo: s.page === 'info',
+      isAccount: s.page === 'account',
+      loggedIn: !!s.loggedInUser,
+      notLoggedIn: !s.loggedInUser,
+      navUserLabel: s.loggedInUser ? (s.loggedInUser.name || '').split(' ')[0] : '',
+      accName: s.loggedInUser ? s.loggedInUser.name : 'Guest',
+      accEmail: s.loggedInUser ? (s.loggedInUser.email || s.loggedInUser.phone || '') : '',
+      logout: () => this.logout(),
+      accHasOrders: (s.userOrders || []).length > 0,
+      accNoOrders: (s.userOrders || []).length === 0,
+      accOrdersList: (s.userOrders || []).map(o => {
+        const d = new Date(o.created_at);
+        const ship = new Date(d.getTime() + 3 * 86400000);
+        const deliver = new Date(d.getTime() + 6 * 86400000);
+        const fmt = (dt) => dt.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+        return {
+          id: o.id, status: (o.status || 'confirmed').toUpperCase(),
+          bg: o.status === 'shipped' ? '#0B3C26' : (o.status === 'delivered' ? '#1a7a2b' : '#C5A059'),
+          items: (o.items || []).map(i => (i.name || i.id) + ' x' + (i.qty || 1)).join(', '),
+          total: '₹' + Number((o.total || 0)/100).toLocaleString('en-IN'),
+          date: fmt(d),
+          shipDate: fmt(ship), shipDot: o.status === 'shipped' || o.status === 'delivered' ? '#0B3C26' : '#ddd6c6',
+          shipColor: o.status === 'shipped' || o.status === 'delivered' ? '#0B3C26' : '#9a9a9a',
+          deliveryDate: fmt(deliver),
+          paymentId: o.razorpay_payment_id ? o.razorpay_payment_id.slice(0,16) + '…' : '—',
+          hasAWB: !!(o.awb && o.awb !== ''),
+          awbUrl: o.awb_url || (o.awb ? 'https://shiprocket.co/tracking/' + o.awb : '')
+        };
+      }),
+      wishlistCount: (s.wishlist || []).length,
+      wishlistHas: (s.wishlist || []).length > 0,
+      wishlistItems: (s.wishlist || []).map(sku => {
+        const p = cat.find(x => x.id === sku);
+        return {
+          name: p ? p.name : sku, price: p ? this.fmt(p.price) : '',
+          onClick: () => this.openProduct(sku),
+          remove: (e) => { e.stopPropagation(); this.toggleWishlist(sku); }
+        };
+      }),
       isTrackPage: s.page === 'info' && s.infoKey === 'track',
       isNotTrackPage: s.page === 'info' && s.infoKey !== 'track',
       trackPhone: s.trackPhone,
