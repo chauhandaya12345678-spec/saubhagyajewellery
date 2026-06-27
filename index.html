@@ -187,30 +187,39 @@
     [style*="repeat(4"][style*="gap: 1px"]{grid-template-columns:1fr 1fr!important}
     /* Checkout 3-col input row */
     [style*="1.2fr 1fr 1fr"]{grid-template-columns:1fr!important;gap:10px!important}
-    /* FOOTER: 4-col -> 2-col (brand spans both) */
-    footer{padding:32px 14px 20px!important}
-    footer > div:first-child{grid-template-columns:1fr 1fr!important;gap:22px!important}
-    footer > div:first-child > div:first-child{grid-column:1/-1!important}
-    /* Footer bottom row: stack */
-    footer > div:last-child{flex-direction:column!important;gap:10px!important;align-items:flex-start!important;text-align:left!important;margin-top:24px!important}
-    /* Mobile footer: compact */
+    /* FOOTER: compact, organized mobile */
+    footer{padding:26px 16px 16px!important}
+    footer > div:first-child{grid-template-columns:1fr 1fr!important;gap:20px 16px!important;align-items:start!important}
+    /* Brand block: centered, spans both cols, no paragraph, no social */
+    footer > div:first-child > div:first-child{grid-column:1/-1!important;text-align:center!important;padding-bottom:14px!important;border-bottom:1px solid rgba(197,160,89,.18)!important;margin-bottom:4px!important}
+    footer > div:first-child > div:first-child > div:first-child{font-size:20px!important;letter-spacing:1.4px!important}
+    footer > div:first-child > div:first-child > div:nth-child(2){font-size:8px!important;letter-spacing:4px!important;margin-top:3px!important}
     footer p{display:none!important}
     footer .f-social{display:none!important}
-    footer > div:first-child{gap:12px!important}
-    footer > div:first-child > div > div{font-size:8px!important;letter-spacing:1.5px!important;margin-bottom:8px!important}
-    footer > div:first-child span,footer > div:first-child a{font-size:11px!important;gap:6px!important}
-    footer > div:first-child > div:last-child > div{font-size:11px!important;line-height:1.4!important}
-    footer > div:last-child > div:first-child{font-size:9px!important}
-    /* Mobile footer: hide payment badges, compact location */
-    .f-location{font-size:10px!important;line-height:1.4!important}
-    .f-location br{display:none!important}
-    .f-location{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-    footer a[href*="wa.me"]{display:none!important}
+    /* Column headings */
+    footer > div:first-child > div > div:first-child{font-size:9px!important;letter-spacing:2px!important;margin-bottom:10px!important}
+    /* Links */
+    footer > div:first-child span{font-size:12px!important;line-height:1.5!important}
+    footer > div:first-child > div > div[style*="flex-direction:column"]{gap:8px!important}
+    /* Location block: spans both cols at bottom */
+    footer > div:first-child > div:last-child{grid-column:1/-1!important;text-align:center!important;padding-top:12px!important;border-top:1px solid rgba(197,160,89,.18)!important;margin-top:4px!important}
+    .f-location{font-size:11px!important;line-height:1.55!important}
+    /* Compact WhatsApp button instead of link */
+    footer a[href*="wa.me"]{display:inline-flex!important;margin-top:10px!important;padding:7px 14px!important;background:rgba(197,160,89,.12)!important;border:1px solid rgba(197,160,89,.4)!important;border-bottom:1px solid rgba(197,160,89,.4)!important;font-size:11px!important;letter-spacing:.5px!important;border-radius:3px!important}
+    /* Bottom row: stacked, small, no payment badges */
+    footer > div:last-child{flex-direction:column!important;gap:6px!important;align-items:center!important;text-align:center!important;margin-top:18px!important;padding-top:12px!important}
+    footer > div:last-child > div:first-child{font-size:10px!important}
     footer > div:last-child > div:last-child{display:none!important}
-    footer > div:last-child{margin-top:12px!important;padding-top:10px!important}
     /* PDP mini bar bottom */
     [style*="padding: 14px 48"] button{padding:0 18px!important;height:42px!important;font-size:11px!important}
-    /* Checkout: sticky Pay Now on mobile */
+    /* Checkout: grid collapse + summary on top, tighter form */
+    .m-checkout-grid{grid-template-columns:1fr!important;gap:18px!important}
+    .m-checkout-summary{order:-1!important;position:relative!important;top:0!important;padding:14px!important}
+    .m-checkout-summary > div:first-child{font-size:18px!important;margin-bottom:12px!important}
+    .m-checkout-summary button{height:46px!important;font-size:11px!important;margin-top:14px!important;letter-spacing:1.5px!important}
+    .m-checkout-form h2{margin:14px 0 6px!important;font-size:15px!important}
+    .m-checkout-form input,.m-checkout-form select{height:42px!important;font-size:13px!important}
+    .m-checkout-form > div[style*="flex-direction:column"]{gap:8px!important}
     .m-checkout{padding-bottom:100px!important}
     @media(max-width:640px){
       .checkout-sticky-pay{display:flex!important;position:fixed!important;bottom:0!important;left:0!important;right:0!important;z-index:50!important;background:#fff!important;border-top:1px solid #eae5d8!important;padding:12px 14px!important;box-shadow:0 -6px 20px rgba(0,0,0,.08)!important}
@@ -221,9 +230,11 @@
     }
     /* PDP: qty +/- and add-to-cart side by side on mobile */
     /* PDP qty + add-to-cart side by side — match exact inline style (no spaces after colons) */
-    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"]{flex-direction:row!important;flex-wrap:nowrap!important}
-    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > div{flex:none!important}
-    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > button{flex:1!important;min-width:100px!important;font-size:10px!important;padding:0 8px!important;height:42px!important}
+    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"]{flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:10px!important}
+    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > div{flex:none!important;height:46px!important}
+    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > div > span{height:46px!important;width:38px!important;font-size:16px!important}
+    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > div > span:nth-child(2){width:32px!important}
+    div[style*="display:flex"][style*="gap:14px"][style*="margin-top:22px"] > button{flex:1!important;min-width:120px!important;font-size:11px!important;letter-spacing:1.5px!important;padding:0 10px!important;height:46px!important}
     /* Hide sticky bottom mini bar on mobile - user wants btn beside qty, not at bottom */
     [style*="position: fixed"][style*="bottom: 0"][style*="z-index: 40"]{display:none!important}
     /* Hide BUY IT NOW on mobile - only show qty+addtocart below price */
@@ -310,7 +321,9 @@
         <svg onClick="{{ openAuth }}" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="cursor:pointer;"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>
         <div onClick="{{ openCart }}" style="position:relative; cursor:pointer;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg>
-          <span style="position:absolute; top:-7px; right:-9px; background:#0B3C26; color:#fff; font-size:9px; font-weight:600; min-width:15px; height:15px; padding:0 3px; border-radius:8px; display:flex; align-items:center; justify-content:center;">{{ cartCount }}</span>
+          <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ false }}">
+            <span style="position:absolute; top:-7px; right:-9px; background:#0B3C26; color:#fff; font-size:9px; font-weight:600; min-width:15px; height:15px; padding:0 3px; border-radius:8px; display:flex; align-items:center; justify-content:center;">{{ cartCount }}</span>
+          </sc-if>
         </div>
       </div>
     </div>
@@ -833,10 +846,10 @@
       <div style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.6px; color:#9a9a9a; margin-bottom:22px;">
         <span onClick="{{ goHome }}" style="cursor:pointer;" style-hover="color:#0B3C26;">Home</span>&nbsp;&nbsp;/&nbsp;&nbsp;<span style="color:#1A1A1A;">Secure Checkout</span>
       </div>
-      <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:32px; align-items:start;">
+      <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:32px; align-items:start;" class="m-checkout-grid">
 
         <!-- LEFT: FORM -->
-        <div>
+        <div class="m-checkout-form">
           <!-- contact -->
           <div style="display:flex; align-items:baseline; justify-content:space-between;">
             <h2 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:17px; color:#1A1A1A; margin:0;">Contact</h2>
@@ -917,7 +930,7 @@
         </div>
 
         <!-- RIGHT: ORDER SUMMARY -->
-        <div style="position:sticky; top:150px; background:#fff; border:1px solid #eae5d8; padding:18px;">
+        <div class="m-checkout-summary" style="position:sticky; top:150px; background:#fff; border:1px solid #eae5d8; padding:18px;">
           <div style="font-family:'Cormorant Garamond',serif; font-size:22px; color:#1A1A1A; margin-bottom:20px;">Order Summary</div>
           <!-- TEST MODE -->
           <div style="margin-bottom:14px;">
@@ -1448,7 +1461,7 @@ class Component extends DCLogic {
           cart: lines.map(l => l.id + 'x' + l.qty).join(',')
         },
         theme: { color: '#0B3C26' },
-        handler: async (resp) => {
+        handler: (resp) => {
           const oid = resp.razorpay_payment_id || ('CC' + Date.now().toString(36).toUpperCase());
           this.saveCart([]);
           const co = this.state.co;
@@ -1462,33 +1475,29 @@ class Component extends DCLogic {
           const total = subtotal - discount;
           const address = { street: co.address, apt: co.apt, city: co.city, state: co.state, pin: co.pin };
           const name = (co.first + ' ' + co.last).trim();
-          try {
-            const r = await fetch('/api/orders/save', {
-              method:'POST', headers:{'Content-Type':'application/json'},
-              body: JSON.stringify({
-                razorpay_payment_id: resp.razorpay_payment_id,
-                items: lines,
-                total: isTest ? 100 : total * 100,
-                subtotal: isTest ? 100 : subtotal * 100,
-                discount: isTest ? 0 : discount * 100,
-                name: isTest ? (name + ' [TEST]') : name,
-                email: co.email || '',
-                phone: co.phone || '',
-                address: JSON.stringify(address),
-                create_account: true,
-                test_mode: isTest
-              })
-            });
-            const d = await r.json();
-            if (d.success) {
-              this.setState({ cartItems: [], placed: true, orderId: d.order_id });
-              if (d.session_token) sessionStorage.setItem('cc_token', d.session_token);
-            } else {
-              this.setState({ cartItems: [], placed: true, orderId: oid });
-            }
-          } catch(e) {
-            this.setState({ cartItems: [], placed: true, orderId: oid });
-          }
+          const isTestMode = this.state.testMode;
+          // Show confirmation immediately
+          this.setState({ cartItems: [], placed: true, orderId: oid });
+          this.top();
+          // Save order to D1 in background
+          fetch('/api/orders/save', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({
+              razorpay_payment_id: resp.razorpay_payment_id,
+              items: lines,
+              total: isTestMode ? 100 : total * 100,
+              subtotal: isTestMode ? 100 : subtotal * 100,
+              discount: isTestMode ? 0 : discount * 100,
+              name: isTestMode ? (name + ' [TEST]') : name,
+              email: co.email || '',
+              phone: co.phone || '',
+              address: JSON.stringify(address),
+              create_account: true,
+              test_mode: isTestMode
+            })
+          }).then(r => r.json()).then(d => {
+            if (d.success && d.session_token) sessionStorage.setItem('cc_token', d.session_token);
+          }).catch(() => {});
           this.top();
         },
         modal: {
