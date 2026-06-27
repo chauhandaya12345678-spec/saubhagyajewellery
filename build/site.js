@@ -82,7 +82,7 @@ const CATALOG = applyOverrides(buildCatalog(), OVERRIDES);
 /* ---------- helpers ---------- */
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const inr = (n) => '₹' + Number(n).toLocaleString('en-IN');
-const urlOf = (slug) => slug === 'index.html' ? BASE_URL + '/' : BASE_URL + '/' + slug;
+const urlOf = (slug) => slug === 'index.html' ? BASE_URL + '/' : BASE_URL + '/' + slug.replace(/\.html$/, '');
 
 /* ---------- shared chrome ---------- */
 const NAV = [
