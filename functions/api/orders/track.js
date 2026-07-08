@@ -22,12 +22,19 @@ export async function onRequest(context) {
     const orderId = url.searchParams.get('order_id');
     const email = url.searchParams.get('email');
     const phone = url.searchParams.get('phone');
+    const userId = url.searchParams.get('user_id');
 
     let results;
 
     if (orderId) {
       const order = await db.prepare('SELECT * FROM orders WHERE id = ?').bind(orderId).first();
       results = order ? [order] : [];
+    } else if (userId) {
+      // Direct user_id lookup (fastest — integer FK index)
+      results = await db.prepare(
+        'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC'
+      ).bind(parseInt(userId, 10)).all();
+      results = results.results || [];
     } else if (email && phone) {
       // Account view: orders may carry either identifier depending on checkout form
       results = await db.prepare(

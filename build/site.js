@@ -159,7 +159,7 @@ function productCard(p) {
   const img = p.image
     ? `<img class="card-photo" src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">`
     : `<span class="card-ph">STUDIO PRODUCT SHOT</span>`;
-  return `<a class="card" href="${APP}?product=${encodeURIComponent(p.id)}">
+  return `<a class="card" href="product.html?sku=${encodeURIComponent(p.sku)}">
   <div class="card-img${p.image ? ' card-img-photo' : ''}">${tag ? `<span class="card-tag">${esc(tag)}</span>` : ''}${img}</div>
   <div class="card-name">${esc(p.name)}</div>
   <div class="card-price">${inr(p.price)}</div>
