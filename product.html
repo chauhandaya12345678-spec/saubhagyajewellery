@@ -162,30 +162,28 @@
   $('pdp-dec').addEventListener('click', function() { updateQty(-1); });
   $('pdp-inc').addEventListener('click', function() { updateQty(1); });
 
-  $('pdp-addcart').addEventListener('click', function() {
-    if (!product) return;
-    if (window.MPA) { window.MPA.addToCart(product.sku, qty); }
-    // Also save to cc_cart directly for SPA cross-compat
+  // Single write path — calling both MPA.addToCart AND a manual write doubled the qty
+  function addToBag() {
+    if (window.MPA) { window.MPA.addToCart(product.sku, qty); return; }
     try {
       var cart = JSON.parse(localStorage.getItem('cc_cart') || '[]');
       var hit = cart.find(function(i) { return i.id === product.sku; });
       if (hit) hit.qty += qty; else cart.push({ id: product.sku, qty: qty });
       localStorage.setItem('cc_cart', JSON.stringify(cart));
     } catch(e) {}
+  }
+
+  $('pdp-addcart').addEventListener('click', function() {
+    if (!product) return;
+    addToBag();
     this.textContent = '✓ ADDED!';
     setTimeout(function() { $('pdp-addcart').textContent = 'ADD TO BAG'; }, 1500);
   });
 
   $('pdp-buynow').addEventListener('click', function() {
     if (!product) return;
-    // Add to cart then go to SPA checkout
-    try {
-      var cart = JSON.parse(localStorage.getItem('cc_cart') || '[]');
-      var hit = cart.find(function(i) { return i.id === product.sku; });
-      if (hit) hit.qty += qty; else cart.push({ id: product.sku, qty: qty });
-      localStorage.setItem('cc_cart', JSON.stringify(cart));
-    } catch(e) {}
-    window.location.href = 'index.html';
+    addToBag();
+    window.location.href = 'checkout.html';
   });
 
   // Fetch product

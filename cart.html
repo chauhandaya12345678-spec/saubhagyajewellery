@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="site.css">
 <script src="layout.js"></script>
 <script src="mpa.js" defer></script>
+<script src="catalog.js?v=4"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #FAFAFA; margin: 0; }
@@ -126,18 +127,37 @@
     $('cart-content').style.display = 'block';
   }
 
+  function useCatalogFallback() {
+    (window.CHAUHAN_CATALOG || []).forEach(function(p) {
+      var k = p.id || p.sku;
+      if (!products[k]) products[k] = p;
+    });
+  }
+
   function fetchProducts() {
     var skus = cartItems.map(function(i) { return i.id; });
     if (!skus.length) { render(); return; }
-    // Fetch all products, filter locally
     fetch('/api/products')
       .then(function(r) { return r.json(); })
       .then(function(data) {
         var list = Array.isArray(data) ? data : (data.products || []);
         list.forEach(function(p) { products[p.sku || p.id] = p; });
+        useCatalogFallback();
         render();
       })
-      .catch(function() { render(); });
+      .catch(function() {
+        // API unreachable — catalog.js static fallback still has names/prices
+        useCatalogFallback();
+        if (!Object.keys(products).length) {
+          var retry = 0;
+          var poll = setInterval(function() {
+            useCatalogFallback();
+            if (Object.keys(products).length || ++retry > 30) { clearInterval(poll); render(); }
+          }, 150);
+          return;
+        }
+        render();
+      });
   }
 
   window.Cart = {
