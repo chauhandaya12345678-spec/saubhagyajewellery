@@ -1906,13 +1906,21 @@ class Component extends DCLogic {
       document.body.appendChild(d);
     } catch(e) {}
   }
-  /* Batch 3: physical success page. Persist the fallback view, save the order
-   * with keepalive (survives the navigation even if we redirect first), wait
-   * up to 6s for the real CC- id, then hard-redirect to /success.html. */
+  /* Batch 3: physical success page. Immediately persist user session from
+   * checkout form so "Continue Shopping" always shows the logged-in header,
+   * even if the save API takes >6s or fails. The real user_id + order_id
+   * are updated when the API responds. */
   finalizeOrder(lastOrder, fallbackId, saveBody) {
     this.setLastOrder(lastOrder);
     try { localStorage.setItem('cc_lastorderid', fallbackId); } catch(e) {}
     this.showOrderOverlay();
+
+    // FIX: Set user from checkout data NOW — don't wait for API
+    var name = (saveBody.name || lastOrder.customer || '').trim();
+    if (name && (saveBody.email || saveBody.phone)) {
+      this.setUser({ id: null, name: name, email: saveBody.email || '', phone: saveBody.phone || '' });
+    }
+
     const save = fetch('/api/orders/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1925,13 +1933,15 @@ class Component extends DCLogic {
       if (d && d.success && d.order_id) {
         try { localStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
         if (d.session_token) { try { localStorage.setItem('cc_token', d.session_token); } catch(e) {} }
-        if (d.user_id) this.setUser({ id: d.user_id, name: lastOrder.customer, email: lastOrder.email, phone: lastOrder.phone });
+        // Update user with real id from D1 (email/phone were set earlier)
+        if (d.user_id) this.setUser({ id: d.user_id, name: name, email: saveBody.email || '', phone: saveBody.phone || '' });
         if (d.shiprocket && !d.shiprocket.pushed) console.warn('Shiprocket push failed:', d.shiprocket.error);
         this.setLastOrder(Object.assign({}, lastOrder, { id: d.order_id }));
         target += '?order_id=' + encodeURIComponent(d.order_id);
       } else if (d && d.error) {
         console.error('Order save failed:', d.error);
       }
+      // FIX: Always navigate — user is already persisted above
       window.location.href = target;
     });
   }

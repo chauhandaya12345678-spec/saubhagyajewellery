@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loading… | Saubhagya</title>
+<meta name="robots" content="index,follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="layout.js"></script>
+<script src="mpa.js" defer></script>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #FAFAFA; margin: 0; }
+  .pdp-wrap { max-width: 1280px; margin: 0 auto; padding: 0 48px 80px; }
+  .pdp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+  .pdp-img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 4px; background: #f0ede5; }
+  .pdp-img-wrap { position: relative; overflow: hidden; border-radius: 4px; }
+  .pdp-img-wrap:hover .pdp-img { transform: scale(1.05); transition: transform 0.5s cubic-bezier(.22,1,.36,1); }
+  .pdp-badge { display: inline-block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 2px; padding: 5px 12px; background: #C5A059; color: #fff; margin-bottom: 14px; }
+  .pdp-cat { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 4px; color: #C5A059; margin-bottom: 8px; text-transform: uppercase; }
+  .pdp-name { font-family: 'Cormorant Garamond',serif; font-size: 36px; font-weight: 500; color: #1A1A1A; line-height: 1.15; margin: 0 0 6px; }
+  .pdp-region { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; margin-bottom: 20px; }
+  .pdp-price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  .pdp-price { font-family: 'Cormorant Garamond',serif; font-size: 28px; font-weight: 600; color: #0B3C26; }
+  .pdp-mrp { font-family: 'Montserrat',sans-serif; font-size: 15px; color: #9a9a9a; text-decoration: line-through; }
+  .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B3C26; font-weight: 500; }
+  .pdp-tax { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; margin-bottom: 22px; }
+  .pdp-qtyrow { display: flex; align-items: stretch; gap: 10px; margin: 0 0 14px; }
+  .pdp-qty { display: flex; align-items: stretch; border: 1px solid #ddd6c6; }
+  .pdp-qty span { display: flex; align-items: center; justify-content: center; font-family: 'Montserrat',sans-serif; font-size: 14px; cursor: pointer; user-select: none; }
+  .pdp-qty .pdp-q { width: 34px; color: #0B3C26; }
+  .pdp-qty .pdp-v { width: 36px; font-size: 13px; border-left: 1px solid #ddd6c6; border-right: 1px solid #ddd6c6; }
+  .pdp-add { flex: 1; height: 48px; border: none; background: #0B3C26; color: #fff; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; white-space: nowrap; }
+  .pdp-buy { width: 100%; height: 48px; border: 1px solid #0B3C26; background: transparent; color: #0B3C26; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; margin-bottom: 24px; }
+  .pdp-desc { font-family: 'Montserrat',sans-serif; font-size: 13px; line-height: 1.8; color: #6a6a6a; max-width: 460px; }
+  .pdp-desc strong { color: #1A1A1A; }
+  .pdp-loading { text-align: center; padding: 80px 24px; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; letter-spacing: 2px; }
+  .pdp-error { text-align: center; padding: 80px 24px; }
+  .pdp-error h1 { font-family: 'Cormorant Garamond',serif; font-size: 28px; color: #1A1A1A; margin: 0 0 14px; }
+  .pdp-error a { color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; padding-bottom: 2px; }
+  @media (max-width: 900px) {
+    .pdp-grid { grid-template-columns: 1fr; gap: 28px; }
+    .pdp-wrap { padding: 0 18px 60px; }
+    .pdp-name { font-size: 26px; }
+    .pdp-price { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<x-layout page=""></x-layout>
+<main>
+  <div class="pdp-wrap">
+    <div class="pdp-loading" id="pdp-loading">LOADING…</div>
+    <div class="pdp-error" id="pdp-error" style="display:none">
+      <h1>Product Not Found</h1>
+      <p style="font-family:'Montserrat',sans-serif;font-size:14px;color:#6a6a6a;margin:0 0 20px;">This piece may no longer be available.</p>
+      <a href="index.html">← Back to Home</a>
+    </div>
+    <div id="pdp-content" style="display:none">
+      <nav class="crumb" id="pdp-crumb"></nav>
+      <div class="pdp-grid">
+        <div class="pdp-img-wrap">
+          <img class="pdp-img" id="pdp-image" src="" alt="">
+        </div>
+        <div>
+          <div class="pdp-cat" id="pdp-cat"></div>
+          <h1 class="pdp-name" id="pdp-name"></h1>
+          <div class="pdp-region" id="pdp-region"></div>
+          <div class="pdp-price-row">
+            <span class="pdp-price" id="pdp-price"></span>
+            <span class="pdp-mrp" id="pdp-mrp"></span>
+            <span class="pdp-save" id="pdp-save"></span>
+          </div>
+          <div class="pdp-tax">incl. of all taxes</div>
+          <div class="pdp-qtyrow">
+            <div class="pdp-qty">
+              <span class="pdp-q" id="pdp-dec">−</span>
+              <span class="pdp-v" id="pdp-qty">1</span>
+              <span class="pdp-q" id="pdp-inc">+</span>
+            </div>
+            <button class="pdp-add" id="pdp-addcart">ADD TO BAG</button>
+          </div>
+          <button class="pdp-buy" id="pdp-buynow">BUY IT NOW</button>
+          <div class="pdp-desc" id="pdp-desc"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<x-footer></x-footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function(id) { return document.getElementById(id); };
+  var sku = new URLSearchParams(location.search).get('sku') || '';
+  if (!sku) { $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block'; return; }
+
+  var product = null;
+  var qty = 1;
+
+  function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+
+  function render() {
+    var p = product;
+    document.title = p.name + ' | Saubhagya';
+    // OG tags
+    var ogTitle = document.querySelector('meta[property="og:title"]');
+    if (!ogTitle) { ogTitle = document.createElement('meta'); ogTitle.setAttribute('property','og:title'); document.head.appendChild(ogTitle); }
+    ogTitle.setAttribute('content', p.name + ' | Saubhagya');
+    var ogImg = document.querySelector('meta[property="og:image"]');
+    if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
+    ogImg.setAttribute('content', (p.image || '').startsWith('http') ? p.image : 'https://saubhagyajewellery.com/' + (p.image || ''));
+    // Breadcrumb
+    $('pdp-crumb').innerHTML = '<a href="index.html">Home</a><i>/</i><a href="' + regionSlug(p.region) + '">' + (p.regionLabel || '') + '</a><i>/</i><span>' + p.name + '</span>';
+    $('pdp-cat').textContent = p.category || '';
+    $('pdp-name').textContent = p.name;
+    $('pdp-region').textContent = (p.badge ? p.badge + ' · ' : '') + (p.city || '') + ' · ' + (p.regionLabel || '');
+    $('pdp-image').src = p.image || '';
+    $('pdp-image').alt = p.name;
+    $('pdp-price').textContent = fmt(p.price);
+    if (p.mrp && p.mrp > p.price) {
+      $('pdp-mrp').textContent = fmt(p.mrp);
+      $('pdp-mrp').style.display = '';
+      var off = Math.round((1 - p.price / p.mrp) * 100);
+      $('pdp-save').textContent = off + '% off';
+    } else {
+      $('pdp-mrp').style.display = 'none';
+      $('pdp-save').textContent = '';
+    }
+    $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> — premium designer imitation jewellery, handcrafted in our Mumbai atelier. ' +
+      (p.category ? 'Part of our ' + p.category + ' collection. ' : '') +
+      'Each piece is individually inspected and dispatched insured across India.';
+    $('pdp-loading').style.display = 'none';
+    $('pdp-content').style.display = 'block';
+    // JSON-LD
+    var ld = document.createElement('script');
+    ld.type = 'application/ld+json';
+    ld.textContent = JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'Product',
+      name: p.name, sku: p.sku, brand: { '@type': 'Brand', name: 'Saubhagya' },
+      offers: { '@type': 'Offer', priceCurrency: 'INR', price: String(p.price), availability: p.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }
+    });
+    document.head.appendChild(ld);
+  }
+
+  function regionSlug(r) {
+    if (r === 'south') return 'south-indian-traditional.html';
+    if (r === 'modern') return 'mumbai-modern.html';
+    if (r === 'bridal') return 'north-indian-bridal.html';
+    return 'south-indian-traditional.html';
+  }
+
+  function updateQty(delta) {
+    qty = Math.max(1, qty + delta);
+    $('pdp-qty').textContent = qty;
+  }
+
+  $('pdp-dec').addEventListener('click', function() { updateQty(-1); });
+  $('pdp-inc').addEventListener('click', function() { updateQty(1); });
+
+  $('pdp-addcart').addEventListener('click', function() {
+    if (!product) return;
+    if (window.MPA) { window.MPA.addToCart(product.sku, qty); }
+    // Also save to cc_cart directly for SPA cross-compat
+    try {
+      var cart = JSON.parse(localStorage.getItem('cc_cart') || '[]');
+      var hit = cart.find(function(i) { return i.id === product.sku; });
+      if (hit) hit.qty += qty; else cart.push({ id: product.sku, qty: qty });
+      localStorage.setItem('cc_cart', JSON.stringify(cart));
+    } catch(e) {}
+    this.textContent = '✓ ADDED!';
+    setTimeout(function() { $('pdp-addcart').textContent = 'ADD TO BAG'; }, 1500);
+  });
+
+  $('pdp-buynow').addEventListener('click', function() {
+    if (!product) return;
+    // Add to cart then go to SPA checkout
+    try {
+      var cart = JSON.parse(localStorage.getItem('cc_cart') || '[]');
+      var hit = cart.find(function(i) { return i.id === product.sku; });
+      if (hit) hit.qty += qty; else cart.push({ id: product.sku, qty: qty });
+      localStorage.setItem('cc_cart', JSON.stringify(cart));
+    } catch(e) {}
+    window.location.href = 'index.html';
+  });
+
+  // Fetch product
+  fetch('/api/products?sku=' + encodeURIComponent(sku))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var list = Array.isArray(data) ? data : (data.products || []);
+      if (!list.length) { $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block'; return; }
+      product = list[0];
+      render();
+    })
+    .catch(function() {
+      $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block';
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout | Saubhagya</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="layout.js"></script>
+<script src="mpa.js" defer></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  window.CC_PAYMENTS = {
+    razorpayKeyId: 'rzp_live_T6EhbHB5QhrM5W',
+    createOrderUrl: '/api/orders/create-razorpay-order',
+    shiprocketTrackBase: 'https://shiprocket.co/tracking/',
+    useMagicCheckout: false
+  };
+</script>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #FAFAFA; margin: 0; }
+  .co-wrap { max-width: 780px; margin: 0 auto; padding: 20px 24px 80px; }
+  .co-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: start; }
+  .co-title { font-family: 'Cormorant Garamond',serif; font-size: 24px; color: #1A1A1A; margin: 0 0 6px; }
+  .co-sub { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; margin: 0 0 22px; }
+  .co-section { margin-bottom: 24px; }
+  .co-label { display: block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 1.5px; color: #6a6a6a; margin-bottom: 6px; text-transform: uppercase; }
+  .co-input { width: 100%; height: 44px; padding: 0 14px; border: 1px solid #ddd6c6; font-family: 'Montserrat',sans-serif; font-size: 13px; outline: none; background: #fff; margin-bottom: 12px; }
+  .co-input:focus { border-color: #C5A059; }
+  .co-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .co-summary { background: #fff; border: 1px solid #eae5d8; padding: 20px; position: sticky; top: 120px; }
+  .co-line { display: flex; justify-content: space-between; padding: 6px 0; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #4a4a4a; }
+  .co-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid #eae5d8; }
+  .co-total span:first-child { font-family: 'Cormorant Garamond',serif; font-size: 16px; }
+  .co-total span:last-child { font-family: 'Cormorant Garamond',serif; font-size: 20px; font-weight: 600; color: #0B3C26; }
+  .co-btn { display: block; width: 100%; padding: 16px; background: #0B3C26; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; margin-top: 16px; }
+  .co-btn:disabled { opacity: .6; cursor: not-allowed; }
+  .co-btn:hover:not(:disabled) { background: #06281a; }
+  .co-error { color: #c0392b; font-family: 'Montserrat',sans-serif; font-size: 11px; margin: -8px 0 8px; }
+  .co-empty { text-align: center; padding: 60px 24px; }
+  .co-empty h1 { font-family: 'Cormorant Garamond',serif; font-size: 24px; margin: 0 0 10px; }
+  .co-empty a { color: #0B3C26; }
+  .co-pay-opt { display: flex; gap: 12px; margin-bottom: 16px; }
+  .co-pay-opt label { display: flex; align-items: center; gap: 6px; font-family: 'Montserrat',sans-serif; font-size: 13px; cursor: pointer; padding: 12px 16px; border: 1px solid #ddd6c6; flex: 1; }
+  .co-pay-opt input[type=radio] { accent-color: #0B3C26; }
+  @keyframes coSpin { to { transform: rotate(360deg); } }
+  .co-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(250,250,250,.96); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+  .co-spinner { width: 34px; height: 34px; border: 3px solid #C5A059; border-top-color: #0B3C26; border-radius: 50%; animation: coSpin 1s linear infinite; }
+  .co-overlay-text { font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; color: #0B3C26; }
+  @media (max-width: 700px) {
+    .co-grid { grid-template-columns: 1fr; }
+    .co-summary { position: static; }
+    .co-wrap { padding: 10px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+<x-layout page=""></x-layout>
+<main>
+<div class="co-wrap">
+  <div class="co-empty" id="co-empty" style="display:none">
+    <h1>Your bag is empty</h1>
+    <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:#6a6a6a;">Add pieces to your bag before checkout.</p>
+    <a href="index.html" style="color:#0B3C26;text-decoration:none;border-bottom:1px solid #C5A059;">← Continue Shopping</a>
+  </div>
+  <div id="co-content">
+    <h1 class="co-title">Checkout</h1>
+    <p class="co-sub">Fill in your details and choose a payment method.</p>
+
+    <div class="co-grid">
+      <div>
+        <div class="co-section">
+          <label class="co-label">Full Name</label>
+          <input class="co-input" id="co-first" placeholder="First name">
+          <input class="co-input" id="co-last" placeholder="Last name">
+          <label class="co-label">Email</label>
+          <input class="co-input" id="co-email" type="email" placeholder="you@email.com">
+          <label class="co-label">Phone Number</label>
+          <input class="co-input" id="co-phone" type="tel" placeholder="10-digit mobile" maxlength="10">
+        </div>
+        <div class="co-section">
+          <label class="co-label">Address</label>
+          <input class="co-input" id="co-address" placeholder="Street, building, flat">
+          <div class="co-row">
+            <div><label class="co-label">City</label><input class="co-input" id="co-city" placeholder="City"></div>
+            <div><label class="co-label">State</label><input class="co-input" id="co-state" value="Maharashtra" placeholder="State"></div>
+          </div>
+          <div class="co-row">
+            <div><label class="co-label">PIN Code</label><input class="co-input" id="co-pin" placeholder="6-digit PIN" maxlength="6"></div>
+            <div></div>
+          </div>
+        </div>
+        <div class="co-section">
+          <label class="co-label">Payment Method</label>
+          <div class="co-pay-opt">
+            <label><input type="radio" name="pay" value="razorpay" checked> Pay Online</label>
+            <label><input type="radio" name="pay" value="cod"> Cash on Delivery</label>
+          </div>
+        </div>
+        <button class="co-btn" id="co-submit">PLACE ORDER</button>
+        <div class="co-error" id="co-error" style="display:none"></div>
+      </div>
+
+      <div class="co-summary" id="co-summary">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:18px;color:#1A1A1A;margin:0 0 14px;">Order Summary</h2>
+        <div id="co-items"></div>
+        <div class="co-line" id="co-disc-row" style="display:none"><span>Discount (10%)</span><span id="co-disc"></span></div>
+        <div class="co-line"><span>Shipping</span><span id="co-shipping">Calculated at checkout</span></div>
+        <div class="co-total"><span>Total</span><span id="co-total-amt"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+<x-footer></x-footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function(id) { return document.getElementById(id); };
+  var fmt = function(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); };
+  var fmtPaise = function(paise) { return Number((paise || 0) / 100); };
+
+  var cartItems = [];
+  var products = {};
+  var subtotal = 0;
+  var promoCode = '';
+
+  function loadCart() {
+    try {
+      cartItems = JSON.parse(localStorage.getItem('cc_cart') || '[]');
+      if (!Array.isArray(cartItems)) cartItems = [];
+      cartItems = cartItems.filter(function(i) { return i && i.id && i.qty > 0; });
+    } catch(e) { cartItems = []; }
+    return cartItems;
+  }
+
+  function render() {
+    if (!cartItems.length) {
+      $('co-content').style.display = 'none'; $('co-empty').style.display = 'block'; return;
+    }
+    subtotal = 0;
+    $('co-items').innerHTML = cartItems.map(function(ci) {
+      var p = products[ci.id] || { name: ci.id, price: 0 };
+      subtotal += (p.price || 0) * ci.qty;
+      return '<div class="co-line"><span>' + (p.name || ci.id) + ' ×' + ci.qty + '</span><span>' + fmt((p.price || 0) * ci.qty) + '</span></div>';
+    }).join('');
+    updateTotals();
+  }
+
+  function shipCharge(pin) {
+    var p = String(pin || '').replace(/\D/g, '');
+    if (p.length !== 6) return null;
+    if (/^40[01]/.test(p)) return 40;
+    if (/^4[1-4]/.test(p)) return 55;
+    return 75;
+  }
+
+  function updateTotals() {
+    var pin = ($('co-pin').value || '').trim();
+    var ship = shipCharge(pin);
+    var discount = promoCode === 'WELCOME10' ? Math.round(subtotal * 0.1) : 0;
+
+    $('co-total-amt').textContent = fmt(subtotal);
+    if (ship !== null) {
+      $('co-shipping').textContent = fmt(ship);
+      var total = subtotal - discount + ship;
+      $('co-total-amt').textContent = fmt(total);
+    }
+    if (discount > 0) {
+      $('co-disc-row').style.display = 'flex';
+      $('co-disc').textContent = '−' + fmt(discount);
+    }
+  }
+
+  $('co-pin').addEventListener('input', updateTotals);
+
+  function validate() {
+    var errs = [];
+    var first = ($('co-first').value || '').trim();
+    var last = ($('co-last').value || '').trim();
+    var email = ($('co-email').value || '').trim();
+    var phone = ($('co-phone').value || '').replace(/\D/g, '');
+    var addr = ($('co-address').value || '').trim();
+    var city = ($('co-city').value || '').trim();
+    var pin = ($('co-pin').value || '').replace(/\D/g, '');
+
+    if (!first || !last) errs.push('Full name required');
+    if (!/^\S+@\S+\.\S+$/.test(email)) errs.push('Valid email required');
+    if (!/^\d{10}$/.test(phone)) errs.push('10-digit mobile required');
+    if (!addr) errs.push('Address required');
+    if (!city) errs.push('City required');
+    if (!/^\d{6}$/.test(pin)) errs.push('6-digit PIN required');
+    return { errs: errs, first: first, last: last, email: email, phone: phone, addr: addr, city: city, pin: pin };
+  }
+
+  function showOverlay() {
+    var d = document.createElement('div');
+    d.className = 'co-overlay';
+    d.innerHTML = '<div class="co-spinner"></div><div class="co-overlay-text">CONFIRMING YOUR ORDER…</div>';
+    document.body.appendChild(d);
+  }
+
+  function finalizeOrder(lastOrder, fallbackId, saveBody) {
+    try { localStorage.setItem('cc_lastorder', JSON.stringify(lastOrder)); } catch(e) {}
+    try { localStorage.setItem('cc_lastorderid', fallbackId); } catch(e) {}
+    showOverlay();
+
+    // Persist user session from checkout data IMMEDIATELY
+    var name = (saveBody.name || '').trim();
+    if (name && (saveBody.email || saveBody.phone)) {
+      try { localStorage.setItem('cc_user', JSON.stringify({ id: null, name: name, email: saveBody.email || '', phone: saveBody.phone || '' })); } catch(e) {}
+      try { localStorage.setItem('cc_token', 'checkout_token_' + Date.now().toString(36)); } catch(e) {}
+    }
+
+    var save = fetch('/api/orders/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify(saveBody)
+    }).then(function(r) { return r.json(); }).catch(function() { return null; });
+
+    var timeout = new Promise(function(res) { setTimeout(function() { res(null); }, 6000); });
+
+    Promise.race([save, timeout]).then(function(d) {
+      var target = '/success.html';
+      if (d && d.success && d.order_id) {
+        try { localStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
+        if (d.session_token) { try { localStorage.setItem('cc_token', d.session_token); } catch(e) {} }
+        if (d.user_id && name) {
+          try { localStorage.setItem('cc_user', JSON.stringify({ id: d.user_id, name: name, email: saveBody.email || '', phone: saveBody.phone || '' })); } catch(e) {}
+        }
+        target += '?order_id=' + encodeURIComponent(d.order_id);
+      }
+      window.location.href = target;
+    });
+  }
+
+  function doPayment(v) {
+    var cart = cartItems.slice();
+    var cfg = window.CC_PAYMENTS || {};
+    var lines = cart.map(function(ci) {
+      var p = products[ci.id] || {};
+      return { id: ci.id, name: p.name || ci.id, price: p.price || 0, qty: ci.qty };
+    });
+    subtotal = lines.reduce(function(s, l) { return s + l.price * l.qty; }, 0);
+    var codFee = v.pay === 'cod' ? 49 : 0;
+    var discount = promoCode === 'WELCOME10' ? Math.round(subtotal * 0.1) : 0;
+    var shipFee = shipCharge(v.pin) || 0;
+    var total = Math.max(0, subtotal - discount + codFee + shipFee);
+    var amountPaise = total * 100;
+
+    // Clear cart
+    try { localStorage.setItem('cc_cart', '[]'); } catch(e) {}
+    cartItems = [];
+    if (window.MPA) { try { window.MPA.setCart([]); } catch(e) {} }
+
+    var name = (v.first + ' ' + v.last).trim();
+    var address = { street: v.addr, apt: '', city: v.city, state: ($('co-state').value || '').trim() || 'Maharashtra', pin: v.pin };
+    var addressStr = JSON.stringify(address);
+
+    // COD path
+    if (v.pay === 'cod') {
+      var codOrderId = 'COD' + Date.now().toString(36).toUpperCase();
+      var lastOrder = {
+        id: codOrderId, paymentId: 'COD', customer: name, email: v.email, phone: v.phone,
+        totalText: fmt(total), lines: lines.map(function(l) { return { name: l.name, qty: l.qty, lineText: fmt(l.price * l.qty) }; }),
+        address: [v.addr, v.city, ($('co-state').value || '').trim(), v.pin].filter(Boolean).join(', ')
+      };
+      finalizeOrder(lastOrder, codOrderId, {
+        razorpay_payment_id: 'COD-' + codOrderId, items: lines, total: total * 100,
+        subtotal: subtotal * 100, discount: discount * 100, shipping: (shipFee + codFee) * 100,
+        name: name, email: v.email || '', phone: v.phone || '',
+        address: addressStr, create_account: true, test_mode: false, payment_method: 'cod'
+      });
+      return;
+    }
+
+    // Razorpay path
+    if (!cfg.razorpayKeyId || cfg.razorpayKeyId.indexOf('REPLACE_ME') >= 0) {
+      $('co-error').textContent = 'Razorpay key not configured.';
+      $('co-error').style.display = 'block';
+      return;
+    }
+    if (typeof Razorpay === 'undefined') {
+      $('co-error').textContent = 'Payment script failed to load. Check your internet connection.';
+      $('co-error').style.display = 'block';
+      return;
+    }
+
+    var lastOrder = {
+      lines: lines.map(function(l) { return { name: l.name, qty: l.qty, lineText: fmt(l.price * l.qty) }; }),
+      subtotalText: fmt(subtotal), discountText: discount > 0 ? fmt(discount) : '',
+      shippingText: fmt(shipFee), totalText: fmt(total),
+      customer: name, email: v.email, phone: v.phone,
+      address: [v.addr, v.city, ($('co-state').value || '').trim(), v.pin].filter(Boolean).join(', ')
+    };
+
+    var handlePayment = function(orderId, serverKeyId) {
+      var opts = {
+        key: serverKeyId || cfg.razorpayKeyId,
+        amount: amountPaise, currency: 'INR', name: 'Saubhagya',
+        description: lines.map(function(l) { return l.name; }).join(', ').slice(0, 200),
+        image: 'images/banners/saubhagya-logo.png',
+        order_id: orderId || undefined,
+        prefill: { name: name, email: v.email, contact: v.phone },
+        notes: { shipping_address: addressStr, cart: lines.map(function(l) { return l.id + 'x' + l.qty; }).join(',') },
+        theme: { color: '#0B3C26' },
+        handler: function(resp) {
+          var oid = resp.razorpay_payment_id || ('CC' + Date.now().toString(36).toUpperCase());
+          lastOrder.id = oid;
+          lastOrder.paymentId = resp.razorpay_payment_id || '';
+          finalizeOrder(lastOrder, oid, {
+            razorpay_payment_id: resp.razorpay_payment_id,
+            razorpay_order_id: resp.razorpay_order_id || orderId || '',
+            razorpay_signature: resp.razorpay_signature || '',
+            payment_method: 'razorpay',
+            items: lines, total: total * 100, subtotal: subtotal * 100,
+            discount: discount * 100, shipping: shipFee * 100,
+            name: name, email: v.email || '', phone: v.phone || '',
+            address: addressStr, create_account: true, test_mode: false
+          });
+        },
+        modal: { ondismiss: function() {} }
+      };
+      try { new Razorpay(opts).open(); } catch(e) {
+        $('co-error').textContent = 'Could not open payment window: ' + e.message;
+        $('co-error').style.display = 'block';
+      }
+    };
+
+    if (cfg.createOrderUrl) {
+      fetch(cfg.createOrderUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: amountPaise, currency: 'INR', cart: lines,
+          name: name, email: v.email, phone: v.phone,
+          address: addressStr, test_mode: false
+        })
+      }).then(function(r) { return r.json(); })
+        .then(function(d) { handlePayment(d.order_id, d.key_id || null); })
+        .catch(function() { handlePayment(null, null); });
+    } else {
+      handlePayment(null, null);
+    }
+  }
+
+  $('co-submit').addEventListener('click', function() {
+    var v = validate();
+    if (v.errs.length) {
+      $('co-error').textContent = v.errs.join('. ');
+      $('co-error').style.display = 'block';
+      return;
+    }
+    $('co-error').style.display = 'none';
+    $('co-submit').disabled = true;
+    $('co-submit').textContent = 'PROCESSING…';
+    doPayment(v);
+  });
+
+  // Init
+  loadCart();
+  if (cartItems.length) {
+    fetch('/api/products')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var list = Array.isArray(data) ? data : (data.products || []);
+        list.forEach(function(p) { products[p.sku || p.id] = p; });
+        render();
+      }).catch(function() { render(); });
+  } else {
+    $('co-content').style.display = 'none';
+    $('co-empty').style.display = 'block';
+  }
+})();
+</script>
+</body>
+</html>

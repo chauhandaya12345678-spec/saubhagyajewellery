@@ -131,8 +131,29 @@
     }
   }
 
+  /* ---- orders (D1 backend) --------------------------------------------- */
+
+  function fetchOrdersForUser() {
+    var user = getUser();
+    if (!user || !(user.email || user.phone)) return;
+    var params = [];
+    if (user.email) params.push('email=' + encodeURIComponent(user.email));
+    if (user.phone) params.push('phone=' + encodeURIComponent(user.phone));
+    if (!params.length) return;
+    fetch('/api/orders/track?' + params.join('&'))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.success && d.orders) {
+          window.MPA._orders = d.orders;
+          emit('orders');
+        }
+      })
+      .catch(function () { /* silent — network can fail on static pages */ });
+  }
+
   function initMPA() {
     render();
+    fetchOrdersForUser();
     return { user: getUser(), cart: getCart() };
   }
 

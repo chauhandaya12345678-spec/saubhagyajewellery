@@ -25,6 +25,8 @@
   'use strict';
 
   var APP = 'index.html';
+  var SIGNIN = 'signin.html';
+  var CART = 'cart.html';
   var WHATSAPP = 'https://wa.me/919987008435';
   var NAV = [
     { slug: 'index.html', label: 'Home' },
@@ -47,8 +49,8 @@
       '<span class="logo-sub">FINE JEWELLERY</span></a>' +
       '<div class="nav-icons">' +
       '<a href="' + APP + '" aria-label="Shop">Shop All</a>' +
-      '<a data-mpa-auth data-mpa-signin-href="' + APP + '" data-mpa-account-href="' + APP + '" href="' + APP + '">Sign in</a>' +
-      '<a href="' + APP + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
+      '<a data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="' + APP + '" href="' + SIGNIN + '">Sign in</a>' +
+      '<a href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
       '</div></div></header>';
   }
 

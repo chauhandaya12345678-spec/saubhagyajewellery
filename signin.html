@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign In | Saubhagya</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="layout.js"></script>
+<script src="mpa.js" defer></script>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #FAFAFA; margin: 0; }
+  .auth-wrap { max-width: 440px; margin: 0 auto; padding: 40px 24px 80px; }
+  .auth-title { font-family: 'Cormorant Garamond',serif; font-size: 28px; color: #1A1A1A; text-align: center; margin: 0 0 6px; }
+  .auth-sub { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; text-align: center; margin: 0 0 28px; }
+  .auth-label { display: block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 1.5px; color: #6a6a6a; margin-bottom: 6px; text-transform: uppercase; }
+  .auth-input { width: 100%; height: 48px; padding: 0 14px; border: 1px solid #ddd6c6; font-family: 'Montserrat',sans-serif; font-size: 14px; outline: none; background: #fff; margin-bottom: 14px; }
+  .auth-input:focus { border-color: #C5A059; }
+  .auth-btn { display: block; width: 100%; padding: 16px; background: #0B3C26; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; }
+  .auth-btn:hover { background: #06281a; }
+  .auth-error { color: #c0392b; font-family: 'Montserrat',sans-serif; font-size: 11px; text-align: center; margin: 12px 0; }
+  .auth-success { color: #0B3C26; font-family: 'Montserrat',sans-serif; font-size: 13px; text-align: center; margin: 12px 0; }
+  .auth-link { text-align: center; margin-top: 18px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; }
+  .auth-link a { color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; }
+  .auth-logged { text-align: center; padding: 40px 0; }
+  .auth-logged h2 { font-family: 'Cormorant Garamond',serif; font-size: 24px; color: #1A1A1A; margin: 0; }
+  .auth-logged button { margin-top: 16px; padding: 12px 24px; background: transparent; border: 1px solid #C5A059; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1.5px; cursor: pointer; }
+</style>
+</head>
+<body>
+<x-layout page=""></x-layout>
+<main>
+<div class="auth-wrap">
+  <div id="auth-logged" style="display:none" class="auth-logged">
+    <h2 id="auth-uname"></h2>
+    <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:#6a6a6a;">You are signed in</p>
+    <button id="auth-logout">SIGN OUT</button>
+    <div class="auth-link"><a href="index.html">← Continue Shopping</a></div>
+  </div>
+  <div id="auth-form">
+    <h1 class="auth-title">Welcome Back</h1>
+    <p class="auth-sub">Sign in to see your orders</p>
+
+    <label class="auth-label">Email or Phone</label>
+    <input class="auth-input" id="auth-identifier" placeholder="Email or 10-digit phone number">
+
+    <label class="auth-label">Password</label>
+    <input class="auth-input" id="auth-password" type="password" placeholder="Your password">
+
+    <div class="auth-error" id="auth-error" style="display:none"></div>
+    <div class="auth-success" id="auth-success" style="display:none"></div>
+
+    <button class="auth-btn" id="auth-submit">SIGN IN</button>
+    <div class="auth-link">New here? <a href="signup.html">Create an account</a></div>
+  </div>
+</div>
+</main>
+<x-footer></x-footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function(id) { return document.getElementById(id); };
+
+  // Check if already logged in
+  var user = null;
+  try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
+  if (user && user.id) {
+    $('auth-form').style.display = 'none';
+    $('auth-logged').style.display = 'block';
+    $('auth-uname').textContent = 'Hi, ' + (user.name || '');
+  }
+
+  $('auth-logout').addEventListener('click', function() {
+    if (window.MPA) window.MPA.signOut();
+    try { localStorage.removeItem('cc_user'); localStorage.removeItem('cc_token'); } catch(e) {}
+    $('auth-logged').style.display = 'none';
+    $('auth-form').style.display = 'block';
+  });
+
+  $('auth-submit').addEventListener('click', function() {
+    var id = ($('auth-identifier').value || '').trim();
+    var pw = ($('auth-password').value || '').trim();
+    if (!id || !pw) {
+      $('auth-error').textContent = 'Please fill in both fields.';
+      $('auth-error').style.display = 'block';
+      return;
+    }
+    $('auth-error').style.display = 'none';
+    $('auth-submit').textContent = 'SIGNING IN…';
+    $('auth-submit').disabled = true;
+
+    var body = { password: pw };
+    if (id.includes('@')) body.email = id; else body.phone = id;
+
+    fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function(r) { return r.json(); })
+      .then(function(d) {
+        $('auth-submit').textContent = 'SIGN IN';
+        $('auth-submit').disabled = false;
+        if (d.success) {
+          try { localStorage.setItem('cc_user', JSON.stringify(d.user)); } catch(e) {}
+          try { localStorage.setItem('cc_token', d.token); } catch(e) {}
+          $('auth-form').style.display = 'none';
+          $('auth-logged').style.display = 'block';
+          $('auth-uname').textContent = 'Hi, ' + (d.user.name || '');
+        } else {
+          $('auth-error').textContent = d.error || 'Sign in failed.';
+          $('auth-error').style.display = 'block';
+        }
+      }).catch(function() {
+        $('auth-submit').textContent = 'SIGN IN';
+        $('auth-submit').disabled = false;
+        $('auth-error').textContent = 'Network error. Please try again.';
+        $('auth-error').style.display = 'block';
+      });
+  });
+
+  $('auth-password').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') $('auth-submit').click();
+  });
+})();
+</script>
+</body>
+</html>

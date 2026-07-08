@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Bag | Saubhagya</title>
+<meta name="robots" content="noindex,follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="layout.js"></script>
+<script src="mpa.js" defer></script>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #FAFAFA; margin: 0; }
+  .cart-wrap { max-width: 900px; margin: 0 auto; padding: 20px 24px 80px; }
+  .cart-empty { text-align: center; padding: 60px 24px; }
+  .cart-empty h1 { font-family: 'Cormorant Garamond',serif; font-size: 28px; color: #1A1A1A; margin: 0 0 10px; }
+  .cart-empty p { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6a6a6a; margin: 0 0 24px; }
+  .cart-empty a { display: inline-block; padding: 14px 28px; background: #0B3C26; color: #fff; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; text-decoration: none; }
+  .cart-item { display: flex; gap: 16px; padding: 20px 0; border-bottom: 1px solid #eae5d8; }
+  .cart-item-img { width: 80px; height: 100px; flex: none; object-fit: cover; background: #eae5d8; border-radius: 2px; }
+  .cart-item-info { flex: 1; min-width: 0; }
+  .cart-item-name { font-family: 'Cormorant Garamond',serif; font-size: 18px; color: #1A1A1A; }
+  .cart-item-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B3C26; margin-top: 4px; }
+  .cart-item-qty { display: flex; align-items: center; gap: 0; margin-top: 10px; border: 1px solid #ddd6c6; width: fit-content; }
+  .cart-item-qty span { width: 30px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; user-select: none; }
+  .cart-item-qty .cq { border-left: 1px solid #ddd6c6; border-right: 1px solid #ddd6c6; width: 34px; font-size: 12px; }
+  .cart-item-remove { font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 1px; color: #9a9a9a; cursor: pointer; margin-top: 8px; }
+  .cart-summary { margin-top: 28px; padding: 20px; background: #fff; border: 1px solid #eae5d8; }
+  .cart-summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #4a4a4a; }
+  .cart-summary-total { display: flex; justify-content: space-between; padding: 14px 0 0; margin-top: 8px; border-top: 1px solid #eae5d8; }
+  .cart-summary-total span:first-child { font-family: 'Cormorant Garamond',serif; font-size: 18px; color: #1A1A1A; }
+  .cart-summary-total span:last-child { font-family: 'Cormorant Garamond',serif; font-size: 22px; font-weight: 600; color: #0B3C26; }
+  .cart-checkout { display: block; width: 100%; margin-top: 16px; padding: 16px; background: #0B3C26; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; text-align: center; text-decoration: none; }
+  .cart-continue { display: block; margin-top: 12px; text-align: center; font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; letter-spacing: 1px; }
+  .cart-continue a { color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; padding-bottom: 1px; }
+  .cart-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; letter-spacing: 2px; }
+  @media (max-width: 640px) {
+    .cart-wrap { padding: 10px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+<x-layout page=""></x-layout>
+<main>
+<div class="cart-wrap">
+  <div class="cart-loading" id="cart-loading">LOADING YOUR BAG…</div>
+  <div class="cart-empty" id="cart-empty" style="display:none">
+    <h1>Your bag is empty</h1>
+    <p>Discover handcrafted imitation jewellery made for every occasion.</p>
+    <a href="index.html">CONTINUE SHOPPING</a>
+  </div>
+  <div id="cart-content" style="display:none">
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:24px;color:#1A1A1A;margin:0 0 20px;">Your Bag</h1>
+    <div id="cart-items"></div>
+    <div class="cart-summary" id="cart-summary" style="display:none">
+      <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal"></span></div>
+      <div class="cart-summary-row"><span>Shipping</span><span id="cart-shipping">Calculated at checkout</span></div>
+      <div class="cart-summary-total"><span>Estimated Total</span><span id="cart-total"></span></div>
+      <a class="cart-checkout" href="checkout.html" id="cart-checkout-btn">PROCEED TO CHECKOUT</a>
+    </div>
+    <div class="cart-continue"><a href="index.html">← Continue Shopping</a></div>
+  </div>
+</div>
+</main>
+<x-footer></x-footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function(id) { return document.getElementById(id); };
+  var fmt = function(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); };
+  var cartItems = [];
+  var products = {};
+
+  function loadCart() {
+    try {
+      cartItems = JSON.parse(localStorage.getItem('cc_cart') || '[]');
+      if (!Array.isArray(cartItems)) cartItems = [];
+      cartItems = cartItems.filter(function(i) { return i && i.id && i.qty > 0; });
+    } catch(e) { cartItems = []; }
+    return cartItems;
+  }
+
+  function saveCart() {
+    try { localStorage.setItem('cc_cart', JSON.stringify(cartItems)); } catch(e) {}
+    // Sync with MPA
+    if (window.MPA) { try { window.MPA.setCart(cartItems); } catch(e) {} }
+  }
+
+  function render() {
+    if (!cartItems.length) {
+      $('cart-loading').style.display = 'none';
+      $('cart-empty').style.display = 'block';
+      return;
+    }
+
+    var subtotal = 0;
+    var html = '';
+    cartItems.forEach(function(ci, idx) {
+      var p = products[ci.id] || { name: ci.id, price: 0, image: '' };
+      var lineTotal = (p.price || 0) * ci.qty;
+      subtotal += lineTotal;
+      html += '<div class="cart-item">' +
+        '<img class="cart-item-img" src="' + (p.image || '') + '" alt="' + (p.name || '') + '" onerror="this.style.display=\'none\'">' +
+        '<div class="cart-item-info">' +
+          '<div class="cart-item-name">' + (p.name || ci.id) + '</div>' +
+          '<div class="cart-item-price">' + fmt(p.price) + ' each</div>' +
+          '<div class="cart-item-qty">' +
+            '<span onclick="Cart.dec(' + idx + ')">−</span>' +
+            '<span class="cq">' + ci.qty + '</span>' +
+            '<span onclick="Cart.inc(' + idx + ')">+</span>' +
+          '</div>' +
+          '<div class="cart-item-remove" onclick="Cart.remove(' + idx + ')">REMOVE</div>' +
+        '</div>' +
+      '</div>';
+    });
+
+    $('cart-items').innerHTML = html;
+    $('cart-subtotal').textContent = fmt(subtotal);
+    $('cart-total').textContent = fmt(subtotal);
+    $('cart-summary').style.display = 'block';
+    $('cart-loading').style.display = 'none';
+    $('cart-content').style.display = 'block';
+  }
+
+  function fetchProducts() {
+    var skus = cartItems.map(function(i) { return i.id; });
+    if (!skus.length) { render(); return; }
+    // Fetch all products, filter locally
+    fetch('/api/products')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var list = Array.isArray(data) ? data : (data.products || []);
+        list.forEach(function(p) { products[p.sku || p.id] = p; });
+        render();
+      })
+      .catch(function() { render(); });
+  }
+
+  window.Cart = {
+    dec: function(idx) {
+      if (cartItems[idx].qty <= 1) { this.remove(idx); return; }
+      cartItems[idx].qty--;
+      saveCart();
+      render();
+    },
+    inc: function(idx) {
+      cartItems[idx].qty++;
+      saveCart();
+      render();
+    },
+    remove: function(idx) {
+      cartItems.splice(idx, 1);
+      saveCart();
+      loadCart();
+      if (!cartItems.length) {
+        $('cart-content').style.display = 'none';
+        $('cart-loading').style.display = 'none';
+        $('cart-empty').style.display = 'block';
+        return;
+      }
+      render();
+    }
+  };
+
+  loadCart();
+  if (cartItems.length) fetchProducts(); else render();
+})();
+</script>
+</body>
+</html>
