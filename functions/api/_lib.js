@@ -46,6 +46,25 @@ export async function verifyPassword(plain, stored) {
  * The Shiprocket "Razorpay" channel only imports Magic Checkout orders, so a
  * standard-Checkout site must push orders itself via this API.
  *
+ * ── NOTIFICATION LIFECYCLE (why the customer gets no tracking SMS yet) ──────
+ * Success here means the order EXISTS in the Shiprocket panel ("New Orders"
+ * tab) — nothing has shipped and no tracking link exists at this timestamp.
+ * A live tracking URL requires an AWB (air waybill) number, and Shiprocket
+ * only assigns one after a human acts:
+ *
+ *   1. NOW  – this API call creates the order (order_id + shipment_id only).
+ *             Customer gets the instant order-confirmation email; there is no
+ *             trackable link yet, so no tracking SMS is possible.
+ *   2. ADMIN – log in to the Shiprocket desk → New Orders → pack the item →
+ *             click "Generate AWB" (assigns courier + AWB number).
+ *   3. AUTO – the courier system then fires the customer's tracking SMS /
+ *             WhatsApp / email with the live link automatically, and updates
+ *             flow (picked up, in transit, delivered) without any code here.
+ *
+ * So: "order created but customer got no SMS" is the expected state between
+ * steps 1 and 2 — it clears the moment the admin generates the AWB.
+ * ─────────────────────────────────────────────────────────────────────────
+ *
  * order = { id, name, email, phone, address: {street,apt,city,state,pin} | string,
  *           items: [{id,name,price,qty}], totalPaise, paymentMethod: 'razorpay'|'cod' }
  * Returns { pushed, shiprocket_order_id?, shipment_id?, error? } — never throws.

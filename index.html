@@ -949,6 +949,12 @@
                 <span style="color:#0B3C26; font-weight:500;">{{ l.lineText }}</span>
               </div>
             </sc-for>
+            <sc-if value="{{ loHasShipping }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; justify-content:space-between; padding:8px 0; font-family:'Montserrat',sans-serif; font-size:13px; color:#4a4a4a;">
+                <span>Shipping &amp; handling</span>
+                <span>{{ lo.shippingText }}</span>
+              </div>
+            </sc-if>
             <div style="display:flex; justify-content:space-between; align-items:baseline; padding-top:14px; margin-top:8px; border-top:1px solid #eae5d8;">
               <span style="font-family:'Cormorant Garamond',serif; font-size:18px; color:#1A1A1A;">Total Paid</span>
               <span style="font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#0B3C26;">{{ lo.totalText }}</span>
@@ -1111,7 +1117,7 @@
 
           <div style="border-top:1px solid #eae5d8; padding-top:16px; margin-top:6px; display:flex; flex-direction:column; gap:10px;">
             <div style="display:flex; justify-content:space-between; font-family:'Montserrat',sans-serif; font-size:13px; color:#4a4a4a;"><span>Subtotal</span><span>{{ cartSubtotalText }}</span></div>
-            <div style="display:flex; justify-content:space-between; font-family:'Montserrat',sans-serif; font-size:13px; color:#4a4a4a;"><span>Shipping</span><span style="color:#7a7a7a;">Calculated at checkout</span></div>
+            <div style="display:flex; justify-content:space-between; font-family:'Montserrat',sans-serif; font-size:13px; color:#4a4a4a;"><span>Shipping</span><span style="color:#7a7a7a;">{{ shipText }}</span></div>
             <div style="display:flex; justify-content:space-between; align-items:baseline; border-top:1px solid #eae5d8; padding-top:14px; margin-top:4px;">
               <span style="font-family:'Cormorant Garamond',serif; font-size:20px; color:#1A1A1A;">Total</span>
               <span style="font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:600; color:#0B3C26;">{{ grandTotalText }}</span>
@@ -1175,6 +1181,9 @@
         <div>
           <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:#1A1A1A;">Hello, {{ accName }}</div>
           <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#9a9a9a; margin-top:4px;">{{ accEmail }}</div>
+          <sc-if value="{{ accHasPhone }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#9a9a9a; margin-top:2px;">+91 {{ accPhone }}</div>
+          </sc-if>
         </div>
         <span onClick="{{ logout }}" style="font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; color:#9e2a2b; cursor:pointer; border-bottom:1px solid #9e2a2b; padding-bottom:2px;">SIGN OUT</span>
       </div>
@@ -1630,6 +1639,10 @@ class Component extends DCLogic {
         else patch.page = 'home';
       }
       if (st.page === 'info') patch.infoKey = st.infoKey || 'shipping';
+      // Order-confirmation view lives in its own history entry: forward/back can
+      // always re-render it (order data persists in localStorage via lastOrder)
+      if (st.page === 'success') { patch.page = 'checkout'; patch.placed = true; }
+      else if (st.page === 'checkout') { patch.placed = false; }
       this.setState(patch);
       this.top();
     };
@@ -1692,7 +1705,18 @@ class Component extends DCLogic {
     this.fetchWishlist();
     this.top();
   }
-  openInfo(key) { history.pushState({page:'info', infoKey:key}, ''); this.setState({ page: 'info', infoKey: key, mega: null, miniBar: false, searchOpen: false, cartOpen: false }); this.top(); }
+  openInfo(key) {
+    history.pushState({page:'info', infoKey:key}, '');
+    const patch = { page: 'info', infoKey: key, mega: null, miniBar: false, searchOpen: false, cartOpen: false };
+    // Logged-in users should never have to re-type their phone on the track form
+    if (key === 'track') {
+      const u = this.state.loggedInUser;
+      if (u && u.phone && !(this.state.trackPhone || '').trim()) patch.trackPhone = String(u.phone);
+    }
+    this.setState(patch);
+    if (patch.trackPhone) setTimeout(() => this.fetchTrackOrders(true), 60);
+    this.top();
+  }
 
   openCart() { this.setState({ cartOpen: true, mega: null, searchOpen: false }); }
   closeCart() { this.setState({ cartOpen: false }); }
@@ -1750,9 +1774,9 @@ class Component extends DCLogic {
   writeReview() {
     window.open('https://wa.me/919987008435?text=' + encodeURIComponent('Hi Saubhagya, I would like to write a review for my recent purchase.'), '_blank');
   }
-  async fetchTrackOrders() {
+  async fetchTrackOrders(auto) {
     const q = (this.state.trackPhone || '').trim();
-    if (!q) { alert('Please enter your phone number or order ID.'); return; }
+    if (!q) { if (!auto) alert('Please enter your phone number or order ID.'); return; }
     this.setState({ trackLoading: true, trackResults: null });
     try {
       const isOrderId = /^CC-/i.test(q);
@@ -1761,8 +1785,8 @@ class Component extends DCLogic {
       const r = await fetch(url);
       const d = await r.json();
       if (d.success) this.setState({ trackResults: d.orders, trackLoading: false });
-      else { alert(d.error); this.setState({ trackResults: [], trackLoading: false }); }
-    } catch(e) { alert('Error: ' + e.message); this.setState({ trackResults: [], trackLoading: false }); }
+      else { if (!auto) alert(d.error); this.setState({ trackResults: [], trackLoading: false }); }
+    } catch(e) { if (!auto) alert('Error: ' + e.message); this.setState({ trackResults: [], trackLoading: false }); }
   }
   async fetchUserOrders() {
     const user = this.state.loggedInUser;
@@ -1848,6 +1872,17 @@ class Component extends DCLogic {
     } catch (e) {}
     this.top();
   }
+  /* Zone-based shipping by PIN prefix ("Kanyakumari problem"): Shiprocket bills
+   * us by zone, so the customer must be charged the matching slab or Zone D
+   * orders (rest of India) eat the margin. Returns null until PIN is a valid
+   * 6 digits so the summary can show "Enter PIN code" instead of a wrong fee. */
+  shipCharge(pin) {
+    const p = String(pin || '').replace(/\D/g, '');
+    if (p.length !== 6) return null;
+    if (/^40[01]/.test(p)) return 40;  // Zone A: Mumbai local (400xxx, 401xxx)
+    if (/^4[1-4]/.test(p)) return 55;  // Zone B/C: Maharashtra regional (41-44xxx)
+    return 75;                         // Zone D: rest of India (e.g. Kanyakumari 629xxx)
+  }
   payNow() {
     if (!this.state.cartItems.length) return;
     const c = this.state.co;
@@ -1871,12 +1906,14 @@ class Component extends DCLogic {
     const codFee = c.pay === 'cod' ? 49 : 0;
     const discount = this.state.discountApplied && this.state.co.discount.trim() ? Math.round(subtotal * 0.1) : 0;
     const isTest = this.state.testMode;
-    const amountPaise = isTest ? 100 : Math.max(0, subtotal - discount + codFee) * 100;
+    // PIN already validated as 6 digits above, so shipCharge cannot be null here
+    const shipFee = isTest ? 0 : (this.shipCharge(c.pin) || 0);
+    const amountPaise = isTest ? 100 : Math.max(0, subtotal - discount + codFee + shipFee) * 100;
     const co = this.state.co;
 
     // COD path: skip Razorpay, save order directly
     if (c.pay === 'cod') {
-      const orderTotal = Math.max(0, subtotal - discount + codFee);
+      const orderTotal = Math.max(0, subtotal - discount + codFee + shipFee);
       const codOrderId = 'COD' + Date.now().toString(36).toUpperCase();
       const name = (co.first + ' ' + co.last).trim();
       const address = { street: co.address, apt: co.apt, city: co.city, state: co.state, pin: co.pin };
@@ -1886,12 +1923,14 @@ class Component extends DCLogic {
         id: codOrderId, paymentId: 'COD (collect on delivery)',
         lines: lines.map(l => ({ name: l.name, qty: l.qty, lineText: this.fmt((l.price || 0) * l.qty) })),
         subtotalText: this.fmt(subtotal), discountText: discount > 0 ? this.fmt(discount) : '',
+        shippingText: this.fmt(shipFee + codFee),
         totalText: this.fmt(orderTotal),
         customer: name, email: co.email, phone: co.phone,
         address: [co.address, co.apt, co.city, co.state, co.pin].filter(Boolean).join(', ')
       };
       this.saveCart([]);
       this.setState({ cartItems: [], placed: true, orderId: codOrderId });
+      history.pushState({ page: 'success' }, '');
       this.setLastOrder(lastOrder);
       try { localStorage.setItem('cc_lastorderid', codOrderId); } catch(e) {}
       this.top();
@@ -1900,6 +1939,7 @@ class Component extends DCLogic {
         body: JSON.stringify({
           razorpay_payment_id: 'COD-' + codOrderId,
           items: lines, total: orderTotal * 100, subtotal: subtotal * 100, discount: discount * 100,
+          shipping: (shipFee + codFee) * 100,
           name, email: co.email || '', phone: co.phone || '',
           address: JSON.stringify(address), create_account: true, test_mode: false,
           payment_method: 'cod'
@@ -1958,10 +1998,11 @@ class Component extends DCLogic {
           });
           const subtotal = lines.reduce((s, l) => s + (l.price || 0) * l.qty, 0);
           const discount = this.state.discountApplied && this.state.co.discount.trim() ? Math.round(subtotal * 0.1) : 0;
-          const total = subtotal - discount;
+          const isTestMode = this.state.testMode;
+          const shipFee = isTestMode ? 0 : (this.shipCharge(co.pin) || 0);
+          const total = subtotal - discount + shipFee;
           const address = { street: co.address, apt: co.apt, city: co.city, state: co.state, pin: co.pin };
           const name = (co.first + ' ' + co.last).trim();
-          const isTestMode = this.state.testMode;
           this.saveCart([]);
           this.saveAddress({ name, address: co.address, apt: co.apt, city: co.city, state: co.state, pin: co.pin, phone: co.phone });
           this.gaEvent('purchase', 'order', 1);
@@ -1971,14 +2012,17 @@ class Component extends DCLogic {
             lines: lines.map(l => ({ name: l.name, qty: l.qty, lineText: this.fmt((l.price || 0) * l.qty) })),
             subtotalText: this.fmt(subtotal),
             discountText: discount > 0 ? this.fmt(discount) : '',
+            shippingText: isTestMode ? '' : this.fmt(shipFee),
             totalText: this.fmt(isTestMode ? 1 : total),
             customer: name,
             email: co.email,
             phone: co.phone,
             address: [co.address, co.apt, co.city, co.state, co.pin].filter(Boolean).join(', ')
           };
-          // Show confirmation immediately
+          // Show confirmation immediately; success gets its own history entry so
+          // the hardware back button can always return to this view
           this.setState({ cartItems: [], placed: true, orderId: oid });
+          history.pushState({ page: 'success' }, '');
           this.setLastOrder(lastOrder);
           try { localStorage.setItem('cc_lastorderid', oid); } catch(e) {}
           this.top();
@@ -1994,6 +2038,7 @@ class Component extends DCLogic {
               total: isTestMode ? 100 : total * 100,
               subtotal: isTestMode ? 100 : subtotal * 100,
               discount: isTestMode ? 0 : discount * 100,
+              shipping: isTestMode ? 0 : shipFee * 100,
               name: isTestMode ? (name + ' [TEST]') : name,
               email: co.email || '',
               phone: co.phone || '',
@@ -2231,7 +2276,10 @@ class Component extends DCLogic {
     // ---- checkout totals ----
     const discountApplied = s.discountApplied && s.co.discount.trim().length > 0;
     const discountVal = discountApplied ? Math.round(subtotal * 0.1) : 0;
-    const grandTotal = Math.max(0, subtotal - discountVal);
+    // Zone shipping is only known once the PIN is complete; COD adds its handling fee
+    const shipFeeVal = this.shipCharge(s.co.pin);
+    const codFeeVal = s.co.pay === 'cod' ? 49 : 0;
+    const grandTotal = Math.max(0, subtotal - discountVal + (shipFeeVal || 0) + codFeeVal);
     const includedTax = grandTotal * (0.03 / 1.03);
     const payMethods = [
       { key: 'razorpay', label: 'Razorpay Secure (UPI, Cards, Wallets)', badges: 'UPI · VISA · Mastercard +18' },
@@ -2465,6 +2513,7 @@ class Component extends DCLogic {
       acceptCookies: () => { try { localStorage.setItem('cc_cookie_ok', '1'); } catch(e){}; this.setState({ cookieAck: true }); },
       rejectCookies: () => { try { localStorage.setItem('cc_cookie_ok', '0'); } catch(e){}; this.setState({ cookieAck: true }); },
       hasLastOrder: !!s.lastOrder,
+      loHasShipping: !!(s.lastOrder && s.lastOrder.shippingText),
       lo: s.lastOrder || {},
       loLines: s.lastOrder ? s.lastOrder.lines : [],
       loEta: (() => {
@@ -2493,6 +2542,7 @@ class Component extends DCLogic {
       ].map(c => ({ label: c.label, onClick: () => { this.coSet('discount', c.code); this.setState({ discountApplied: true }); } })),
       discountApplied, discountText: this.fmt(discountVal),
       grandTotalText: this.fmt(grandTotal), taxText: this.fmt2(includedTax),
+      shipText: shipFeeVal === null ? 'Enter PIN code' : this.fmt(shipFeeVal + codFeeVal),
       billSameOn: () => this.coSet('billSame', true), billSameOff: () => this.coSet('billSame', false),
       billSameBg: s.co.billSame ? 'rgba(11,60,38,.04)' : '#fff', billDiffBg: !s.co.billSame ? 'rgba(11,60,38,.04)' : '#fff',
       billSameRing: s.co.billSame ? '5px solid #0B3C26' : '1px solid #bbb', billDiffRing: !s.co.billSame ? '5px solid #0B3C26' : '1px solid #bbb',
@@ -2583,6 +2633,8 @@ class Component extends DCLogic {
       navUserLabel: s.loggedInUser ? (s.loggedInUser.name || '').split(' ')[0] : '',
       accName: s.loggedInUser ? s.loggedInUser.name : 'Guest',
       accEmail: s.loggedInUser ? (s.loggedInUser.email || s.loggedInUser.phone || '') : '',
+      accPhone: s.loggedInUser ? (s.loggedInUser.phone || '') : '',
+      accHasPhone: !!(s.loggedInUser && s.loggedInUser.phone && s.loggedInUser.email),
       logout: () => this.logout(),
       accHasOrders: (s.userOrders || []).length > 0,
       accNoOrders: (s.userOrders || []).length === 0,

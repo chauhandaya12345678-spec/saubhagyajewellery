@@ -29,6 +29,15 @@
   };
 
   function publish(catalog) {
+    // Canonical product id = sku. D1 rows carry a numeric id while the static
+    // fallback JSON has none, and SEO deep links (?product=CC-SI-001) use the
+    // sku — without this, links and carts break depending on data source.
+    catalog = (catalog || []).map(function (p) {
+      var q = {};
+      for (var k in p) q[k] = p[k];
+      q.id = p.sku || p.id;
+      return q;
+    });
     window.CHAUHAN_CATALOG = catalog;
     window.CHAUHAN_HERO = [
       { image: 'images/banners/Website_hero_banner_concept_art._202606221611.webp', tone: 'charcoal',  kicker: "SAUBHAGYA",  title: 'Designer Earrings Collection' },
