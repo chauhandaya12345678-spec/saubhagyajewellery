@@ -1603,6 +1603,21 @@ class Component extends DCLogic {
     let tries = 0;
     this._poll = setInterval(() => { if (this.loadCatalog() || ++tries > 50) clearInterval(this._poll); }, 60);
     this.loadCart();
+    // Checkout continuity: the SPA can be restored from bfcache after the user
+    // added items on a static page (mpa.js), or another tab may have changed
+    // the cart/session — re-read localStorage in both cases.
+    this._onPageShow = (e) => { if (e && e.persisted) this.loadCart(); };
+    window.addEventListener('pageshow', this._onPageShow);
+    this._onStorage = (e) => {
+      if (!e || e.key === 'cc_cart' || e.key === null) this.loadCart();
+      if (e && e.key === 'cc_user') {
+        try {
+          const u = localStorage.getItem('cc_user');
+          this.setState({ loggedInUser: u ? JSON.parse(u) : null });
+        } catch(err) {}
+      }
+    };
+    window.addEventListener('storage', this._onStorage);
     this.setState({ recentlyViewed: this.loadRecentlyViewed(), savedAddresses: this.loadSavedAddresses() });
     try { this.setState({ cookieAck: !!localStorage.getItem('cc_cookie_ok') }); } catch(e) {}
     try {
@@ -1639,10 +1654,6 @@ class Component extends DCLogic {
         else patch.page = 'home';
       }
       if (st.page === 'info') patch.infoKey = st.infoKey || 'shipping';
-      // Order-confirmation view lives in its own history entry: forward/back can
-      // always re-render it (order data persists in localStorage via lastOrder)
-      if (st.page === 'success') { patch.page = 'checkout'; patch.placed = true; }
-      else if (st.page === 'checkout') { patch.placed = false; }
       this.setState(patch);
       this.top();
     };
@@ -1651,6 +1662,8 @@ class Component extends DCLogic {
   componentWillUnmount() {
     window.removeEventListener('scroll', this._onScroll);
     if (this._onPop) window.removeEventListener('popstate', this._onPop);
+    if (this._onPageShow) window.removeEventListener('pageshow', this._onPageShow);
+    if (this._onStorage) window.removeEventListener('storage', this._onStorage);
     if (this._catReady) window.removeEventListener('catalog-ready', this._catReady);
     if (this._poll) clearInterval(this._poll);
     this.heroPause();
