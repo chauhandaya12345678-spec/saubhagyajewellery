@@ -41,8 +41,7 @@
     var links = NAV.map(function (n) {
       return '<a class="navlink' + (n.slug === active ? ' is-active' : '') + '" href="' + n.slug + '">' + n.label + '</a>';
     }).join('');
-    return '<div class="ann">FREE INSURED SHIPPING ACROSS INDIA</div>' +
-      '<header class="site"><div class="nav">' +
+    return '<header class="site"><div class="nav">' +
       '<nav class="navlinks">' + links + '</nav>' +
       '<a class="logo" href="index.html">' +
       '<span class="logo-name">SAUBHAGYA</span>' +
