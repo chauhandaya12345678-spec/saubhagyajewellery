@@ -4,6 +4,8 @@
  * Body: { name, email?, phone?, password }
  * Returns: { success: true, token, user: { id, name, email, phone } }
  */
+import { hashPassword } from '../_lib.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
   const corsHeaders = {
@@ -41,10 +43,10 @@ export async function onRequest(context) {
       }
     }
 
-    // Create user
+    // Create user (password stored salted+hashed, never plaintext)
     const result = await db.prepare(
       'INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)'
-    ).bind(name, email || null, phone || null, password).run();
+    ).bind(name, email || null, phone || null, await hashPassword(password)).run();
 
     const userId = result.meta.last_row_id;
 

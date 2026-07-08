@@ -3,3 +3,4 @@ node_modules/
 Thumbs.db
 *.bak
 products.json.bak
+.wrangler/

@@ -32,7 +32,7 @@ Magic Checkout requires GST. Without GST you can still use Standard Razorpay Che
 
 1. Sign up → KYC (PAN, GST, bank, pickup address).
 2. Settings → Pickup Address → add yours.
-3. Marketplace / Channels → search **Razorpay** → click **Connect** → log in with Razorpay → authorize. Done. Now every paid Razorpay order = auto-pushed to Shiprocket.
+3. ~~Marketplace / Channels → Razorpay channel~~ **Correction (July 2026):** the Shiprocket Razorpay channel only imports *Magic Checkout* orders; with standard Razorpay Checkout it stays "Never Synced" forever. This site instead pushes every paid order to Shiprocket server-side (`functions/api/_lib.js → pushToShiprocket`, called from `/api/orders/save` and the Razorpay webhook). Requires Cloudflare Pages secrets: `SHIPROCKET_EMAIL`, `SHIPROCKET_PASSWORD` (API user from Settings → API → Configure User), `SHIPROCKET_PICKUP_LOCATION` (= pickup nickname, currently `work`).
 4. Settings → Courier → enable couriers (Delhivery, Bluedart, India Post for COD reach).
 5. Settings → Courier Rules → set priority: **Cheapest** (or Fastest for premium).
 6. Settings → Automation → enable **Auto-Pickup** (optional, removes the weekly click).

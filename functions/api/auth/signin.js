@@ -4,6 +4,8 @@
  * Body: { email?, phone?, password }
  * Returns: { success: true, token, user: { id, name, email, phone } }
  */
+import { verifyPassword, hashPassword } from '../_lib.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
   const corsHeaders = {
@@ -38,8 +40,14 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({ error: 'No account found with this email/phone' }), { status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
     }
 
-    if (user.password !== password) {
+    if (!(await verifyPassword(password, user.password))) {
       return new Response(JSON.stringify({ error: 'Incorrect password' }), { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+    }
+    // Upgrade legacy plaintext rows to salted hash on successful login
+    if (!String(user.password).startsWith('s256$')) {
+      try {
+        await db.prepare('UPDATE users SET password = ? WHERE id = ?').bind(await hashPassword(password), user.id).run();
+      } catch (e) {}
     }
 
     // Create session token

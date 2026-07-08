@@ -937,7 +937,7 @@
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
           </div>
           <h1 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:36px; color:#1A1A1A; margin:22px 0 6px;">Order Confirmed</h1>
-          <p style="font-family:'Montserrat',sans-serif; font-weight:300; font-size:13px; line-height:1.7; color:#6a6a6a; margin:0 auto; max-width:460px;">Thank you. Your order <strong style="color:#0B3C26;">{{ orderId }}</strong> is confirmed. A confirmation will reach you on WhatsApp and email shortly.</p>
+          <p style="font-family:'Montserrat',sans-serif; font-weight:300; font-size:13px; line-height:1.7; color:#6a6a6a; margin:0 auto; max-width:460px;">Thank you. Your order <strong style="color:#0B3C26;">{{ orderId }}</strong> is confirmed. Save this order ID: you can track it anytime from My Orders using your phone number. Shipping updates arrive on WhatsApp and email once your piece is dispatched.</p>
         </div>
 
         <sc-if value="{{ hasLastOrder }}" hint-placeholder-val="{{ true }}">
@@ -1910,10 +1910,18 @@ class Component extends DCLogic {
         })
       }).then(r => r.json()).then(d => {
         if (d && d.success) {
+          if (d.order_id) {
+            this.setState({ orderId: d.order_id });
+            try { sessionStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
+            this.setLastOrder(Object.assign({}, this.state.lastOrder || lastOrder, { id: d.order_id }));
+          }
           if (d.session_token) sessionStorage.setItem('cc_token', d.session_token);
           if (d.user_id) this.setUser({ id: d.user_id, name, email: co.email, phone: co.phone });
+          if (d.shiprocket && !d.shiprocket.pushed) console.warn('Shiprocket push failed:', d.shiprocket.error);
+        } else if (d && d.error) {
+          console.error('Order save failed:', d.error);
         }
-      }).catch(() => {});
+      }).catch((e) => { console.error('Order save failed:', e); });
       return;
     }
 
@@ -1925,9 +1933,9 @@ class Component extends DCLogic {
       alert('Razorpay script failed to load. Check internet.');
       return;
     }
-    const openCheckout = (orderId) => {
+    const openCheckout = (orderId, serverKeyId) => {
       const opts = {
-        key: cfg.razorpayKeyId,
+        key: serverKeyId || cfg.razorpayKeyId,
         amount: amountPaise,
         currency: 'INR',
         name: "Saubhagya",
@@ -1946,7 +1954,6 @@ class Component extends DCLogic {
         theme: { color: '#0B3C26' },
         handler: (resp) => {
           const oid = resp.razorpay_payment_id || ('CC' + Date.now().toString(36).toUpperCase());
-          this.saveCart([]);
           const co = this.state.co;
           const cat = window.CHAUHAN_CATALOG || [];
           const lines = this.state.cartItems.map(ci => {
@@ -1959,6 +1966,7 @@ class Component extends DCLogic {
           const address = { street: co.address, apt: co.apt, city: co.city, state: co.state, pin: co.pin };
           const name = (co.first + ' ' + co.last).trim();
           const isTestMode = this.state.testMode;
+          this.saveCart([]);
           this.saveAddress({ name, address: co.address, apt: co.apt, city: co.city, state: co.state, pin: co.pin, phone: co.phone });
           this.gaEvent('purchase', 'order', 1);
           const lastOrder = {
@@ -1983,6 +1991,9 @@ class Component extends DCLogic {
             method:'POST', headers:{'Content-Type':'application/json'},
             body: JSON.stringify({
               razorpay_payment_id: resp.razorpay_payment_id,
+              razorpay_order_id: resp.razorpay_order_id || orderId || '',
+              razorpay_signature: resp.razorpay_signature || '',
+              payment_method: 'razorpay',
               items: lines,
               total: isTestMode ? 100 : total * 100,
               subtotal: isTestMode ? 100 : subtotal * 100,
@@ -1995,11 +2006,19 @@ class Component extends DCLogic {
               test_mode: isTestMode
             })
           }).then(r => r.json()).then(d => {
-            if (d.success) {
+            if (d && d.success) {
+              if (d.order_id) {
+                this.setState({ orderId: d.order_id });
+                try { sessionStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
+                this.setLastOrder(Object.assign({}, this.state.lastOrder || lastOrder, { id: d.order_id }));
+              }
               if (d.session_token) sessionStorage.setItem('cc_token', d.session_token);
               if (d.user_id) this.setUser({ id: d.user_id, name: name, email: co.email, phone: co.phone });
+              if (d.shiprocket && !d.shiprocket.pushed) console.warn('Shiprocket push failed:', d.shiprocket.error);
+            } else if (d && d.error) {
+              console.error('Order save failed:', d.error);
             }
-          }).catch(() => {});
+          }).catch((e) => { console.error('Order save failed:', e); });
           this.top();
         },
         modal: {
@@ -2021,11 +2040,16 @@ class Component extends DCLogic {
           name: (co.first + ' ' + co.last).trim(),
           email: co.email,
           phone: co.phone,
-          address: [co.address, co.apt, co.city, co.state, co.pin].filter(Boolean).join(', ')
+          address: [co.address, co.apt, co.city, co.state, co.pin].filter(Boolean).join(', '),
+          address_json: { street: co.address, apt: co.apt, city: co.city, state: co.state, pin: co.pin },
+          test_mode: isTest
         })
       })
         .then(r => r.json())
-        .then(d => openCheckout(d.id))
+        .then(d => {
+          if (d && d.error) console.warn('create-razorpay-order failed:', d.error, d.details || '');
+          openCheckout(d && d.id, d && d.key_id);
+        })
         .catch(() => openCheckout(null));
     } else {
       openCheckout(null);
