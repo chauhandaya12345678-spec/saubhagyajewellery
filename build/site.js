@@ -614,9 +614,16 @@ CONTENT.forEach(d => written.push(write(d.slug, contentPage(d))));
 // sitemap + robots
 const pageSlugs = ['index.html', ...['south', 'modern', 'bridal'].map(k => COLLECTIONS[k].slug), ...CONTENT.map(d => d.slug)];
 const today = new Date().toISOString().slice(0, 10);
+// Every product gets a crawlable URL on the MPA product page.
+// complete-catalog.json is the deployable truth (blocked SKUs already removed);
+// the embedded CATALOG list still contains them and would emit dead URLs.
+const LIVE_CATALOG = JSON.parse(fs.readFileSync(path.join(__dirname, 'complete-catalog.json'), 'utf8'));
+const productUrls = LIVE_CATALOG.filter(p => p.inStock !== 0 && p.inStock !== false)
+  .map(p => `${BASE_URL}/product.html?sku=${encodeURIComponent(p.sku)}`);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${pageSlugs.map(s => `  <url><loc>${urlOf(s)}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
+${productUrls.map(u => `  <url><loc>${u}</loc><lastmod>${today}</lastmod></url>`).join('\n')}
 </urlset>
 `;
 written.push(write('sitemap.xml', sitemap));

@@ -4,7 +4,7 @@
   "private": true,
   "description": "Saubhagya jewellery storefront. Static site - serve as-is.",
   "scripts": {
-    "build": "node build/site.js",
+    "build": "node build/site.js && node build/inject-tracking.js",
     "seed": "node build/seed-products.js",
     "dev": "npx --yes serve -l 8753 ."
   },
