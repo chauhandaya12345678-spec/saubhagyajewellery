@@ -82,3 +82,7 @@ ALTER TABLE orders ADD COLUMN razorpay_order_id TEXT;
 ALTER TABLE orders ADD COLUMN shiprocket_order_id TEXT;
 ALTER TABLE orders ADD COLUMN shiprocket_shipment_id TEXT;
 ALTER TABLE orders ADD COLUMN test_mode INTEGER DEFAULT 0;
+
+-- Guest accounts auto-created at checkout; signup with same email/phone claims them
+ALTER TABLE users ADD COLUMN is_guest INTEGER DEFAULT 0;
+UPDATE users SET is_guest = 1 WHERE password LIKE 'guest_%';

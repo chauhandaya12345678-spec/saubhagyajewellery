@@ -1151,38 +1151,15 @@
         <h1 style="font-family:'Cormorant Garamond',serif; font-weight:500; font-size:28px; color:#1A1A1A; margin:0 0 6px;">{{ authTitle }}</h1>
         <p style="font-family:'Montserrat',sans-serif; font-weight:300; font-size:13px; color:#7a7a7a; margin:0 0 16px;">{{ authSubtitle }}</p>
 
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <span onClick="{{ usePassMode }}" style="flex:1; text-align:center; padding:9px 0; font-family:'Montserrat',sans-serif; font-size:10.5px; letter-spacing:1.5px; cursor:pointer; border:1px solid #ddd6c6; background:{{ passModeBg }}; color:{{ passModeColor }};">PASSWORD</span>
-          <span onClick="{{ useOtpMode }}" style="flex:1; text-align:center; padding:9px 0; font-family:'Montserrat',sans-serif; font-size:10.5px; letter-spacing:1.5px; cursor:pointer; border:1px solid #ddd6c6; background:{{ otpModeBg }}; color:{{ otpModeColor }};">PHONE OTP</span>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+            <input id="auth-name" placeholder="Full name" style="height:50px; padding:0 16px; border:1px solid #ddd6c6; font-size:14px; outline:none; background:#fff;">
+          </sc-if>
+          <input id="auth-id" placeholder="Email or mobile phone number" style="height:50px; padding:0 16px; border:1px solid #ddd6c6; font-size:14px; outline:none; background:#fff;">
+          <input id="auth-pass" type="password" placeholder="Password" style="height:50px; padding:0 16px; border:1px solid #ddd6c6; font-size:14px; outline:none; background:#fff;">
         </div>
-
-        <sc-if value="{{ isPasswordMode }}" hint-placeholder-val="{{ true }}">
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
-              <input id="auth-name" placeholder="Full name" style="height:50px; padding:0 16px; border:1px solid #ddd6c6; font-size:14px; outline:none; background:#fff;">
-            </sc-if>
-            <input id="auth-id" placeholder="Email or mobile phone number" style="height:50px; padding:0 16px; border:1px solid #ddd6c6; font-size:14px; outline:none; background:#fff;">
-            <input id="auth-pass" type="password" placeholder="Password" style="height:50px; padding:0 16px; border:1px solid #ddd6c6; font-size:14px; outline:none; background:#fff;">
-          </div>
-          <label style="display:flex; gap:10px; align-items:center; margin-top:16px; font-family:'Montserrat',sans-serif; font-size:12px; color:#6a6a6a; cursor:pointer;"><input type="checkbox" style="accent-color:#0B3C26;">Keep me signed in &amp; email me offers</label>
-          <button onClick="{{ authSubmit }}" style="width:100%; margin-top:22px; height:52px; background:#0B3C26; color:#fff; border:none; font-size:12px; letter-spacing:2px; cursor:pointer; transition:background .4s ease;" style-hover="background:#06281a;">{{ authCta }}</button>
-        </sc-if>
-
-        <sc-if value="{{ isOtpMode }}" hint-placeholder-val="{{ false }}">
-          <sc-if value="{{ otpStepPhone }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex; flex-direction:column; gap:12px;">
-              <input value="{{ otpPhone }}" onInput="{{ onOtpPhone }}" placeholder="10-digit mobile number" maxlength="10" style="height:50px; padding:0 16px; border:1px solid #ddd6c6; font-size:14px; outline:none; background:#fff;">
-            </div>
-            <button onClick="{{ sendOtp }}" style="width:100%; margin-top:18px; height:52px; background:#0B3C26; color:#fff; border:none; font-size:12px; letter-spacing:2px; cursor:pointer;">SEND OTP</button>
-            <div style="font-family:'Montserrat',sans-serif; font-size:11px; color:#9a9a9a; margin-top:10px; text-align:center;">For testing, OTP is 123456</div>
-          </sc-if>
-          <sc-if value="{{ otpStepVerify }}" hint-placeholder-val="{{ false }}">
-            <div style="font-family:'Montserrat',sans-serif; font-size:12px; color:#4a4a4a; margin-bottom:10px;">OTP sent to +91 {{ otpPhone }}</div>
-            <input value="{{ otpCode }}" onInput="{{ onOtpCode }}" placeholder="Enter 6-digit OTP" maxlength="6" style="width:100%; height:50px; padding:0 16px; border:1px solid #ddd6c6; font-size:18px; letter-spacing:6px; text-align:center; outline:none; background:#fff;">
-            <button onClick="{{ verifyOtp }}" style="width:100%; margin-top:18px; height:52px; background:#0B3C26; color:#fff; border:none; font-size:12px; letter-spacing:2px; cursor:pointer;">VERIFY &amp; SIGN IN</button>
-            <div onClick="{{ resendOtp }}" style="text-align:center; margin-top:10px; font-family:'Montserrat',sans-serif; font-size:11px; color:#0B3C26; cursor:pointer; border-bottom:1px solid #C5A059; display:inline-block; padding-bottom:2px;">Resend OTP</div>
-          </sc-if>
-        </sc-if>
+        <div style="font-family:'Montserrat',sans-serif; font-size:11px; color:#9a9a9a; margin-top:10px; line-height:1.6;">Ordered before without an account? Use CREATE ACCOUNT with the same email or phone number and your orders appear automatically.</div>
+        <button onClick="{{ authSubmit }}" style="width:100%; margin-top:22px; height:52px; background:#0B3C26; color:#fff; border:none; font-size:12px; letter-spacing:2px; cursor:pointer; transition:background .4s ease;" style-hover="background:#06281a;">{{ authCta }}</button>
 
         <div onClick="{{ goHome }}" style="text-align:center; margin-top:18px; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; color:#9a9a9a; cursor:pointer;">&larr; Back to shopping</div>
       </div>
@@ -1553,15 +1530,20 @@ class Component extends DCLogic {
   }
   saveCart(items) { try { localStorage.setItem('cc_cart', JSON.stringify(items)); } catch (e) {} }
   setUser(user) {
-    try { sessionStorage.setItem('cc_user', JSON.stringify(user)); } catch(e) {}
+    /* localStorage so login survives new tabs and browser restarts */
+    try { localStorage.setItem('cc_user', JSON.stringify(user)); } catch(e) {}
     this.setState({ loggedInUser: user });
   }
   clearUser() {
-    try { sessionStorage.removeItem('cc_user'); sessionStorage.removeItem('cc_token'); sessionStorage.removeItem('cc_lastorder'); } catch(e) {}
+    try {
+      ['cc_user', 'cc_token', 'cc_lastorder', 'cc_lastorderid'].forEach(k => {
+        localStorage.removeItem(k); sessionStorage.removeItem(k);
+      });
+    } catch(e) {}
     this.setState({ loggedInUser: null, userOrders: [], wishlist: [], lastOrder: null });
   }
   setLastOrder(lo) {
-    try { sessionStorage.setItem('cc_lastorder', JSON.stringify(lo)); } catch(e) {}
+    try { localStorage.setItem('cc_lastorder', JSON.stringify(lo)); } catch(e) {}
     this.setState({ lastOrder: lo });
   }
   loadRecentlyViewed() {
@@ -1615,14 +1597,15 @@ class Component extends DCLogic {
     this.setState({ recentlyViewed: this.loadRecentlyViewed(), savedAddresses: this.loadSavedAddresses() });
     try { this.setState({ cookieAck: !!localStorage.getItem('cc_cookie_ok') }); } catch(e) {}
     try {
-      const u = sessionStorage.getItem('cc_user');
+      const u = localStorage.getItem('cc_user') || sessionStorage.getItem('cc_user');
       if (u) { const user = JSON.parse(u); this.setState({ loggedInUser: user }); setTimeout(() => this.fetchUserOrders(), 100); }
     } catch(e) {}
     try {
-      const lo = sessionStorage.getItem('cc_lastorder');
-      const oid = sessionStorage.getItem('cc_lastorderid');
+      const lo = localStorage.getItem('cc_lastorder') || sessionStorage.getItem('cc_lastorder');
+      const oid = localStorage.getItem('cc_lastorderid') || sessionStorage.getItem('cc_lastorderid');
       if (lo) this.setState({ lastOrder: JSON.parse(lo), orderId: oid || '' });
     } catch(e) {}
+    try { history.replaceState({ page: 'home' }, ''); } catch(e) {}
     this.applyDeepLink();
     this.heroPlay();
     this._onScroll = () => {
@@ -1635,9 +1618,20 @@ class Component extends DCLogic {
     this.setupReveal();
     // Browser back/forward support
     this._onPop = (e) => {
-      var s = e.state;
-      var pg = s && s.page ? s.page : 'home';
-      this.setState({ page: pg });
+      var st = e.state || { page: 'home' };
+      var patch = { page: st.page || 'home', mega: null, searchOpen: false, cartOpen: false };
+      if (st.page === 'collection') {
+        patch.collMode = st.collMode || 'region';
+        if (st.region) patch.region = st.region;
+        if (st.collTag) patch.collTag = st.collTag;
+      }
+      if (st.page === 'pdp') {
+        if (st.selectedId) { patch.selectedId = st.selectedId; this.loadReviews(st.selectedId); }
+        else patch.page = 'home';
+      }
+      if (st.page === 'info') patch.infoKey = st.infoKey || 'shipping';
+      this.setState(patch);
+      this.top();
     };
     window.addEventListener('popstate', this._onPop);
   }
@@ -1676,14 +1670,14 @@ class Component extends DCLogic {
   closeOverlays() { this.setState({ mega: null, searchOpen: false }); }
   goHome() { history.pushState({page:'home'}, ''); this.setState({ page: 'home', mega: null, miniBar: false, searchOpen: false }); this.top(); }
   goTrust() { history.pushState({page:'trust'}, ''); this.setState({ page: 'trust', mega: null, miniBar: false, searchOpen: false, cartOpen: false }); this.top(); }
-  openCollection(region) { history.pushState({page:'collection'}, ''); this.setState({ page: 'collection', collMode: 'region', region, mega: null, miniBar: false, searchOpen: false, sort: 'featured', visibleCount: 12 }); this.top(); }
-  openTag(key) { history.pushState({page:'collection'}, ''); this.setState({ page: 'collection', collMode: 'tag', collTag: key, mega: null, miniBar: false, searchOpen: false, sort: 'featured', visibleCount: 12 }); this.top(); }
+  openCollection(region) { history.pushState({page:'collection', collMode:'region', region:region}, ''); this.setState({ page: 'collection', collMode: 'region', region, mega: null, miniBar: false, searchOpen: false, sort: 'featured', visibleCount: 12 }); this.top(); }
+  openTag(key) { history.pushState({page:'collection', collMode:'tag', collTag:key}, ''); this.setState({ page: 'collection', collMode: 'tag', collTag: key, mega: null, miniBar: false, searchOpen: false, sort: 'featured', visibleCount: 12 }); this.top(); }
   openEarrings() { this.openTag('earrings'); }
   openNecklaces() { this.openTag('necklaces'); }
   openChoker() { this.openTag('choker'); }
   openWaist() { this.openTag('waist'); }
   openProduct(id) {
-    history.pushState({page:'pdp'}, '');
+    history.pushState({page:'pdp', selectedId:id}, '');
     this.setState({ page: 'pdp', selectedId: id, mega: null, miniBar: false, searchOpen: false, cartOpen: false, qty: 1, mainImg: 0, delivered: false, pin: '', reviewForm: false });
     this.loadReviews(id);
     this.pushRecentlyViewed(id);
@@ -1698,7 +1692,7 @@ class Component extends DCLogic {
     this.fetchWishlist();
     this.top();
   }
-  openInfo(key) { history.pushState({page:'info'}, ''); this.setState({ page: 'info', infoKey: key, mega: null, miniBar: false, searchOpen: false, cartOpen: false }); this.top(); }
+  openInfo(key) { history.pushState({page:'info', infoKey:key}, ''); this.setState({ page: 'info', infoKey: key, mega: null, miniBar: false, searchOpen: false, cartOpen: false }); this.top(); }
 
   openCart() { this.setState({ cartOpen: true, mega: null, searchOpen: false }); }
   closeCart() { this.setState({ cartOpen: false }); }
@@ -1773,10 +1767,12 @@ class Component extends DCLogic {
   async fetchUserOrders() {
     const user = this.state.loggedInUser;
     if (!user || !(user.email || user.phone)) return;
-    const q = user.email || user.phone;
-    const url = user.email ? '/api/orders/track?email=' + encodeURIComponent(q) : '/api/orders/track?phone=' + encodeURIComponent(q);
+    // Orders may carry only the email OR only the phone used at checkout — query both.
+    const params = [];
+    if (user.email) params.push('email=' + encodeURIComponent(user.email));
+    if (user.phone) params.push('phone=' + encodeURIComponent(user.phone));
     try {
-      const r = await fetch(url);
+      const r = await fetch('/api/orders/track?' + params.join('&'));
       const d = await r.json();
       if (d.success) this.setState({ userOrders: d.orders || [] });
     } catch(e) {}
@@ -1897,7 +1893,7 @@ class Component extends DCLogic {
       this.saveCart([]);
       this.setState({ cartItems: [], placed: true, orderId: codOrderId });
       this.setLastOrder(lastOrder);
-      try { sessionStorage.setItem('cc_lastorderid', codOrderId); } catch(e) {}
+      try { localStorage.setItem('cc_lastorderid', codOrderId); } catch(e) {}
       this.top();
       fetch('/api/orders/save', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1912,10 +1908,10 @@ class Component extends DCLogic {
         if (d && d.success) {
           if (d.order_id) {
             this.setState({ orderId: d.order_id });
-            try { sessionStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
+            try { localStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
             this.setLastOrder(Object.assign({}, this.state.lastOrder || lastOrder, { id: d.order_id }));
           }
-          if (d.session_token) sessionStorage.setItem('cc_token', d.session_token);
+          if (d.session_token) localStorage.setItem('cc_token', d.session_token);
           if (d.user_id) this.setUser({ id: d.user_id, name, email: co.email, phone: co.phone });
           if (d.shiprocket && !d.shiprocket.pushed) console.warn('Shiprocket push failed:', d.shiprocket.error);
         } else if (d && d.error) {
@@ -1984,7 +1980,7 @@ class Component extends DCLogic {
           // Show confirmation immediately
           this.setState({ cartItems: [], placed: true, orderId: oid });
           this.setLastOrder(lastOrder);
-          try { sessionStorage.setItem('cc_lastorderid', oid); } catch(e) {}
+          try { localStorage.setItem('cc_lastorderid', oid); } catch(e) {}
           this.top();
           // Save order to D1 in background
           fetch('/api/orders/save', {
@@ -2009,10 +2005,10 @@ class Component extends DCLogic {
             if (d && d.success) {
               if (d.order_id) {
                 this.setState({ orderId: d.order_id });
-                try { sessionStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
+                try { localStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
                 this.setLastOrder(Object.assign({}, this.state.lastOrder || lastOrder, { id: d.order_id }));
               }
-              if (d.session_token) sessionStorage.setItem('cc_token', d.session_token);
+              if (d.session_token) localStorage.setItem('cc_token', d.session_token);
               if (d.user_id) this.setUser({ id: d.user_id, name: name, email: co.email, phone: co.phone });
               if (d.shiprocket && !d.shiprocket.pushed) console.warn('Shiprocket push failed:', d.shiprocket.error);
             } else if (d && d.error) {
@@ -2535,7 +2531,7 @@ class Component extends DCLogic {
             d = await r.json();
           }
           if (d.success) {
-            if (d.token) sessionStorage.setItem('cc_token', d.token);
+            if (d.token) localStorage.setItem('cc_token', d.token);
             this.setUser(d.user); this.setState({ otpSent: false, otpPhone: '', otpCode: '' });
             this.openAccount();
           } else { alert(d.error || 'Sign-in failed'); }
@@ -2562,7 +2558,7 @@ class Component extends DCLogic {
             });
             const d = await r.json();
             if (!d.success) { alert(d.error); return; }
-            if (d.token) sessionStorage.setItem('cc_token', d.token);
+            if (d.token) localStorage.setItem('cc_token', d.token);
             this.setUser(d.user); this.setState({ fieldErrors: {} });
             this.openAccount();
           } else {
@@ -2572,7 +2568,7 @@ class Component extends DCLogic {
             });
             const d = await r.json();
             if (!d.success) { alert(d.error); return; }
-            if (d.token) sessionStorage.setItem('cc_token', d.token);
+            if (d.token) localStorage.setItem('cc_token', d.token);
             this.setUser(d.user); this.setState({ fieldErrors: {} });
             this.openAccount();
           }

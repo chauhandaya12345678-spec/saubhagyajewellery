@@ -28,6 +28,12 @@ export async function onRequest(context) {
     if (orderId) {
       const order = await db.prepare('SELECT * FROM orders WHERE id = ?').bind(orderId).first();
       results = order ? [order] : [];
+    } else if (email && phone) {
+      // Account view: orders may carry either identifier depending on checkout form
+      results = await db.prepare(
+        'SELECT * FROM orders WHERE email = ? OR phone = ? ORDER BY created_at DESC'
+      ).bind(email, phone).all();
+      results = results.results || [];
     } else if (email) {
       results = await db.prepare(
         'SELECT * FROM orders WHERE email = ? ORDER BY created_at DESC'

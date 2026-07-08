@@ -82,10 +82,19 @@ export async function onRequest(context) {
       if (existingUser) {
         userId = existingUser.id;
       } else if (create_account) {
+        // is_guest=1 lets a later signup with the same email/phone claim this account
         const autoPwd = await hashPassword('guest_' + crypto.randomUUID());
-        const newUser = await db.prepare(
-          'INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)'
-        ).bind(name || 'Guest', email || null, phone || null, autoPwd).run();
+        let newUser;
+        try {
+          newUser = await db.prepare(
+            'INSERT INTO users (name, email, phone, password, is_guest) VALUES (?, ?, ?, ?, 1)'
+          ).bind(name || 'Guest', email || null, phone || null, autoPwd).run();
+        } catch (e) {
+          if (!/no such column/i.test(e.message)) throw e;
+          newUser = await db.prepare(
+            'INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)'
+          ).bind(name || 'Guest', email || null, phone || null, autoPwd).run();
+        }
         userId = newUser.meta.last_row_id;
       }
 
