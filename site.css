@@ -107,7 +107,20 @@ footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
   .band,.hero,.ph,.prose,.seo,.crumb,.grid-wrap{padding-left:20px;padding-right:20px}
 }
 @media(max-width:560px){
-  .grid,.ccards,.rgrid,.fwrap{grid-template-columns:1fr}
+  .grid,.ccards,.rgrid{grid-template-columns:1fr}
+  /* compact mobile footer */
+  footer.site{padding:28px 16px 18px}
+  .fwrap{grid-template-columns:1fr 1fr;gap:22px 16px;align-items:start}
+  .fbrand{grid-column:1/-1;text-align:center;padding-bottom:14px;border-bottom:1px solid rgba(197,160,89,.18);margin-bottom:4px}
+  .fbrand p{display:none}
+  .fhead{font-size:9px;letter-spacing:1.5px;margin-bottom:10px}
+  .fcol a{font-size:11px;margin-bottom:7px}
+  .fatelier{font-size:10px;line-height:1.55;text-align:center}
+  .fwa{display:inline-block;margin-top:8px;font-size:11px;padding:6px 12px;background:rgba(197,160,89,.12);border:1px solid rgba(197,160,89,.4)}
+  .fbar{flex-direction:column;gap:6px;align-items:center;text-align:center;margin-top:16px;padding-top:12px;font-size:10px}
+  .fpay{display:none}
+  .logo-name{font-size:20px;letter-spacing:1px}
+  .logo-sub{font-size:7px;letter-spacing:4px}
 }
 /* PDP mobile: single column + sticky cart */
 @media(max-width:768px){
