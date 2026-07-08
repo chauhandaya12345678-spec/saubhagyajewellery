@@ -94,56 +94,15 @@ const NAV = [
   { slug: 'contact.html', label: 'Contact' }
 ];
 
+// Header/footer live in ONE runtime source now: layout.js (<x-layout>/<x-footer>
+// custom elements, hydrated by mpa.js). Generated pages just emit the tags —
+// keep NAV/labels in sync with layout.js when they change.
 function header(active) {
-  const links = NAV.map(n => `<a class="navlink${n.slug === active ? ' is-active' : ''}" href="${n.slug}">${esc(n.label)}</a>`).join('');
-  return `<div class="ann">FREE INSURED SHIPPING ACROSS INDIA</div>
-<header class="site">
-  <div class="nav">
-    <nav class="navlinks">${links}</nav>
-    <a class="logo" href="index.html">
-      <span class="logo-name">SAUBHAGYA</span>
-      <span class="logo-sub">FINE JEWELLERY</span>
-    </a>
-    <div class="nav-icons">
-      <a href="${APP}" aria-label="Search">Search</a>
-      <a href="${APP}" aria-label="Shop">Shop All</a>
-      <a href="${APP}" aria-label="Bag">Bag</a>
-    </div>
-  </div>
-</header>`;
+  return `<x-layout page="${active}"></x-layout>`;
 }
 
 function footer() {
-  const company = [
-    ['About Us', 'about.html'], ['Locate Stores', 'contact.html'], ['Contact Us', 'contact.html'], ['Blogs', 'blogs.html']
-  ];
-  const policy = [
-    ['Track Orders', 'track-orders.html'], ['Shipping and Delivery', 'shipping-and-returns.html'],
-    ['Return Policy', 'shipping-and-returns.html'], ['E & S Policy', 'es-policy.html'],
-    ['Grievances', 'grievances.html'], ['Terms of Service', 'terms.html'],
-    ['Offer T&C', 'offer-terms.html'], ['Privacy Policy', 'privacy-policy.html']
-  ];
-  const col = (title, items) => `<div class="fcol"><div class="fhead">${esc(title)}</div>${items.map(([l, h]) => `<a href="${h}">${esc(l)}</a>`).join('')}</div>`;
-  return `<footer class="site">
-  <div class="fwrap">
-    <div class="fbrand">
-      <div class="logo-name">SAUBHAGYA</div>
-      <div class="logo-sub">FINE JEWELLERY</div>
-      <p>Premium designer imitation jewellery: temple, Kundan/Polki and American Diamond. High-quality artificial jewellery, handcrafted and dispatched insured across India.</p>
-    </div>
-    ${col('COMPANY', company)}
-    ${col('POLICY', policy)}
-    <div class="fcol">
-      <div class="fhead">THE ATELIER</div>
-      <p class="fatelier">Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101<br>Phone: +91 99870 08435</p>
-      <a class="fwa" href="${WHATSAPP}">WhatsApp Support &rarr;</a>
-    </div>
-  </div>
-  <div class="fbar">
-    <span>&copy; 2026 Saubhagya Jewellery &middot; High-quality imitation jewellery &middot; SSL secured</span>
-    <span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span>
-  </div>
-</footer>`;
+  return `<x-footer></x-footer>`;
 }
 
 function page({ slug, title, desc, h1, jsonld, body, active }) {
@@ -168,6 +127,8 @@ function page({ slug, title, desc, h1, jsonld, body, active }) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
+<script src="layout.js"></script>
+<script src="mpa.js" defer></script>
 ${ld}
 </head>
 <body>
