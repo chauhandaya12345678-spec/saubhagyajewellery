@@ -55,18 +55,55 @@
       d.head.appendChild(tc);
     }
     var s = d.createElement('style');
-    s.textContent =
-      '.logo{display:flex;align-items:center;gap:10px;text-decoration:none}' +
-      '.logo-stack{display:flex;flex-direction:column;align-items:flex-start}' +
-      /* footer: gold brand on deep green (header colors were invisible there) */
-      'footer.site .logo-name{color:#C9A75F!important}' +
-      'footer.site .logo-sub{color:rgba(201,167,95,.85)!important}' +
-      'footer.site .fbrand{display:flex;flex-direction:column;align-items:flex-start}' +
-      '@media(max-width:560px){footer.site .fbrand{align-items:center}}' +
-      /* Apple-TV style 3D tilt */
-      '.fx-tilt{transform-style:preserve-3d;will-change:transform;transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s cubic-bezier(.22,1,.36,1)}' +
-      '.fx-tilt.fx-active{transition:transform .06s linear,box-shadow .3s}' +
-      '.fx-tilt.fx-active{box-shadow:0 24px 50px -18px rgba(6,40,26,.45),0 8px 20px -10px rgba(0,0,0,.3)}';
+    s.textContent = [
+      /* ── professional 3-zone header (overrides site.css) ────────── */
+      'header.site{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,160,89,.20)}',
+      '.nav{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:14px 40px}',
+      '.logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none;order:0}',
+      '.logo-stack{display:flex;flex-direction:column;align-items:flex-start}',
+      '.logo-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:#0B3C26;letter-spacing:2px;line-height:1}',
+      '.logo-sub{font-size:8px;letter-spacing:5px;color:#C5A059;margin-top:3px}',
+      '.navlinks{order:1;flex:1;display:flex;justify-content:center;gap:26px;flex-wrap:nowrap;font-size:12px;letter-spacing:.6px;margin:0}',
+      '.navlink{padding-bottom:3px;border-bottom:1px solid transparent;white-space:nowrap;color:#1A1A1A;text-decoration:none;transition:border-color .3s,color .3s}',
+      '.navlink:hover,.navlink.is-active{border-bottom-color:#C5A059;color:#0B3C26}',
+      '.nav-icons{order:2;flex:none;display:flex;align-items:center;gap:20px;font-size:11px;letter-spacing:1px}',
+      '.nav-icons a{color:#1A1A1A;text-decoration:none;white-space:nowrap;transition:color .3s}',
+      '.nav-icons a:hover{color:#0B3C26}',
+      /* badge shows only when mpa.js clears the inline display:none (count>0) */
+      '.nav-bag [data-mpa-cart-count]{align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:4px;border-radius:9px;background:#0B3C26;color:#fff;font-size:10px;font-weight:600;line-height:1;vertical-align:middle}',
+      '.nav-bag [data-mpa-cart-count]:not([style*="none"]){display:inline-flex}',
+      '.nav-burger{order:0;display:none;flex-direction:column;justify-content:center;gap:5px;width:34px;height:34px;padding:0;background:none;border:none;cursor:pointer}',
+      '.nav-burger span{display:block;height:2px;width:22px;background:#0B3C26;border-radius:2px;transition:transform .35s,opacity .25s}',
+      '.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}',
+      '.nav-burger.open span:nth-child(2){opacity:0}',
+      '.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}',
+      /* slide-down drawer */
+      '.nav-drawer{display:none;flex-direction:column;background:#fff;border-bottom:1px solid rgba(197,160,89,.2);overflow:hidden;max-height:0;transition:max-height .4s cubic-bezier(.22,1,.36,1)}',
+      '.nav-drawer.open{max-height:70vh}',
+      '.nav-drawer a{padding:15px 24px;font-size:14px;letter-spacing:.5px;color:#1A1A1A;text-decoration:none;border-top:1px solid #f0ece1}',
+      '.nav-drawer a.is-active{color:#0B3C26}',
+      '.nav-drawer a:first-child{border-top:none}',
+      /* mobile layout */
+      '@media(max-width:900px){',
+      '  .nav{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:11px 16px;gap:12px}',
+      '  .navlinks,.nav-icons{flex:none}',
+      '  .nav-burger{display:flex}',
+      '  .logo{order:1;flex:1;justify-content:center}',
+      '  .logo-name{font-size:19px;letter-spacing:1.5px}',
+      '  .navlinks{display:none}',
+      '  .nav-icons{order:2;gap:0}',
+      '  .nav-icons .ni-hide{display:none}',
+      '  .nav-drawer{display:flex}',
+      '}',
+      /* footer: gold brand on deep green */
+      'footer.site .logo-name{color:#C9A75F!important}',
+      'footer.site .logo-sub{color:rgba(201,167,95,.85)!important}',
+      'footer.site .fbrand{display:flex;flex-direction:column;align-items:flex-start}',
+      '@media(max-width:560px){footer.site .fbrand{align-items:center}}',
+      /* Apple-TV 3D tilt (hover scale is guarded per-page under @media(hover:hover)) */
+      '.fx-tilt{transform-style:preserve-3d;will-change:transform;transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s cubic-bezier(.22,1,.36,1)}',
+      '.fx-tilt.fx-active{transition:transform .06s linear,box-shadow .3s;box-shadow:0 24px 50px -18px rgba(6,40,26,.45),0 8px 20px -10px rgba(0,0,0,.3)}'
+    ].join('');
     d.head.appendChild(s);
   })();
   var NAV = [
@@ -82,16 +119,24 @@
     var links = NAV.map(function (n) {
       return '<a class="navlink' + (n.slug === active ? ' is-active' : '') + '" href="' + n.slug + '">' + n.label + '</a>';
     }).join('');
-    return '<header class="site"><div class="nav">' +
-      '<nav class="navlinks">' + links + '</nav>' +
+    var drawerLinks = links +
+      '<a class="navlink" href="' + APP + '">Shop All</a>' +
+      '<a class="navlink" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="track-orders.html" href="' + SIGNIN + '">Sign in</a>' +
+      '<a class="navlink" href="track-orders.html">Track Orders</a>';
+    return '<header class="site">' +
+      '<div class="nav">' +
+      '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<a class="logo" href="index.html" aria-label="Saubhagya Jewellery home">' + LOTUS(34) +
       '<span class="logo-stack"><span class="logo-name">SAUBHAGYA</span>' +
       '<span class="logo-sub">FINE JEWELLERY</span></span></a>' +
+      '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
-      '<a href="' + APP + '" aria-label="Shop">Shop All</a>' +
-      '<a data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="track-orders.html" href="' + SIGNIN + '">Sign in</a>' +
-      '<a href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
-      '</div></div></header>';
+      '<a class="ni-hide" href="' + APP + '" aria-label="Shop">Shop All</a>' +
+      '<a class="ni-hide" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="track-orders.html" href="' + SIGNIN + '">Sign in</a>' +
+      '<a class="nav-bag" href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
+      '</div></div>' +
+      '<div class="nav-drawer" id="nav-drawer">' + drawerLinks + '</div>' +
+      '</header>';
   }
 
   function footerHtml() {
@@ -124,6 +169,19 @@
       this.innerHTML = headerHtml(this.getAttribute('page') || '');
       this.style.display = 'block';
       hydrate();
+      // Hamburger drawer
+      var burger = this.querySelector('#nav-burger');
+      var drawer = this.querySelector('#nav-drawer');
+      if (burger && drawer) {
+        var toggle = function (open) {
+          burger.classList.toggle('open', open);
+          drawer.classList.toggle('open', open);
+          burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        burger.addEventListener('click', function () { toggle(!drawer.classList.contains('open')); });
+        drawer.addEventListener('click', function (e) { if (e.target.closest('a')) toggle(false); });
+        window.addEventListener('resize', function () { if (innerWidth > 900) toggle(false); });
+      }
     }
   });
 
@@ -135,18 +193,27 @@
   });
 
   /* ── Apple-TV style 3D tilt on cards ──────────────────────────────
-   * Cards tilt toward the cursor (max ~7°), lift slightly and deepen
-   * their shadow; springs back on leave, presses down on click.
-   * Desktop pointers only — touch devices skip it entirely.           */
+   * Fine pointers (mouse/trackpad): tilt toward cursor on hover.
+   * Touch: brief press-tilt while the finger is down, then a hard
+   * reset on release. Exactly ONE card is ever tilted at a time —
+   * `clearAll()` wipes any previous card so nothing stays "floating".*/
   (function tiltEngine() {
-    // Fine pointers (mouse/trackpad) tilt on hover; touch tilts while the
-    // finger is down and springs back on release — same Apple-TV feel,
-    // without fighting scroll (listeners stay passive).
     var FINE = !!(window.matchMedia && matchMedia('(hover:hover) and (pointer:fine)').matches);
     var SELECTOR = '.card, .tr-card, .cat-tile, .her-tile, .product-card';
-    var MAX = 7, raf = null;
+    var MAX = 7, raf = null, activeEl = null;
 
-    function apply(el, e, pressed) {
+    function clear(el) {
+      if (!el) return;
+      el.classList.remove('fx-active', 'fx-tilt');
+      el.style.transform = '';
+      el.__pressed = false;
+    }
+    function clearAll() {
+      var all = document.querySelectorAll('.fx-tilt');
+      for (var i = 0; i < all.length; i++) clear(all[i]);
+      activeEl = null;
+    }
+    function tilt(el, e, pressed) {
       var r = el.getBoundingClientRect();
       var px = (e.clientX - r.left) / r.width - 0.5;
       var py = (e.clientY - r.top) / r.height - 0.5;
@@ -154,58 +221,45 @@
       el.style.transform = 'perspective(900px) rotateX(' + (-py * MAX).toFixed(2) + 'deg) rotateY(' + (px * MAX).toFixed(2) + 'deg) scale3d(' + s + ',' + s + ',' + s + ')';
     }
 
-    document.addEventListener('pointerover', function (e) {
-      var el = e.target.closest(SELECTOR);
-      if (!el || el.__fx) return;
-      el.__fx = true;
-      el.classList.add('fx-tilt');
-    });
-
     document.addEventListener('pointermove', function (e) {
       var el = e.target.closest(SELECTOR);
+      if (!FINE) { if (el && el.__pressed) tiltNow(el, e); return; }
+      if (el !== activeEl) { clearAll(); activeEl = el; }
       if (!el) return;
-      if (!FINE && !el.__pressed) return; // touch: only tilt while held
+      tiltNow(el, e);
+    }, { passive: true });
+
+    function tiltNow(el, e) {
       if (raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(function () {
-        el.classList.add('fx-tilt');
-        el.classList.add('fx-active');
-        apply(el, e, el.__pressed);
+        el.classList.add('fx-tilt', 'fx-active');
+        tilt(el, e, el.__pressed);
       });
-    }, { passive: true });
+    }
 
     document.addEventListener('pointerdown', function (e) {
       var el = e.target.closest(SELECTOR);
-      if (!el) return;
-      el.__pressed = true;
-      el.classList.add('fx-tilt');
-      el.classList.add('fx-active');
-      apply(el, e, true);
+      if (!el) { clearAll(); return; }
+      clearAll();
+      activeEl = el; el.__pressed = true;
+      el.classList.add('fx-tilt', 'fx-active');
+      tilt(el, e, true);
     }, { passive: true });
 
-    document.addEventListener('pointerup', function (e) {
+    function release(e) {
       var el = e.target.closest(SELECTOR);
-      if (!el) return;
-      el.__pressed = false;
-      if (FINE) { apply(el, e, false); return; }
-      el.classList.remove('fx-active');
-      el.style.transform = '';
-    }, { passive: true });
-
-    document.addEventListener('pointercancel', function (e) {
-      var el = e.target.closest(SELECTOR);
-      if (!el) return;
-      el.__pressed = false;
-      el.classList.remove('fx-active');
-      el.style.transform = '';
-    }, { passive: true });
-
+      if (FINE && el) { el.__pressed = false; tiltNow(el, e); return; }
+      clearAll(); // touch: reset everything on lift/cancel
+    }
+    document.addEventListener('pointerup', release, { passive: true });
+    document.addEventListener('pointercancel', clearAll, { passive: true });
+    // Leaving a card with a fine pointer springs it back
     document.addEventListener('pointerout', function (e) {
+      if (!FINE) return;
       var el = e.target.closest(SELECTOR);
-      if (!el) return;
-      if (el.contains(e.relatedTarget)) return;
-      el.__pressed = false;
-      el.classList.remove('fx-active');
-      el.style.transform = '';
+      if (el && !el.contains(e.relatedTarget)) { clear(el); if (el === activeEl) activeEl = null; }
     });
+    // Scrolling on touch cancels any press-tilt
+    window.addEventListener('scroll', function () { if (!FINE) clearAll(); }, { passive: true });
   })();
 })();
