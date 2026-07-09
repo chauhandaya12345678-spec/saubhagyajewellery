@@ -14,7 +14,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to Shiprocket custom-channel order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShiprocket, recordShiprocketResult } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShiprocket, recordShiprocketResult, normEmail, normPhone } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -33,9 +33,11 @@ export async function onRequest(context) {
     const body = await request.json();
     const {
       razorpay_payment_id, razorpay_order_id, razorpay_signature,
-      items, total, subtotal, discount, name, email, phone, address,
+      items, total, subtotal, discount, name, address,
       create_account, test_mode, payment_method,
     } = body;
+    const email = normEmail(body.email);
+    const phone = normPhone(body.phone);
 
     if (!razorpay_payment_id || !items || total === undefined) {
       return json({ error: 'Missing required fields: razorpay_payment_id, items, total' }, 400);
@@ -73,7 +75,7 @@ export async function onRequest(context) {
       const identifier = email || phone;
       let existingUser = null;
       if (email) {
-        existingUser = await db.prepare('SELECT id, name FROM users WHERE email = ?').bind(email).first();
+        existingUser = await db.prepare('SELECT id, name FROM users WHERE lower(email) = ?').bind(email).first();
       }
       if (!existingUser && phone) {
         existingUser = await db.prepare('SELECT id, name FROM users WHERE phone = ?').bind(phone).first();

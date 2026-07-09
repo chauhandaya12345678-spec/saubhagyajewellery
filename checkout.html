@@ -35,8 +35,18 @@
   .co-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .co-summary { background: #fff; border: 1px solid #eae5d8; padding: 20px; position: sticky; top: 120px; }
   .co-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #4a4a4a; }
-  .co-line .co-x { flex: none; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd6c6; border-radius: 50%; color: #9a9a9a; font-size: 12px; cursor: pointer; background: #fff; line-height: 1; }
+  .co-item { padding: 10px 0; border-bottom: 1px solid #f3ede1; }
+  .co-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .co-item-name { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #1A1A1A; line-height: 1.4; }
+  .co-item-bot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .co-item-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B3C26; font-weight: 500; }
+  .co-qty { display: inline-flex; align-items: center; border: 1px solid #ddd6c6; border-radius: 4px; overflow: hidden; }
+  .co-qbtn { width: 28px; height: 28px; border: none; background: #fff; color: #0B3C26; font-size: 15px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .co-qbtn:hover { background: #f3ede1; }
+  .co-qv { min-width: 30px; text-align: center; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #1A1A1A; }
+  .co-x { flex: none; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd6c6; border-radius: 50%; color: #9a9a9a; font-size: 13px; cursor: pointer; background: #fff; line-height: 1; }
   .co-x:hover { color: #c0392b; border-color: #c0392b; }
+  select.co-input { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px; }
   .co-noreturn { font-family: 'Montserrat',sans-serif; font-size: 10.5px; color: #9a9a9a; line-height: 1.6; margin-top: 12px; }
   .co-noreturn a { color: #0B3C26; }
   .co-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid #eae5d8; }
@@ -89,15 +99,15 @@
         </div>
         <div class="co-section">
           <label class="co-label">Address</label>
-          <input class="co-input" id="co-address" placeholder="Street, building, flat">
+          <input class="co-input" id="co-address" placeholder="House / flat no, building, street, area">
           <div class="co-row">
-            <div><label class="co-label">City</label><input class="co-input" id="co-city" placeholder="City"></div>
-            <div><label class="co-label">State</label><input class="co-input" id="co-state" value="Maharashtra" placeholder="State"></div>
+            <div><label class="co-label">PIN Code</label><input class="co-input" id="co-pin" placeholder="6-digit PIN" maxlength="6" inputmode="numeric"></div>
+            <div><label class="co-label">City / District</label><input class="co-input" id="co-city" placeholder="City" autocomplete="address-level2"></div>
           </div>
-          <div class="co-row">
-            <div><label class="co-label">PIN Code</label><input class="co-input" id="co-pin" placeholder="6-digit PIN" maxlength="6"></div>
-            <div></div>
-          </div>
+          <label class="co-label">State</label>
+          <select class="co-input" id="co-state">
+            <option value="">Select state…</option>
+          </select>
         </div>
         <div class="co-section">
           <label class="co-label">Payment Method</label>
@@ -105,9 +115,6 @@
             <label><input type="radio" name="pay" value="razorpay" checked> Pay Online</label>
             <label><input type="radio" name="pay" value="cod"> Cash on Delivery</label>
           </div>
-          <label style="display:flex;align-items:center;gap:8px;font-family:'Montserrat',sans-serif;font-size:11px;color:#9a9a9a;cursor:pointer;">
-            <input type="checkbox" id="co-testmode" style="accent-color:#C5A059;"> 🧪 Test Mode (charges ₹1, no shipment)
-          </label>
         </div>
         <button class="co-btn" id="co-submit">PLACE ORDER</button>
         <div class="co-error" id="co-error" style="display:none"></div>
@@ -163,21 +170,40 @@
     $('co-items').innerHTML = cartItems.map(function(ci, idx) {
       var p = products[ci.id] || { name: ci.id, price: 0 };
       subtotal += (p.price || 0) * ci.qty;
-      return '<div class="co-line">' +
-        '<span class="co-x" data-idx="' + idx + '" title="Remove">×</span>' +
-        '<span style="flex:1">' + (p.name || ci.id) + ' ×' + ci.qty + '</span>' +
-        '<span>' + fmt((p.price || 0) * ci.qty) + '</span></div>';
+      return '<div class="co-item">' +
+        '<div class="co-item-top">' +
+          '<span class="co-item-name">' + (p.name || ci.id) + '</span>' +
+          '<span class="co-x" data-act="rm" data-idx="' + idx + '" title="Remove">×</span>' +
+        '</div>' +
+        '<div class="co-item-bot">' +
+          '<span class="co-qty">' +
+            '<button type="button" class="co-qbtn" data-act="dec" data-idx="' + idx + '" aria-label="Decrease">−</button>' +
+            '<span class="co-qv">' + ci.qty + '</span>' +
+            '<button type="button" class="co-qbtn" data-act="inc" data-idx="' + idx + '" aria-label="Increase">+</button>' +
+          '</span>' +
+          '<span class="co-item-price">' + fmt((p.price || 0) * ci.qty) + '</span>' +
+        '</div>' +
+      '</div>';
     }).join('');
     updateTotals();
   }
 
-  // Remove a line right from checkout (persists + syncs the header badge)
-  $('co-items').addEventListener('click', function(e) {
-    var x = e.target.closest('.co-x');
-    if (!x) return;
-    cartItems.splice(Number(x.getAttribute('data-idx')), 1);
+  function persistCart() {
     try { localStorage.setItem('cc_cart', JSON.stringify(cartItems)); } catch(err) {}
     if (window.MPA) { try { window.MPA.init(); } catch(err) {} }
+  }
+
+  // Qty +/- and remove, right from the order summary
+  $('co-items').addEventListener('click', function(e) {
+    var b = e.target.closest('[data-act]');
+    if (!b) return;
+    var idx = Number(b.getAttribute('data-idx'));
+    var act = b.getAttribute('data-act');
+    if (act === 'inc') cartItems[idx].qty++;
+    else if (act === 'dec') { cartItems[idx].qty--; if (cartItems[idx].qty < 1) cartItems.splice(idx, 1); }
+    else if (act === 'rm') cartItems.splice(idx, 1);
+    persistCart();
+    if (!cartItems.length) { $('co-content').style.display = 'none'; $('co-empty').style.display = 'block'; return; }
     render();
   });
 
@@ -217,15 +243,17 @@
     var phone = ($('co-phone').value || '').replace(/\D/g, '');
     var addr = ($('co-address').value || '').trim();
     var city = ($('co-city').value || '').trim();
+    var state = ($('co-state').value || '').trim();
     var pin = ($('co-pin').value || '').replace(/\D/g, '');
 
-    if (!first || !last) errs.push('Full name required');
+    if (first.length < 2 || last.length < 1) errs.push('Enter your full name');
     if (!/^\S+@\S+\.\S+$/.test(email)) errs.push('Valid email required');
-    if (!/^\d{10}$/.test(phone)) errs.push('10-digit mobile required');
-    if (!addr) errs.push('Address required');
-    if (!city) errs.push('City required');
-    if (!/^\d{6}$/.test(pin)) errs.push('6-digit PIN required');
-    return { errs: errs, first: first, last: last, email: email, phone: phone, addr: addr, city: city, pin: pin, pay: payMethod() };
+    if (!/^[6-9]\d{9}$/.test(phone)) errs.push('Valid 10-digit Indian mobile required');
+    if (addr.length < 8) errs.push('Enter a complete street address');
+    if (!/^[A-Za-z][A-Za-z .'-]{1,}$/.test(city)) errs.push('Enter a valid city / district');
+    if (!state) errs.push('Select your state');
+    if (!/^\d{6}$/.test(pin)) errs.push('Valid 6-digit PIN required');
+    return { errs: errs, first: first, last: last, email: email, phone: phone, addr: addr, city: city, state: state, pin: pin, pay: payMethod() };
   }
 
   function showOverlay() {
@@ -287,16 +315,14 @@
       return;
     }
 
-    var isTest = !!($('co-testmode') && $('co-testmode').checked);
     var codFee = v.pay === 'cod' ? PRICING.codFee : 0;
     var discount = promoCode === 'WELCOME10' ? Math.round(subtotal * 0.1) : 0;
     var shipFee = PRICING.freeShipping ? 0 : (shipCharge(v.pin) || 0);
     var total = Math.max(0, subtotal - discount + codFee + shipFee);
-    var amountPaise = isTest ? 100 : total * 100;
+    var amountPaise = total * 100;
 
     var name = (v.first + ' ' + v.last).trim();
-    if (isTest) name += ' [TEST]';
-    var address = { street: v.addr, apt: '', city: v.city, state: ($('co-state').value || '').trim() || 'Maharashtra', pin: v.pin };
+    var address = { street: v.addr, apt: '', city: v.city, state: v.state, pin: v.pin };
     var addressStr = JSON.stringify(address);
 
     // COD path
@@ -305,16 +331,14 @@
       var lastOrder = {
         id: codOrderId, paymentId: 'COD', customer: name, email: v.email, phone: v.phone,
         totalText: fmt(total), lines: lines.map(function(l) { return { name: l.name, qty: l.qty, lineText: fmt(l.price * l.qty) }; }),
-        address: [v.addr, v.city, ($('co-state').value || '').trim(), v.pin].filter(Boolean).join(', ')
+        address: [v.addr, v.city, v.state, v.pin].filter(Boolean).join(', ')
       };
       finalizeOrder(lastOrder, codOrderId, {
         razorpay_payment_id: 'COD-' + codOrderId, items: lines,
-        total: isTest ? 100 : total * 100,
-        subtotal: isTest ? 100 : subtotal * 100,
-        discount: isTest ? 0 : discount * 100,
-        shipping: isTest ? 0 : (shipFee + codFee) * 100,
+        total: total * 100, subtotal: subtotal * 100, discount: discount * 100,
+        shipping: (shipFee + codFee) * 100,
         name: name, email: v.email || '', phone: v.phone || '',
-        address: addressStr, create_account: true, test_mode: isTest, payment_method: 'cod'
+        address: addressStr, create_account: true, test_mode: false, payment_method: 'cod'
       });
       return;
     }
@@ -342,7 +366,7 @@
       subtotalText: fmt(subtotal), discountText: discount > 0 ? fmt(discount) : '',
       shippingText: fmt(shipFee), totalText: fmt(total),
       customer: name, email: v.email, phone: v.phone,
-      address: [v.addr, v.city, ($('co-state').value || '').trim(), v.pin].filter(Boolean).join(', ')
+      address: [v.addr, v.city, v.state, v.pin].filter(Boolean).join(', ')
     };
 
     var handlePayment = function(orderId, serverKeyId) {
@@ -365,12 +389,10 @@
             razorpay_signature: resp.razorpay_signature || '',
             payment_method: 'razorpay',
             items: lines,
-            total: isTest ? 100 : total * 100,
-            subtotal: isTest ? 100 : subtotal * 100,
-            discount: isTest ? 0 : discount * 100,
-            shipping: isTest ? 0 : shipFee * 100,
+            total: total * 100, subtotal: subtotal * 100,
+            discount: discount * 100, shipping: shipFee * 100,
             name: name, email: v.email || '', phone: v.phone || '',
-            address: addressStr, create_account: true, test_mode: isTest
+            address: addressStr, create_account: true, test_mode: false
           });
         },
         // Buyer closed the modal without paying: cart is untouched, re-arm the button
@@ -390,9 +412,9 @@
         body: JSON.stringify({
           amount: amountPaise, currency: 'INR', cart: lines,
           name: name, email: v.email, phone: v.phone,
-          address: [v.addr, v.city, ($('co-state').value || '').trim(), v.pin].filter(Boolean).join(', '),
+          address: [v.addr, v.city, v.state, v.pin].filter(Boolean).join(', '),
           address_json: address,
-          test_mode: isTest
+          test_mode: false
         })
       }).then(function(r) { return r.json(); })
         // create-razorpay-order returns { id, amount, currency, key_id }
@@ -418,6 +440,13 @@
     $('co-submit').textContent = 'PROCESSING…';
     doPayment(v);
   });
+
+  // Populate state dropdown (28 states + 8 UTs)
+  (function fillStates() {
+    var STATES = ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Andaman & Nicobar Islands','Chandigarh','Dadra & Nagar Haveli and Daman & Diu','Delhi','Jammu & Kashmir','Ladakh','Lakshadweep','Puducherry'];
+    var sel = $('co-state');
+    STATES.forEach(function(s) { var o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o); });
+  })();
 
   // Init
   function useCatalogFallback() {

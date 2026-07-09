@@ -4,7 +4,7 @@
  * Body: { name, email?, phone?, password }
  * Returns: { success: true, token, user: { id, name, email, phone } }
  */
-import { hashPassword } from '../_lib.js';
+import { hashPassword, normEmail, normPhone } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -19,7 +19,11 @@ export async function onRequest(context) {
   }
 
   try {
-    const { name, email, phone, password } = await request.json();
+    const body = await request.json();
+    const name = body.name;
+    const password = body.password;
+    const email = normEmail(body.email);
+    const phone = normPhone(body.phone);
     if (!name || !password) {
       return new Response(JSON.stringify({ error: 'Name and password are required' }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
     }
@@ -29,9 +33,9 @@ export async function onRequest(context) {
 
     const db = env.DB;
 
-    // Find any existing account under this email or phone
+    // Find any existing account under this email or phone (case-insensitive email)
     let existing = null;
-    if (email) existing = await db.prepare('SELECT * FROM users WHERE email = ?').bind(email).first();
+    if (email) existing = await db.prepare('SELECT * FROM users WHERE lower(email) = ?').bind(email).first();
     if (!existing && phone) existing = await db.prepare('SELECT * FROM users WHERE phone = ?').bind(phone).first();
 
     let userId;

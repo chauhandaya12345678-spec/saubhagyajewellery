@@ -13,6 +13,19 @@
 
 const enc = new TextEncoder();
 
+/* Email is the account key — normalise to lowercase+trim everywhere so
+   "Daya@x.com" and "daya@x.com" are one account, never duplicates. */
+export function normEmail(e) {
+  if (!e) return null;
+  const t = String(e).trim().toLowerCase();
+  return t || null;
+}
+export function normPhone(p) {
+  if (!p) return null;
+  const d = String(p).replace(/\D/g, '');
+  return d ? d.slice(-10) : null;
+}
+
 export async function hmacSha256Hex(secret, message) {
   const key = await crypto.subtle.importKey(
     'raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']

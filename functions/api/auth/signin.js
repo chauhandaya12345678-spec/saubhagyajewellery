@@ -4,7 +4,7 @@
  * Body: { email?, phone?, password }
  * Returns: { success: true, token, user: { id, name, email, phone } }
  */
-import { verifyPassword, hashPassword } from '../_lib.js';
+import { verifyPassword, hashPassword, normEmail, normPhone } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -19,7 +19,10 @@ export async function onRequest(context) {
   }
 
   try {
-    const { email, phone, password } = await request.json();
+    const body = await request.json();
+    const password = body.password;
+    const email = normEmail(body.email);
+    const phone = normPhone(body.phone);
     if (!password) {
       return new Response(JSON.stringify({ error: 'Password is required' }), { status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
     }
@@ -31,7 +34,8 @@ export async function onRequest(context) {
     let user;
 
     if (email) {
-      user = await db.prepare('SELECT * FROM users WHERE email = ?').bind(email).first();
+      // case-insensitive email match (covers legacy mixed-case rows)
+      user = await db.prepare('SELECT * FROM users WHERE lower(email) = ?').bind(email).first();
     } else {
       user = await db.prepare('SELECT * FROM users WHERE phone = ?').bind(phone).first();
     }

@@ -155,7 +155,7 @@
       '<div class="fbrand">' + LOTUS(40) + '<div class="logo-name" style="margin-top:8px">SAUBHAGYA</div><div class="logo-sub">FINE JEWELLERY</div>' +
       '<p>Premium designer imitation jewellery: temple, Kundan/Polki and American Diamond. High-quality artificial jewellery, handcrafted and dispatched insured across India.</p></div>' +
       col('COMPANY', company) + col('POLICY', policy) +
-      '<div class="fcol"><div class="fhead">THE ATELIER</div>' +
+      '<div class="fcol"><div class="fhead">STORE LOCATION</div>' +
       '<p class="fatelier">Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101<br>Phone: +91 99870 08435</p>' +
       '<a class="fwa" href="' + WHATSAPP + '">WhatsApp Support &rarr;</a></div></div>' +
       '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; High-quality imitation jewellery &middot; SSL secured</span>' +

@@ -89,7 +89,15 @@
 
   $('track-btn').addEventListener('click', doTrack);
   $('track-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') doTrack(); });
-  if (document.readyState !== 'loading') loadMyOrders();
-  else document.addEventListener('DOMContentLoaded', loadMyOrders);
+  // Logged-in / just-checked-out users: prefill phone and auto-search
+  function prefillAndTrack() {
+    loadMyOrders();
+    var user = null;
+    try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
+    var phone = (user && user.phone) || '';
+    if (phone && !($('track-input').value || '').trim()) { $('track-input').value = phone; doTrack(); }
+  }
+  if (document.readyState !== 'loading') prefillAndTrack();
+  else document.addEventListener('DOMContentLoaded', prefillAndTrack);
 })();
 </script>
