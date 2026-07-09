@@ -139,7 +139,10 @@
    * their shadow; springs back on leave, presses down on click.
    * Desktop pointers only — touch devices skip it entirely.           */
   (function tiltEngine() {
-    if (!window.matchMedia || !matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    // Fine pointers (mouse/trackpad) tilt on hover; touch tilts while the
+    // finger is down and springs back on release — same Apple-TV feel,
+    // without fighting scroll (listeners stay passive).
+    var FINE = !!(window.matchMedia && matchMedia('(hover:hover) and (pointer:fine)').matches);
     var SELECTOR = '.card, .tr-card, .cat-tile, .her-tile, .product-card';
     var MAX = 7, raf = null;
 
@@ -161,8 +164,10 @@
     document.addEventListener('pointermove', function (e) {
       var el = e.target.closest(SELECTOR);
       if (!el) return;
+      if (!FINE && !el.__pressed) return; // touch: only tilt while held
       if (raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(function () {
+        el.classList.add('fx-tilt');
         el.classList.add('fx-active');
         apply(el, e, el.__pressed);
       });
@@ -172,6 +177,8 @@
       var el = e.target.closest(SELECTOR);
       if (!el) return;
       el.__pressed = true;
+      el.classList.add('fx-tilt');
+      el.classList.add('fx-active');
       apply(el, e, true);
     }, { passive: true });
 
@@ -179,7 +186,17 @@
       var el = e.target.closest(SELECTOR);
       if (!el) return;
       el.__pressed = false;
-      apply(el, e, false);
+      if (FINE) { apply(el, e, false); return; }
+      el.classList.remove('fx-active');
+      el.style.transform = '';
+    }, { passive: true });
+
+    document.addEventListener('pointercancel', function (e) {
+      var el = e.target.closest(SELECTOR);
+      if (!el) return;
+      el.__pressed = false;
+      el.classList.remove('fx-active');
+      el.style.transform = '';
     }, { passive: true });
 
     document.addEventListener('pointerout', function (e) {

@@ -159,7 +159,7 @@ function productCard(p) {
   const img = p.image
     ? `<img class="card-photo" src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">`
     : `<span class="card-ph">STUDIO PRODUCT SHOT</span>`;
-  return `<a class="card" href="product?sku=${encodeURIComponent(p.sku)}">
+  return `<a class="card" data-sku="${esc(p.sku)}" href="product?sku=${encodeURIComponent(p.sku)}">
   <div class="card-img${p.image ? ' card-img-photo' : ''}">${tag ? `<span class="card-tag">${esc(tag)}</span>` : ''}${img}</div>
   <div class="card-name">${esc(p.name)}</div>
   <div class="card-price">${inr(p.price)}</div>
@@ -219,7 +219,36 @@ function collectionPage(key) {
 ${grid}
   </div>
   <div class="cta-row"><a class="btn" href="${APP}?collection=${c.region}">SHOP THE FULL ${esc(c.label.toUpperCase())} EDIT &rarr;</a></div>
-</section>`;
+</section>
+<script src="catalog.js?v=4"></script>
+<script>
+/* Live-price hydration: the HTML above is baked at build time, but prices
+ * live in D1 and change without a deploy — refresh every card from the
+ * catalog (API first, static fallback) so listings always match the PDP. */
+(function () {
+  function apply() {
+    var cat = window.CHAUHAN_CATALOG || [];
+    if (!cat.length) return false;
+    var map = {};
+    cat.forEach(function (p) { map[p.id || p.sku] = p; });
+    document.querySelectorAll('.card[data-sku]').forEach(function (a) {
+      var p = map[a.getAttribute('data-sku')];
+      if (!p) return;
+      var pr = a.querySelector('.card-price');
+      if (pr) pr.innerHTML = '₹' + Number(p.price || 0).toLocaleString('en-IN') +
+        (p.mrp && p.mrp > p.price ? ' <small style="text-decoration:line-through">₹' + Number(p.mrp).toLocaleString('en-IN') + '</small>' : '');
+      var im = a.querySelector('.card-photo');
+      if (im && p.image && im.getAttribute('src') !== p.image) im.src = p.image;
+    });
+    return true;
+  }
+  if (!apply()) {
+    window.addEventListener('catalog-ready', apply);
+    var tries = 0;
+    var poll = setInterval(function () { if (apply() || ++tries > 60) clearInterval(poll); }, 150);
+  }
+})();
+</script>`;
   return page({ slug: c.slug, title: c.title, desc: c.desc, h1: c.label, active: c.slug, jsonld: [crumb.ld, itemListLd], body });
 }
 
@@ -519,7 +548,8 @@ header.site{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);ba
 .grid-wrap{max-width:1280px;margin:0 auto;padding:20px 40px 70px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
 .card{display:block}
-.card-img{position:relative;height:300px;background:repeating-linear-gradient(135deg,#f1efe9 0 16px,#e9e6dd 16px 32px);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card-img{position:relative;aspect-ratio:4/5;background:repeating-linear-gradient(135deg,#f1efe9 0 16px,#e9e6dd 16px 32px);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:14px}
+.prose img,.seo img{border-radius:12px;max-width:100%}
 .card-img-photo{background:#efece4}
 .card-photo{width:100%;height:100%;object-fit:cover;display:block;transition:transform .9s cubic-bezier(.22,1,.36,1)}
 .card:hover .card-photo{transform:scale(1.05)}
@@ -573,7 +603,12 @@ footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
   .band,.hero,.ph,.prose,.seo,.crumb,.grid-wrap{padding-left:20px;padding-right:20px}
 }
 @media(max-width:560px){
-  .grid,.ccards,.rgrid{grid-template-columns:1fr}
+  /* retail-style mobile: two tidy columns, never one long photo per screen */
+  .grid,.ccards,.rgrid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .card-img{border-radius:10px}
+  .card-name{font-size:14px;margin-top:8px}
+  .card-price{font-size:12px;margin-top:3px}
+  .card-tag{display:none}
   /* compact mobile footer */
   footer.site{padding:28px 16px 18px}
   .fwrap{grid-template-columns:1fr 1fr;gap:22px 16px;align-items:start}
@@ -588,23 +623,7 @@ footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
   .logo-name{font-size:20px;letter-spacing:1px}
   .logo-sub{font-size:7px;letter-spacing:4px}
 }
-/* PDP mobile: single column + sticky cart */
-@media(max-width:768px){
-  div[style*="1fr 1fr"]{
-    grid-template-columns:1fr !important;
-    gap:24px !important;
-    padding:20px !important;
-    padding-bottom:80px !important
-  }
-  div[style*="position:sticky"]{position:static !important}
-  div[style*="Cormorant"][style*="42px"]{font-size:28px !important}
-  div[style*="4 / 5"],div[style*="4/5"]{max-height:45vh !important}
-  button[style*="letter-spacing"][style*="54px"]{
-    position:fixed !important;bottom:0 !important;left:0 !important;
-    right:0 !important;width:100% !important;height:56px !important;
-    border-radius:0 !important;z-index:999 !important
-  }
-}`;
+`;
 
 /* ---------- write ---------- */
 function write(name, content) {

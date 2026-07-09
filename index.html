@@ -145,10 +145,21 @@
     .hm-hero-caption .t { font-size: 26px; }
     .hm-hero-arrow { width: 36px; height: 36px; font-size: 18px; }
     .hm-section { padding: 32px 18px 6px; }
-    .cat2 { grid-template-columns: 1fr; }
-    .cat3 { grid-template-columns: 1fr; }
-    .her3 { grid-template-columns: 1fr; gap: 16px; }
-    .her-tile { height: 300px; }
+    /* retail-style mobile: tidy 2-column tiles instead of one long photo per screen */
+    .cat2 { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .cat-tile.big { height: 190px; }
+    .cat3 { grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .cat-tile.small { height: 150px; }
+    .cat3 a:last-child { grid-column: 1 / -1; height: 160px; }
+    .cat-text .t { font-size: 18px; }
+    .cat-text .s { display: none; }
+    .cat-text { left: 16px; bottom: 14px; }
+    .cat-tile.small .cat-text { left: 16px; bottom: 12px; }
+    .her3 { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .her-tile { height: 210px; }
+    .her3 a:last-child { grid-column: 1 / -1; height: 200px; }
+    .her-text { left: 16px; bottom: 16px; }
+    .her-text .t { font-size: 19px; }
     .tr-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
     .hm-sec-title { font-size: 26px; }
     .seo-block { padding: 30px 18px 56px; }
