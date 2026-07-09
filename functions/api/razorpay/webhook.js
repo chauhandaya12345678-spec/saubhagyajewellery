@@ -11,7 +11,7 @@
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
  *   Event:  payment.captured
  */
-import { hmacSha256Hex, pushToShiprocket, recordShiprocketResult } from '../_lib.js';
+import { hmacSha256Hex, pushToShiprocket, recordShiprocketResult, sendOrderEmail } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -90,6 +90,19 @@ export async function onRequest(context) {
         paymentMethod: 'razorpay',
       });
       await recordShiprocketResult(db, orderId, shiprocket);
+
+      // Backstop path also sends the confirmation email (browser never called save)
+      const emailJob = sendOrderEmail(env, {
+        id: orderId,
+        name: notes.customer_name || 'Guest',
+        email: notes.customer_email || p.email || '',
+        phone: notes.customer_phone || p.contact || '',
+        address: addressJson,
+        items,
+        totalPaise: p.amount,
+        paymentMethod: 'razorpay',
+      });
+      if (context.waitUntil) context.waitUntil(emailJob); else await emailJob;
     }
 
     return new Response(JSON.stringify({ ok: true, order_id: orderId, shiprocket }), { headers: { 'Content-Type': 'application/json' } });

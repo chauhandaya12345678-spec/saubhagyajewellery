@@ -9,6 +9,9 @@
  *   SHIPROCKET_EMAIL         Shiprocket API-user email  (Settings → API → Configure)
  *   SHIPROCKET_PASSWORD      Shiprocket API-user password
  *   SHIPROCKET_PICKUP_LOCATION  pickup nickname in Shiprocket (default "Primary")
+ *   RESEND_API_KEY           Resend API key — enables order-confirmation email (optional)
+ *   ORDER_EMAIL_FROM         verified sender, default "Saubhagya Jewellery <orders@saubhagyajewellery.com>"
+ *   ORDER_EMAIL_BCC          store copy address (default saubhagyajewellery01@gmail.com)
  */
 
 const enc = new TextEncoder();
@@ -161,4 +164,80 @@ export async function recordShiprocketResult(db, orderId, sr) {
     await db.prepare("UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime('now') WHERE id = ?")
       .bind(sr.shiprocket_order_id, sr.shipment_id, orderId).run();
   } catch (e) { /* columns may not exist until migration runs */ }
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+function inr(paise) { return '₹' + Number((paise || 0) / 100).toLocaleString('en-IN'); }
+
+/**
+ * Instant order-confirmation email via Resend (https://resend.com, free tier).
+ * No-ops silently when RESEND_API_KEY is unset, so it never blocks an order.
+ * Sender domain must be verified in Resend; store gets a bcc copy.
+ *
+ * order = { id, name, email, phone, address:{...}|string, items:[{name,qty,price}],
+ *           totalPaise, paymentMethod }
+ * Returns { sent, id?, error? } — never throws.
+ */
+export async function sendOrderEmail(env, order) {
+  try {
+    const key = env.RESEND_API_KEY;
+    if (!key) return { sent: false, error: 'RESEND_API_KEY not configured' };
+    if (!order.email) return { sent: false, error: 'no customer email' };
+
+    const from = env.ORDER_EMAIL_FROM || 'Saubhagya Jewellery <orders@saubhagyajewellery.com>';
+    const bcc = env.ORDER_EMAIL_BCC || 'saubhagyajewellery01@gmail.com';
+
+    let addr = order.address;
+    if (typeof addr === 'string') { try { addr = JSON.parse(addr); } catch (e) { addr = { street: addr }; } }
+    addr = addr || {};
+    const addrLine = [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).join(', ');
+
+    const rows = (order.items || []).map(l =>
+      `<tr><td style="padding:8px 0;border-bottom:1px solid #f0ece1;font:14px Georgia,serif;color:#1A1A1A">${esc(l.name)} &times; ${l.qty || 1}</td>` +
+      `<td style="padding:8px 0;border-bottom:1px solid #f0ece1;text-align:right;font:14px Arial,sans-serif;color:#0B3C26">${inr((l.price || 0) * 100 * (l.qty || 1))}</td></tr>`
+    ).join('');
+
+    const pay = order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid online';
+    const html =
+`<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
+  <div style="text-align:center;padding:26px 0 14px">
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B3C26">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A059;margin-top:3px">FINE JEWELLERY</div>
+  </div>
+  <div style="background:#0B3C26;color:#fff;padding:22px 24px;text-align:center">
+    <div style="font:600 20px Georgia,serif">Order Confirmed</div>
+    <div style="font-size:13px;opacity:.85;margin-top:6px">Order <strong>${esc(order.id)}</strong></div>
+  </div>
+  <div style="padding:24px">
+    <p style="font-size:14px;line-height:1.6;color:#4a4a4a;margin:0 0 18px">Hi ${esc((order.name || 'there').split(' ')[0])}, thank you for your order. We're preparing your piece for dispatch. You can track it anytime at <a href="https://saubhagyajewellery.com/track-orders.html" style="color:#0B3C26">My Orders</a> using your phone number.</p>
+    <table style="width:100%;border-collapse:collapse">${rows}
+      <tr><td style="padding:12px 0 0;font:600 16px Georgia,serif">Total (${esc(pay)})</td>
+      <td style="padding:12px 0 0;text-align:right;font:600 18px Georgia,serif;color:#0B3C26">${inr(order.totalPaise)}</td></tr>
+    </table>
+    <div style="margin-top:20px;padding:14px 16px;background:#faf8f3;border:1px solid #eee5d6;border-radius:6px">
+      <div style="font-size:10px;letter-spacing:2px;color:#C5A059;margin-bottom:6px">SHIP TO</div>
+      <div style="font-size:13px;line-height:1.6;color:#1A1A1A">${esc(order.name || '')}<br>${esc(addrLine)}<br>${esc(order.phone || '')}</div>
+    </div>
+    <p style="font-size:12px;line-height:1.7;color:#9a9a9a;margin-top:20px">Ready pieces dispatch in 2–4 business days (10–14 for made-to-order bridal). A tracking link arrives on WhatsApp &amp; email once shipped. All sales are final; manufacturing defects are repaired or replaced.</p>
+    <p style="font-size:12px;color:#9a9a9a">Questions? <a href="https://wa.me/919987008435" style="color:#0B3C26">WhatsApp us</a>.</p>
+  </div>
+</div>`;
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from, to: [order.email], bcc: [bcc],
+        subject: `Order ${order.id} confirmed · Saubhagya Jewellery`,
+        html,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { sent: false, error: 'Resend error: ' + JSON.stringify(data).slice(0, 300) };
+    return { sent: true, id: data.id };
+  } catch (err) {
+    return { sent: false, error: 'Email error: ' + err.message };
+  }
 }

@@ -14,7 +14,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to Shiprocket custom-channel order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShiprocket, recordShiprocketResult, normEmail, normPhone } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShiprocket, recordShiprocketResult, normEmail, normPhone, sendOrderEmail } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -149,6 +149,20 @@ export async function onRequest(context) {
         paymentMethod: method,
       });
       await recordShiprocketResult(db, orderId, shiprocket);
+
+      // Instant confirmation email (Resend) — fire-and-forget, never blocks the
+      // response or the order. No-ops if RESEND_API_KEY is unset.
+      const emailJob = sendOrderEmail(env, {
+        id: orderId,
+        name: name || 'Guest',
+        email,
+        phone: phone || '',
+        address: addressJson,
+        items: typeof items === 'string' ? JSON.parse(items) : items,
+        totalPaise: total,
+        paymentMethod: method,
+      });
+      if (context.waitUntil) context.waitUntil(emailJob); else await emailJob;
     }
 
     return json({
