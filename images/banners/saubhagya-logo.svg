@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-label="Saubhagya Jewellery">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D6B678"/>
+      <stop offset="1" stop-color="#A87F3F"/>
+    </linearGradient>
+  </defs>
+  <!-- lotus mark -->
+  <g transform="translate(320,74)" fill="none" stroke="url(#gold)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0,-38 C14,-22 14,-4 0,10 C-14,-4 -14,-22 0,-38 Z"/>
+    <path d="M-34,-24 C-12,-18 -2,-4 0,10 C-20,8 -32,-6 -34,-24 Z"/>
+    <path d="M34,-24 C12,-18 2,-4 0,10 C20,8 32,-6 34,-24 Z"/>
+    <path d="M-58,-2 C-36,4 -14,10 0,10 C-18,22 -44,18 -58,-2 Z"/>
+    <path d="M58,-2 C36,4 14,10 0,10 C18,22 44,18 58,-2 Z"/>
+  </g>
+  <!-- sparkles -->
+  <g fill="url(#gold)">
+    <path d="M402,28 l5,14 14,5 -14,5 -5,14 -5,-14 -14,-5 14,-5 Z"/>
+    <path d="M424,66 l3,9 9,3 -9,3 -3,9 -3,-9 -9,-3 9,-3 Z"/>
+  </g>
+  <!-- wordmark -->
+  <text x="320" y="204" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif" font-size="88" font-weight="600" letter-spacing="6" fill="url(#gold)">SAUBHAGYA</text>
+  <text x="320" y="268" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif" font-size="40" letter-spacing="10" fill="url(#gold)">Jewellery</text>
+</svg>
