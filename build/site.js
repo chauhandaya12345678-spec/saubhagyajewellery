@@ -159,7 +159,7 @@ function productCard(p) {
   const img = p.image
     ? `<img class="card-photo" src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">`
     : `<span class="card-ph">STUDIO PRODUCT SHOT</span>`;
-  return `<a class="card" href="product.html?sku=${encodeURIComponent(p.sku)}">
+  return `<a class="card" href="product?sku=${encodeURIComponent(p.sku)}">
   <div class="card-img${p.image ? ' card-img-photo' : ''}">${tag ? `<span class="card-tag">${esc(tag)}</span>` : ''}${img}</div>
   <div class="card-name">${esc(p.name)}</div>
   <div class="card-price">${inr(p.price)}</div>
@@ -336,9 +336,15 @@ const CONTENT = [
     h1: 'Blogs',
     lede: 'Styling notes, craft stories and bridal inspiration from the Saubhagya atelier.',
     blocks: [
-      ['h', 'Coming soon'],
-      ['p', 'Our journal is being written. Soon you will find guides on styling temple jewellery, caring for matte antique-gold finishes, and choosing a bridal set for the big day.'],
-      ['p', 'In the meantime, follow us on Instagram and Pinterest for daily inspiration.']
+      ['h', 'How to style temple jewellery beyond the wedding'],
+      ['p', 'Temple jewellery is not only for the mandap. A matte antique-gold choker over a plain silk kurta lifts a festive dinner instantly; matte jhumkas with a cotton saree work for pujas and office celebrations alike. Keep the rest of the look quiet — one statement piece, solid fabrics, warm tones — and let the deity motifs do the talking.'],
+      ['h', 'Kundan vs Polki: what brides should actually compare'],
+      ['p', 'Kundan settings hold flat, foiled glass stones in gold-toned frames for a formal, structured sparkle; Polki-style pieces use uncut-look stones for a raw, older-world glow. For daytime weddings, Polki photographs softer; for receptions under artificial light, Kundan throws more fire. Match the base tone to your outfit borders, not your skin tone — that is what shows in photos.'],
+      ['h', 'Caring for matte antique-gold finishes'],
+      ['p', 'Imitation jewellery lasts years with three habits: wear it last (after perfume, hairspray and makeup), wipe it with a dry soft cloth before storing, and keep each piece in its own zip pouch so platings never rub. Never store in the bathroom — humidity is what dulls a matte finish, not age.'],
+      ['h', 'Choosing a bridal set that survives a 6-hour event'],
+      ['p', 'Weight decides comfort: pick a haaram that sits below the collarbone so it does not fight your dupatta pins, earrings with ear-chain support if they cross 40 grams, and a maang tikka with a hook — not a paste patch. Our made-to-order bridal sets are built exactly for this; message us on WhatsApp with your outfit photo and we will suggest the right set.'],
+      ['p', 'For daily inspiration, follow us on Instagram and Pinterest.']
     ]
   },
   {
@@ -362,8 +368,9 @@ const CONTENT = [
     blocks: [
       ['h', 'Shipping & Delivery'],
       ['p', 'Ready pieces dispatch within 2 to 4 business days; made-to-order bridal sets within 10 to 14 days. Every shipment is fully insured in transit and delivered across India.'],
-      ['h', 'Returns'],
-      ['p', 'Because every piece is made-to-order and individually inspected, we are unable to accept change-of-mind returns. Verified manufacturing defects are repaired or replaced, supported by the continuous unboxing video described in our standards.']
+      ['h', 'No-Return Policy'],
+      ['p', 'ALL SALES ARE FINAL. Because every piece is made-to-order and individually inspected before dispatch, we do not accept returns, exchanges or cancellations for change of mind — no exceptions. This protects every client from receiving a previously worn piece.'],
+      ['p', 'The only exception: a verified manufacturing defect, which we repair or replace free of cost. Defect claims require the continuous unboxing video described in our standards page, reported within 48 hours of delivery.']
     ],
     related: [['Read our standards', 'trust.html']]
   },
@@ -619,7 +626,7 @@ const today = new Date().toISOString().slice(0, 10);
 // the embedded CATALOG list still contains them and would emit dead URLs.
 const LIVE_CATALOG = JSON.parse(fs.readFileSync(path.join(__dirname, 'complete-catalog.json'), 'utf8'));
 const productUrls = LIVE_CATALOG.filter(p => p.inStock !== 0 && p.inStock !== false)
-  .map(p => `${BASE_URL}/product.html?sku=${encodeURIComponent(p.sku)}`);
+  .map(p => `${BASE_URL}/product?sku=${encodeURIComponent(p.sku)}`);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${pageSlugs.map(s => `  <url><loc>${urlOf(s)}</loc><lastmod>${today}</lastmod></url>`).join('\n')}

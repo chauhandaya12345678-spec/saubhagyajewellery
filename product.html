@@ -11,13 +11,15 @@
 <link rel="stylesheet" href="site.css">
 <script src="layout.js"></script>
 <script src="mpa.js" defer></script>
+<script src="catalog.js?v=4"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #FAFAFA; margin: 0; }
-  .pdp-wrap { max-width: 1280px; margin: 0 auto; padding: 0 48px 80px; }
-  .pdp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
-  .pdp-img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 4px; background: #f0ede5; }
-  .pdp-img-wrap { position: relative; overflow: hidden; border-radius: 4px; }
+  .pdp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px 80px; }
+  /* image capped at a regular card size instead of half the monitor */
+  .pdp-grid { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 56px; align-items: start; justify-content: center; }
+  .pdp-img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 12px; background: #f0ede5; }
+  .pdp-img-wrap { position: relative; overflow: hidden; border-radius: 12px; max-width: 440px; }
   .pdp-img-wrap:hover .pdp-img { transform: scale(1.05); transition: transform 0.5s cubic-bezier(.22,1,.36,1); }
   .pdp-badge { display: inline-block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 2px; padding: 5px 12px; background: #C5A059; color: #fff; margin-bottom: 14px; }
   .pdp-cat { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 4px; color: #C5A059; margin-bottom: 8px; text-transform: uppercase; }
@@ -27,7 +29,28 @@
   .pdp-price { font-family: 'Cormorant Garamond',serif; font-size: 28px; font-weight: 600; color: #0B3C26; }
   .pdp-mrp { font-family: 'Montserrat',sans-serif; font-size: 15px; color: #9a9a9a; text-decoration: line-through; }
   .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B3C26; font-weight: 500; }
-  .pdp-tax { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; margin-bottom: 22px; }
+  .pdp-tax { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; margin-bottom: 6px; }
+  .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B3C26; margin-bottom: 4px; }
+  .pdp-noreturn { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; margin-bottom: 22px; }
+  .pdp-noreturn a { color: #0B3C26; }
+  /* reviews */
+  .rv-wrap { max-width: 1080px; margin: 30px auto 0; padding: 34px 0 0; border-top: 1px solid #eae5d8; }
+  .rv-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .rv-title { font-family: 'Cormorant Garamond',serif; font-size: 26px; color: #1A1A1A; margin: 0; }
+  .rv-avg { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #C5A059; }
+  .rv-item { padding: 14px 0; border-bottom: 1px solid #f3ede1; }
+  .rv-stars { color: #C5A059; font-size: 13px; letter-spacing: 2px; }
+  .rv-name { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #1A1A1A; font-weight: 500; margin-top: 4px; }
+  .rv-text { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6a6a6a; line-height: 1.7; margin-top: 6px; }
+  .rv-empty { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; padding: 10px 0 4px; }
+  .rv-form { margin-top: 22px; max-width: 460px; }
+  .rv-form h3 { font-family: 'Cormorant Garamond',serif; font-size: 20px; color: #1A1A1A; margin: 0 0 12px; }
+  .rv-input, .rv-textarea { width: 100%; padding: 12px 14px; border: 1px solid #ddd6c6; font-family: 'Montserrat',sans-serif; font-size: 13px; outline: none; background: #fff; margin-bottom: 10px; box-sizing: border-box; }
+  .rv-textarea { min-height: 90px; resize: vertical; }
+  .rv-starpick { display: flex; gap: 6px; margin-bottom: 12px; cursor: pointer; font-size: 22px; color: #ddd6c6; user-select: none; }
+  .rv-starpick span.on { color: #C5A059; }
+  .rv-submit { padding: 13px 26px; background: #0B3C26; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; }
+  .rv-msg { font-family: 'Montserrat',sans-serif; font-size: 12px; margin-top: 10px; }
   .pdp-qtyrow { display: flex; align-items: stretch; gap: 10px; margin: 0 0 14px; }
   .pdp-qty { display: flex; align-items: stretch; border: 1px solid #ddd6c6; }
   .pdp-qty span { display: flex; align-items: center; justify-content: center; font-family: 'Montserrat',sans-serif; font-size: 14px; cursor: pointer; user-select: none; }
@@ -75,6 +98,8 @@
             <span class="pdp-save" id="pdp-save"></span>
           </div>
           <div class="pdp-tax">incl. of all taxes</div>
+          <div class="pdp-ship">FREE insured shipping across India · price includes delivery</div>
+          <div class="pdp-noreturn">All sales are final: no returns or exchanges. Manufacturing defects are repaired or replaced — see <a href="trust.html">our standards</a>.</div>
           <div class="pdp-qtyrow">
             <div class="pdp-qty">
               <span class="pdp-q" id="pdp-dec">−</span>
@@ -85,6 +110,25 @@
           </div>
           <button class="pdp-buy" id="pdp-buynow">BUY IT NOW</button>
           <div class="pdp-desc" id="pdp-desc"></div>
+        </div>
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="rv-wrap">
+        <div class="rv-head">
+          <h2 class="rv-title">Reviews</h2>
+          <span class="rv-avg" id="rv-avg"></span>
+        </div>
+        <div id="rv-list"><div class="rv-empty">Be the first to review this piece.</div></div>
+        <div class="rv-form">
+          <h3>Write a review</h3>
+          <div class="rv-starpick" id="rv-starpick" title="Tap to rate">
+            <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+          </div>
+          <input class="rv-input" id="rv-name" placeholder="Your name" maxlength="60">
+          <textarea class="rv-textarea" id="rv-text" placeholder="How was the piece? Fit, finish, occasion…" maxlength="600"></textarea>
+          <button class="rv-submit" id="rv-submit">SUBMIT REVIEW</button>
+          <div class="rv-msg" id="rv-msg"></div>
         </div>
       </div>
     </div>
@@ -186,18 +230,90 @@
     window.location.href = 'checkout.html';
   });
 
-  // Fetch product
+  /* ---- reviews (existing /api/reviews backend) ---- */
+  var rvRating = 5;
+  var starWrap = $('rv-starpick');
+  function paintStars() {
+    [].forEach.call(starWrap.children, function(s) {
+      s.classList.toggle('on', Number(s.getAttribute('data-v')) <= rvRating);
+    });
+  }
+  starWrap.addEventListener('click', function(e) {
+    var v = e.target.getAttribute && e.target.getAttribute('data-v');
+    if (v) { rvRating = Number(v); paintStars(); }
+  });
+  paintStars();
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  function loadReviews() {
+    fetch('/api/reviews?sku=' + encodeURIComponent(sku))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (!d || !d.success) return;
+        if (d.count > 0) $('rv-avg').textContent = '★ ' + d.average + ' · ' + d.count + ' review' + (d.count > 1 ? 's' : '');
+        if (d.reviews && d.reviews.length) {
+          $('rv-list').innerHTML = d.reviews.map(function(r) {
+            return '<div class="rv-item">' +
+              '<div class="rv-stars">' + '★'.repeat(Math.max(1, Math.min(5, r.rating))) + '</div>' +
+              '<div class="rv-name">' + esc(r.name) + '</div>' +
+              '<div class="rv-text">' + esc(r.review_text) + '</div></div>';
+          }).join('');
+        }
+      }).catch(function() {});
+  }
+  loadReviews();
+
+  $('rv-submit').addEventListener('click', function() {
+    var name = ($('rv-name').value || '').trim();
+    var text = ($('rv-text').value || '').trim();
+    var msg = $('rv-msg');
+    if (!name || !text) { msg.style.color = '#c0392b'; msg.textContent = 'Please add your name and a few words.'; return; }
+    this.disabled = true;
+    fetch('/api/reviews', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_sku: sku, name: name, rating: rvRating, review_text: text })
+    }).then(function(r) { return r.json(); })
+      .then(function(d) {
+        $('rv-submit').disabled = false;
+        if (d && d.success) {
+          msg.style.color = '#0B3C26'; msg.textContent = 'Thank you! Your review is live.';
+          $('rv-name').value = ''; $('rv-text').value = '';
+          loadReviews();
+        } else {
+          msg.style.color = '#c0392b'; msg.textContent = (d && d.error) || 'Could not submit. Try again.';
+        }
+      }).catch(function() {
+        $('rv-submit').disabled = false;
+        msg.style.color = '#c0392b'; msg.textContent = 'Network error. Try again.';
+      });
+  });
+
+  // Fetch product (catalog.js static fallback if the API is unreachable)
+  function fromCatalog() {
+    var hit = (window.CHAUHAN_CATALOG || []).find(function(p) { return p.id === sku || p.sku === sku; });
+    if (hit) { product = hit; render(); return true; }
+    return false;
+  }
+  function showError() { $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block'; }
+
+  function fallbackWithPoll() {
+    if (fromCatalog()) return;
+    var tries = 0;
+    var poll = setInterval(function() {
+      if (fromCatalog()) { clearInterval(poll); return; }
+      if (++tries > 30) { clearInterval(poll); showError(); }
+    }, 150);
+  }
+
   fetch('/api/products?sku=' + encodeURIComponent(sku))
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      var list = Array.isArray(data) ? data : (data.products || []);
-      if (!list.length) { $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block'; return; }
-      product = list[0];
-      render();
+      var list = Array.isArray(data) ? data : (data && data.products || []);
+      if (list && list.length) { product = list[0]; render(); return; }
+      fallbackWithPoll();
     })
-    .catch(function() {
-      $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block';
-    });
+    .catch(fallbackWithPoll);
 })();
 </script>
 </body>

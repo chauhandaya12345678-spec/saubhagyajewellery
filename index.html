@@ -35,7 +35,7 @@
   (function () {
     var q = new URLSearchParams(location.search);
     var p = q.get('product');
-    if (p) { location.replace('product.html?sku=' + encodeURIComponent(p)); return; }
+    if (p) { location.replace('product?sku=' + encodeURIComponent(p)); return; }
     var c = q.get('collection');
     var map = { south: 'south-indian-traditional.html', modern: 'mumbai-modern.html', bridal: 'north-indian-bridal.html' };
     if (c && map[c]) location.replace(map[c]);
@@ -61,23 +61,26 @@
   .hm-h1 { font-family: 'Cormorant Garamond',serif; font-weight: 400; font-size: 46px; line-height: 1.16; color: #1A1A1A; margin: 0 auto; max-width: 720px; }
   .hm-h1 em { font-style: italic; color: #0B3C26; }
 
-  /* Hero slider — same visual language as the original */
-  .hero-wrap { max-width: 1280px; margin: 34px auto 0; padding: 0 48px; }
-  .hero { position: relative; height: 560px; overflow: hidden; border-radius: 20px; border: 1px solid rgba(197,160,89,.35); box-shadow: 0 50px 90px -42px rgba(6,40,26,.5), 0 20px 48px -28px rgba(0,0,0,.28); animation: ccFadeUp 1.1s cubic-bezier(.22,1,.36,1) .15s both; }
-  .hero-track { display: flex; height: 100%; transition: transform 1.1s cubic-bezier(.65,0,.18,1); }
-  .hero-slide { position: relative; min-width: 100%; height: 100%; overflow: hidden; }
-  .hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 1s cubic-bezier(.22,1,.36,1); }
-  .hero-slide:hover .hero-bg { transform: scale(1.05); }
-  .hero-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 55%); }
-  .hero-caption { position: absolute; left: 44px; bottom: 40px; right: 44px; color: #fff; z-index: 2; }
-  .hero-caption .k { font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 4px; color: #C5A059; margin-bottom: 8px; }
-  .hero-caption .t { font-family: 'Cormorant Garamond',serif; font-size: 42px; font-weight: 500; line-height: 1.12; text-shadow: 0 2px 12px rgba(0,0,0,.35); }
-  .hero-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.16); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #fff; font-size: 22px; cursor: pointer; border: none; transition: background .4s ease; }
-  .hero-arrow:hover { background: rgba(255,255,255,.32); }
-  .hero-arrow.prev { left: 18px; } .hero-arrow.next { right: 18px; }
-  .hero-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 8px; }
-  .hero-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.5); border: none; cursor: pointer; padding: 0; transition: all .3s; }
-  .hero-dot.active { background: #fff; transform: scale(1.3); }
+  /* Hero slider — same visual language as the original.
+   * aspect-ratio matches the banner files (1200x630) so the FULL image
+   * shows on desktop instead of a center crop; slides are hard-clipped
+   * so neighbouring banners can never bleed into view. */
+  .hm-hero-wrap { max-width: 1280px; margin: 34px auto 0; padding: 0 48px; }
+  .hm-hero { position: relative; width: 100%; aspect-ratio: 1200 / 630; max-height: 640px; overflow: hidden; isolation: isolate; border-radius: 20px; border: 1px solid rgba(197,160,89,.35); box-shadow: 0 50px 90px -42px rgba(6,40,26,.5), 0 20px 48px -28px rgba(0,0,0,.28); animation: ccFadeUp 1.1s cubic-bezier(.22,1,.36,1) .15s both; }
+  .hm-hero-track { display: flex; width: 100%; height: 100%; transition: transform 1.1s cubic-bezier(.65,0,.18,1); }
+  .hm-hero-slide { position: relative; flex: 0 0 100%; min-width: 100%; height: 100%; overflow: hidden; }
+  .hm-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 1s cubic-bezier(.22,1,.36,1); }
+  .hm-hero-slide:hover .hm-hero-bg { transform: scale(1.05); }
+  .hm-hero-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 55%); }
+  .hm-hero-caption { position: absolute; left: 44px; bottom: 40px; right: 44px; color: #fff; z-index: 2; }
+  .hm-hero-caption .k { font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 4px; color: #C5A059; margin-bottom: 8px; }
+  .hm-hero-caption .t { font-family: 'Cormorant Garamond',serif; font-size: 42px; font-weight: 500; line-height: 1.12; text-shadow: 0 2px 12px rgba(0,0,0,.35); }
+  .hm-hero-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.16); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #fff; font-size: 22px; cursor: pointer; border: none; transition: background .4s ease; }
+  .hm-hero-arrow:hover { background: rgba(255,255,255,.32); }
+  .hm-hero-arrow.prev { left: 18px; } .hm-hero-arrow.next { right: 18px; }
+  .hm-hero-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 8px; }
+  .hm-hero-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.5); border: none; cursor: pointer; padding: 0; transition: all .3s; }
+  .hm-hero-dot.active { background: #fff; transform: scale(1.3); }
 
   .hm-ctas { display: flex; gap: 18px; margin: 42px 0 0; justify-content: center; animation: ccFadeUp 1.1s cubic-bezier(.22,1,.36,1) .4s both; flex-wrap: wrap; padding: 0 24px; }
   .hm-btn { font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; padding: 17px 36px; cursor: pointer; text-decoration: none; text-align: center; }
@@ -135,11 +138,12 @@
 
   @media (max-width: 900px) {
     .hm-h1 { font-size: 30px; }
-    .hero-wrap { padding: 0 18px; }
-    .hero { height: auto; aspect-ratio: 4/5; max-height: 520px; border-radius: 12px; }
-    .hero-caption { left: 22px; bottom: 26px; right: 22px; }
-    .hero-caption .t { font-size: 26px; }
-    .hero-arrow { width: 36px; height: 36px; font-size: 18px; }
+    .hm-hero-wrap { padding: 0 18px; }
+    /* phones: taller crop reads better than a thin strip */
+    .hm-hero { aspect-ratio: 4/5; max-height: 520px; border-radius: 12px; }
+    .hm-hero-caption { left: 22px; bottom: 26px; right: 22px; }
+    .hm-hero-caption .t { font-size: 26px; }
+    .hm-hero-arrow { width: 36px; height: 36px; font-size: 18px; }
     .hm-section { padding: 32px 18px 6px; }
     .cat2 { grid-template-columns: 1fr; }
     .cat3 { grid-template-columns: 1fr; }
@@ -161,28 +165,28 @@
   </div>
 
   <!-- HERO SLIDER: original banners only -->
-  <div class="hero-wrap">
-    <div class="hero" id="hero">
-      <div class="hero-track" id="hero-track">
-        <div class="hero-slide">
-          <div class="hero-bg" style="background-image:url('images/banners/Website_hero_banner_concept_art._202606221611.webp')"></div>
-          <div class="hero-shade"></div>
-          <div class="hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Designer Earrings Collection</div></div>
+  <div class="hm-hero-wrap">
+    <div class="hm-hero" id="hm-hero">
+      <div class="hm-hero-track" id="hm-hero-track">
+        <div class="hm-hero-slide">
+          <div class="hm-hero-bg" style="background-image:url('images/banners/Website_hero_banner_concept_art._202606221611.webp')"></div>
+          <div class="hm-hero-shade"></div>
+          <div class="hm-hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Designer Earrings Collection</div></div>
         </div>
-        <div class="hero-slide">
-          <div class="hero-bg" style="background-image:url('images/banners/Website_hero_image_for_Saubhagya_202606221620.webp')"></div>
-          <div class="hero-shade"></div>
-          <div class="hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Where Tradition Meets Design</div></div>
+        <div class="hm-hero-slide">
+          <div class="hm-hero-bg" style="background-image:url('images/banners/Website_hero_image_for_Saubhagya_202606221620.webp')"></div>
+          <div class="hm-hero-shade"></div>
+          <div class="hm-hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Where Tradition Meets Design</div></div>
         </div>
-        <div class="hero-slide">
-          <div class="hero-bg" style="background-image:url('images/banners/gold necklacer._A_202606221636.webp')"></div>
-          <div class="hero-shade"></div>
-          <div class="hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Gold Necklace Edit</div></div>
+        <div class="hm-hero-slide">
+          <div class="hm-hero-bg" style="background-image:url('images/banners/gold necklacer._A_202606221636.webp')"></div>
+          <div class="hm-hero-shade"></div>
+          <div class="hm-hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Gold Necklace Edit</div></div>
         </div>
       </div>
-      <button class="hero-arrow prev" id="hero-prev" aria-label="Previous">&lsaquo;</button>
-      <button class="hero-arrow next" id="hero-next" aria-label="Next">&rsaquo;</button>
-      <div class="hero-dots" id="hero-dots"></div>
+      <button class="hm-hero-arrow prev" id="hm-hero-prev" aria-label="Previous">&lsaquo;</button>
+      <button class="hm-hero-arrow next" id="hm-hero-next" aria-label="Next">&rsaquo;</button>
+      <div class="hm-hero-dots" id="hm-hero-dots"></div>
     </div>
   </div>
 
@@ -271,14 +275,14 @@
   'use strict';
 
   /* ---- hero slider ---- */
-  var track = document.getElementById('hero-track');
+  var track = document.getElementById('hm-hero-track');
   var slides = track.children.length;
-  var dotsWrap = document.getElementById('hero-dots');
+  var dotsWrap = document.getElementById('hm-hero-dots');
   var idx = 0, timer = null;
 
   for (var i = 0; i < slides; i++) {
     var b = document.createElement('button');
-    b.className = 'hero-dot' + (i === 0 ? ' active' : '');
+    b.className = 'hm-hero-dot' + (i === 0 ? ' active' : '');
     b.setAttribute('aria-label', 'Slide ' + (i + 1));
     (function (n) { b.addEventListener('click', function () { go(n, true); }); })(i);
     dotsWrap.appendChild(b);
@@ -295,8 +299,8 @@
     if (timer) clearInterval(timer);
     timer = setInterval(function () { go(idx + 1); }, 6000);
   }
-  document.getElementById('hero-prev').addEventListener('click', function () { go(idx - 1, true); });
-  document.getElementById('hero-next').addEventListener('click', function () { go(idx + 1, true); });
+  document.getElementById('hm-hero-prev').addEventListener('click', function () { go(idx - 1, true); });
+  document.getElementById('hm-hero-next').addEventListener('click', function () { go(idx + 1, true); });
   restart();
 
   /* ---- trending grid (catalog.js: D1 API with static fallback) ---- */
@@ -309,7 +313,7 @@
     var picks = cat.filter(function (p) { return p.inStock !== 0 && p.inStock !== false; }).slice(0, 8);
     var grid = document.getElementById('tr-grid');
     grid.innerHTML = picks.map(function (p) {
-      return '<a class="tr-card" href="product.html?sku=' + encodeURIComponent(p.id) + '">' +
+      return '<a class="tr-card" href="product?sku=' + encodeURIComponent(p.id) + '">' +
         '<div class="tr-img">' +
           (p.badge ? '<span class="tr-badge">' + esc(p.badge) + '</span>' : '') +
           '<div class="im" style="background-image:url(\'' + esc(p.image) + '\')"></div>' +

@@ -34,7 +34,11 @@
   .co-input:focus { border-color: #C5A059; }
   .co-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .co-summary { background: #fff; border: 1px solid #eae5d8; padding: 20px; position: sticky; top: 120px; }
-  .co-line { display: flex; justify-content: space-between; padding: 6px 0; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #4a4a4a; }
+  .co-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #4a4a4a; }
+  .co-line .co-x { flex: none; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd6c6; border-radius: 50%; color: #9a9a9a; font-size: 12px; cursor: pointer; background: #fff; line-height: 1; }
+  .co-x:hover { color: #c0392b; border-color: #c0392b; }
+  .co-noreturn { font-family: 'Montserrat',sans-serif; font-size: 10.5px; color: #9a9a9a; line-height: 1.6; margin-top: 12px; }
+  .co-noreturn a { color: #0B3C26; }
   .co-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid #eae5d8; }
   .co-total span:first-child { font-family: 'Cormorant Garamond',serif; font-size: 16px; }
   .co-total span:last-child { font-family: 'Cormorant Garamond',serif; font-size: 20px; font-weight: 600; color: #0B3C26; }
@@ -99,7 +103,7 @@
           <label class="co-label">Payment Method</label>
           <div class="co-pay-opt">
             <label><input type="radio" name="pay" value="razorpay" checked> Pay Online</label>
-            <label><input type="radio" name="pay" value="cod"> Cash on Delivery (+₹49)</label>
+            <label><input type="radio" name="pay" value="cod"> Cash on Delivery</label>
           </div>
           <label style="display:flex;align-items:center;gap:8px;font-family:'Montserrat',sans-serif;font-size:11px;color:#9a9a9a;cursor:pointer;">
             <input type="checkbox" id="co-testmode" style="accent-color:#C5A059;"> 🧪 Test Mode (charges ₹1, no shipment)
@@ -115,6 +119,7 @@
         <div class="co-line" id="co-disc-row" style="display:none"><span>Discount (10%)</span><span id="co-disc"></span></div>
         <div class="co-line"><span>Shipping</span><span id="co-shipping">Calculated at checkout</span></div>
         <div class="co-total"><span>Total</span><span id="co-total-amt"></span></div>
+        <div class="co-noreturn">All sales are final: made-to-order pieces cannot be returned or exchanged. Manufacturing defects are repaired or replaced — see <a href="shipping-and-returns.html">policy</a>.</div>
       </div>
     </div>
   </div>
@@ -134,6 +139,13 @@
   var subtotal = 0;
   var promoCode = '';
 
+  /* ── Single-price policy ─────────────────────────────────────────
+   * Product prices already include shipping in the cost build-up, so
+   * the customer sees ONE price: no shipping line, no COD surcharge.
+   * To ever charge fees again, flip these two values — everything
+   * downstream (display + charge + order record) follows them.       */
+  var PRICING = { freeShipping: true, codFee: 0 };
+
   function loadCart() {
     try {
       cartItems = JSON.parse(localStorage.getItem('cc_cart') || '[]');
@@ -148,15 +160,30 @@
       $('co-content').style.display = 'none'; $('co-empty').style.display = 'block'; return;
     }
     subtotal = 0;
-    $('co-items').innerHTML = cartItems.map(function(ci) {
+    $('co-items').innerHTML = cartItems.map(function(ci, idx) {
       var p = products[ci.id] || { name: ci.id, price: 0 };
       subtotal += (p.price || 0) * ci.qty;
-      return '<div class="co-line"><span>' + (p.name || ci.id) + ' ×' + ci.qty + '</span><span>' + fmt((p.price || 0) * ci.qty) + '</span></div>';
+      return '<div class="co-line">' +
+        '<span class="co-x" data-idx="' + idx + '" title="Remove">×</span>' +
+        '<span style="flex:1">' + (p.name || ci.id) + ' ×' + ci.qty + '</span>' +
+        '<span>' + fmt((p.price || 0) * ci.qty) + '</span></div>';
     }).join('');
     updateTotals();
   }
 
+  // Remove a line right from checkout (persists + syncs the header badge)
+  $('co-items').addEventListener('click', function(e) {
+    var x = e.target.closest('.co-x');
+    if (!x) return;
+    cartItems.splice(Number(x.getAttribute('data-idx')), 1);
+    try { localStorage.setItem('cc_cart', JSON.stringify(cartItems)); } catch(err) {}
+    if (window.MPA) { try { window.MPA.init(); } catch(err) {} }
+    render();
+  });
+
+  // Zone table kept for the day fees come back; charges 0 while freeShipping
   function shipCharge(pin) {
+    if (PRICING.freeShipping) return 0;
     var p = String(pin || '').replace(/\D/g, '');
     if (p.length !== 6) return null;
     if (/^40[01]/.test(p)) return 40;
@@ -170,25 +197,16 @@
   }
 
   function updateTotals() {
-    var pin = ($('co-pin').value || '').trim();
-    var ship = shipCharge(pin);
-    var codFee = payMethod() === 'cod' ? 49 : 0;
+    var codFee = payMethod() === 'cod' ? PRICING.codFee : 0;
     var discount = promoCode === 'WELCOME10' ? Math.round(subtotal * 0.1) : 0;
-
-    if (ship === null) {
-      $('co-shipping').textContent = 'Enter PIN code';
-      $('co-total-amt').textContent = fmt(Math.max(0, subtotal - discount + codFee));
-    } else {
-      $('co-shipping').textContent = fmt(ship + codFee);
-      $('co-total-amt').textContent = fmt(Math.max(0, subtotal - discount + ship + codFee));
-    }
+    $('co-shipping').textContent = 'FREE (included)';
+    $('co-total-amt').textContent = fmt(Math.max(0, subtotal - discount + codFee));
     if (discount > 0) {
       $('co-disc-row').style.display = 'flex';
       $('co-disc').textContent = '−' + fmt(discount);
     }
   }
 
-  $('co-pin').addEventListener('input', updateTotals);
   document.querySelectorAll('input[name=pay]').forEach(function(r) { r.addEventListener('change', updateTotals); });
 
   function validate() {
@@ -238,7 +256,7 @@
     var timeout = new Promise(function(res) { setTimeout(function() { res(null); }, 6000); });
 
     Promise.race([save, timeout]).then(function(d) {
-      var target = '/success.html';
+      var target = '/success';
       if (d && d.success && d.order_id) {
         try { localStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
         if (d.session_token) { try { localStorage.setItem('cc_token', d.session_token); } catch(e) {} }
@@ -270,9 +288,9 @@
     }
 
     var isTest = !!($('co-testmode') && $('co-testmode').checked);
-    var codFee = v.pay === 'cod' ? 49 : 0;
+    var codFee = v.pay === 'cod' ? PRICING.codFee : 0;
     var discount = promoCode === 'WELCOME10' ? Math.round(subtotal * 0.1) : 0;
-    var shipFee = shipCharge(v.pin) || 0;
+    var shipFee = PRICING.freeShipping ? 0 : (shipCharge(v.pin) || 0);
     var total = Math.max(0, subtotal - discount + codFee + shipFee);
     var amountPaise = isTest ? 100 : total * 100;
 
