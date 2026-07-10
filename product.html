@@ -31,7 +31,20 @@
   .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B3C26; font-weight: 500; }
   .pdp-tax { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; margin-bottom: 6px; }
   .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B3C26; margin-bottom: 4px; }
+  .pdp-stock { display:inline-flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; color:#0B3C26; margin-bottom:12px; }
+  .pdp-stock.low { color:#c0392b; }
+  .pdp-stock .dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
   .pdp-noreturn { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; margin-bottom: 22px; }
+  .pdp-fav { position:absolute; top:14px; right:14px; z-index:3; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.94); border:none; cursor:pointer; font-size:18px; color:#9a9a9a; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.12); transition:color .25s, transform .25s; }
+  .pdp-fav:hover { transform:scale(1.08); }
+  .pdp-fav.on { color:#c0392b; }
+  .pdp-pincheck { margin: 6px 0 18px; padding:14px 16px; background:#faf8f3; border:1px solid #eee5d6; border-radius:8px; }
+  .pdp-pincheck-title { font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:2px; color:#6a6a6a; margin-bottom:8px; }
+  .pdp-pincheck-row { display:flex; gap:8px; }
+  .pdp-pincheck input { flex:1; height:38px; padding:0 12px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff; border-radius:4px; }
+  .pdp-pincheck button { height:38px; padding:0 18px; background:#0B3C26; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; cursor:pointer; border-radius:4px; }
+  .pdp-pincheck-result { margin-top:8px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26; min-height:16px; }
+  .pdp-pincheck-result.err { color:#c0392b; }
   .pdp-noreturn a { color: #0B3C26; }
   /* reviews */
   .rv-wrap { max-width: 1080px; margin: 30px auto 0; padding: 34px 0 0; border-top: 1px solid #eae5d8; }
@@ -86,6 +99,7 @@
       <nav class="crumb" id="pdp-crumb"></nav>
       <div class="pdp-grid">
         <div class="pdp-img-wrap">
+          <button class="pdp-fav" id="pdp-fav" title="Save to favourites" aria-label="Save to favourites">♡</button>
           <img class="pdp-img" id="pdp-image" src="" alt="">
         </div>
         <div>
@@ -98,8 +112,17 @@
             <span class="pdp-save" id="pdp-save"></span>
           </div>
           <div class="pdp-tax">incl. of all taxes</div>
-          <div class="pdp-ship">FREE insured shipping across India · price includes delivery</div>
+          <div class="pdp-ship">Insured shipping across India · price includes delivery</div>
+          <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
           <div class="pdp-noreturn">All sales are final: no returns or exchanges. Manufacturing defects are repaired or replaced — see <a href="trust.html">our standards</a>.</div>
+          <div class="pdp-pincheck">
+            <div class="pdp-pincheck-title">CHECK DELIVERY DATE</div>
+            <div class="pdp-pincheck-row">
+              <input id="pdp-pin" type="tel" maxlength="6" placeholder="Enter 6-digit PIN code" inputmode="numeric">
+              <button id="pdp-pin-btn" type="button">CHECK</button>
+            </div>
+            <div class="pdp-pincheck-result" id="pdp-pin-result"></div>
+          </div>
           <div class="pdp-qtyrow">
             <div class="pdp-qty">
               <span class="pdp-q" id="pdp-dec">−</span>
@@ -162,7 +185,7 @@
     $('pdp-crumb').innerHTML = '<a href="index.html">Home</a><i>/</i><a href="' + regionSlug(p.region) + '">' + (p.regionLabel || '') + '</a><i>/</i><span>' + p.name + '</span>';
     $('pdp-cat').textContent = p.category || '';
     $('pdp-name').textContent = p.name;
-    $('pdp-region').textContent = (p.badge ? p.badge + ' · ' : '') + (p.city || '') + ' · ' + (p.regionLabel || '');
+    $('pdp-region').textContent = p.regionLabel || '';
     $('pdp-image').src = p.image || '';
     $('pdp-image').alt = p.name;
     $('pdp-price').textContent = fmt(p.price);
@@ -178,6 +201,16 @@
     $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> — premium designer imitation jewellery, handcrafted in our Mumbai atelier. ' +
       (p.category ? 'Part of our ' + p.category + ' collection. ' : '') +
       'Each piece is individually inspected and dispatched insured across India.';
+    // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")
+    var stockLbl = '', stockCls = '';
+    if (p.inStock === 0 || p.inStock === false) { stockLbl = 'Out of stock'; stockCls = 'low'; }
+    else if (typeof p.stock_count === 'number' && p.stock_count > 0 && p.stock_count <= 3) { stockLbl = 'Only ' + p.stock_count + ' left — order soon'; stockCls = 'low'; }
+    else stockLbl = 'In stock · dispatches within 2–4 business days';
+    $('pdp-stock-txt').textContent = stockLbl;
+    $('pdp-stock').className = 'pdp-stock ' + stockCls;
+    $('pdp-stock').style.display = 'inline-flex';
+    // Favourite toggle initial state
+    paintFav();
     $('pdp-loading').style.display = 'none';
     $('pdp-content').style.display = 'block';
     // JSON-LD
@@ -205,6 +238,52 @@
 
   $('pdp-dec').addEventListener('click', function() { updateQty(-1); });
   $('pdp-inc').addEventListener('click', function() { updateQty(1); });
+
+  /* ---- favourites (localStorage; syncs to profile page) ---- */
+  function getFavs() {
+    try { var f = JSON.parse(localStorage.getItem('cc_favs') || '[]'); return Array.isArray(f) ? f : []; }
+    catch (e) { return []; }
+  }
+  function paintFav() {
+    var favs = getFavs();
+    var on = favs.indexOf(sku) > -1;
+    $('pdp-fav').textContent = on ? '♥' : '♡';
+    $('pdp-fav').classList.toggle('on', on);
+  }
+  $('pdp-fav').addEventListener('click', function() {
+    var favs = getFavs(), i = favs.indexOf(sku);
+    if (i > -1) favs.splice(i, 1); else favs.unshift(sku);
+    try { localStorage.setItem('cc_favs', JSON.stringify(favs.slice(0, 100))); } catch(e) {}
+    paintFav();
+  });
+
+  /* ---- PIN code delivery check (same zones as checkout: Mumbai 2-4d, Maharashtra 3-5d, India 5-8d) ---- */
+  function etaFromPin(pin) {
+    var p = String(pin || '').replace(/\D/g, '');
+    if (p.length !== 6) return null;
+    var lo = 5, hi = 8;
+    if (/^40[01]/.test(p)) { lo = 2; hi = 4; }
+    else if (/^4[1-4]/.test(p)) { lo = 3; hi = 5; }
+    var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var f = function(d) { return d.getDate() + ' ' + M[d.getMonth()]; };
+    var now = new Date();
+    return { lo: lo, hi: hi, text: f(new Date(now.getTime() + lo * 86400000)) + ' – ' + f(new Date(now.getTime() + hi * 86400000)) };
+  }
+  function doPinCheck() {
+    var pin = ($('pdp-pin').value || '').replace(/\D/g, '');
+    var r = etaFromPin(pin);
+    if (!r) {
+      $('pdp-pin-result').className = 'pdp-pincheck-result err';
+      $('pdp-pin-result').textContent = 'Enter a valid 6-digit PIN.';
+      return;
+    }
+    try { localStorage.setItem('cc_pin', pin); } catch(e) {}
+    $('pdp-pin-result').className = 'pdp-pincheck-result';
+    $('pdp-pin-result').innerHTML = '✓ Delivery to <strong>' + pin + '</strong> by <strong>' + r.text + '</strong>';
+  }
+  $('pdp-pin-btn').addEventListener('click', doPinCheck);
+  $('pdp-pin').addEventListener('keydown', function(e) { if (e.key === 'Enter') doPinCheck(); });
+  try { var stored = localStorage.getItem('cc_pin'); if (stored) { $('pdp-pin').value = stored; doPinCheck(); } } catch(e) {}
 
   // Single write path — calling both MPA.addToCart AND a manual write doubled the qty
   function addToBag() {
@@ -269,10 +348,22 @@
     var text = ($('rv-text').value || '').trim();
     var msg = $('rv-msg');
     if (!name || !text) { msg.style.color = '#c0392b'; msg.textContent = 'Please add your name and a few words.'; return; }
+    // Only verified buyers can review. Pull email + phone from the logged-in
+    // session (or /api/orders/save auto-account) so it matches the buyer row.
+    var user = null;
+    try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
+    if (!user || !(user.email || user.phone)) {
+      msg.style.color = '#c0392b';
+      msg.innerHTML = 'Only verified buyers can review. Please <a href="signin.html" style="color:#0B3C26">sign in</a> with the email or phone you used at checkout.';
+      return;
+    }
     this.disabled = true;
     fetch('/api/reviews', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ product_sku: sku, name: name, rating: rvRating, review_text: text })
+      body: JSON.stringify({
+        product_sku: sku, name: name, rating: rvRating, review_text: text,
+        email: user.email || '', phone: user.phone || ''
+      })
     }).then(function(r) { return r.json(); })
       .then(function(d) {
         $('rv-submit').disabled = false;

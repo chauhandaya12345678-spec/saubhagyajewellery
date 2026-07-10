@@ -123,6 +123,9 @@
         a.removeAttribute('title');
       }
     }
+    // Sign-out + auth-only links (Account, Sign out): shown ONLY when logged in
+    var outs = document.querySelectorAll('[data-mpa-signout],[data-mpa-onlyauth]');
+    for (var k = 0; k < outs.length; k++) outs[k].style.display = user ? '' : 'none';
   }
 
   /* ---- change propagation ---------------------------------------------- */

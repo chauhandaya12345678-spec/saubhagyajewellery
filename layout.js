@@ -121,18 +121,20 @@
     }).join('');
     var drawerLinks = links +
       '<a class="navlink" href="' + APP + '">Shop All</a>' +
-      '<a class="navlink" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="track-orders.html" href="' + SIGNIN + '">Sign in</a>' +
-      '<a class="navlink" href="track-orders.html">Track Orders</a>';
+      '<a class="navlink" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
+      '<a class="navlink" href="track-orders.html">Track Orders</a>' +
+      '<a class="navlink" href="account.html" data-mpa-onlyauth style="display:none">My Account</a>' +
+      '<a class="navlink nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>';
     return '<header class="site">' +
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
-      '<a class="logo" href="index.html" aria-label="Saubhagya Jewellery home">' + LOTUS(34) +
-      '<span class="logo-stack"><span class="logo-name">SAUBHAGYA</span>' +
-      '<span class="logo-sub">FINE JEWELLERY</span></span></a>' +
+      '<a class="logo logo-real" href="index.html" aria-label="Saubhagya Jewellery home">' +
+      '<img src="images/banners/saubhagya-logo.jpg?v=2" alt="Saubhagya Jewellery" style="height:44px;width:auto;display:block"></a>' +
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
       '<a class="ni-hide" href="' + APP + '" aria-label="Shop">Shop All</a>' +
-      '<a class="ni-hide" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="track-orders.html" href="' + SIGNIN + '">Sign in</a>' +
+      '<a class="ni-hide" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
+      '<a class="ni-hide nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>' +
       '<a class="nav-bag" href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
       '</div></div>' +
       '<div class="nav-drawer" id="nav-drawer">' + drawerLinks + '</div>' +
@@ -169,6 +171,14 @@
       this.innerHTML = headerHtml(this.getAttribute('page') || '');
       this.style.display = 'block';
       hydrate();
+      // Sign out click handler
+      this.addEventListener('click', function (e) {
+        var s = e.target.closest('[data-mpa-signout]');
+        if (!s) return;
+        e.preventDefault();
+        if (window.MPA) window.MPA.signOut();
+        location.href = 'index.html';
+      });
       // Hamburger drawer
       var burger = this.querySelector('#nav-burger');
       var drawer = this.querySelector('#nav-drawer');

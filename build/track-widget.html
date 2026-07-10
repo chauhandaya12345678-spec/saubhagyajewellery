@@ -22,6 +22,27 @@
   var $ = function(id) { return document.getElementById(id); };
   var fmt = function (paise) { return '₹' + Number((paise || 0) / 100).toLocaleString('en-IN'); };
   var fmtDate = function(d) { if (!d) return ''; return new Date(String(d).replace(' ', 'T') + 'Z').toLocaleDateString('en-IN', { month:'short', day:'numeric', year:'numeric' }); };
+  var CATALOG = {}; // sku → { name, image }; hydrated from catalog.js (D1 backed)
+  function hydrateCatalog() {
+    var list = window.CHAUHAN_CATALOG || [];
+    list.forEach(function(p) { CATALOG[p.id || p.sku] = p; });
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function itemsHtml(items) {
+    items = items || [];
+    return items.map(function(i) {
+      var sku = i.id || i.sku || '';
+      var p = CATALOG[sku] || {};
+      var img = i.image || p.image || '';
+      var name = p.name || i.name || sku;
+      var link = 'product.html?sku=' + encodeURIComponent(sku);
+      return '<a href="' + link + '" style="display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #f3ede1;text-decoration:none;color:inherit">' +
+        (img ? '<img src="' + esc(img) + '" alt="" style="width:52px;height:64px;object-fit:cover;border-radius:6px;background:#f0ede5;flex:none">' : '<div style="width:52px;height:64px;border-radius:6px;background:#eae5d8;flex:none"></div>') +
+        '<div style="flex:1;min-width:0"><div style="font-family:\'Cormorant Garamond\',serif;font-size:15px;color:#1A1A1A;line-height:1.3">' + esc(name) + '</div>' +
+        '<div style="font-family:\'Montserrat\',sans-serif;font-size:11px;color:#9a9a9a;margin-top:2px">Qty ' + (i.qty || 1) + '</div></div>' +
+        '</a>';
+    }).join('');
+  }
 
   // Delivery estimate by PIN zone: Mumbai 2-4d, Maharashtra 3-5d, India 5-8d
   function etaForOrder(o) {
@@ -42,21 +63,20 @@
 
   function orderCard(o) {
     var statusLabel = (o.status || 'confirmed').toUpperCase();
-    var items = (o.items || []).map(function (i) { return (i.name || i.id) + ' × ' + (i.qty || 1); }).join(', ');
     var hasAWB = o.awb && o.awb.trim();
     var eta = etaForOrder(o);
     return '<div style="border:1px solid rgba(197,160,89,.3);border-radius:10px;padding:18px 20px;background:#fff;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
-        '<div><div style="' + FID + '">' + o.id + '</div>' +
+        '<div><div style="' + FID + '">' + esc(o.id) + '</div>' +
         '<div style="font-family:\'Montserrat\',sans-serif;font-size:11px;font-weight:300;color:#9a9a9a;margin-top:3px;">Placed ' + fmtDate(o.created_at) + '</div></div>' +
         '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:2px;padding:5px 12px;border-radius:20px;background:' + (statusLabel === 'CONFIRMED' ? '#0B3C26' : '#C5A059') + ';color:#fff;">' + statusLabel + '</span>' +
       '</div>' +
-      '<div style="font-family:\'Montserrat\',sans-serif;font-size:12px;font-weight:300;color:#6a6a6a;margin-top:12px;line-height:1.7;">' + items + '</div>' +
+      '<div style="margin-top:10px">' + itemsHtml(o.items) + '</div>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid #f3ede1;">' +
         '<span style="font-family:\'Montserrat\',sans-serif;font-size:12px;color:#6a6a6a;">' + (eta ? 'Est. delivery <strong style="color:#0B3C26;font-weight:600;">' + eta + '</strong>' : '') + '</span>' +
         '<span style="font-family:\'Montserrat\',sans-serif;font-size:14px;font-weight:600;color:#0B3C26;font-variant-numeric:tabular-nums;">' + fmt(o.total) + '</span>' +
       '</div>' +
-      (hasAWB ? '<div style="margin-top:10px;padding:10px 12px;background:#e8f0e8;border-radius:6px;font-family:\'Montserrat\',sans-serif;font-size:12px;"><strong style="color:#0B3C26;">AWB: ' + o.awb + '</strong> <a href="' + (o.awb_url || '#') + '" target="_blank" style="margin-left:12px;color:#0B3C26;border-bottom:1px solid #C5A059;text-decoration:none;">Track via Shiprocket →</a></div>' : '') +
+      (hasAWB ? '<div style="margin-top:10px;padding:10px 12px;background:#e8f0e8;border-radius:6px;font-family:\'Montserrat\',sans-serif;font-size:12px;"><strong style="color:#0B3C26;">AWB: ' + esc(o.awb) + '</strong> <a href="' + esc(o.awb_url || '#') + '" target="_blank" style="margin-left:12px;color:#0B3C26;border-bottom:1px solid #C5A059;text-decoration:none;">Track via Shiprocket →</a></div>' : '') +
     '</div>';
   }
 
@@ -75,16 +95,25 @@
     var user = null;
     try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
     if (!user || !(user.email || user.phone)) return;
-    var params = [];
-    if (user.email) params.push('email=' + encodeURIComponent(user.email));
-    if (user.phone) params.push('phone=' + encodeURIComponent(user.phone));
-    if (!params.length) return;
-    fetch('/api/orders/track?' + params.join('&'))
+    // Only pull orders that match this user by phone AND email jointly — never
+    // OR (that used to surface every test order under a shared email). Prefer
+    // phone since it's the strongest identity on a shared device.
+    var url;
+    if (user.phone) url = '/api/orders/track?phone=' + encodeURIComponent(user.phone);
+    else url = '/api/orders/track?email=' + encodeURIComponent(user.email);
+    fetch(url)
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (!d || !d.success || !d.orders || !d.orders.length) return;
+        var mine = d.orders;
+        // If the account has BOTH email and phone, tighten further: only orders
+        // that carry the same phone as our session (email overlaps between users)
+        if (user.phone && user.email) {
+          mine = mine.filter(function(o) { return String(o.phone || '').replace(/\D/g,'').slice(-10) === String(user.phone).replace(/\D/g,'').slice(-10); });
+        }
+        if (!mine.length) return;
         $('my-orders').style.display = 'block';
-        $('my-orders-list').innerHTML = d.orders.map(mpaOrderCard).join('');
+        $('my-orders-list').innerHTML = mine.map(mpaOrderCard).join('');
       }).catch(function() {});
   }
 
@@ -111,11 +140,19 @@
   $('track-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') doTrack(); });
   // Logged-in / just-checked-out users: prefill phone and auto-search
   function prefillAndTrack() {
+    hydrateCatalog();
+    if (!window.CHAUHAN_CATALOG || !window.CHAUHAN_CATALOG.length) {
+      window.addEventListener('catalog-ready', function once() { window.removeEventListener('catalog-ready', once); hydrateCatalog(); loadMyOrders(); });
+    }
     loadMyOrders();
     var user = null;
     try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
     var phone = (user && user.phone) || '';
     if (phone && !($('track-input').value || '').trim()) { $('track-input').value = phone; doTrack(); }
+  }
+  // Ensure catalog.js is loaded on this page (product images + names)
+  if (!document.querySelector('script[src^="catalog.js"]')) {
+    var cs = document.createElement('script'); cs.src = 'catalog.js?v=5'; document.head.appendChild(cs);
   }
   if (document.readyState !== 'loading') prefillAndTrack();
   else document.addEventListener('DOMContentLoaded', prefillAndTrack);

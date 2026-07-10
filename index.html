@@ -332,7 +332,7 @@
     grid.innerHTML = picks.map(function (p) {
       return '<a class="tr-card" href="product?sku=' + encodeURIComponent(p.id) + '">' +
         '<div class="tr-img">' +
-          (p.badge ? '<span class="tr-badge">' + esc(p.badge) + '</span>' : '') +
+          '' +
           '<div class="im" style="background-image:url(\'' + esc(p.image) + '\')"></div>' +
           '<button class="tr-quick" data-sku="' + esc(p.id) + '">QUICK ADD</button>' +
         '</div>' +

@@ -155,7 +155,8 @@ function breadcrumb(trail) {
 }
 
 function productCard(p) {
-  const tag = p.badge ? (p.city ? p.badge + ' · ' + p.city : p.badge) : (p.city || '');
+  // Suppressed for launch: no BESTSELLER/NEW/city tags on cards (real inventory not tagged yet)
+  const tag = '';
   const img = p.image
     ? `<img class="card-photo" src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">`
     : `<span class="card-ph">STUDIO PRODUCT SHOT</span>`;
@@ -338,7 +339,7 @@ const CONTENT = [
     blocks: [
       ['h', 'Client Care'],
       ['p', 'WhatsApp and phone: +91 99870 08435. Email: care@saubhagyajewellery.com. We typically reply within a few hours, Monday to Saturday.'],
-      ['h', 'Flagship Atelier'],
+      ['h', 'Store Location'],
       ['p', 'Saubhagya Jewellery, Tanaji Nagar Rd, opp Vishwakarma Mandir, Hanuman Nagar, Kandivali East, Mumbai 400101, Maharashtra. Open Monday to Saturday, 11:00 am to 7:30 pm. Private bridal consultations are by appointment.']
     ],
     whatsapp: true
