@@ -108,7 +108,9 @@ export async function pushToShiprocket(env, order) {
     const firstName = fullName.split(/\s+/)[0] || 'Guest';
     const lastName = fullName.split(/\s+/).slice(1).join(' ') || '.';
     const phone10 = String(order.phone || '').replace(/\D/g, '').slice(-10);
-    const street = [addr.street, addr.apt].filter(Boolean).join(', ') || 'NA';
+    let street = [addr.street, addr.apt].filter(Boolean).join(', ') || 'NA';
+    // Shiprocket rejects addresses <3 chars; pad short/missing ones so the push never fails validation
+    if (street.length < 3) street = 'Address on request';
 
     const items = (order.items || []).map(l => ({
       name: l.name || l.id || 'Jewellery item',
