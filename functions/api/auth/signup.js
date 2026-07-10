@@ -4,7 +4,7 @@
  * Body: { name, email?, phone?, password }
  * Returns: { success: true, token, user: { id, name, email, phone } }
  */
-import { hashPassword, normEmail, normPhone } from '../_lib.js';
+import { hashPassword, normEmail, normPhone, sendWelcomeEmail } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -71,6 +71,12 @@ export async function onRequest(context) {
     await db.prepare(
       'INSERT INTO sessions (user_id, token, email, name) VALUES (?, ?, ?, ?)'
     ).bind(userId, token, email || phone || '', name).run();
+
+    // Welcome email in the background — never blocks signup
+    if (email) {
+      const job = sendWelcomeEmail(env, { name, email });
+      if (context.waitUntil) context.waitUntil(job);
+    }
 
     return new Response(JSON.stringify({
       success: true,

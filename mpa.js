@@ -46,9 +46,11 @@
   // network call here: /api is frozen and has no /api/auth/session route.
   // When one exists, this is the single seam to swap in:
   //   fetch('/api/auth/session', {headers:{Authorization: token}}) …
+  // A logged-in identity needs an email OR phone. `id` is optional so a guest
+  // is "logged in" the moment they check out, before the server row exists.
   function getUser() {
     var u = read(K_USER, null);
-    if (!u || typeof u !== 'object' || !u.id || !(u.email || u.phone)) {
+    if (!u || typeof u !== 'object' || !(u.email || u.phone)) {
       if (u) { try { localStorage.removeItem(K_USER); } catch (e) {} } // corrupt row
       return null;
     }

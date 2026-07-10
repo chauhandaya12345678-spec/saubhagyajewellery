@@ -268,12 +268,21 @@
     try { localStorage.setItem('cc_lastorderid', fallbackId); } catch(e) {}
     showOverlay();
 
+    // Log the guest in IMMEDIATELY from the form — before any network call.
+    // If the server is slow and we redirect on timeout, the buyer still has a
+    // session, so Track Orders always finds their history by phone/email.
+    var name = (saveBody.name || '').trim();
+    try {
+      localStorage.setItem('cc_user', JSON.stringify({
+        id: null, name: name || 'Guest',
+        email: saveBody.email || '', phone: saveBody.phone || ''
+      }));
+    } catch(e) {}
+
     // Payment is done (or COD placed) — only NOW is it safe to clear the bag.
     // Clearing earlier loses the cart when the buyer closes the Razorpay modal.
     try { localStorage.setItem('cc_cart', '[]'); } catch(e) {}
     cartItems = [];
-
-    var name = (saveBody.name || '').trim();
     var save = fetch('/api/orders/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -172,6 +172,24 @@ function esc(s) {
 function inr(paise) { return '₹' + Number((paise || 0) / 100).toLocaleString('en-IN'); }
 
 /**
+ * Estimated delivery window by PIN zone (dispatch + courier transit):
+ * Mumbai 400/401 → 2-4 days · Maharashtra 41-44 → 3-5 · rest of India → 5-8.
+ * Returns { minDays, maxDays, text: "14–17 Jul" } from `from` (default now, IST).
+ */
+export function etaForPin(pin, from) {
+  const p = String(pin || '').replace(/\D/g, '');
+  let lo = 5, hi = 8;
+  if (/^40[01]/.test(p)) { lo = 2; hi = 4; }
+  else if (/^4[1-4]/.test(p)) { lo = 3; hi = 5; }
+  const base = from ? new Date(from) : new Date();
+  const ist = new Date(base.getTime() + 5.5 * 3600 * 1000);
+  const fmt = d => d.getUTCDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getUTCMonth()];
+  const a = new Date(ist.getTime() + lo * 86400000);
+  const b = new Date(ist.getTime() + hi * 86400000);
+  return { minDays: lo, maxDays: hi, text: fmt(a) + ' – ' + fmt(b) };
+}
+
+/**
  * Instant order-confirmation email via Resend (https://resend.com, free tier).
  * No-ops silently when RESEND_API_KEY is unset, so it never blocks an order.
  * Sender domain must be verified in Resend; store gets a bcc copy.
@@ -186,8 +204,9 @@ export async function sendOrderEmail(env, order) {
     if (!key) return { sent: false, error: 'RESEND_API_KEY not configured' };
     if (!order.email) return { sent: false, error: 'no customer email' };
 
-    const from = env.ORDER_EMAIL_FROM || 'Saubhagya Jewellery <orders@saubhagyajewellery.com>';
-    const bcc = env.ORDER_EMAIL_BCC || 'saubhagyajewellery01@gmail.com';
+    // care@ routes to the store gmail via Cloudflare Email Routing
+    const from = env.ORDER_EMAIL_FROM || 'Saubhagya Jewellery <care@saubhagyajewellery.com>';
+    const bcc = env.ORDER_EMAIL_BCC || 'care@saubhagyajewellery.com';
 
     let addr = order.address;
     if (typeof addr === 'string') { try { addr = JSON.parse(addr); } catch (e) { addr = { street: addr }; } }
@@ -200,6 +219,7 @@ export async function sendOrderEmail(env, order) {
     ).join('');
 
     const pay = order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid online';
+    const eta = etaForPin(addr.pin);
     const html =
 `<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
   <div style="text-align:center;padding:26px 0 14px">
@@ -219,6 +239,7 @@ export async function sendOrderEmail(env, order) {
     <div style="margin-top:20px;padding:14px 16px;background:#faf8f3;border:1px solid #eee5d6;border-radius:6px">
       <div style="font-size:10px;letter-spacing:2px;color:#C5A059;margin-bottom:6px">SHIP TO</div>
       <div style="font-size:13px;line-height:1.6;color:#1A1A1A">${esc(order.name || '')}<br>${esc(addrLine)}<br>${esc(order.phone || '')}</div>
+      <div style="font-size:12px;color:#0B3C26;margin-top:10px"><strong>Estimated delivery:</strong> ${esc(eta.text)}</div>
     </div>
     <p style="font-size:12px;line-height:1.7;color:#9a9a9a;margin-top:20px">Ready pieces dispatch in 2–4 business days (10–14 for made-to-order bridal). A tracking link arrives on WhatsApp &amp; email once shipped. All sales are final; manufacturing defects are repaired or replaced.</p>
     <p style="font-size:12px;color:#9a9a9a">Questions? <a href="https://wa.me/919987008435" style="color:#0B3C26">WhatsApp us</a>.</p>
@@ -233,6 +254,44 @@ export async function sendOrderEmail(env, order) {
         subject: `Order ${order.id} confirmed · Saubhagya Jewellery`,
         html,
       }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { sent: false, error: 'Resend error: ' + JSON.stringify(data).slice(0, 300) };
+    return { sent: true, id: data.id };
+  } catch (err) {
+    return { sent: false, error: 'Email error: ' + err.message };
+  }
+}
+
+/**
+ * Account-created welcome email. Same Resend plumbing as sendOrderEmail;
+ * no-ops without RESEND_API_KEY. Never throws.
+ */
+export async function sendWelcomeEmail(env, user) {
+  try {
+    const key = env.RESEND_API_KEY;
+    if (!key) return { sent: false, error: 'RESEND_API_KEY not configured' };
+    if (!user.email) return { sent: false, error: 'no email' };
+    const from = env.ORDER_EMAIL_FROM || 'Saubhagya Jewellery <care@saubhagyajewellery.com>';
+    const first = esc(String(user.name || 'there').split(' ')[0]);
+    const html =
+`<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
+  <div style="text-align:center;padding:26px 0 14px">
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B3C26">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A059;margin-top:3px">FINE JEWELLERY</div>
+  </div>
+  <div style="padding:8px 24px 24px">
+    <h2 style="font:600 20px Georgia,serif;color:#0B3C26;margin:0 0 12px">Welcome, ${first}</h2>
+    <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 14px">Your Saubhagya account is ready. Every order you place is saved to it — track them anytime at <a href="https://saubhagyajewellery.com/track-orders.html" style="color:#0B3C26">My Orders</a> with your phone number.</p>
+    <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 18px">Handcrafted temple, Kundan/Polki and American Diamond jewellery — free insured shipping across India, every price all-inclusive.</p>
+    <a href="https://saubhagyajewellery.com/" style="display:inline-block;padding:13px 26px;background:#0B3C26;color:#fff;text-decoration:none;font-size:11px;letter-spacing:2px">EXPLORE COLLECTIONS</a>
+    <p style="font-size:12px;color:#9a9a9a;margin-top:22px">Questions? <a href="https://wa.me/919987008435" style="color:#0B3C26">WhatsApp us</a> or reply to this email.</p>
+  </div>
+</div>`;
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: [user.email], subject: 'Welcome to Saubhagya Jewellery', html }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return { sent: false, error: 'Resend error: ' + JSON.stringify(data).slice(0, 300) };

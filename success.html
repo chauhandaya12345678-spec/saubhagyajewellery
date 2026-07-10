@@ -17,7 +17,9 @@
   .sx-check { width:64px; height:64px; margin:0 auto; border-radius:50%; background:#0B3C26; display:flex; align-items:center; justify-content:center; }
   .sx-h1 { font-family:'Cormorant Garamond',serif; font-weight:500; font-size:36px; color:#1A1A1A; margin:22px 0 6px; }
   .sx-sub { font-family:'Montserrat',sans-serif; font-weight:300; font-size:13px; line-height:1.7; color:#6a6a6a; margin:0 auto; max-width:460px; }
-  .sx-sub strong { color:#0B3C26; }
+  .sx-sub strong { color:#0B3C26; font-weight:600; letter-spacing:1px; font-variant-numeric:tabular-nums; }
+  .sx-eta { display:inline-block; margin-top:14px; padding:8px 16px; background:#f4efe4; border:1px solid #e4d9c2; border-radius:6px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26; }
+  .sx-eta strong { font-weight:600; }
   .sx-card { background:#fff; border:1px solid #eae5d8; padding:22px; margin-top:28px; }
   .sx-kicker { font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:12px; }
   .sx-line { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3ede1; font-family:'Montserrat',sans-serif; font-size:13px; color:#1A1A1A; }
@@ -51,6 +53,7 @@
         View it anytime under <a href="track-orders.html" style="color:#0B3C26;">My Orders</a> — it opens pre-filled with your number, so nothing gets lost.
         A tracking link arrives on WhatsApp and email once your piece is dispatched.</p>
       <span class="sx-status" id="sx-status" style="display:none"></span>
+      <div><span class="sx-eta" id="sx-eta" style="display:none"></span></div>
     </div>
 
     <div id="sx-summary" style="display:none">
@@ -94,10 +97,34 @@
   var fmt = function (rupees) { return '₹' + Number(rupees || 0).toLocaleString('en-IN'); };
   var orderId = new URLSearchParams(location.search).get('order_id') || '';
 
+  // Delivery estimate by PIN zone: Mumbai 2-4d, Maharashtra 3-5d, India 5-8d
+  function etaForPin(pin, from) {
+    var p = String(pin || '').replace(/\D/g, '');
+    var lo = 5, hi = 8;
+    if (/^40[01]/.test(p)) { lo = 2; hi = 4; }
+    else if (/^4[1-4]/.test(p)) { lo = 3; hi = 5; }
+    var base = from ? new Date(from) : new Date();
+    if (isNaN(base.getTime())) base = new Date();
+    var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var f = function (d) { return d.getDate() + ' ' + M[d.getMonth()]; };
+    var a = new Date(base.getTime() + lo * 86400000), b = new Date(base.getTime() + hi * 86400000);
+    return f(a) + ' – ' + f(b);
+  }
+  function pinFrom(view) {
+    if (view.pin) return view.pin;
+    var m = String(view.address || '').match(/\b(\d{6})\b/);
+    return m ? m[1] : '';
+  }
+
   function show(view) {
     $('sx-loading').style.display = 'none';
     $('sx-oid').textContent = view.id || (localStorage.getItem('cc_lastorderid') || '');
     if (view.status) { $('sx-status').textContent = view.status.toUpperCase(); $('sx-status').style.display = 'inline-block'; }
+    var pin = pinFrom(view);
+    if (pin) {
+      $('sx-eta').innerHTML = '<strong>Estimated delivery:</strong> ' + etaForPin(pin, view.createdAt);
+      $('sx-eta').style.display = 'inline-block';
+    }
     if (view.lines && view.lines.length) {
       $('sx-summary').style.display = 'block';
       $('sx-lines').innerHTML = view.lines.map(function (l) {
@@ -134,6 +161,8 @@
       discountText: o.discount > 0 ? fmt(o.discount / 100) : '',
       customer: o.name || '',
       address: [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).join(', '),
+      pin: addr.pin || '',
+      createdAt: o.created_at ? o.created_at.replace(' ', 'T') + 'Z' : null,
       phone: o.phone || '',
       paymentId: o.razorpay_payment_id || ''
     };

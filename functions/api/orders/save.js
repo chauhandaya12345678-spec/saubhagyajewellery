@@ -135,24 +135,13 @@ export async function onRequest(context) {
       ).run();
     }
 
-    // Push to Shiprocket so it appears in the panel and gets AWB + notifications.
-    let shiprocket = { pushed: false, error: 'skipped (test mode)' };
+    // Shiprocket push + confirmation email run in the BACKGROUND (waitUntil).
+    // They must never delay this response: the checkout page only waits a few
+    // seconds before redirecting, and a slow Shiprocket login once cost the
+    // buyer their client-side session entirely.
+    let shiprocket = { queued: false, note: 'skipped (test mode)' };
     if (!isTest) {
-      shiprocket = await pushToShiprocket(env, {
-        id: orderId,
-        name: name || 'Guest',
-        email: email || '',
-        phone: phone || '',
-        address: addressJson,
-        items: typeof items === 'string' ? JSON.parse(items) : items,
-        totalPaise: total,
-        paymentMethod: method,
-      });
-      await recordShiprocketResult(db, orderId, shiprocket);
-
-      // Instant confirmation email (Resend) — fire-and-forget, never blocks the
-      // response or the order. No-ops if RESEND_API_KEY is unset.
-      const emailJob = sendOrderEmail(env, {
+      const orderForJobs = {
         id: orderId,
         name: name || 'Guest',
         email,
@@ -161,8 +150,17 @@ export async function onRequest(context) {
         items: typeof items === 'string' ? JSON.parse(items) : items,
         totalPaise: total,
         paymentMethod: method,
-      });
-      if (context.waitUntil) context.waitUntil(emailJob); else await emailJob;
+      };
+      const srJob = pushToShiprocket(env, orderForJobs)
+        .then(sr => recordShiprocketResult(db, orderId, sr));
+      const emailJob = sendOrderEmail(env, orderForJobs);
+      if (context.waitUntil) {
+        context.waitUntil(Promise.all([srJob, emailJob]));
+        shiprocket = { queued: true };
+      } else {
+        await Promise.all([srJob, emailJob]);
+        shiprocket = { queued: true };
+      }
     }
 
     return json({
