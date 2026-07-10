@@ -135,11 +135,11 @@ export async function onRequest(context) {
       ).run();
     }
 
-    // Shiprocket push + confirmation email run in the BACKGROUND (waitUntil).
-    // They must never delay this response: the checkout page only waits a few
-    // seconds before redirecting, and a slow Shiprocket login once cost the
-    // buyer their client-side session entirely.
-    let shiprocket = { queued: false, note: 'skipped (test mode)' };
+    // Shiprocket push MUST await before the response — Pages Functions kill the
+    // isolate right after `return`, so waitUntil never actually runs on free
+    // tier. Race it against a 12 s cap so a slow Shiprocket can't hang the
+    // buyer; the email is truly optional so it goes on waitUntil.
+    let shiprocket = { pushed: false, note: 'skipped (test mode)' };
     if (!isTest) {
       const orderForJobs = {
         id: orderId,
@@ -151,16 +151,21 @@ export async function onRequest(context) {
         totalPaise: total,
         paymentMethod: method,
       };
-      const srJob = pushToShiprocket(env, orderForJobs)
-        .then(sr => recordShiprocketResult(db, orderId, sr));
-      const emailJob = sendOrderEmail(env, orderForJobs);
-      if (context.waitUntil) {
-        context.waitUntil(Promise.all([srJob, emailJob]));
-        shiprocket = { queued: true };
-      } else {
-        await Promise.all([srJob, emailJob]);
-        shiprocket = { queued: true };
+      const srPromise = pushToShiprocket(env, orderForJobs);
+      const capped = Promise.race([
+        srPromise,
+        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (Shiprocket >12s)' }), 12000)),
+      ]);
+      try {
+        shiprocket = await capped;
+        await recordShiprocketResult(db, orderId, shiprocket);
+      } catch (e) {
+        shiprocket = { pushed: false, error: 'push exception: ' + e.message };
       }
+      // Email genuinely doesn't need to block; try waitUntil, fall back to sync
+      const emailJob = sendOrderEmail(env, orderForJobs);
+      if (context.waitUntil) context.waitUntil(emailJob);
+      else emailJob.catch(() => {});
     }
 
     return json({
