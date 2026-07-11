@@ -185,9 +185,10 @@
       ['Grievances', 'grievances.html'], ['Terms of Service', 'terms.html'],
       ['Offer T&C', 'offer-terms.html'], ['Cookie Policy', 'cookie-policy.html'], ['Privacy Policy', 'privacy-policy.html']
     ];
+    /* Mobile-friendly footer col: collapses on ≤560px via <details>; open on desktop via CSS */
     var col = function (title, items) {
-      return '<div class="fcol"><div class="fhead">' + title + '</div>' +
-        items.map(function (i) { return '<a href="' + i[1] + '">' + i[0] + '</a>'; }).join('') + '</div>';
+      return '<details class="fcol"><summary class="fhead">' + title + '</summary>' +
+        items.map(function (i) { return '<a href="' + i[1] + '">' + i[0] + '</a>'; }).join('') + '</details>';
     };
     var MAPS = 'https://maps.google.com/?q=Saubhagya+Jewellery+Kandivali+East+Mumbai';
     var INSTA = 'https://www.instagram.com/saubhagyajewellery';
@@ -205,11 +206,11 @@
       '<p>Handcrafted premium imitation jewellery from our Mumbai warehouse. Every piece is manufactured in-house, inspected and dispatched insured across India.</p>' +
       social + '</div>' +
       col('COMPANY', company) + col('POLICY', policy) +
-      '<div class="fcol"><div class="fhead">SELLER &amp; SUPPORT</div>' +
+      '<details class="fcol fcol-support"><summary class="fhead">SELLER &amp; SUPPORT</summary>' +
       '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A059">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
       '<a class="fwa" href="' + WHATSAPP + '" rel="noopener" target="_blank">WhatsApp Support &rarr;</a>' +
       '<a class="fwa" href="' + MAPS + '" rel="noopener" target="_blank" style="margin-top:8px;display:inline-block">Get Directions (Google Maps) &rarr;</a>' +
-      '</div></div>' +
+      '</details></div>' +
       '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; Manufacturer &amp; direct seller &middot; SSL secured</span>' +
       '<span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span></div>';
   }
@@ -345,6 +346,17 @@
     connectedCallback() {
       this.innerHTML = '<footer class="site">' + footerHtml() + '</footer>';
       this.style.display = 'block';
+      /* Desktop: force footer <details> open. Mobile: leave collapsed. */
+      var syncFooterDetails = function () {
+        var isDesktop = window.innerWidth > 560;
+        var all = document.querySelectorAll('footer.site details.fcol');
+        for (var i = 0; i < all.length; i++) {
+          if (isDesktop) all[i].setAttribute('open', '');
+          else all[i].removeAttribute('open');
+        }
+      };
+      syncFooterDetails();
+      window.addEventListener('resize', syncFooterDetails);
     }
   });
 

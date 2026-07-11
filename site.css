@@ -102,9 +102,17 @@ header.site{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);ba
 footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
 .fwrap{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.7fr 1fr 1fr 1.2fr;gap:40px}
 .fbrand p{font-weight:300;font-size:12px;line-height:1.8;color:rgba(255,255,255,.6);margin-top:16px;max-width:300px}
-.fhead{font-size:10px;letter-spacing:2px;color:#C5A059;margin-bottom:16px}
+.fhead{font-size:10px;letter-spacing:2px;color:#C5A059;margin-bottom:16px;list-style:none;cursor:default}
+.fhead::-webkit-details-marker{display:none}
 .fcol a{display:block;font-weight:300;font-size:13px;color:rgba(255,255,255,.75);margin-bottom:11px}
 .fcol a:hover{color:#C5A059}
+/* Desktop: <details> reads like a plain column — no chevron, force-open regardless of state */
+@media(min-width:561px){
+  footer.site details.fcol{display:block}
+  footer.site details.fcol > *{display:block!important}
+  footer.site details.fcol .fhead{cursor:default;pointer-events:none}
+  footer.site details.fcol .fhead::after{display:none}
+}
 .fatelier{font-weight:300;font-size:12px;line-height:1.7;color:rgba(255,255,255,.6)}
 .fwa{display:inline-block;margin-top:14px;font-size:12px;border-bottom:1px solid #C5A059;padding-bottom:3px;color:#fff}
 .fbar{max-width:1280px;margin:32px auto 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:11px;color:rgba(255,255,255,.45)}
@@ -118,6 +126,17 @@ footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
   .band,.hero,.ph,.prose,.seo,.crumb,.grid-wrap{padding-left:20px;padding-right:20px}
 }
 @media(max-width:560px){
+  /* Footer: accordion column headers, single-column layout, no bulky address block visible */
+  footer.site .fwrap{grid-template-columns:1fr;gap:0}
+  footer.site details.fcol{border-top:1px solid rgba(197,160,89,.14);padding:2px 0}
+  footer.site details.fcol:first-of-type{border-top:1px solid rgba(197,160,89,.14)}
+  footer.site details.fcol .fhead{position:relative;padding:14px 30px 14px 4px;margin-bottom:0;cursor:pointer;font-size:11px;letter-spacing:2px;color:#C5A059;display:block}
+  footer.site details.fcol .fhead::after{content:'+';position:absolute;right:6px;top:50%;transform:translateY(-50%);font:300 20px "Montserrat",sans-serif;color:#C5A059;transition:transform .3s}
+  footer.site details.fcol[open] .fhead::after{transform:translateY(-50%) rotate(45deg)}
+  footer.site details.fcol a{padding:0 4px 10px;margin-bottom:0}
+  footer.site details.fcol-support{padding-bottom:14px}
+  footer.site details.fcol-support .fatelier{padding:6px 4px 8px;font-size:11px;line-height:1.7;text-align:left}
+  footer.site .fwa{margin-left:4px}
   /* retail-style mobile: two tidy columns, never one long photo per screen */
   .grid,.ccards,.rgrid{grid-template-columns:repeat(2,1fr);gap:14px}
   /* Premium card, mobile-tuned — smaller padding, tighter type, gold ring on tap */
@@ -131,16 +150,13 @@ footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
   .card-off{top:8px;right:8px;padding:3px 7px;font-size:8.5px}
   /* Mobile: quick-add always visible so buyer never needs to hover */
   .tr-quick{opacity:1;transform:none;font-size:9.5px;padding:9px 0}
-  /* compact mobile footer */
-  footer.site{padding:28px 16px 18px}
-  .fwrap{grid-template-columns:1fr 1fr;gap:22px 16px;align-items:start}
-  .fbrand{grid-column:1/-1;text-align:center;padding-bottom:14px;border-bottom:1px solid rgba(197,160,89,.18);margin-bottom:4px}
+  /* compact mobile footer — single column + accordion columns above */
+  footer.site{padding:22px 16px 14px}
+  .fbrand{text-align:center;padding-bottom:14px;border-bottom:1px solid rgba(197,160,89,.14);margin-bottom:0}
   .fbrand p{display:none}
-  .fhead{font-size:9px;letter-spacing:1.5px;margin-bottom:10px}
-  .fcol a{font-size:11px;margin-bottom:7px}
-  .fatelier{font-size:10px;line-height:1.55;text-align:center}
-  .fwa{display:inline-block;margin-top:8px;font-size:11px;padding:6px 12px;background:rgba(197,160,89,.12);border:1px solid rgba(197,160,89,.4)}
-  .fbar{flex-direction:column;gap:6px;align-items:center;text-align:center;margin-top:16px;padding-top:12px;font-size:10px}
+  .fbrand .fsocial{justify-content:center;margin-top:10px}
+  .fwa{display:inline-block;font-size:11px;padding:8px 14px;background:rgba(197,160,89,.14);border:1px solid rgba(197,160,89,.4);border-radius:4px}
+  .fbar{flex-direction:column;gap:6px;align-items:center;text-align:center;margin-top:14px;padding-top:12px;font-size:10px}
   .fpay{display:none}
   .logo-name{font-size:20px;letter-spacing:1px}
   .logo-sub{font-size:7px;letter-spacing:4px}
