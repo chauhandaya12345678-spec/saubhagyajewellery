@@ -15,10 +15,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=6">
-<script src="layout.js?v=6"></script>
+<link rel="stylesheet" href="site.css?v=7">
+<script src="layout.js?v=7"></script>
 <script src="mpa.js?v=5" defer></script>
-<script src="catalog.js?v=6"></script>
+<script src="catalog.js?v=7"></script>
 <style>
   body { background: #FAFAFA; margin: 0; }
   .cat-hero { max-width: 1280px; margin: 0 auto; padding: 46px 40px 6px; text-align: center; }
@@ -54,6 +54,13 @@
   .cat-empty { text-align: center; padding: 60px 24px; font-family: 'Montserrat',sans-serif; color: #9a9a9a; }
   .cat-empty a { color: #0B3C26; }
   .cat-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; color: #9a9a9a; }
+  @keyframes catFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  .cat-grid > .p-card { animation: catFadeUp .5s cubic-bezier(.22,1,.36,1) both; }
+  .cat-grid > .p-card:nth-child(1) { animation-delay: .02s; } .cat-grid > .p-card:nth-child(2) { animation-delay: .06s; }
+  .cat-grid > .p-card:nth-child(3) { animation-delay: .10s; } .cat-grid > .p-card:nth-child(4) { animation-delay: .14s; }
+  .cat-grid > .p-card:nth-child(5) { animation-delay: .18s; } .cat-grid > .p-card:nth-child(6) { animation-delay: .22s; }
+  .cat-grid > .p-card:nth-child(7) { animation-delay: .26s; } .cat-grid > .p-card:nth-child(8) { animation-delay: .30s; }
+  .cat-filterbar.pulse { animation: catFadeUp .5s cubic-bezier(.22,1,.36,1) both; }
   .crumb { max-width: 1280px; margin: 0 auto; padding: 18px 40px 0; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1px; color: #9a9a9a; }
   .crumb a { color: #0B3C26; text-decoration: none; }
   .crumb i { margin: 0 8px; color: #C5A059; font-style: normal; }
@@ -192,8 +199,41 @@
   }
 
   renderHub();
+
+  /* Smooth-scroll to results when tile clicked (avoid full jump) */
+  $('cat-hub-grid').addEventListener('click', function (e) {
+    var a = e.target.closest('a.cat-card');
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    var m = href.match(/[?&]cat=([^&]+)/);
+    if (!m) return;
+    e.preventDefault();
+    var slug = decodeURIComponent(m[1]);
+    current.cat = slug;
+    current.q = ($('cat-search-in').value || '').trim();
+    var url = new URL(location.href);
+    url.searchParams.set('cat', slug);
+    history.replaceState(null, '', url.toString());
+    renderHub();
+    renderList();
+    var bar = document.querySelector('.cat-filterbar');
+    bar.classList.remove('pulse'); void bar.offsetWidth; bar.classList.add('pulse');
+    var top = bar.getBoundingClientRect().top + window.pageYOffset - 90;
+    window.scrollTo({ top: top, behavior: 'smooth' });
+  });
+
   var initInput = $('cat-search-in');
   if (current.q) initInput.value = current.q;
+
+  /* If page opened directly with ?cat=… (from home / another page), scroll to results after paint */
+  if (current.cat) {
+    setTimeout(function () {
+      var bar = document.querySelector('.cat-filterbar');
+      if (!bar) return;
+      var top = bar.getBoundingClientRect().top + window.pageYOffset - 90;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }, 350);
+  }
   var debounce = null;
   initInput.addEventListener('input', function () {
     clearTimeout(debounce);

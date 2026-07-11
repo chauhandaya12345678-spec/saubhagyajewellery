@@ -155,7 +155,7 @@
       '<p>Handcrafted premium imitation jewellery from our Mumbai warehouse. Every piece is manufactured in-house, inspected and dispatched insured across India.</p></div>' +
       col('COMPANY', company) + col('POLICY', policy) +
       '<div class="fcol"><div class="fhead">SELLER &amp; SUPPORT</div>' +
-      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Proprietor: Dayasingh Chauhan<br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br><strong>Grievance Officer:</strong><br>Dayasingh Chauhan<br>care@saubhagyajewellery.com<br>+91 99870 08435<br>Ack. 48 hrs · Resolve within 30 days</p>' +
+      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A059">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
       '<a class="fwa" href="' + WHATSAPP + '">WhatsApp Support &rarr;</a></div></div>' +
       '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; Manufacturer &amp; direct seller &middot; SSL secured</span>' +
       '<span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span></div>';
