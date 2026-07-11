@@ -1,20 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://saubhagyajewellery.com/</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/categories</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/gifting</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/about</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/contact</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/trust</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/blogs</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/track-orders</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/shipping-and-returns</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/es-policy</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/grievances</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/terms</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/offer-terms</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/cookie-policy</loc><lastmod>2026-07-11</lastmod></url>
-  <url><loc>https://saubhagyajewellery.com/privacy-policy</loc><lastmod>2026-07-11</lastmod></url>
+  <url><loc>https://saubhagyajewellery.com/</loc><lastmod>2026-07-11</lastmod><priority>1.0</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://saubhagyajewellery.com/categories</loc><lastmod>2026-07-11</lastmod><priority>0.9</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=necklaces</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=premium-chokers</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=earrings</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=jhumkas</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=waist-chains</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=pendants</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=necklace-set</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=fashion-earrings</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=bridal-set</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/categories.html?cat=south-temple-necklace</loc><lastmod>2026-07-11</lastmod><priority>0.8</priority></url>
+  <url><loc>https://saubhagyajewellery.com/gifting</loc><lastmod>2026-07-11</lastmod><priority>0.7</priority></url>
+  <url><loc>https://saubhagyajewellery.com/blogs</loc><lastmod>2026-07-11</lastmod><priority>0.7</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://saubhagyajewellery.com/about</loc><lastmod>2026-07-11</lastmod><priority>0.6</priority></url>
+  <url><loc>https://saubhagyajewellery.com/contact</loc><lastmod>2026-07-11</lastmod><priority>0.6</priority></url>
+  <url><loc>https://saubhagyajewellery.com/trust</loc><lastmod>2026-07-11</lastmod><priority>0.5</priority></url>
+  <url><loc>https://saubhagyajewellery.com/track-orders</loc><lastmod>2026-07-11</lastmod><priority>0.5</priority></url>
+  <url><loc>https://saubhagyajewellery.com/shipping-and-returns</loc><lastmod>2026-07-11</lastmod><priority>0.4</priority></url>
+  <url><loc>https://saubhagyajewellery.com/es-policy</loc><lastmod>2026-07-11</lastmod><priority>0.3</priority></url>
+  <url><loc>https://saubhagyajewellery.com/grievances</loc><lastmod>2026-07-11</lastmod><priority>0.3</priority></url>
+  <url><loc>https://saubhagyajewellery.com/terms</loc><lastmod>2026-07-11</lastmod><priority>0.3</priority></url>
+  <url><loc>https://saubhagyajewellery.com/offer-terms</loc><lastmod>2026-07-11</lastmod><priority>0.3</priority></url>
+  <url><loc>https://saubhagyajewellery.com/cookie-policy</loc><lastmod>2026-07-11</lastmod><priority>0.3</priority></url>
+  <url><loc>https://saubhagyajewellery.com/privacy-policy</loc><lastmod>2026-07-11</lastmod><priority>0.3</priority></url>
   <url><loc>https://saubhagyajewellery.com/product?sku=CC-SI-001</loc><lastmod>2026-07-10</lastmod></url>
   <url><loc>https://saubhagyajewellery.com/product?sku=CC-SI-002</loc><lastmod>2026-07-10</lastmod></url>
   <url><loc>https://saubhagyajewellery.com/product?sku=CC-SI-003</loc><lastmod>2026-07-10</lastmod></url>

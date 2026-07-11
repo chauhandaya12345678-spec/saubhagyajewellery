@@ -30,6 +30,7 @@
       'header.site{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,160,89,.20)}',
       '.nav{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:14px 40px}',
       '.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;flex:none;order:0}',
+      '.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}',
       '.brand-logo{display:block;max-height:64px;width:auto;height:auto;max-width:100%;overflow:visible;vertical-align:middle}',
       '@media(max-width:900px){.brand-logo{max-height:48px}}',
       '@media(max-width:480px){.brand-logo{max-height:38px}}',
@@ -79,7 +80,10 @@
          and a light brightness bump so the gold pops on deep green */
       'footer.site .fbrand{display:flex;flex-direction:column;align-items:flex-start;gap:14px}',
       'footer.site .brand-logo-footer{max-height:none;height:auto;width:200px;max-width:100%;filter:brightness(1.2) saturate(1.15) contrast(1.05)}',
-      '@media(max-width:560px){footer.site .fbrand{align-items:center}footer.site .brand-logo-footer{width:170px}}',
+      '@media(max-width:560px){footer.site .fbrand{align-items:center;text-align:center}footer.site .brand-logo-footer{width:170px}footer.site .fsocial{justify-content:center}}',
+      'footer.site .fsocial{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}',
+      'footer.site .fsocial a{font:500 12px "Montserrat",sans-serif;letter-spacing:.5px;color:#C5A059;text-decoration:none;border-bottom:1px solid rgba(197,160,89,.35);padding-bottom:2px;transition:color .3s,border-color .3s}',
+      'footer.site .fsocial a:hover{color:#fff;border-bottom-color:#fff}',
       /* cookie consent banner */
       '.ck-banner{position:fixed;left:16px;right:16px;bottom:16px;background:#fff;border:1px solid #C5A059;border-radius:8px;box-shadow:0 12px 40px rgba(6,40,26,.18);padding:18px 22px;z-index:120;display:none;font-family:"Montserrat",sans-serif;font-size:12.5px;line-height:1.55;color:#3a3a3a;max-width:640px;margin:0 auto}',
       '.ck-banner.on{display:block;animation:ckSlide .5s cubic-bezier(.22,1,.36,1) both}',
@@ -119,8 +123,10 @@
     return '<header class="site">' +
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
-      '<a class="logo logo-real" href="index.html" aria-label="Saubhagya Jewellery home">' +
-      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=4" alt="Saubhagya Jewellery"></a>' +
+      '<a class="logo logo-real" href="index.html">' +
+      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=4" alt="Saubhagya Jewellery">' +
+      '<span class="sr-only">Saubhagya Jewellery — handcrafted imitation jewellery, Mumbai. Home.</span>' +
+      '</a>' +
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
       '<button type="button" id="nav-search-btn" aria-label="Search">' + searchIcon + '</button>' +
@@ -149,14 +155,27 @@
       return '<div class="fcol"><div class="fhead">' + title + '</div>' +
         items.map(function (i) { return '<a href="' + i[1] + '">' + i[0] + '</a>'; }).join('') + '</div>';
     };
+    var MAPS = 'https://maps.google.com/?q=Saubhagya+Jewellery+Kandivali+East+Mumbai';
+    var INSTA = 'https://www.instagram.com/saubhagyajewellery';
+    var FB = 'https://www.facebook.com/saubhagyajewellery';
+    var social =
+      '<div class="fsocial">' +
+      '<a href="' + INSTA + '" rel="noopener" target="_blank" aria-label="Saubhagya Jewellery on Instagram">Instagram</a>' +
+      '<a href="' + FB + '" rel="noopener" target="_blank" aria-label="Saubhagya Jewellery on Facebook">Facebook</a>' +
+      '<a href="' + WHATSAPP + '" rel="noopener" target="_blank" aria-label="WhatsApp Saubhagya Jewellery">WhatsApp</a>' +
+      '<a href="' + MAPS + '" rel="noopener" target="_blank" aria-label="Saubhagya Jewellery on Google Maps">Google Maps</a>' +
+      '</div>';
     return '<div class="fwrap">' +
       '<div class="fbrand">' +
       '<img class="brand-logo brand-logo-footer" src="images/brand/saubhagya-logo.svg?v=4" alt="Saubhagya Jewellery">' +
-      '<p>Handcrafted premium imitation jewellery from our Mumbai warehouse. Every piece is manufactured in-house, inspected and dispatched insured across India.</p></div>' +
+      '<p>Handcrafted premium imitation jewellery from our Mumbai warehouse. Every piece is manufactured in-house, inspected and dispatched insured across India.</p>' +
+      social + '</div>' +
       col('COMPANY', company) + col('POLICY', policy) +
       '<div class="fcol"><div class="fhead">SELLER &amp; SUPPORT</div>' +
       '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A059">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
-      '<a class="fwa" href="' + WHATSAPP + '">WhatsApp Support &rarr;</a></div></div>' +
+      '<a class="fwa" href="' + WHATSAPP + '" rel="noopener" target="_blank">WhatsApp Support &rarr;</a>' +
+      '<a class="fwa" href="' + MAPS + '" rel="noopener" target="_blank" style="margin-top:8px;display:inline-block">Get Directions (Google Maps) &rarr;</a>' +
+      '</div></div>' +
       '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; Manufacturer &amp; direct seller &middot; SSL secured</span>' +
       '<span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span></div>';
   }

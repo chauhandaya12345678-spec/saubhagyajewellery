@@ -72,6 +72,7 @@
   .hm-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 1s cubic-bezier(.22,1,.36,1); }
   @media(hover:hover){ .hm-hero-slide:hover .hm-hero-bg { transform: scale(1.05); } }
   .hm-hero-link { position: absolute; inset: 0; z-index: 2; }
+  .hm-hero-anchor { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   .hm-hero-caption { pointer-events: none; }
   .hm-hero-cta { display: inline-block; margin-top: 12px; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; color: #fff; border-bottom: 1px solid #C5A059; padding-bottom: 3px; }
   .hm-hero-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 55%); }
@@ -134,9 +135,11 @@
   .tr-more a { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; padding-bottom: 2px; }
   .tr-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; color: #9a9a9a; }
 
-  .seo-block { max-width: 920px; margin: 0 auto; padding: 44px 48px 70px; text-align: center; }
-  .seo-block h2 { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 34px; color: #1A1A1A; margin: 0 0 16px; }
-  .seo-block p { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; line-height: 1.9; color: #6a6a6a; margin: 0 0 12px; }
+  .seo-block { max-width: 920px; margin: 0 auto; padding: 44px 48px 70px; text-align: left; }
+  .seo-block h2 { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 28px; color: #1A1A1A; margin: 34px 0 12px; }
+  .seo-block h2:first-child { margin-top: 0; }
+  .seo-block p { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; line-height: 1.9; color: #6a6a6a; margin: 0 0 14px; }
+  .seo-block strong { color: #1A1A1A; font-weight: 500; }
   .seo-block a { color: #0B3C26; }
 
   @media (max-width: 900px) {
@@ -184,19 +187,19 @@
         <div class="hm-hero-slide">
           <div class="hm-hero-bg" style="background-image:url('images/banners/Website_hero_banner_concept_art._202606221611.webp')"></div>
           <div class="hm-hero-shade"></div>
-          <a class="hm-hero-link" href="categories.html?cat=earrings" aria-label="Shop Earrings"></a>
+          <a class="hm-hero-link" href="categories.html?cat=earrings"><span class="hm-hero-anchor">Shop Earrings Collection — Jhumkas, Studs and Drops</span></a>
           <div class="hm-hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Earrings Collection</div><span class="hm-hero-cta">SHOP NOW &rarr;</span></div>
         </div>
         <div class="hm-hero-slide">
           <div class="hm-hero-bg" style="background-image:url('images/banners/Website_hero_image_for_Saubhagya_202606221620.webp')"></div>
           <div class="hm-hero-shade"></div>
-          <a class="hm-hero-link" href="categories.html" aria-label="Shop by category"></a>
+          <a class="hm-hero-link" href="categories.html"><span class="hm-hero-anchor">Shop All Jewellery by Category — Where Tradition Meets Design</span></a>
           <div class="hm-hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Where Tradition Meets Design</div><span class="hm-hero-cta">SHOP NOW &rarr;</span></div>
         </div>
         <div class="hm-hero-slide">
           <div class="hm-hero-bg" style="background-image:url('images/banners/gold necklacer._A_202606221636.webp')"></div>
           <div class="hm-hero-shade"></div>
-          <a class="hm-hero-link" href="categories.html?cat=necklaces" aria-label="Shop Necklaces"></a>
+          <a class="hm-hero-link" href="categories.html?cat=necklaces"><span class="hm-hero-anchor">Shop Necklaces — Gold Necklace Edit, Haarams and Rani Haar</span></a>
           <div class="hm-hero-caption"><div class="k">SAUBHAGYA</div><div class="t">Gold Necklace Edit</div><span class="hm-hero-cta">SHOP NOW &rarr;</span></div>
         </div>
       </div>
@@ -214,32 +217,32 @@
   <!-- CATEGORY BANNERS: original images -->
   <section class="hm-section">
     <div class="cat2">
-      <a class="cat-tile big" href="categories.html?cat=earrings">
+      <a class="cat-tile big" href="categories.html?cat=earrings" aria-label="Shop Earrings — matte jhumkas, studs and drops">
         <div class="cat-bg" style="background-image:url('images/banners/Close-up_editorial_portrait_of_an_202606221617.webp')"></div>
         <div class="cat-shade"></div>
-        <div class="cat-text"><div class="k">SHOP NOW</div><div class="t">Earrings</div><div class="s">Matte jhumkas, studs &amp; drops</div></div>
+        <div class="cat-text"><div class="k">SHOP NOW </div><div class="t">Earrings </div><div class="s">Matte jhumkas, studs &amp; drops</div></div>
       </a>
-      <a class="cat-tile big" href="categories.html?cat=necklaces">
+      <a class="cat-tile big" href="categories.html?cat=necklaces" aria-label="Shop Necklaces — haarams, chokers and rani haar">
         <div class="cat-bg" style="background-image:url('images/banners/High-end_fashion_editorial_concept_art_202606221611.webp')"></div>
         <div class="cat-shade"></div>
-        <div class="cat-text"><div class="k">SHOP NOW</div><div class="t">Necklaces</div><div class="s">Haarams, chokers &amp; rani haar</div></div>
+        <div class="cat-text"><div class="k">SHOP NOW </div><div class="t">Necklaces </div><div class="s">Haarams, chokers &amp; rani haar</div></div>
       </a>
     </div>
     <div class="cat3">
-      <a class="cat-tile small" href="categories.html?cat=premium-chokers">
+      <a class="cat-tile small" href="categories.html?cat=premium-chokers" aria-label="Shop Premium Chokers">
         <div class="cat-bg" style="background-image:url('images/banners/chokerhero_image_featuring_202606221635.webp')"></div>
         <div class="cat-shade"></div>
-        <div class="cat-text"><div class="t">Premium Chokers</div><div class="go">Explore &rarr;</div></div>
+        <div class="cat-text"><div class="t">Premium Chokers </div><div class="go">Explore &rarr;</div></div>
       </a>
-      <a class="cat-tile small" href="categories.html?cat=waist-chains">
+      <a class="cat-tile small" href="categories.html?cat=waist-chains" aria-label="Shop Waist Chains and Vankis">
         <div class="cat-bg" style="background-image:url('images/banners/waist chain._202606221630.webp')"></div>
         <div class="cat-shade"></div>
-        <div class="cat-text"><div class="t">Waist Chains</div><div class="go">Explore &rarr;</div></div>
+        <div class="cat-text"><div class="t">Waist Chains </div><div class="go">Explore &rarr;</div></div>
       </a>
-      <a class="cat-tile small" href="categories.html?cat=bridal-set">
+      <a class="cat-tile small" href="categories.html?cat=bridal-set" aria-label="Shop Bridal Sets — Kundan, Polki and Meenakari">
         <div class="cat-bg" style="background-image:url('images/banners/bridal_set_promotional_image_202606221633.webp')"></div>
         <div class="cat-shade"></div>
-        <div class="cat-text"><div class="t">Bridal Sets</div><div class="go">Explore &rarr;</div></div>
+        <div class="cat-text"><div class="t">Bridal Sets </div><div class="go">Explore &rarr;</div></div>
       </a>
     </div>
   </section>
@@ -257,8 +260,27 @@
 
   <!-- SEO COPY -->
   <section class="seo-block">
-    <p>Shop handcrafted premium imitation jewellery direct from our Mumbai warehouse: <a href="categories.html?cat=necklaces">necklaces</a>, <a href="categories.html?cat=premium-chokers">premium chokers</a>, <a href="categories.html?cat=earrings">earrings</a>, <a href="categories.html?cat=waist-chains">waist chains</a>, <a href="categories.html?cat=pendants">pendants</a>, <a href="categories.html?cat=necklace-set">necklace sets</a> and <a href="categories.html?cat=bridal-set">bridal sets</a>. Every piece is manufactured in-house, individually inspected and dispatched fully insured across India.</p>
-    <p>Looking for a gift under ₹2,999? <a href="gifting.html">Browse our gifting edit</a>. Track any order with your phone number on our <a href="track-orders.html">Track Orders</a> page. Questions? <a href="contact.html">Talk to us</a> or message us on WhatsApp.</p>
+    <h2>Handcrafted Imitation Jewellery, Made in Mumbai</h2>
+    <p>Saubhagya Jewellery is a manufacturer and direct seller of premium imitation jewellery from our Kandivali East (Mumbai) warehouse. Every piece is designed, moulded, plated and finished in-house — no marketplace resellers, no drop-shippers, and no middle layer between the workshop and your doorstep. That is how a Kundan set that would retail for ₹4,000 in a mall counter reaches you for a fraction of the price, without cutting a single corner on plating or stone quality.</p>
+
+    <h2>Shop by Occasion, Region and Style</h2>
+    <p>Our catalogue is organised the way real Indian women shop. Bride-to-be? Start with <a href="categories.html?cat=bridal-set">bridal sets</a>: full temple sets from Madurai and Coimbatore, Kundan and Polki suites for North Indian ceremonies, and Meenakari finishes for Rajasthani and Punjabi weddings. Reception look? Our <a href="categories.html?cat=premium-chokers">premium chokers</a> and <a href="categories.html?cat=necklaces">designer necklaces</a> sit beautifully with lehengas and modern sarees. Sangeet or mehndi? Layer a light <a href="categories.html?cat=necklace-set">necklace set</a> with a matching <a href="categories.html?cat=waist-chains">waist chain (vanki)</a> and a <a href="categories.html?cat=earrings">maang tikka or passa</a> for a completed bridal-adjacent look.</p>
+    <p>Everyday styling gets the same care. Fashion <a href="categories.html?cat=fashion-earrings">jhumkas, studs and drops</a> under ₹500 pair with kurtis, workwear and gowns; delicate <a href="categories.html?cat=pendants">pendants</a> layer cleanly over a plain top; solitaire studs finish an office look without shouting. For festive gifting we curate seasonal boxes under ₹2,999 in the <a href="gifting.html">Gifting Edit</a> — Karva Chauth, Raksha Bandhan, birthdays, anniversaries and grihapravesh (housewarming).</p>
+
+    <h2>Why Shoppers Across India Trust Saubhagya</h2>
+    <p><strong>Made in-house, priced fairly.</strong> Because we are the manufacturer, our pricing is all-inclusive: GST, insured shipping, and after-sales manufacturing-defect cover are already in the sticker price. No surprise charges at checkout. All-India Prepaid on UPI, cards or net banking; Cash on Delivery available on eligible pieces.</p>
+    <p><strong>Free insured shipping.</strong> Ready pieces dispatch in 2–4 business days from Mumbai; made-to-order bridal sets ship in 10–14 days. Every parcel travels with courier insurance and a tamper-evident seal. Live tracking arrives on WhatsApp and email the moment your AWB is generated. Mumbai (400/401) deliveries typically land in 2–4 days, wider Maharashtra in 3–5, and the rest of India in 5–8. Use the PIN-code checker on any product page for an instant estimate.</p>
+    <p><strong>Defect-free promise.</strong> All sales are final (this is imitation jewellery, not fine gold), but any manufacturing defect flagged within 48 hours of delivery — with a continuous unboxing video — is repaired or replaced free. That policy is spelled out in plain English on <a href="trust.html">our standards page</a> and repeated on every product.</p>
+    <p><strong>Care that treats you like a neighbour.</strong> Real humans answer WhatsApp at +91 99870 08435 between 10 am and 8 pm IST. Care escalations are acknowledged within 48 hours and resolved inside 30 days per the DPDPA-compliant <a href="grievances.html">grievance policy</a>.</p>
+
+    <h2>Craftsmanship: How Every Piece Is Made</h2>
+    <p>Base alloys are cast in reusable moulds, hand-finished with chisels and files, then micron-plated in matte or high-gloss gold. Stones — American Diamonds, Kundan, Polki, Meenakari enamels, cultured pearls — are hand-set one at a time by artisans who trained in traditional workshops in Jaipur, Coimbatore and Mumbai. Each piece then passes a five-point inspection (plating uniformity, stone seating, clasp fit, weight tolerance, finish sheen) before it is boxed. Photos on this website are taken of the actual production piece, not a stock render — what you see is what ships.</p>
+
+    <h2>Popular Categories</h2>
+    <p>Browse our best-sellers: <a href="categories.html?cat=south-temple-necklace">South temple necklaces</a> and <a href="categories.html?cat=necklaces">Lakshmi haarams</a> in matte antique gold · lightweight <a href="categories.html?cat=jhumkas">jhumkas</a> and <a href="categories.html?cat=earrings">maang tikkas</a> under ₹400 · <a href="categories.html?cat=premium-chokers">Polki and statement chokers</a> · <a href="categories.html?cat=bridal-set">complete bridal suites</a> from ₹1,599. Read the <a href="blogs.html">Saubhagya journal</a> for styling notes, gifting picks and care tips, or check the <a href="es-policy.html">E&amp;S Policy</a> for our stance on ethical sourcing and small-batch production.</p>
+
+    <h2>Ordering &amp; Support</h2>
+    <p>Placing an order takes a minute: pick a piece, verify the delivery date with your PIN, and check out with UPI, card, net banking, EMI or COD. Track any order with your phone number on <a href="track-orders.html">Track Orders</a> — no login needed. <a href="contact.html">Talk to us</a> for a bulk order (weddings, corporate gifting, festival hampers) or message us on <a href="https://wa.me/919987008435" rel="noopener">WhatsApp</a> for a live styling consult.</p>
   </section>
 </main>
 <x-footer></x-footer>
