@@ -59,7 +59,11 @@
       /* ── professional 3-zone header (overrides site.css) ────────── */
       'header.site{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,160,89,.20)}',
       '.nav{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:14px 40px}',
-      '.logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex:none;order:0}',
+      '.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;flex:none;order:0}',
+      /* Header brand SVG — scales cleanly at every breakpoint, no CSS blend hacks */
+      '.brand-logo{display:block;max-height:60px;width:auto;height:auto;max-width:100%;overflow:visible;vertical-align:middle}',
+      '@media(max-width:900px){.brand-logo{max-height:44px}}',
+      '@media(max-width:480px){.brand-logo{max-height:36px}}',
       '.logo-stack{display:flex;flex-direction:column;align-items:flex-start}',
       '.logo-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:#0B3C26;letter-spacing:2px;line-height:1}',
       '.logo-sub{font-size:8px;letter-spacing:5px;color:#C5A059;margin-top:3px}',
@@ -129,7 +133,7 @@
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<a class="logo logo-real" href="index.html" aria-label="Saubhagya Jewellery home">' +
-      '<img src="images/banners/saubhagya-logo.jpg?v=2" alt="Saubhagya Jewellery" style="height:44px;width:auto;display:block"></a>' +
+      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=1" alt="Saubhagya Jewellery"></a>' +
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
       '<a class="ni-hide" href="' + APP + '" aria-label="Shop">Shop All</a>' +
