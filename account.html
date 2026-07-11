@@ -57,6 +57,24 @@
         <button class="ac-signout" data-mpa-signout>Sign out</button>
       </div>
       <div class="ac-section">
+        <h2>My Profile</h2>
+        <div style="background:#fff;border:1px solid #eae5d8;border-radius:8px;padding:20px 22px;">
+          <div style="display:grid;grid-template-columns:120px 1fr;gap:10px 16px;font-family:'Montserrat',sans-serif;font-size:13px;color:#4a4a4a;line-height:1.6;">
+            <div style="color:#9a9a9a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Name</div>
+            <div id="pf-name" style="color:#1A1A1A;">—</div>
+            <div style="color:#9a9a9a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Email</div>
+            <div id="pf-email" style="color:#1A1A1A;word-break:break-word;">—</div>
+            <div style="color:#9a9a9a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Phone</div>
+            <div id="pf-phone" style="color:#1A1A1A;">—</div>
+            <div style="color:#9a9a9a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Member since</div>
+            <div id="pf-since" style="color:#1A1A1A;">—</div>
+          </div>
+          <div style="margin-top:14px;font-family:'Montserrat',sans-serif;font-size:11px;color:#9a9a9a;">
+            To change your email or phone, write to <a href="mailto:care@saubhagyajewellery.com" style="color:#0B3C26;">care@saubhagyajewellery.com</a>. To reset your password, use <a href="forgot-password.html" style="color:#0B3C26;">Forgot Password</a>.
+          </div>
+        </div>
+      </div>
+      <div class="ac-section">
         <h2>My Orders</h2>
         <div class="ac-cards" id="ac-orders"></div>
       </div>
@@ -108,6 +126,16 @@
     }).join('') + '</div>';
   }
 
+  function profileUI(user, oldestOrder) {
+    $('pf-name').textContent = user.name || '—';
+    $('pf-email').textContent = user.email || 'Not on file';
+    $('pf-phone').textContent = user.phone ? '+91 ' + user.phone : 'Not on file';
+    var since = oldestOrder && oldestOrder.created_at
+      ? new Date(String(oldestOrder.created_at).replace(' ','T')+'Z').toLocaleDateString('en-IN', { month:'short', year:'numeric' })
+      : 'Recently';
+    $('pf-since').textContent = since;
+  }
+
   function loadOrders(user) {
     var url = user.phone ? '/api/orders/track?phone=' + encodeURIComponent(user.phone)
                         : '/api/orders/track?email=' + encodeURIComponent(user.email);
@@ -116,8 +144,10 @@
       if (user.phone && user.email) {
         list = list.filter(function(o) { return String(o.phone||'').replace(/\D/g,'').slice(-10) === String(user.phone).replace(/\D/g,'').slice(-10); });
       }
+      var oldest = list.length ? list.slice().sort(function(a,b){ return String(a.created_at||'').localeCompare(String(b.created_at||'')); })[0] : null;
+      profileUI(user, oldest);
       ordersUI(list);
-    }).catch(function() { ordersUI([]); });
+    }).catch(function() { profileUI(user, null); ordersUI([]); });
   }
 
   function boot() {

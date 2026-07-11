@@ -52,7 +52,7 @@
     <input class="auth-input" id="auth-password" type="password" placeholder="Your password">
 
     <div style="text-align:right;margin:-8px 0 14px;">
-      <a href="#" id="forgot-link" style="font-family:'Montserrat',sans-serif;font-size:11px;color:#C5A059;text-decoration:none;">Forgot password?</a>
+      <a href="forgot-password.html" style="font-family:'Montserrat',sans-serif;font-size:11px;color:#C5A059;text-decoration:none;">Forgot password?</a>
     </div>
 
     <div class="auth-error" id="auth-error" style="display:none"></div>
@@ -66,7 +66,7 @@
       <div style="flex:1;height:1px;background:#eae5d8;"></div>
     </div>
 
-    <button type="button" id="magic-link-btn" style="display:block;width:100%;padding:14px;background:transparent;color:#0B3C26;border:1px solid #0B3C26;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;cursor:pointer;">EMAIL ME A SIGN-IN LINK</button>
+    <a href="magic-link.html" style="display:block;width:100%;padding:14px;background:transparent;color:#0B3C26;border:1px solid #0B3C26;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;text-align:center;text-decoration:none;box-sizing:border-box;">EMAIL ME A SIGN-IN LINK</a>
 
     <div class="auth-link">New here? <a href="signup.html">Create an account</a></div>
   </div>
@@ -140,37 +140,7 @@
     if (e.key === 'Enter') $('auth-submit').click();
   });
 
-  /* ── Forgot password ────────────────────────────────────── */
-  var forgotLink = $('forgot-link');
-  if (forgotLink) {
-    forgotLink.addEventListener('click', function (e) {
-      e.preventDefault();
-      var id = ($('auth-identifier').value || '').trim();
-      if (!id || !/^\S+@\S+\.\S+$/.test(id)) {
-        $('auth-error').textContent = 'Enter your registered email above, then click Forgot password.';
-        $('auth-error').style.color = '#c0392b'; $('auth-error').style.display = 'block';
-        return;
-      }
-      $('auth-error').style.display = 'none';
-      forgotLink.textContent = 'Sending…';
-      fetch('/api/auth/forgot-password', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: id }),
-      }).then(function (r) { return r.json(); }).then(function (d) {
-        $('auth-error').style.color = '#0B3C26';
-        $('auth-error').textContent = d.message || 'Reset link sent if account exists.';
-        $('auth-error').style.display = 'block';
-        forgotLink.textContent = 'Forgot password?';
-      }).catch(function () {
-        $('auth-error').style.color = '#c0392b';
-        $('auth-error').textContent = 'Network error. Try again.';
-        $('auth-error').style.display = 'block';
-        forgotLink.textContent = 'Forgot password?';
-      });
-    });
-  }
-
-  /* ── Magic link auto-verify (URL ?ml=token) ─────────────── */
+  /* ── Magic link auto-verify (URL ?ml=token from email click-through) ─ */
   var mlParams = new URLSearchParams(window.location.search);
   var mlToken = mlParams.get('ml');
   if (mlToken) {
@@ -192,35 +162,6 @@
     }).catch(function () {
       $('auth-error').style.color = '#c0392b';
       $('auth-error').textContent = 'Network error. Please try again.';
-    });
-  }
-
-  /* ── Magic link request button ──────────────────────────── */
-  var mlBtn = $('magic-link-btn');
-  if (mlBtn) {
-    mlBtn.addEventListener('click', function () {
-      var id = ($('auth-identifier').value || '').trim();
-      if (!id || !/^\S+@\S+\.\S+$/.test(id)) {
-        $('auth-error').textContent = 'Enter your registered email above first.';
-        $('auth-error').style.color = '#c0392b'; $('auth-error').style.display = 'block';
-        return;
-      }
-      mlBtn.disabled = true; mlBtn.textContent = 'SENDING LINK…';
-      $('auth-error').style.display = 'none';
-      fetch('/api/auth/magic-link', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: id }),
-      }).then(function (r) { return r.json(); }).then(function (d) {
-        $('auth-error').style.color = '#0B3C26';
-        $('auth-error').textContent = '✓ ' + (d.message || 'Check your email!');
-        $('auth-error').style.display = 'block';
-        mlBtn.textContent = 'EMAIL ME A SIGN-IN LINK'; mlBtn.disabled = false;
-      }).catch(function () {
-        $('auth-error').style.color = '#c0392b';
-        $('auth-error').textContent = 'Network error. Try again.';
-        $('auth-error').style.display = 'block';
-        mlBtn.textContent = 'EMAIL ME A SIGN-IN LINK'; mlBtn.disabled = false;
-      });
     });
   }
 })();
