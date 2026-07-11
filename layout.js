@@ -52,18 +52,44 @@
       '.nav-burger.open span:nth-child(2){opacity:0}',
       '.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}',
       /* slide-down drawer */
-      '.nav-drawer{display:none;flex-direction:column;background:#fff;border-bottom:1px solid rgba(197,160,89,.2);overflow:hidden;max-height:0;transition:max-height .4s cubic-bezier(.22,1,.36,1)}',
-      '.nav-drawer.open{max-height:80vh;overflow-y:auto}',
-      '.nav-drawer a{padding:15px 24px;font-size:14px;letter-spacing:.5px;color:#1A1A1A;text-decoration:none;border-top:1px solid #f0ece1}',
-      '.nav-drawer a.is-active{color:#0B3C26}',
+      '.nav-drawer{display:none;flex-direction:column;background:#fff;border-bottom:1px solid rgba(197,160,89,.2);overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.22,1,.36,1);padding-bottom:env(safe-area-inset-bottom);position:fixed;top:59px;left:0;right:0;z-index:70;isolation:isolate;box-shadow:0 12px 30px rgba(6,40,26,.12)}',
+      '.nav-drawer.open{max-height:calc(100vh - 59px);overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      '.nav-drawer a{padding:17px 22px;font:500 14px "Montserrat",sans-serif;letter-spacing:.6px;color:#1A1A1A;text-decoration:none;border-top:1px solid #f0ece1;transition:background .2s,color .2s;display:flex;align-items:center;justify-content:space-between}',
+      '.nav-drawer a::after{content:"›";color:#C5A059;font-size:20px;opacity:.6;transition:transform .25s}',
+      '.nav-drawer a:hover,.nav-drawer a:active{background:#faf8f3;color:#0B3C26}',
+      '.nav-drawer a:hover::after,.nav-drawer a:active::after{transform:translateX(4px);opacity:1}',
+      '.nav-drawer a.is-active{color:#0B3C26;background:#faf8f3}',
       '.nav-drawer a:first-child{border-top:none}',
+      '.nav-drawer-backdrop{position:fixed;inset:0;top:64px;background:rgba(6,40,26,.4);z-index:59;opacity:0;pointer-events:none;transition:opacity .35s}',
+      '.nav-drawer-backdrop.on{opacity:1;pointer-events:auto}',
       /* header search sheet */
-      '.nav-search-sheet{position:fixed;top:0;left:0;width:100%;background:#fff;padding:22px 24px;box-shadow:0 4px 24px rgba(0,0,0,.08);transform:translateY(-100%);transition:transform .4s cubic-bezier(.22,1,.36,1);z-index:80}',
-      '.nav-search-sheet.open{transform:translateY(0)}',
-      '.nav-search-wrap{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px}',
-      '.nav-search-input{flex:1;height:44px;padding:0 14px;border:1px solid #d4cec0;border-radius:4px;font:400 15px "Montserrat",sans-serif;outline:none;color:#1A1A1A;background:#fff}',
-      '.nav-search-input:focus{border-color:#C5A059}',
-      '.nav-search-close{background:none;border:none;font-size:22px;color:#6a6a6a;cursor:pointer;padding:4px 8px}',
+      '.nav-search-sheet{position:fixed;top:0;left:0;right:0;background:#fff;padding:18px 20px 22px;box-shadow:0 12px 40px rgba(6,40,26,.14);transform:translateY(-100%);transition:transform .45s cubic-bezier(.22,1,.36,1);z-index:80;padding-top:calc(18px + env(safe-area-inset-top))}',
+      '.nav-search-sheet.on{transform:translateY(0)}',
+      '.nav-search-wrap{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px}',
+      '.nav-search-form{flex:1;display:flex;align-items:center;gap:8px;border:1px solid #d4cec0;border-radius:8px;background:#fff;padding:0 6px 0 14px;transition:border-color .25s,box-shadow .25s}',
+      '.nav-search-form:focus-within{border-color:#C5A059;box-shadow:0 0 0 3px rgba(197,160,89,.15)}',
+      '.nav-search-icon-l{width:18px;height:18px;stroke:#9a9a9a;stroke-width:2;fill:none;flex:none}',
+      '.nav-search-input{flex:1;min-width:0;height:46px;border:none;background:transparent;font:400 15px "Montserrat",sans-serif;outline:none;color:#1A1A1A}',
+      '.nav-search-input::-webkit-search-cancel-button{-webkit-appearance:none}',
+      '.nav-search-go{height:38px;padding:0 18px;background:#0B3C26;color:#fff;border:none;border-radius:6px;font:600 11px "Montserrat",sans-serif;letter-spacing:1.5px;cursor:pointer;flex:none}',
+      '.nav-search-go:hover{background:#06281a}',
+      '.nav-search-close{background:none;border:none;font-size:26px;color:#6a6a6a;cursor:pointer;padding:4px 10px;line-height:1;flex:none}',
+      '.nav-search-close:hover{color:#0B3C26}',
+      '.nav-search-hits{max-width:720px;margin:12px auto 0;background:#fff;border:1px solid #eee5d6;border-radius:10px;overflow:hidden;max-height:min(60vh,420px);overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}',
+      '.nav-search-hits.on{display:block;animation:nshFade .25s ease}',
+      '@keyframes nshFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}',
+      '.nav-search-hit{display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#1A1A1A;border-bottom:1px solid #f5f0e2;transition:background .2s}',
+      '.nav-search-hit:hover,.nav-search-hit.active{background:#faf8f3}',
+      '.nav-search-hit:last-child{border-bottom:none}',
+      '.nav-search-hit-img{width:48px;height:60px;flex:none;border-radius:6px;background-size:cover;background-position:center;background-color:#f0ede5}',
+      '.nav-search-hit-meta{flex:1;min-width:0}',
+      '.nav-search-hit-name{font-family:"Cormorant Garamond",serif;font-size:15px;color:#1A1A1A;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '.nav-search-hit-cat{font-family:"Montserrat",sans-serif;font-size:11px;color:#9a9a9a;margin-top:2px;letter-spacing:.4px}',
+      '.nav-search-hit-price{font-family:"Montserrat",sans-serif;font-size:13px;font-weight:500;color:#0B3C26;flex:none}',
+      '.nav-search-more{display:block;padding:12px;text-align:center;font-family:"Montserrat",sans-serif;font-size:11px;letter-spacing:1.5px;color:#0B3C26;background:#faf8f3;text-decoration:none;border-top:1px solid #eee5d6}',
+      '.nav-search-empty{padding:22px 16px;text-align:center;font-family:"Montserrat",sans-serif;font-size:12px;color:#9a9a9a}',
+      '.nav-search-backdrop{position:fixed;inset:0;background:rgba(6,40,26,.4);z-index:79;opacity:0;pointer-events:none;transition:opacity .3s}',
+      '.nav-search-backdrop.on{opacity:1;pointer-events:auto}',
       /* mobile layout */
       '@media(max-width:900px){',
       '  .nav{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:11px 16px;gap:12px}',
@@ -135,11 +161,19 @@
       '<a class="nav-bag" href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
       '</div></div>' +
       '<div class="nav-drawer" id="nav-drawer">' + drawerLinks + '</div>' +
-      '<div class="nav-search-sheet" id="nav-search-sheet">' +
+      '<div class="nav-drawer-backdrop" id="nav-drawer-backdrop"></div>' +
+      '<div class="nav-search-backdrop" id="nav-search-backdrop"></div>' +
+      '<div class="nav-search-sheet" id="nav-search-sheet" role="search">' +
       '<div class="nav-search-wrap">' +
-      '<input class="nav-search-input" id="nav-search-input" type="search" placeholder="Search jewellery: necklaces, earrings, bridal sets…" autocomplete="off">' +
-      '<button class="nav-search-close" id="nav-search-close" aria-label="Close">×</button>' +
-      '</div></div>' +
+      '<form class="nav-search-form" id="nav-search-form" action="categories.html" method="get">' +
+      '<svg class="nav-search-icon-l" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>' +
+      '<input class="nav-search-input" id="nav-search-input" name="q" type="search" placeholder="Search jewellery: necklaces, earrings, bridal sets…" autocomplete="off" enterkeyhint="search" inputmode="search">' +
+      '<button class="nav-search-go" type="submit" aria-label="Search">SEARCH</button>' +
+      '</form>' +
+      '<button class="nav-search-close" id="nav-search-close" type="button" aria-label="Close">×</button>' +
+      '</div>' +
+      '<div class="nav-search-hits" id="nav-search-hits" role="listbox" aria-label="Search suggestions"></div>' +
+      '</div>' +
       '</header>';
   }
 
@@ -199,31 +233,109 @@
       }
       var burger = this.querySelector('#nav-burger');
       var drawer = this.querySelector('#nav-drawer');
+      var drawBack = this.querySelector('#nav-drawer-backdrop');
       if (burger && drawer) {
         var toggle = function (open) {
           burger.classList.toggle('open', open);
           drawer.classList.toggle('open', open);
+          if (drawBack) drawBack.classList.toggle('on', open);
           burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+          document.body.style.overflow = open ? 'hidden' : '';
         };
         burger.addEventListener('click', function () { toggle(!drawer.classList.contains('open')); });
         drawer.addEventListener('click', function (e) { if (e.target.closest('a')) toggle(false); });
+        drawBack && drawBack.addEventListener('click', function () { toggle(false); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && drawer.classList.contains('open')) toggle(false); });
         window.addEventListener('resize', function () { if (innerWidth > 900) toggle(false); });
       }
-      /* header search sheet */
+      /* header search sheet + typeahead */
       var sBtn = this.querySelector('#nav-search-btn');
       var sSheet = this.querySelector('#nav-search-sheet');
+      var sBack = this.querySelector('#nav-search-backdrop');
       var sIn = this.querySelector('#nav-search-input');
       var sClose = this.querySelector('#nav-search-close');
-      if (sBtn && sSheet) {
-        var openSheet = function () { sSheet.classList.add('on'); setTimeout(function () { sIn && sIn.focus(); }, 100); };
-        var closeSheet = function () { sSheet.classList.remove('on'); if (sIn) sIn.value = ''; };
+      var sForm = this.querySelector('#nav-search-form');
+      var sHits = this.querySelector('#nav-search-hits');
+      if (sBtn && sSheet && sForm) {
+        var activeIdx = -1;
+        var openSheet = function () {
+          sSheet.classList.add('on');
+          if (sBack) sBack.classList.add('on');
+          setTimeout(function () { sIn && sIn.focus(); }, 120);
+        };
+        var closeSheet = function () {
+          sSheet.classList.remove('on');
+          if (sBack) sBack.classList.remove('on');
+          if (sHits) { sHits.classList.remove('on'); sHits.innerHTML = ''; }
+          if (sIn) sIn.value = '';
+          activeIdx = -1;
+        };
         sBtn.addEventListener('click', openSheet);
         sClose && sClose.addEventListener('click', closeSheet);
-        sIn && sIn.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter') {
-            var q = (sIn.value || '').trim();
-            if (q) location.href = 'categories.html?q=' + encodeURIComponent(q);
-          } else if (e.key === 'Escape') { closeSheet(); }
+        sBack && sBack.addEventListener('click', closeSheet);
+
+        function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+        function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+
+        function renderHits(q) {
+          var cat = window.CHAUHAN_CATALOG || [];
+          if (!cat.length || !q) { sHits.classList.remove('on'); sHits.innerHTML = ''; return; }
+          var lc = q.toLowerCase();
+          var hits = cat.filter(function (p) {
+            if (p.inStock === 0 || p.inStock === false) return false;
+            var hay = ((p.name || '') + ' ' + (p.category || '') + ' ' + (p.regionLabel || '')).toLowerCase();
+            return hay.indexOf(lc) !== -1;
+          }).slice(0, 6);
+          if (!hits.length) {
+            sHits.innerHTML = '<div class="nav-search-empty">No pieces match "' + esc(q) + '". Hit Search for full results.</div>';
+            sHits.classList.add('on');
+            return;
+          }
+          var rows = hits.map(function (p, i) {
+            return '<a class="nav-search-hit" role="option" data-idx="' + i + '" href="product?sku=' + encodeURIComponent(p.sku || p.id) + '">' +
+              '<div class="nav-search-hit-img" style="background-image:url(\'' + esc(p.image || '') + '\')"></div>' +
+              '<div class="nav-search-hit-meta">' +
+                '<div class="nav-search-hit-name">' + esc(p.name) + '</div>' +
+                '<div class="nav-search-hit-cat">' + esc(p.category || '') + '</div>' +
+              '</div>' +
+              '<div class="nav-search-hit-price">' + fmt(p.price) + '</div>' +
+            '</a>';
+          }).join('') +
+            '<a class="nav-search-more" href="categories.html?q=' + encodeURIComponent(q) + '">SEE ALL RESULTS &rarr;</a>';
+          sHits.innerHTML = rows;
+          sHits.classList.add('on');
+          activeIdx = -1;
+        }
+
+        var debounce = null;
+        sIn.addEventListener('input', function () {
+          clearTimeout(debounce);
+          var v = (sIn.value || '').trim();
+          debounce = setTimeout(function () { renderHits(v); }, 140);
+        });
+
+        sIn.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') { closeSheet(); return; }
+          if (!sHits.classList.contains('on')) return;
+          var items = sHits.querySelectorAll('.nav-search-hit');
+          if (!items.length) return;
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIdx = (activeIdx + 1) % items.length;
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIdx = (activeIdx - 1 + items.length) % items.length;
+          } else if (e.key === 'Enter' && activeIdx >= 0) {
+            e.preventDefault();
+            items[activeIdx].click();
+            return;
+          } else { return; }
+          for (var i = 0; i < items.length; i++) items[i].classList.toggle('active', i === activeIdx);
+        });
+
+        sForm.addEventListener('submit', function (e) {
+          var q = (sIn.value || '').trim();
+          if (!q) { e.preventDefault(); sIn.focus(); return; }
         });
       }
     }

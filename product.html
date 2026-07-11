@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=7">
-<script src="layout.js?v=7"></script>
-<script src="mpa.js?v=7" defer></script>
-<script src="catalog.js?v=7"></script>
+<link rel="stylesheet" href="site.css?v=8">
+<script src="layout.js?v=8"></script>
+<script src="mpa.js?v=8" defer></script>
+<script src="catalog.js?v=8"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #FAFAFA; margin: 0; }
@@ -78,11 +78,28 @@
   .pdp-error h1 { font-family: 'Cormorant Garamond',serif; font-size: 28px; color: #1A1A1A; margin: 0 0 14px; }
   .pdp-error a { color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; padding-bottom: 2px; }
   @media (max-width: 900px) {
-    .pdp-grid { grid-template-columns: 1fr; gap: 28px; }
-    .pdp-wrap { padding: 0 18px 60px; }
+    .pdp-grid { grid-template-columns: 1fr; gap: 24px; }
+    .pdp-wrap { padding: 0 16px calc(96px + env(safe-area-inset-bottom)); }
     .pdp-name { font-size: 26px; }
     .pdp-price { font-size: 22px; }
+    .pdp-img-wrap { max-width: 100%; }
+    .pdp-desc { max-width: 100%; }
+    /* Bigger tap targets */
+    .pdp-qty span { padding: 0 12px; }
+    .pdp-qty .pdp-q { width: 44px; height: 48px; font-size: 20px; }
+    .pdp-qty .pdp-v { width: 50px; height: 48px; font-size: 15px; }
+    .pdp-add { height: 52px; font-size: 12px; letter-spacing: 2.2px; }
+    .pdp-buy { height: 52px; font-size: 12px; letter-spacing: 2.2px; }
+    /* Sticky bottom CTA bar on mobile — visible after user scrolls past the fold */
+    .pdp-mobile-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(197,160,89,.28); box-shadow: 0 -6px 24px rgba(6,40,26,.08); transform: translateY(120%); transition: transform .4s cubic-bezier(.22,1,.36,1); }
+    .pdp-mobile-bar.on { transform: translateY(0); }
+    .pdp-mobile-bar .price { flex: none; font-family: 'Cormorant Garamond',serif; font-size: 18px; font-weight: 600; color: #0B3C26; align-self: center; padding: 0 4px; }
+    .pdp-mobile-bar button { flex: 1; height: 48px; border: none; border-radius: 8px; font-family: 'Montserrat',sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.8px; cursor: pointer; }
+    .pdp-mobile-bar .add { background: #fff; color: #0B3C26; border: 1px solid #0B3C26; }
+    .pdp-mobile-bar .buy { background: #0B3C26; color: #fff; box-shadow: 0 6px 16px rgba(11,60,38,.24); }
+    .pdp-mobile-bar .buy:hover { background: #06281a; }
   }
+  @media (min-width: 901px) { .pdp-mobile-bar { display: none; } }
 </style>
 </head>
 <body>
@@ -156,6 +173,11 @@
       </div>
     </div>
   </div>
+  <div class="pdp-mobile-bar" id="pdp-mobile-bar" aria-hidden="true">
+    <div class="price" id="pdp-mobile-price"></div>
+    <button class="add" id="pdp-mobile-add" type="button">ADD TO BAG</button>
+    <button class="buy" id="pdp-mobile-buy" type="button">BUY NOW</button>
+  </div>
 </main>
 <x-footer></x-footer>
 
@@ -199,6 +221,7 @@
       $('pdp-mrp').style.display = 'none';
       $('pdp-save').textContent = '';
     }
+    var mp = $('pdp-mobile-price'); if (mp) mp.textContent = fmt(p.price);
     $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> — premium handcrafted imitation jewellery, manufactured in our Mumbai warehouse. ' +
       (p.category ? 'Part of our ' + p.category + ' collection. ' : '') +
       'Each piece is individually inspected and dispatched insured across India.';
@@ -309,6 +332,34 @@
     addToBag();
     window.location.href = 'checkout.html';
   });
+
+  /* Sticky mobile CTA bar — mirrors ADD TO BAG + BUY NOW, reveals on scroll */
+  var mAdd = $('pdp-mobile-add'), mBuy = $('pdp-mobile-buy'), mBar = $('pdp-mobile-bar');
+  if (mAdd) mAdd.addEventListener('click', function () {
+    if (!product) return;
+    addToBag();
+    mAdd.textContent = '✓ ADDED';
+    setTimeout(function () { mAdd.textContent = 'ADD TO BAG'; }, 1400);
+  });
+  if (mBuy) mBuy.addEventListener('click', function () {
+    if (!product) return;
+    addToBag();
+    window.location.href = 'checkout.html';
+  });
+  if (mBar) {
+    var toggleBar = function () {
+      // show once the primary desktop-side ADD button leaves the viewport
+      var anchor = $('pdp-addcart');
+      if (!anchor) return;
+      var r = anchor.getBoundingClientRect();
+      var below = r.bottom < 40;
+      mBar.classList.toggle('on', below);
+      mBar.setAttribute('aria-hidden', below ? 'false' : 'true');
+    };
+    window.addEventListener('scroll', toggleBar, { passive: true });
+    window.addEventListener('resize', toggleBar);
+    setTimeout(toggleBar, 300);
+  }
 
   /* ---- reviews (existing /api/reviews backend) ---- */
   var rvRating = 5;

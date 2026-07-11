@@ -44,10 +44,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=7">
-<script src="layout.js?v=7"></script>
-<script src="mpa.js?v=7" defer></script>
-<script src="catalog.js?v=7"></script>
+<link rel="stylesheet" href="site.css?v=8">
+<script src="layout.js?v=8"></script>
+<script src="mpa.js?v=8" defer></script>
+<script src="catalog.js?v=8"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Saubhagya Jewellery","url":"https://saubhagyajewellery.com/","logo":"https://saubhagyajewellery.com/images/banners/saubhagya-logo.png","sameAs":[],"address":{"@type":"PostalAddress","addressLocality":"Mumbai","addressRegion":"Maharashtra","postalCode":"400101","addressCountry":"IN"}}</script>
 <style>
   * { box-sizing: border-box; }
@@ -120,20 +120,12 @@
   .her-text .k { font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 3px; color: #C5A059; margin-bottom: 8px; }
   .her-text .t { font-family: 'Cormorant Garamond',serif; font-size: 26px; line-height: 1.2; }
 
-  .tr-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 22px; }
-  .tr-card { text-decoration: none; color: inherit; display: block; position: relative; }
-  .tr-img { position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden; border-radius: 8px; background: #eae5d8; }
-  .tr-img .im { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.22,1,.36,1); }
-  @media(hover:hover){ .tr-card:hover .tr-img .im { transform: scale(1.05); } }
-  .tr-badge { position: absolute; top: 12px; left: 12px; z-index: 2; font-family: 'Montserrat',sans-serif; font-size: 9px; letter-spacing: 1.5px; padding: 4px 10px; background: #0B3C26; color: #fff; border-radius: 3px; }
-  .tr-quick { position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 2; padding: 10px 0; background: rgba(255,255,255,.94); color: #0B3C26; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 2px; text-align: center; border: none; cursor: pointer; opacity: 0; transition: opacity .3s; border-radius: 4px; }
-  @media(hover:hover){ .tr-card:hover .tr-quick { opacity: 1; } }
-  .tr-name { font-family: 'Cormorant Garamond',serif; font-size: 17px; color: #1A1A1A; margin-top: 10px; }
-  .tr-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B3C26; font-weight: 500; margin-top: 3px; }
-  .tr-mrp { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; text-decoration: line-through; margin-left: 8px; font-weight: 300; }
-  .tr-more { text-align: center; margin: 26px 0 0; }
+  /* Trending grid layout — card styling comes from site.css .tr-card block */
+  .tr-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 28px; }
+  .tr-more { text-align: center; margin: 30px 0 0; }
   .tr-more a { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; padding-bottom: 2px; }
   .tr-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; color: #9a9a9a; }
+  .tr-img .im { position: absolute; inset: 0; background-size: cover; background-position: center; }
 
   .seo-block { max-width: 920px; margin: 0 auto; padding: 44px 48px 70px; text-align: left; }
   .seo-block h2 { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 28px; color: #1A1A1A; margin: 34px 0 12px; }
@@ -143,34 +135,49 @@
   .seo-block a { color: #0B3C26; }
 
   @media (max-width: 900px) {
-    .hm-h1 { font-size: 30px; }
-    .hm-hero-wrap { padding: 0 18px; }
-    /* phones: taller crop reads better than a thin strip */
-    .hm-hero { aspect-ratio: 4/5; max-height: 520px; border-radius: 12px; }
-    .hm-hero-caption { left: 22px; bottom: 26px; right: 22px; }
-    .hm-hero-caption .t { font-size: 26px; }
-    .hm-hero-arrow { width: 36px; height: 36px; font-size: 18px; }
-    .hm-section { padding: 32px 18px 6px; }
+    .hm-head { padding: 30px 18px 6px; }
+    .hm-h1 { font-size: 28px; line-height: 1.2; }
+    .hm-hero-wrap { padding: 0 14px; margin-top: 22px; }
+    /* Phones: taller crop reads better than a thin strip. Rounded, softer shadow. */
+    .hm-hero { aspect-ratio: 4/5; max-height: 560px; border-radius: 16px; box-shadow: 0 20px 40px -20px rgba(6,40,26,.35); }
+    .hm-hero-caption { left: 20px; bottom: 24px; right: 20px; }
+    .hm-hero-caption .t { font-size: 24px; line-height: 1.16; }
+    .hm-hero-caption .k { font-size: 9px; letter-spacing: 3px; }
+    .hm-hero-arrow { width: 40px; height: 40px; font-size: 20px; background: rgba(255,255,255,.24); }
+    .hm-hero-arrow.prev { left: 12px; } .hm-hero-arrow.next { right: 12px; }
+    .hm-hero-dots { bottom: 12px; }
+    .hm-hero-dot { width: 8px; height: 8px; }
+    .hm-ctas { gap: 12px; padding: 0 18px; margin-top: 30px; }
+    .hm-btn { flex: 1; min-width: 0; padding: 15px 12px; font-size: 11px; letter-spacing: 1.5px; }
+    .hm-section { padding: 30px 14px 6px; }
     /* retail-style mobile: tidy 2-column tiles instead of one long photo per screen */
-    .cat2 { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .cat-tile.big { height: 190px; }
-    .cat3 { grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
-    .cat-tile.small { height: 150px; }
-    .cat3 a:last-child { grid-column: 1 / -1; height: 160px; }
-    .cat-text .t { font-size: 18px; }
+    .cat2 { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cat-tile.big { height: 200px; border-radius: 10px; }
+    .cat3 { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .cat-tile.small { height: 150px; border-radius: 10px; }
+    .cat3 a:last-child { grid-column: 1 / -1; height: 170px; }
+    .cat-text .t { font-size: 17px; }
     .cat-text .s { display: none; }
-    .cat-text { left: 16px; bottom: 14px; }
-    .cat-tile.small .cat-text { left: 16px; bottom: 12px; }
+    .cat-text { left: 14px; bottom: 12px; }
+    .cat-tile.small .cat-text { left: 14px; bottom: 10px; }
     .her3 { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .her-tile { height: 210px; }
+    .her-tile { height: 210px; border-radius: 10px; }
     .her3 a:last-child { grid-column: 1 / -1; height: 200px; }
-    .her-text { left: 16px; bottom: 16px; }
-    .her-text .t { font-size: 19px; }
+    .her-text { left: 14px; bottom: 14px; }
+    .her-text .t { font-size: 18px; }
     .tr-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
-    .hm-sec-title { font-size: 26px; }
-    .seo-block { padding: 30px 18px 56px; }
-    .tr-quick { opacity: 1; background: rgba(255,255,255,.9); }
+    .hm-sec-head { margin-bottom: 24px; }
+    .hm-sec-title { font-size: 24px; }
+    .seo-block { padding: 24px 18px 40px; }
+    .seo-block h2 { font-size: 22px; margin-top: 24px; }
+    .seo-block p { font-size: 13.5px; line-height: 1.8; }
   }
+  @media (max-width: 480px) {
+    .hm-h1 { font-size: 24px; }
+    .hm-ctas { padding: 0 14px; }
+  }
+  /* iOS momentum + no double-tap zoom on tiles */
+  .hm-hero, .cat-tile, .her-tile, .tr-card { touch-action: manipulation; }
 </style>
 </head>
 <body>
