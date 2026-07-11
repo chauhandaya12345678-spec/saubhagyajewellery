@@ -175,14 +175,19 @@
       this.innerHTML = headerHtml(this.getAttribute('page') || '');
       this.style.display = 'block';
       hydrate();
-      // Sign out click handler
-      this.addEventListener('click', function (e) {
-        var s = e.target.closest('[data-mpa-signout]');
-        if (!s) return;
-        e.preventDefault();
-        if (window.MPA) window.MPA.signOut();
-        location.href = 'index.html';
-      });
+      // Sign-out delegation lives on the DOCUMENT, not on <x-layout>, so it
+      // catches [data-mpa-signout] buttons anywhere on the page (account.html
+      // has one in <main>). Guarded so multiple mounts don't rebind.
+      if (!window.__mpaSignoutBound) {
+        window.__mpaSignoutBound = true;
+        document.addEventListener('click', function (e) {
+          var s = e.target.closest('[data-mpa-signout]');
+          if (!s) return;
+          e.preventDefault();
+          if (window.MPA) window.MPA.signOut();
+          location.href = 'index.html';
+        });
+      }
       // Hamburger drawer
       var burger = this.querySelector('#nav-burger');
       var drawer = this.querySelector('#nav-drawer');
