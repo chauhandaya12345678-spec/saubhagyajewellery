@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=5">
-<script src="layout.js?v=5"></script>
-<script src="mpa.js?v=5" defer></script>
+<link rel="stylesheet" href="site.css?v=6">
+<script src="layout.js?v=6"></script>
+<script src="mpa.js?v=6" defer></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #FAFAFA; margin: 0; }
@@ -47,6 +47,15 @@
   <label class="auth-label">Password</label>
   <input class="auth-input" id="signup-password" type="password" placeholder="Choose a password (min 6 characters)">
 
+  <label style="display:flex;gap:9px;align-items:flex-start;font-family:'Montserrat',sans-serif;font-size:11.5px;color:#4a4a4a;line-height:1.55;cursor:pointer;margin:6px 0 6px;">
+    <input type="checkbox" id="signup-consent" style="margin-top:3px;accent-color:#0B3C26;">
+    <span>I am 18+ and agree to the <a href="terms.html" style="color:#0B3C26;">Terms</a>, <a href="privacy-policy.html" style="color:#0B3C26;">Privacy Policy</a> and <a href="cookie-policy.html" style="color:#0B3C26;">Cookie Policy</a>.</span>
+  </label>
+  <label style="display:flex;gap:9px;align-items:flex-start;font-family:'Montserrat',sans-serif;font-size:11.5px;color:#4a4a4a;line-height:1.55;cursor:pointer;margin:0 0 14px;">
+    <input type="checkbox" id="signup-marketing" style="margin-top:3px;accent-color:#0B3C26;">
+    <span>Email me new drops, offers and edits (optional, unsubscribe anytime).</span>
+  </label>
+
   <div class="auth-error" id="signup-error" style="display:none"></div>
   <div class="auth-success" id="signup-success" style="display:none"></div>
 
@@ -70,6 +79,8 @@
     if (!name) { $('signup-error').textContent = 'Name is required.'; $('signup-error').style.display = 'block'; return; }
     if (!email && !phone) { $('signup-error').textContent = 'Email or phone is required.'; $('signup-error').style.display = 'block'; return; }
     if (pw.length < 6) { $('signup-error').textContent = 'Password must be at least 6 characters.'; $('signup-error').style.display = 'block'; return; }
+    if (!$('signup-consent').checked) { $('signup-error').textContent = 'Please confirm age 18+ and accept the policies.'; $('signup-error').style.display = 'block'; return; }
+    var marketing = !!$('signup-marketing').checked;
 
     $('signup-error').style.display = 'none';
     $('signup-submit').textContent = 'CREATING…';
@@ -78,7 +89,7 @@
     fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, email: email || null, phone: phone || null, password: pw })
+      body: JSON.stringify({ name: name, email: email || null, phone: phone || null, password: pw, marketing_consent: marketing, age_confirmed: true })
     }).then(function(r) { return r.json(); })
       .then(function(d) {
         $('signup-submit').textContent = 'CREATE ACCOUNT';

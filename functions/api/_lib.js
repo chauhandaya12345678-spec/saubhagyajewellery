@@ -302,3 +302,85 @@ export async function sendWelcomeEmail(env, user) {
     return { sent: false, error: 'Email error: ' + err.message };
   }
 }
+
+/**
+ * Magic-link sign-in email. Same Resend plumbing; no-ops without RESEND_API_KEY.
+ * Returns { sent, id?, error? } — never throws.
+ */
+export async function sendMagicLinkEmail(env, email, name, token) {
+  try {
+    const key = env.RESEND_API_KEY;
+    if (!key) return { sent: false, error: 'RESEND_API_KEY not configured' };
+    if (!email) return { sent: false, error: 'no email' };
+
+    const from = env.ORDER_EMAIL_FROM || 'Saubhagya Jewellery <care@saubhagyajewellery.com>';
+    const first = esc(String(name || 'there').split(' ')[0]);
+    const link = `https://saubhagyajewellery.com/signin.html?ml=${encodeURIComponent(token)}`;
+
+    const html =
+`<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
+  <div style="text-align:center;padding:26px 0 14px">
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B3C26">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A059;margin-top:3px">JEWELLERY</div>
+  </div>
+  <div style="padding:8px 24px 24px">
+    <h2 style="font:600 20px Georgia,serif;color:#0B3C26;margin:0 0 12px">Sign in to your account</h2>
+    <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 20px">Hi ${first}, click below to sign in instantly. Link expires in 15 minutes and works only once.</p>
+    <a href="${link}" style="display:inline-block;padding:14px 32px;background:#0B3C26;color:#fff;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:4px">SIGN IN TO SAUBHAGYA</a>
+    <p style="font-size:12px;color:#9a9a9a;margin-top:20px">If you didn't request this, ignore this email.</p>
+  </div>
+</div>`;
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: [email], subject: 'Sign in to Saubhagya Jewellery', html }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { sent: false, error: 'Resend error: ' + JSON.stringify(data).slice(0, 300) };
+    return { sent: true, id: data.id };
+  } catch (err) {
+    return { sent: false, error: 'Magic link error: ' + err.message };
+  }
+}
+
+/**
+ * Password-reset email. Same Resend plumbing; no-ops without RESEND_API_KEY.
+ */
+export async function sendPasswordResetEmail(env, email, name, token) {
+  try {
+    const key = env.RESEND_API_KEY;
+    if (!key) return { sent: false, error: 'RESEND_API_KEY not configured' };
+    if (!email) return { sent: false, error: 'no email' };
+
+    const from = env.ORDER_EMAIL_FROM || 'Saubhagya Jewellery <care@saubhagyajewellery.com>';
+    const first = esc(String(name || 'there').split(' ')[0]);
+    const link = `https://saubhagyajewellery.com/reset-password.html?token=${encodeURIComponent(token)}`;
+
+    const html =
+`<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
+  <div style="text-align:center;padding:26px 0 14px">
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B3C26">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A059;margin-top:3px">JEWELLERY</div>
+  </div>
+  <div style="padding:8px 24px 24px">
+    <h2 style="font:600 20px Georgia,serif;color:#0B3C26;margin:0 0 12px">Reset your password</h2>
+    <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 8px">Hi ${first}, we received a request to reset your Saubhagya account password.</p>
+    <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 20px">Click below to set a new password. Link expires in 1 hour.</p>
+    <a href="${link}" style="display:inline-block;padding:14px 32px;background:#0B3C26;color:#fff;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:4px">RESET PASSWORD</a>
+    <p style="font-size:12px;color:#9a9a9a;margin-top:20px">If you didn't request this, ignore this email. Your password won't change.</p>
+  </div>
+</div>`;
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: [email], subject: 'Reset your Saubhagya password', html }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { sent: false, error: 'Resend error: ' + JSON.stringify(data).slice(0, 300) };
+    return { sent: true, id: data.id };
+  } catch (err) {
+    return { sent: false, error: 'Reset email error: ' + err.message };
+  }
+}

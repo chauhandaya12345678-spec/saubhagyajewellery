@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=5">
-<script src="layout.js?v=5"></script>
-<script src="mpa.js?v=5" defer></script>
-<script src="catalog.js?v=5"></script>
+<link rel="stylesheet" href="site.css?v=6">
+<script src="layout.js?v=6"></script>
+<script src="mpa.js?v=6" defer></script>
+<script src="catalog.js?v=6"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   window.CC_PAYMENTS = {
@@ -112,9 +112,15 @@
         <div class="co-section">
           <label class="co-label">Payment Method</label>
           <div class="co-pay-opt">
-            <label><input type="radio" name="pay" value="razorpay" checked> Pay Online</label>
-            <label><input type="radio" name="pay" value="cod"> Cash on Delivery</label>
+            <label><input type="radio" name="pay" value="razorpay" checked> Pay Online (UPI, Cards, Net Banking, EMI)</label>
           </div>
+          <p style="font-family:'Montserrat',sans-serif;font-size:11px;color:#9a9a9a;margin:0;">Cash on Delivery is temporarily unavailable. All payments are secured by Razorpay with 256-bit SSL.</p>
+        </div>
+        <div class="co-section">
+          <label style="display:flex;gap:10px;align-items:flex-start;font-family:'Montserrat',sans-serif;font-size:11.5px;color:#4a4a4a;line-height:1.55;cursor:pointer;">
+            <input type="checkbox" id="co-consent" style="margin-top:3px;accent-color:#0B3C26;">
+            <span>I confirm I am 18 years or older and agree to the <a href="terms.html" style="color:#0B3C26;">Terms of Service</a>, <a href="privacy-policy.html" style="color:#0B3C26;">Privacy Policy</a> and <a href="shipping-and-returns.html" style="color:#0B3C26;">no-return policy</a>. I understand made-to-order pieces are non-refundable.</span>
+          </label>
         </div>
         <button class="co-btn" id="co-submit">PLACE ORDER</button>
         <div class="co-error" id="co-error" style="display:none"></div>
@@ -123,10 +129,12 @@
       <div class="co-summary" id="co-summary">
         <h2 style="font-family:'Cormorant Garamond',serif;font-size:18px;color:#1A1A1A;margin:0 0 14px;">Order Summary</h2>
         <div id="co-items"></div>
+        <div class="co-line"><span>Subtotal</span><span id="co-subtotal">₹0</span></div>
         <div class="co-line" id="co-disc-row" style="display:none"><span>Discount (10%)</span><span id="co-disc"></span></div>
-        <div class="co-line"><span>Shipping</span><span id="co-shipping">Calculated at checkout</span></div>
+        <div class="co-line"><span>Shipping</span><span id="co-shipping">FREE (included)</span></div>
+        <div class="co-line"><span>Taxes</span><span>Inclusive of all taxes</span></div>
         <div class="co-total"><span>Total</span><span id="co-total-amt"></span></div>
-        <div class="co-noreturn">All sales are final: made-to-order pieces cannot be returned or exchanged. Manufacturing defects are repaired or replaced — see <a href="shipping-and-returns.html">policy</a>.</div>
+        <div class="co-noreturn">All sales final: made-to-order pieces cannot be returned or exchanged. Manufacturing defects claimed within 48 hours of delivery (with continuous unboxing video) are repaired or replaced free — see <a href="shipping-and-returns.html">policy</a>.<br><br><strong>Country of origin:</strong> India (Made in Mumbai)<br><strong>Sold by:</strong> Saubhagya Jewellery (Proprietor: Dayasingh Chauhan)</div>
       </div>
     </div>
   </div>
@@ -218,15 +226,15 @@
   }
 
   function payMethod() {
-    var r = document.querySelector('input[name=pay]:checked');
-    return r ? r.value : 'razorpay';
+    /* COD disabled — Razorpay is the only path. Radio kept for a11y but ignored. */
+    return 'razorpay';
   }
 
   function updateTotals() {
-    var codFee = payMethod() === 'cod' ? PRICING.codFee : 0;
     var discount = promoCode === 'WELCOME10' ? Math.round(subtotal * 0.1) : 0;
+    var subEl = $('co-subtotal'); if (subEl) subEl.textContent = fmt(subtotal);
     $('co-shipping').textContent = 'FREE (included)';
-    $('co-total-amt').textContent = fmt(Math.max(0, subtotal - discount + codFee));
+    $('co-total-amt').textContent = fmt(Math.max(0, subtotal - discount));
     if (discount > 0) {
       $('co-disc-row').style.display = 'flex';
       $('co-disc').textContent = '−' + fmt(discount);
@@ -334,25 +342,7 @@
     var address = { street: v.addr, apt: '', city: v.city, state: v.state, pin: v.pin };
     var addressStr = JSON.stringify(address);
 
-    // COD path
-    if (v.pay === 'cod') {
-      var codOrderId = 'COD' + Date.now().toString(36).toUpperCase();
-      var lastOrder = {
-        id: codOrderId, paymentId: 'COD', customer: name, email: v.email, phone: v.phone,
-        totalText: fmt(total), lines: lines.map(function(l) { return { name: l.name, qty: l.qty, lineText: fmt(l.price * l.qty) }; }),
-        address: [v.addr, v.city, v.state, v.pin].filter(Boolean).join(', ')
-      };
-      finalizeOrder(lastOrder, codOrderId, {
-        razorpay_payment_id: 'COD-' + codOrderId, items: lines,
-        total: total * 100, subtotal: subtotal * 100, discount: discount * 100,
-        shipping: (shipFee + codFee) * 100,
-        name: name, email: v.email || '', phone: v.phone || '',
-        address: addressStr, create_account: true, test_mode: false, payment_method: 'cod'
-      });
-      return;
-    }
-
-    // Razorpay path
+    // Razorpay path (COD disabled)
     var resetBtn = function() {
       $('co-submit').disabled = false;
       $('co-submit').textContent = 'PLACE ORDER';
@@ -441,6 +431,12 @@
     var v = validate();
     if (v.errs.length) {
       $('co-error').textContent = v.errs.join('. ');
+      $('co-error').style.display = 'block';
+      return;
+    }
+    var consent = $('co-consent');
+    if (consent && !consent.checked) {
+      $('co-error').textContent = 'Please confirm age 18+ and accept the Terms, Privacy and no-return policy before placing the order.';
       $('co-error').style.display = 'block';
       return;
     }

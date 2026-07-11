@@ -1,25 +1,7 @@
 /* ============================================================
- * SAUBHAGYA – shared layout components (Batch 2)
- * ------------------------------------------------------------
+ * SAUBHAGYA – shared layout components
  * ONE source of truth for the header + footer of every static
- * page. Pages declare:
- *
- *   <head> … <script src="layout.js"></script>
- *            <script src="mpa.js" defer></script> … </head>
- *   <body>
- *     <x-layout page="about.html"></x-layout>   ← header (+active nav)
- *     <main>…page content…</main>
- *     <x-footer></x-footer>                     ← footer
- *
- * layout.js loads synchronously in <head> so the custom elements
- * upgrade while the body parses — header paints with the page,
- * no flash. mpa.js then hydrates the [data-mpa-*] hooks (cart
- * badge, Sign in / Hi <name>) from localStorage.
- *
- * Editing the header/footer? Change it HERE and in
- * build/site.js (header()/footer() emit these tags now).
- * index.html (the SPA) keeps its own header — do not add these
- * elements there.
+ * page. Change here + in build/site.js.
  * ============================================================ */
 (function () {
   'use strict';
@@ -28,18 +10,6 @@
   var SIGNIN = 'signin.html';
   var CART = 'cart.html';
   var WHATSAPP = 'https://wa.me/919987008435';
-
-  /* Brand lotus mark (matches the gold logo) — inlined so it inherits page fonts/colors */
-  var LOTUS = function (size) {
-    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 64 52" fill="none" stroke="#C19A5B" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<g transform="translate(32,34)">' +
-      '<path d="M0,-24 C8,-14 8,-3 0,6 C-8,-3 -8,-14 0,-24 Z"/>' +
-      '<path d="M-20,-15 C-7,-11 -1,-2 0,6 C-12,4.8 -19,-4 -20,-15 Z"/>' +
-      '<path d="M20,-15 C7,-11 1,-2 0,6 C12,4.8 19,-4 20,-15 Z"/>' +
-      '<path d="M-32,-1 C-21,3 -8,6 0,6 C-10,13 -25,10 -32,-1 Z"/>' +
-      '<path d="M32,-1 C21,3 8,6 0,6 C10,13 25,10 32,-1 Z"/>' +
-      '</g><path d="M50,4 l2,5.5 5.5,2 -5.5,2 -2,5.5 -2,-5.5 -5.5,-2 5.5,-2 Z" fill="#C19A5B" stroke="none"/></svg>';
-  };
 
   /* Head extras every page gets: favicon, theme color, brand/fx styles */
   (function injectHead() {
@@ -60,20 +30,19 @@
       'header.site{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,160,89,.20)}',
       '.nav{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:14px 40px}',
       '.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;flex:none;order:0}',
-      /* Header brand SVG — scales cleanly at every breakpoint, no CSS blend hacks */
-      '.brand-logo{display:block;max-height:60px;width:auto;height:auto;max-width:100%;overflow:visible;vertical-align:middle}',
-      '@media(max-width:900px){.brand-logo{max-height:44px}}',
-      '@media(max-width:480px){.brand-logo{max-height:36px}}',
+      '.brand-logo{display:block;max-height:64px;width:auto;height:auto;max-width:100%;overflow:visible;vertical-align:middle}',
+      '@media(max-width:900px){.brand-logo{max-height:48px}}',
+      '@media(max-width:480px){.brand-logo{max-height:38px}}',
       '.logo-stack{display:flex;flex-direction:column;align-items:flex-start}',
       '.logo-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:#0B3C26;letter-spacing:2px;line-height:1}',
       '.logo-sub{font-size:8px;letter-spacing:5px;color:#C5A059;margin-top:3px}',
-      '.navlinks{order:1;flex:1;display:flex;justify-content:center;gap:26px;flex-wrap:nowrap;font-size:12px;letter-spacing:.6px;margin:0}',
+      '.navlinks{order:1;flex:1;display:flex;justify-content:center;gap:24px;flex-wrap:nowrap;font-size:12px;letter-spacing:.6px;margin:0}',
       '.navlink{padding-bottom:3px;border-bottom:1px solid transparent;white-space:nowrap;color:#1A1A1A;text-decoration:none;transition:border-color .3s,color .3s}',
       '.navlink:hover,.navlink.is-active{border-bottom-color:#C5A059;color:#0B3C26}',
-      '.nav-icons{order:2;flex:none;display:flex;align-items:center;gap:20px;font-size:11px;letter-spacing:1px}',
-      '.nav-icons a{color:#1A1A1A;text-decoration:none;white-space:nowrap;transition:color .3s}',
-      '.nav-icons a:hover{color:#0B3C26}',
-      /* badge shows only when mpa.js clears the inline display:none (count>0) */
+      '.nav-icons{order:2;flex:none;display:flex;align-items:center;gap:18px;font-size:11px;letter-spacing:1px}',
+      '.nav-icons a,.nav-icons button{color:#1A1A1A;text-decoration:none;white-space:nowrap;transition:color .3s;background:none;border:none;padding:0;font:inherit;letter-spacing:inherit;cursor:pointer}',
+      '.nav-icons a:hover,.nav-icons button:hover{color:#0B3C26}',
+      '.nav-search-icon{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}',
       '.nav-bag [data-mpa-cart-count]{align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:4px;border-radius:9px;background:#0B3C26;color:#fff;font-size:10px;font-weight:600;line-height:1;vertical-align:middle}',
       '.nav-bag [data-mpa-cart-count]:not([style*="none"]){display:inline-flex}',
       '.nav-burger{order:0;display:none;flex-direction:column;justify-content:center;gap:5px;width:34px;height:34px;padding:0;background:none;border:none;cursor:pointer}',
@@ -83,10 +52,17 @@
       '.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}',
       /* slide-down drawer */
       '.nav-drawer{display:none;flex-direction:column;background:#fff;border-bottom:1px solid rgba(197,160,89,.2);overflow:hidden;max-height:0;transition:max-height .4s cubic-bezier(.22,1,.36,1)}',
-      '.nav-drawer.open{max-height:70vh}',
+      '.nav-drawer.open{max-height:80vh;overflow-y:auto}',
       '.nav-drawer a{padding:15px 24px;font-size:14px;letter-spacing:.5px;color:#1A1A1A;text-decoration:none;border-top:1px solid #f0ece1}',
       '.nav-drawer a.is-active{color:#0B3C26}',
       '.nav-drawer a:first-child{border-top:none}',
+      /* header search sheet */
+      '.nav-search-sheet{position:fixed;top:0;left:0;width:100%;background:#fff;padding:22px 24px;box-shadow:0 4px 24px rgba(0,0,0,.08);transform:translateY(-100%);transition:transform .4s cubic-bezier(.22,1,.36,1);z-index:80}',
+      '.nav-search-sheet.open{transform:translateY(0)}',
+      '.nav-search-wrap{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px}',
+      '.nav-search-input{flex:1;height:44px;padding:0 14px;border:1px solid #d4cec0;border-radius:4px;font:400 15px "Montserrat",sans-serif;outline:none;color:#1A1A1A;background:#fff}',
+      '.nav-search-input:focus{border-color:#C5A059}',
+      '.nav-search-close{background:none;border:none;font-size:22px;color:#6a6a6a;cursor:pointer;padding:4px 8px}',
       /* mobile layout */
       '@media(max-width:900px){',
       '  .nav{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:11px 16px;gap:12px}',
@@ -95,26 +71,37 @@
       '  .logo{order:1;flex:1;justify-content:center}',
       '  .logo-name{font-size:19px;letter-spacing:1.5px}',
       '  .navlinks{display:none}',
-      '  .nav-icons{order:2;gap:0}',
+      '  .nav-icons{order:2;gap:10px}',
       '  .nav-icons .ni-hide{display:none}',
       '  .nav-drawer{display:flex}',
       '}',
       /* footer: same brand SVG as header, sized down for the column,
          and a light brightness bump so the gold pops on deep green */
       'footer.site .fbrand{display:flex;flex-direction:column;align-items:flex-start;gap:14px}',
-      'footer.site .brand-logo-footer{max-height:none;height:auto;width:180px;max-width:100%;filter:brightness(1.15) saturate(1.05)}',
-      '@media(max-width:560px){footer.site .fbrand{align-items:center}footer.site .brand-logo-footer{width:150px}}',
-      /* Apple-TV 3D tilt (hover scale is guarded per-page under @media(hover:hover)) */
+      'footer.site .brand-logo-footer{max-height:none;height:auto;width:200px;max-width:100%;filter:brightness(1.2) saturate(1.15) contrast(1.05)}',
+      '@media(max-width:560px){footer.site .fbrand{align-items:center}footer.site .brand-logo-footer{width:170px}}',
+      /* cookie consent banner */
+      '.ck-banner{position:fixed;left:16px;right:16px;bottom:16px;background:#fff;border:1px solid #C5A059;border-radius:8px;box-shadow:0 12px 40px rgba(6,40,26,.18);padding:18px 22px;z-index:120;display:none;font-family:"Montserrat",sans-serif;font-size:12.5px;line-height:1.55;color:#3a3a3a;max-width:640px;margin:0 auto}',
+      '.ck-banner.on{display:block;animation:ckSlide .5s cubic-bezier(.22,1,.36,1) both}',
+      '@keyframes ckSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}',
+      '.ck-banner p{margin:0 0 12px}',
+      '.ck-banner a{color:#0B3C26;text-decoration:underline}',
+      '.ck-btns{display:flex;gap:10px;flex-wrap:wrap}',
+      '.ck-btn{border:none;padding:10px 18px;font:600 11px "Montserrat",sans-serif;letter-spacing:1.5px;cursor:pointer;border-radius:4px}',
+      '.ck-btn.primary{background:#0B3C26;color:#fff}',
+      '.ck-btn.ghost{background:transparent;color:#0B3C26;border:1px solid #C5A059}',
+      /* Apple-TV 3D tilt */
       '.fx-tilt{transform-style:preserve-3d;will-change:transform;transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s cubic-bezier(.22,1,.36,1)}',
       '.fx-tilt.fx-active{transition:transform .06s linear,box-shadow .3s;box-shadow:0 24px 50px -18px rgba(6,40,26,.45),0 8px 20px -10px rgba(0,0,0,.3)}'
     ].join('');
     d.head.appendChild(s);
   })();
+
   var NAV = [
     { slug: 'index.html', label: 'Home' },
-    { slug: 'south-indian-traditional.html', label: 'South Indian' },
-    { slug: 'mumbai-modern.html', label: 'Mumbai Modern' },
-    { slug: 'north-indian-bridal.html', label: 'North Indian Bridal' },
+    { slug: 'categories.html', label: 'Categories' },
+    { slug: 'gifting.html', label: 'Gifting' },
+    { slug: 'track-orders.html', label: 'Track Order' },
     { slug: 'about.html', label: 'About' },
     { slug: 'contact.html', label: 'Contact' }
   ];
@@ -124,34 +111,39 @@
       return '<a class="navlink' + (n.slug === active ? ' is-active' : '') + '" href="' + n.slug + '">' + n.label + '</a>';
     }).join('');
     var drawerLinks = links +
-      '<a class="navlink" href="' + APP + '">Shop All</a>' +
       '<a class="navlink" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
-      '<a class="navlink" href="track-orders.html">Track Orders</a>' +
       '<a class="navlink" href="account.html" data-mpa-onlyauth style="display:none">My Account</a>' +
       '<a class="navlink nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>';
+    var searchIcon =
+      '<svg class="nav-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>';
     return '<header class="site">' +
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<a class="logo logo-real" href="index.html" aria-label="Saubhagya Jewellery home">' +
-      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=3" alt="Saubhagya Jewellery"></a>' +
+      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=4" alt="Saubhagya Jewellery"></a>' +
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
-      '<a class="ni-hide" href="' + APP + '" aria-label="Shop">Shop All</a>' +
+      '<button type="button" id="nav-search-btn" aria-label="Search">' + searchIcon + '</button>' +
       '<a class="ni-hide" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
       '<a class="ni-hide nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>' +
       '<a class="nav-bag" href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
       '</div></div>' +
       '<div class="nav-drawer" id="nav-drawer">' + drawerLinks + '</div>' +
+      '<div class="nav-search-sheet" id="nav-search-sheet">' +
+      '<div class="nav-search-wrap">' +
+      '<input class="nav-search-input" id="nav-search-input" type="search" placeholder="Search jewellery: necklaces, earrings, bridal sets…" autocomplete="off">' +
+      '<button class="nav-search-close" id="nav-search-close" aria-label="Close">×</button>' +
+      '</div></div>' +
       '</header>';
   }
 
   function footerHtml() {
-    var company = [['About Us', 'about.html'], ['Locate Stores', 'contact.html'], ['Contact Us', 'contact.html'], ['Blogs', 'blogs.html']];
+    var company = [['About Us', 'about.html'], ['Contact Us', 'contact.html'], ['Categories', 'categories.html'], ['Gifting', 'gifting.html'], ['Blogs', 'blogs.html']];
     var policy = [
       ['Track Orders', 'track-orders.html'], ['Shipping and Delivery', 'shipping-and-returns.html'],
       ['Return Policy', 'shipping-and-returns.html'], ['E & S Policy', 'es-policy.html'],
       ['Grievances', 'grievances.html'], ['Terms of Service', 'terms.html'],
-      ['Offer T&C', 'offer-terms.html'], ['Privacy Policy', 'privacy-policy.html']
+      ['Offer T&C', 'offer-terms.html'], ['Cookie Policy', 'cookie-policy.html'], ['Privacy Policy', 'privacy-policy.html']
     ];
     var col = function (title, items) {
       return '<div class="fcol"><div class="fhead">' + title + '</div>' +
@@ -159,13 +151,13 @@
     };
     return '<div class="fwrap">' +
       '<div class="fbrand">' +
-      '<img class="brand-logo brand-logo-footer" src="images/brand/saubhagya-logo.svg?v=3" alt="Saubhagya Jewellery">' +
-      '<p>Premium designer imitation jewellery: temple, Kundan/Polki and American Diamond. High-quality artificial jewellery, handcrafted and dispatched insured across India.</p></div>' +
+      '<img class="brand-logo brand-logo-footer" src="images/brand/saubhagya-logo.svg?v=4" alt="Saubhagya Jewellery">' +
+      '<p>Handcrafted premium imitation jewellery from our Mumbai warehouse. Every piece is manufactured in-house, inspected and dispatched insured across India.</p></div>' +
       col('COMPANY', company) + col('POLICY', policy) +
-      '<div class="fcol"><div class="fhead">STORE LOCATION</div>' +
-      '<p class="fatelier">Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101<br>Phone: +91 99870 08435</p>' +
+      '<div class="fcol"><div class="fhead">SELLER &amp; SUPPORT</div>' +
+      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Proprietor: Dayasingh Chauhan<br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br><strong>Grievance Officer:</strong><br>Dayasingh Chauhan<br>care@saubhagyajewellery.com<br>+91 99870 08435<br>Ack. 48 hrs · Resolve within 30 days</p>' +
       '<a class="fwa" href="' + WHATSAPP + '">WhatsApp Support &rarr;</a></div></div>' +
-      '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; High-quality imitation jewellery &middot; SSL secured</span>' +
+      '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; Manufacturer &amp; direct seller &middot; SSL secured</span>' +
       '<span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span></div>';
   }
 
@@ -176,9 +168,6 @@
       this.innerHTML = headerHtml(this.getAttribute('page') || '');
       this.style.display = 'block';
       hydrate();
-      // Sign-out delegation lives on the DOCUMENT, not on <x-layout>, so it
-      // catches [data-mpa-signout] buttons anywhere on the page (account.html
-      // has one in <main>). Guarded so multiple mounts don't rebind.
       if (!window.__mpaSignoutBound) {
         window.__mpaSignoutBound = true;
         document.addEventListener('click', function (e) {
@@ -189,7 +178,6 @@
           location.href = 'index.html';
         });
       }
-      // Hamburger drawer
       var burger = this.querySelector('#nav-burger');
       var drawer = this.querySelector('#nav-drawer');
       if (burger && drawer) {
@@ -202,6 +190,23 @@
         drawer.addEventListener('click', function (e) { if (e.target.closest('a')) toggle(false); });
         window.addEventListener('resize', function () { if (innerWidth > 900) toggle(false); });
       }
+      /* header search sheet */
+      var sBtn = this.querySelector('#nav-search-btn');
+      var sSheet = this.querySelector('#nav-search-sheet');
+      var sIn = this.querySelector('#nav-search-input');
+      var sClose = this.querySelector('#nav-search-close');
+      if (sBtn && sSheet) {
+        var openSheet = function () { sSheet.classList.add('on'); setTimeout(function () { sIn && sIn.focus(); }, 100); };
+        var closeSheet = function () { sSheet.classList.remove('on'); if (sIn) sIn.value = ''; };
+        sBtn.addEventListener('click', openSheet);
+        sClose && sClose.addEventListener('click', closeSheet);
+        sIn && sIn.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            var q = (sIn.value || '').trim();
+            if (q) location.href = 'categories.html?q=' + encodeURIComponent(q);
+          } else if (e.key === 'Escape') { closeSheet(); }
+        });
+      }
     }
   });
 
@@ -212,11 +217,37 @@
     }
   });
 
-  /* ── Apple-TV style 3D tilt on cards ──────────────────────────────
-   * Fine pointers (mouse/trackpad): tilt toward cursor on hover.
-   * Touch: brief press-tilt while the finger is down, then a hard
-   * reset on release. Exactly ONE card is ever tilted at a time —
-   * `clearAll()` wipes any previous card so nothing stays "floating".*/
+  /* ── Cookie consent banner (DPDPA 2023) ─────────────────────────── */
+  (function cookieConsent() {
+    function ready(fn) {
+      if (document.readyState !== 'loading') fn();
+      else document.addEventListener('DOMContentLoaded', fn);
+    }
+    ready(function () {
+      var choice = null;
+      try { choice = localStorage.getItem('cc_cookie_consent'); } catch (e) {}
+      if (choice) return;
+      var el = document.createElement('div');
+      el.className = 'ck-banner';
+      el.innerHTML =
+        '<p><strong>We value your privacy.</strong> We use cookies to remember your cart, sign-in and to measure site usage. You can accept all or use only essential cookies. See our <a href="cookie-policy.html">Cookie Policy</a> and <a href="privacy-policy.html">Privacy Policy</a>.</p>' +
+        '<div class="ck-btns">' +
+        '<button class="ck-btn primary" id="ck-accept">ACCEPT ALL</button>' +
+        '<button class="ck-btn ghost" id="ck-essential">ESSENTIAL ONLY</button>' +
+        '</div>';
+      document.body.appendChild(el);
+      setTimeout(function () { el.classList.add('on'); }, 400);
+      var save = function (v) {
+        try { localStorage.setItem('cc_cookie_consent', v); } catch (e) {}
+        el.classList.remove('on');
+        setTimeout(function () { el.remove(); }, 400);
+      };
+      el.querySelector('#ck-accept').addEventListener('click', function () { save('all'); });
+      el.querySelector('#ck-essential').addEventListener('click', function () { save('essential'); });
+    });
+  })();
+
+  /* ── Apple-TV style 3D tilt on cards ────────────────────────────── */
   (function tiltEngine() {
     var FINE = !!(window.matchMedia && matchMedia('(hover:hover) and (pointer:fine)').matches);
     var SELECTOR = '.card, .tr-card, .cat-tile, .her-tile, .product-card';
@@ -269,17 +300,15 @@
     function release(e) {
       var el = e.target.closest(SELECTOR);
       if (FINE && el) { el.__pressed = false; tiltNow(el, e); return; }
-      clearAll(); // touch: reset everything on lift/cancel
+      clearAll();
     }
     document.addEventListener('pointerup', release, { passive: true });
     document.addEventListener('pointercancel', clearAll, { passive: true });
-    // Leaving a card with a fine pointer springs it back
     document.addEventListener('pointerout', function (e) {
       if (!FINE) return;
       var el = e.target.closest(SELECTOR);
       if (el && !el.contains(e.relatedTarget)) { clear(el); if (el === activeEl) activeEl = null; }
     });
-    // Scrolling on touch cancels any press-tilt
     window.addEventListener('scroll', function () { if (!FINE) clearAll(); }, { passive: true });
   })();
 })();

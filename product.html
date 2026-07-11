@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=5">
-<script src="layout.js?v=5"></script>
-<script src="mpa.js?v=5" defer></script>
-<script src="catalog.js?v=5"></script>
+<link rel="stylesheet" href="site.css?v=6">
+<script src="layout.js?v=6"></script>
+<script src="mpa.js?v=6" defer></script>
+<script src="catalog.js?v=6"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #FAFAFA; margin: 0; }
@@ -114,7 +114,7 @@
           <div class="pdp-tax">incl. of all taxes</div>
           <div class="pdp-ship">Insured shipping across India · price includes delivery</div>
           <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
-          <div class="pdp-noreturn">All sales are final: no returns or exchanges. Manufacturing defects are repaired or replaced — see <a href="trust.html">our standards</a>.</div>
+          <div class="pdp-noreturn">All sales are final: no returns or exchanges. Manufacturing defects claimed within 48 hours of delivery (with continuous unboxing video) are repaired or replaced free — see <a href="trust.html">our standards</a>.<br><br><strong>Country of origin:</strong> India · <strong>Manufactured by:</strong> Saubhagya Jewellery (Mumbai) · <strong>Sold by:</strong> Saubhagya Jewellery (direct seller, not a marketplace)</div>
           <div class="pdp-pincheck">
             <div class="pdp-pincheck-title">CHECK DELIVERY DATE</div>
             <div class="pdp-pincheck-row">
@@ -181,11 +181,12 @@
     var ogImg = document.querySelector('meta[property="og:image"]');
     if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
     ogImg.setAttribute('content', (p.image || '').startsWith('http') ? p.image : 'https://saubhagyajewellery.com/' + (p.image || ''));
-    // Breadcrumb
-    $('pdp-crumb').innerHTML = '<a href="index.html">Home</a><i>/</i><a href="' + regionSlug(p.region) + '">' + (p.regionLabel || '') + '</a><i>/</i><span>' + p.name + '</span>';
+    // Breadcrumb — points to Categories hub (regional pages retired)
+    $('pdp-crumb').innerHTML = '<a href="index.html">Home</a><i>/</i><a href="categories.html">Categories</a><i>/</i><span>' + p.name + '</span>';
     $('pdp-cat').textContent = p.category || '';
     $('pdp-name').textContent = p.name;
-    $('pdp-region').textContent = p.regionLabel || '';
+    $('pdp-region').textContent = '';
+    $('pdp-region').style.display = 'none';
     $('pdp-image').src = p.image || '';
     $('pdp-image').alt = p.name;
     $('pdp-price').textContent = fmt(p.price);
@@ -198,7 +199,7 @@
       $('pdp-mrp').style.display = 'none';
       $('pdp-save').textContent = '';
     }
-    $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> — premium designer imitation jewellery, handcrafted in our Mumbai atelier. ' +
+    $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> — premium handcrafted imitation jewellery, manufactured in our Mumbai warehouse. ' +
       (p.category ? 'Part of our ' + p.category + ' collection. ' : '') +
       'Each piece is individually inspected and dispatched insured across India.';
     // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")

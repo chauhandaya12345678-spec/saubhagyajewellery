@@ -8,9 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=5">
-<script src="layout.js?v=5"></script>
-<script src="mpa.js?v=5" defer></script>
+<link rel="stylesheet" href="site.css?v=6">
+<script src="layout.js?v=6"></script>
+<script src="mpa.js?v=6" defer></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #FAFAFA; margin: 0; }
@@ -51,10 +51,23 @@
     <label class="auth-label">Password</label>
     <input class="auth-input" id="auth-password" type="password" placeholder="Your password">
 
+    <div style="text-align:right;margin:-8px 0 14px;">
+      <a href="#" id="forgot-link" style="font-family:'Montserrat',sans-serif;font-size:11px;color:#C5A059;text-decoration:none;">Forgot password?</a>
+    </div>
+
     <div class="auth-error" id="auth-error" style="display:none"></div>
     <div class="auth-success" id="auth-success" style="display:none"></div>
 
     <button class="auth-btn" id="auth-submit">SIGN IN</button>
+
+    <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+      <div style="flex:1;height:1px;background:#eae5d8;"></div>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:2px;color:#9a9a9a;">OR</span>
+      <div style="flex:1;height:1px;background:#eae5d8;"></div>
+    </div>
+
+    <button type="button" id="magic-link-btn" style="display:block;width:100%;padding:14px;background:transparent;color:#0B3C26;border:1px solid #0B3C26;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;cursor:pointer;">EMAIL ME A SIGN-IN LINK</button>
+
     <div class="auth-link">New here? <a href="signup.html">Create an account</a></div>
   </div>
 </div>
@@ -126,6 +139,90 @@
   $('auth-password').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') $('auth-submit').click();
   });
+
+  /* ── Forgot password ────────────────────────────────────── */
+  var forgotLink = $('forgot-link');
+  if (forgotLink) {
+    forgotLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      var id = ($('auth-identifier').value || '').trim();
+      if (!id || !/^\S+@\S+\.\S+$/.test(id)) {
+        $('auth-error').textContent = 'Enter your registered email above, then click Forgot password.';
+        $('auth-error').style.color = '#c0392b'; $('auth-error').style.display = 'block';
+        return;
+      }
+      $('auth-error').style.display = 'none';
+      forgotLink.textContent = 'Sending…';
+      fetch('/api/auth/forgot-password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: id }),
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        $('auth-error').style.color = '#0B3C26';
+        $('auth-error').textContent = d.message || 'Reset link sent if account exists.';
+        $('auth-error').style.display = 'block';
+        forgotLink.textContent = 'Forgot password?';
+      }).catch(function () {
+        $('auth-error').style.color = '#c0392b';
+        $('auth-error').textContent = 'Network error. Try again.';
+        $('auth-error').style.display = 'block';
+        forgotLink.textContent = 'Forgot password?';
+      });
+    });
+  }
+
+  /* ── Magic link auto-verify (URL ?ml=token) ─────────────── */
+  var mlParams = new URLSearchParams(window.location.search);
+  var mlToken = mlParams.get('ml');
+  if (mlToken) {
+    $('auth-error').style.color = '#6a6a6a';
+    $('auth-error').textContent = 'Verifying your sign-in link…';
+    $('auth-error').style.display = 'block';
+    fetch('/api/auth/verify-magic-link', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: mlToken }),
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.success && d.session_token) {
+        try { localStorage.setItem('cc_token', d.session_token); } catch (e) {}
+        try { localStorage.setItem('cc_user', JSON.stringify(d.user)); } catch (e) {}
+        window.location.href = 'account.html';
+      } else {
+        $('auth-error').style.color = '#c0392b';
+        $('auth-error').textContent = d.error || 'Invalid or expired link';
+      }
+    }).catch(function () {
+      $('auth-error').style.color = '#c0392b';
+      $('auth-error').textContent = 'Network error. Please try again.';
+    });
+  }
+
+  /* ── Magic link request button ──────────────────────────── */
+  var mlBtn = $('magic-link-btn');
+  if (mlBtn) {
+    mlBtn.addEventListener('click', function () {
+      var id = ($('auth-identifier').value || '').trim();
+      if (!id || !/^\S+@\S+\.\S+$/.test(id)) {
+        $('auth-error').textContent = 'Enter your registered email above first.';
+        $('auth-error').style.color = '#c0392b'; $('auth-error').style.display = 'block';
+        return;
+      }
+      mlBtn.disabled = true; mlBtn.textContent = 'SENDING LINK…';
+      $('auth-error').style.display = 'none';
+      fetch('/api/auth/magic-link', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: id }),
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        $('auth-error').style.color = '#0B3C26';
+        $('auth-error').textContent = '✓ ' + (d.message || 'Check your email!');
+        $('auth-error').style.display = 'block';
+        mlBtn.textContent = 'EMAIL ME A SIGN-IN LINK'; mlBtn.disabled = false;
+      }).catch(function () {
+        $('auth-error').style.color = '#c0392b';
+        $('auth-error').textContent = 'Network error. Try again.';
+        $('auth-error').style.display = 'block';
+        mlBtn.textContent = 'EMAIL ME A SIGN-IN LINK'; mlBtn.disabled = false;
+      });
+    });
+  }
 })();
 </script>
 </body>

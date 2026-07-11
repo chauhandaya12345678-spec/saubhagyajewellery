@@ -40,13 +40,13 @@
     });
     window.CHAUHAN_CATALOG = catalog;
     window.CHAUHAN_HERO = [
-      { image: 'images/banners/Website_hero_banner_concept_art._202606221611.webp', tone: 'charcoal',  kicker: "SAUBHAGYA",  title: 'Designer Earrings Collection' },
+      { image: 'images/banners/Website_hero_banner_concept_art._202606221611.webp', tone: 'charcoal',  kicker: "SAUBHAGYA",  title: 'Earrings Collection' },
       { image: 'images/banners/Website_hero_image_for_Saubhagya_202606221620.webp', tone: 'emerald',   kicker: "SAUBHAGYA",  title: 'Where Tradition Meets Design' },
       { image: 'images/banners/gold necklacer._A_202606221636.webp',  tone: 'maroon',    kicker: "SAUBHAGYA",  title: 'Gold Necklace Edit' }
     ];
     window.CHAUHAN_SETTINGS = {
       shippingNote: '',
-      payments: ['UPI', 'Cards', 'Net Banking', 'Cash on Delivery', 'No-Cost EMI']
+      payments: ['UPI', 'Cards', 'Net Banking', 'No-Cost EMI']
     };
     window.dispatchEvent(new CustomEvent('catalog-ready'));
   }

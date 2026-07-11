@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="620" height="220" viewBox="0 0 620 220" role="img" aria-label="Saubhagya Jewellery">
-  <g fill="none" stroke="#B08B50" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" transform="translate(310 60)">
+  <g fill="none" stroke="#A6813F" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" transform="translate(310 60)">
     <path d="M0 -34 C 9 -21 9 -6 0 6 C -9 -6 -9 -21 0 -34 Z"/>
     <path d="M0 6 C -6 -6 -18 -14 -30 -14 C -32 -4 -22 6 -6 8 Z"/>
     <path d="M0 6 C  6 -6  18 -14  30 -14 C 32 -4  22 6  6 8 Z"/>
@@ -7,11 +7,11 @@
     <path d="M0 6 C  14 4  34 4  48 -2 C 46 8  32 16  8 12 Z"/>
     <path d="M-50 -2 Q 0 22 50 -2"/>
   </g>
-  <g fill="#B08B50">
+  <g fill="#A6813F">
     <path d="M370 22 L373 30 L381 33 L373 36 L370 44 L367 36 L359 33 L367 30 Z"/>
     <path d="M388 40 L390 46 L396 48 L390 50 L388 56 L386 50 L380 48 L386 46 Z"/>
     <path d="M362 46 L363 49 L366 50 L363 51 L362 54 L361 51 L358 50 L361 49 Z"/>
   </g>
-  <text x="310" y="150" text-anchor="middle" font-family="'Cormorant Garamond','Cormorant',Georgia,'Times New Roman',serif" font-weight="600" font-size="72" letter-spacing="6" fill="#B08B50">SAUBHAGYA</text>
-  <text x="310" y="200" text-anchor="middle" font-family="'Cormorant Garamond','Cormorant',Georgia,'Times New Roman',serif" font-weight="500" font-size="34" letter-spacing="4" fill="#B08B50">Jewellery</text>
+  <text x="310" y="150" text-anchor="middle" font-family="'Cormorant Garamond','Cormorant',Georgia,'Times New Roman',serif" font-weight="700" font-size="72" letter-spacing="6" fill="#A6813F">SAUBHAGYA</text>
+  <text x="310" y="200" text-anchor="middle" font-family="'Cormorant Garamond','Cormorant',Georgia,'Times New Roman',serif" font-weight="600" font-size="34" letter-spacing="4" fill="#A6813F">Jewellery</text>
 </svg>

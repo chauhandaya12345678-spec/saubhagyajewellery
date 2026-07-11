@@ -1,2 +1,14 @@
 # Stale duplicate store copies removed July 2026; send old links to the blog page
 /blog/* /blogs.html 301
+
+# Regional pages retired 2026-07-11 — legacy links + Google index map to categories
+/south-indian-traditional /categories.html?cat=south-temple-necklace 301
+/south-indian-traditional.html /categories.html?cat=south-temple-necklace 301
+/mumbai-modern /categories.html?cat=necklaces 301
+/mumbai-modern.html /categories.html?cat=necklaces 301
+/north-indian-bridal /categories.html?cat=bridal-set 301
+/north-indian-bridal.html /categories.html?cat=bridal-set 301
+
+# Shop All replaced by category hub
+/shop-all /categories.html 301
+/shop-all.html /categories.html 301

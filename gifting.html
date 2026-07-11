@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gifting under ₹2,999 | Saubhagya Jewellery</title>
+<meta name="description" content="Curated jewellery gifts under ₹400, ₹1,000 and ₹2,999. Handcrafted earrings, pendants, chokers and more — insured shipping across India.">
+<link rel="canonical" href="https://saubhagyajewellery.com/gifting">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Saubhagya">
+<meta property="og:title" content="Gifting under ₹2,999 | Saubhagya Jewellery">
+<meta property="og:description" content="Thoughtful jewellery gifts starting under ₹400. Handcrafted and shipped insured across India.">
+<meta property="og:url" content="https://saubhagyajewellery.com/gifting">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=6">
+<script src="layout.js?v=6"></script>
+<script src="mpa.js?v=5" defer></script>
+<script src="catalog.js?v=6"></script>
+<style>
+  body { background: #FAFAFA; margin: 0; }
+  .gf-hero { max-width: 1280px; margin: 0 auto; padding: 46px 40px 8px; text-align: center; }
+  .gf-kicker { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 4px; color: #C5A059; margin-bottom: 12px; }
+  .gf-title { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 40px; color: #1A1A1A; margin: 0 0 8px; }
+  .gf-title em { font-style: italic; color: #0B3C26; }
+  .gf-sub { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; color: #6a6a6a; margin: 0; }
+  .gf-tabs { max-width: 1280px; margin: 34px auto 0; padding: 0 40px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .gf-tab { border: 1px solid #C5A059; background: #fff; color: #0B3C26; font-family: 'Montserrat',sans-serif; font-size: 11.5px; letter-spacing: 1.5px; padding: 12px 22px; cursor: pointer; border-radius: 999px; text-decoration: none; }
+  .gf-tab.on { background: #0B3C26; color: #fff; border-color: #0B3C26; }
+  .gf-tab:hover { background: #0B3C26; color: #fff; }
+  .gf-heads { max-width: 1280px; margin: 34px auto 12px; padding: 0 40px; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .gf-heads h2 { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 24px; color: #1A1A1A; margin: 0; }
+  .gf-heads .count { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; }
+  .gf-list { max-width: 1280px; margin: 0 auto; padding: 0 40px 60px; }
+  .gf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .p-card { text-decoration: none; color: inherit; display: block; position: relative; }
+  .p-img { position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden; border-radius: 8px; background: #eae5d8; }
+  .p-img .im { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.22,1,.36,1); }
+  @media(hover:hover) { .p-card:hover .p-img .im { transform: scale(1.05); } }
+  .p-badge { position: absolute; top: 12px; left: 12px; font-family: 'Montserrat',sans-serif; font-size: 9px; letter-spacing: 1.5px; padding: 4px 10px; background: #0B3C26; color: #fff; border-radius: 3px; }
+  .p-name { font-family: 'Cormorant Garamond',serif; font-size: 17px; color: #1A1A1A; margin-top: 10px; }
+  .p-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B3C26; font-weight: 500; margin-top: 3px; }
+  .p-mrp { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; text-decoration: line-through; margin-left: 8px; font-weight: 300; }
+  .gf-empty { text-align: center; padding: 60px 24px; font-family: 'Montserrat',sans-serif; color: #9a9a9a; }
+  .gf-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; color: #9a9a9a; }
+  .crumb { max-width: 1280px; margin: 0 auto; padding: 18px 40px 0; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1px; color: #9a9a9a; }
+  .crumb a { color: #0B3C26; text-decoration: none; }
+  .crumb i { margin: 0 8px; color: #C5A059; font-style: normal; }
+  @media (max-width: 900px) {
+    .gf-hero { padding: 26px 18px 4px; }
+    .gf-title { font-size: 28px; }
+    .gf-tabs, .gf-heads, .gf-list, .crumb { padding-left: 18px; padding-right: 18px; }
+    .gf-tab { padding: 10px 16px; font-size: 10.5px; }
+    .gf-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  }
+</style>
+</head>
+<body>
+<x-layout page="gifting.html"></x-layout>
+<main>
+<nav class="crumb"><a href="index.html">Home</a><i>/</i><span>Gifting</span></nav>
+<section class="gf-hero">
+  <div class="gf-kicker">THOUGHTFUL GIFTING</div>
+  <h1 class="gf-title">Gifts under <em>₹2,999</em></h1>
+  <p class="gf-sub">Handpicked pieces across three price bands. Free insured shipping across India.</p>
+</section>
+
+<div class="gf-tabs" id="gf-tabs">
+  <button class="gf-tab" data-lo="400" data-hi="999">Under ₹1,000</button>
+  <button class="gf-tab" data-lo="1000" data-hi="1999">₹1,000 – ₹1,999</button>
+  <button class="gf-tab" data-lo="2000" data-hi="2999">₹2,000 – ₹2,999</button>
+  <button class="gf-tab on" data-lo="400" data-hi="2999">All Gifts (₹400 – ₹2,999)</button>
+</div>
+
+<section class="gf-heads">
+  <h2 id="gf-title-h2">All Gifts (₹400 – ₹2,999)</h2>
+  <div class="count" id="gf-count">Loading…</div>
+</section>
+
+<section class="gf-list">
+  <div class="gf-loading" id="gf-loading">LOADING PIECES…</div>
+  <div class="gf-grid" id="gf-grid"></div>
+  <div class="gf-empty" id="gf-empty" style="display:none">No pieces in this range right now.</div>
+</section>
+</main>
+<x-footer></x-footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+
+  var current = { lo: 400, hi: 2999 };
+
+  function bandLabel(lo, hi) {
+    if (lo === 400 && hi === 999) return 'Under ₹1,000';
+    if (lo === 1000 && hi === 1999) return '₹1,000 – ₹1,999';
+    if (lo === 2000 && hi === 2999) return '₹2,000 – ₹2,999';
+    return 'All Gifts (₹400 – ₹2,999)';
+  }
+
+  function render() {
+    var all = window.CHAUHAN_CATALOG || [];
+    if (!all.length) return false;
+    var list = all.filter(function (p) {
+      if (p.inStock === 0 || p.inStock === false) return false;
+      var price = Number(p.price || 0);
+      return price >= current.lo && price <= current.hi;
+    });
+    list.sort(function (a, b) { return (a.price || 0) - (b.price || 0); });
+    $('gf-title-h2').textContent = bandLabel(current.lo, current.hi);
+    $('gf-count').textContent = list.length + ' piece' + (list.length === 1 ? '' : 's');
+    $('gf-loading').style.display = 'none';
+    if (!list.length) { $('gf-grid').innerHTML = ''; $('gf-empty').style.display = 'block'; return true; }
+    $('gf-empty').style.display = 'none';
+    $('gf-grid').innerHTML = list.map(function (p) {
+      var img = p.image || '';
+      return '<a class="p-card" href="product?sku=' + encodeURIComponent(p.sku || p.id) + '">' +
+        '<div class="p-img">' +
+          (p.badge ? '<span class="p-badge">' + esc(p.badge) + '</span>' : '') +
+          '<div class="im" style="background-image:url(\'' + esc(img) + '\')"></div>' +
+        '</div>' +
+        '<div class="p-name">' + esc(p.name) + '</div>' +
+        '<div class="p-price">' + fmt(p.price) +
+          (p.mrp && p.mrp > p.price ? '<span class="p-mrp">' + fmt(p.mrp) + '</span>' : '') +
+        '</div></a>';
+    }).join('');
+    return true;
+  }
+
+  $('gf-tabs').addEventListener('click', function (e) {
+    var t = e.target.closest('.gf-tab');
+    if (!t) return;
+    Array.prototype.forEach.call($('gf-tabs').children, function (n) { n.classList.remove('on'); });
+    t.classList.add('on');
+    current.lo = Number(t.getAttribute('data-lo'));
+    current.hi = Number(t.getAttribute('data-hi'));
+    render();
+  });
+
+  var ok = render();
+  if (!ok) {
+    window.addEventListener('catalog-ready', render);
+    var tries = 0;
+    var poll = setInterval(function () { if (render() || ++tries > 60) clearInterval(poll); }, 150);
+  }
+})();
+</script>
+</body>
+</html>

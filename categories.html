@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop by Category | Saubhagya Jewellery</title>
+<meta name="description" content="Shop Saubhagya jewellery by category: necklaces, premium chokers, waist chains, jhumkas, earrings, pendants, necklace sets, fashion earrings, bridal sets and South temple necklaces. Handcrafted, free insured shipping across India.">
+<link rel="canonical" href="https://saubhagyajewellery.com/categories">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Saubhagya">
+<meta property="og:title" content="Shop by Category | Saubhagya Jewellery">
+<meta property="og:description" content="Shop handcrafted imitation jewellery by category. Necklaces, chokers, earrings, bridal sets and more.">
+<meta property="og:url" content="https://saubhagyajewellery.com/categories">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=6">
+<script src="layout.js?v=6"></script>
+<script src="mpa.js?v=5" defer></script>
+<script src="catalog.js?v=6"></script>
+<style>
+  body { background: #FAFAFA; margin: 0; }
+  .cat-hero { max-width: 1280px; margin: 0 auto; padding: 46px 40px 6px; text-align: center; }
+  .cat-kicker { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 4px; color: #C5A059; margin-bottom: 12px; }
+  .cat-title { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 40px; color: #1A1A1A; margin: 0 0 8px; }
+  .cat-sub { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; color: #6a6a6a; margin: 0; }
+  .cat-hub { max-width: 1280px; margin: 32px auto 0; padding: 0 40px; }
+  .cat-hub-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .cat-card { position: relative; display: block; border-radius: 10px; overflow: hidden; text-decoration: none; aspect-ratio: 1/1; background: #eae5d8; }
+  .cat-card .bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.22,1,.36,1); }
+  @media(hover:hover) { .cat-card:hover .bg { transform: scale(1.05); } }
+  .cat-card .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(6,40,26,.85) 0%, rgba(6,40,26,0) 55%); }
+  .cat-card .lbl { position: absolute; left: 14px; right: 14px; bottom: 14px; color: #fff; font-family: 'Cormorant Garamond',serif; font-size: 18px; line-height: 1.15; }
+  .cat-card .lbl .arr { display: block; margin-top: 4px; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 2px; color: #C5A059; }
+  .cat-card.is-active { outline: 3px solid #C5A059; outline-offset: 2px; }
+  .cat-filterbar { max-width: 1280px; margin: 40px auto 12px; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .cat-filterbar h2 { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 24px; color: #1A1A1A; margin: 0; }
+  .cat-filterbar .count { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; }
+  .cat-clear { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1px; color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; padding-bottom: 2px; }
+  .cat-search { max-width: 1280px; margin: 6px auto 0; padding: 0 40px; }
+  .cat-search input { width: 100%; height: 46px; padding: 0 16px; border: 1px solid #d4cec0; border-radius: 4px; font: 400 14px 'Montserrat',sans-serif; outline: none; background: #fff; }
+  .cat-search input:focus { border-color: #C5A059; }
+  .cat-list-wrap { max-width: 1280px; margin: 0 auto; padding: 8px 40px 60px; }
+  .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .p-card { text-decoration: none; color: inherit; display: block; position: relative; }
+  .p-img { position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden; border-radius: 8px; background: #eae5d8; }
+  .p-img .im { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.22,1,.36,1); }
+  @media(hover:hover) { .p-card:hover .p-img .im { transform: scale(1.05); } }
+  .p-badge { position: absolute; top: 12px; left: 12px; font-family: 'Montserrat',sans-serif; font-size: 9px; letter-spacing: 1.5px; padding: 4px 10px; background: #0B3C26; color: #fff; border-radius: 3px; }
+  .p-name { font-family: 'Cormorant Garamond',serif; font-size: 17px; color: #1A1A1A; margin-top: 10px; }
+  .p-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B3C26; font-weight: 500; margin-top: 3px; }
+  .p-mrp { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; text-decoration: line-through; margin-left: 8px; font-weight: 300; }
+  .cat-empty { text-align: center; padding: 60px 24px; font-family: 'Montserrat',sans-serif; color: #9a9a9a; }
+  .cat-empty a { color: #0B3C26; }
+  .cat-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; color: #9a9a9a; }
+  .crumb { max-width: 1280px; margin: 0 auto; padding: 18px 40px 0; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1px; color: #9a9a9a; }
+  .crumb a { color: #0B3C26; text-decoration: none; }
+  .crumb i { margin: 0 8px; color: #C5A059; font-style: normal; }
+  @media (max-width: 900px) {
+    .cat-hero { padding: 26px 18px 4px; }
+    .cat-title { font-size: 28px; }
+    .cat-hub, .cat-filterbar, .cat-search, .cat-list-wrap, .crumb { padding-left: 18px; padding-right: 18px; }
+    .cat-hub-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .cat-card .lbl { font-size: 15px; }
+    .cat-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  }
+</style>
+</head>
+<body>
+<x-layout page="categories.html"></x-layout>
+<main>
+<nav class="crumb"><a href="index.html">Home</a><i>/</i><span id="crumb-here">Categories</span></nav>
+<section class="cat-hero">
+  <div class="cat-kicker">SHOP BY CATEGORY</div>
+  <h1 class="cat-title">Handcrafted Jewellery, by Category</h1>
+  <p class="cat-sub">Necklaces, chokers, earrings, bridal sets and more. All handcrafted in-house, dispatched insured.</p>
+</section>
+
+<section class="cat-hub">
+  <div class="cat-hub-grid" id="cat-hub-grid"></div>
+</section>
+
+<div class="cat-search"><input id="cat-search-in" type="search" placeholder="Search by name (e.g. Kasu, Kundan, jhumka, choker)…" autocomplete="off"></div>
+
+<section class="cat-filterbar">
+  <div>
+    <h2 id="cat-title-h2">All Categories</h2>
+    <div class="count" id="cat-count">Loading…</div>
+  </div>
+  <a class="cat-clear" href="categories.html" id="cat-clear" style="display:none">Clear filter ×</a>
+</section>
+
+<section class="cat-list-wrap">
+  <div class="cat-loading" id="cat-loading">LOADING PIECES…</div>
+  <div class="cat-grid" id="cat-grid"></div>
+  <div class="cat-empty" id="cat-empty" style="display:none">No pieces match this filter. <a href="categories.html">See all categories</a>.</div>
+</section>
+</main>
+<x-footer></x-footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+
+  /* Subcategory definitions — each maps to a name/category matcher.
+     `image` = a representative photo we already have.
+     `match(p)` gets the product; returns true if it belongs.        */
+  var SUBS = [
+    { slug: 'necklaces',   label: 'Necklaces',           image: 'images/necklace/20260602_163137.webp',
+      match: function (p) { return /Necklace|Haaram|Kasu Mala|Rani Haar/i.test(p.category + ' ' + p.name) && !/Set/i.test(p.category); } },
+    { slug: 'premium-chokers', label: 'Premium Chokers', image: 'images/choker/202606051334.webp',
+      match: function (p) { return /Choker/i.test(p.category + ' ' + p.name) && (p.price >= 1000); } },
+    { slug: 'waist-chains', label: 'Waist Chains',       image: 'images/waist-chain/20260528_132320.webp',
+      match: function (p) { return /Vanki|Waist/i.test(p.category + ' ' + p.name); } },
+    { slug: 'jhumkas',     label: 'Jhumkas',             image: 'images/Earrings/20260528_121549.webp',
+      match: function (p) { return /Jhumka|Drop/i.test(p.category + ' ' + p.name) && !/Solitaire|Studs/i.test(p.category + ' ' + p.name); } },
+    { slug: 'earrings',    label: 'Earrings',            image: 'images/Earrings/20260528_120749.webp',
+      match: function (p) { return /Earring|Drop|Studs|Jhumka|Passa|Nath|Maang Tikka/i.test(p.category + ' ' + p.name); } },
+    { slug: 'pendants',    label: 'Pendants',            image: 'images/pendant/pendant-01.webp',
+      match: function (p) { return /Pendant/i.test(p.category + ' ' + p.name); } },
+    { slug: 'necklace-set', label: 'Necklace Sets',      image: 'images/necklace/necklace-05.webp',
+      match: function (p) { return /Set/i.test(p.category) && !/Bridal/i.test(p.category); } },
+    { slug: 'fashion-earrings', label: 'Fashion Earrings', image: 'images/Earrings/20260528_123742.webp',
+      match: function (p) { return /Drop|Studs|Earring/i.test(p.category + ' ' + p.name) && p.price < 1500; } },
+    { slug: 'bridal-set',  label: 'Bridal Sets',         image: 'images/necklace/20260605_111058.webp',
+      match: function (p) { return /Bridal Set/i.test(p.category + ' ' + p.name); } },
+    { slug: 'south-temple-necklace', label: 'South Temple Necklaces', image: 'images/necklace/20260605_110931.webp',
+      match: function (p) { return /Temple/i.test(p.category + ' ' + p.name); } }
+  ];
+
+  function getParam(name) { return new URLSearchParams(location.search).get(name) || ''; }
+
+  var current = { cat: getParam('cat'), q: getParam('q') };
+
+  function renderHub() {
+    var active = current.cat;
+    $('cat-hub-grid').innerHTML = SUBS.map(function (s) {
+      var cls = 'cat-card' + (s.slug === active ? ' is-active' : '');
+      return '<a class="' + cls + '" href="categories.html?cat=' + s.slug + '">' +
+        '<div class="bg" style="background-image:url(\'' + esc(s.image) + '\')"></div>' +
+        '<div class="shade"></div>' +
+        '<div class="lbl">' + esc(s.label) + '<span class="arr">SHOP →</span></div>' +
+        '</a>';
+    }).join('');
+  }
+
+  function findSub(slug) { for (var i = 0; i < SUBS.length; i++) if (SUBS[i].slug === slug) return SUBS[i]; return null; }
+
+  function filterProducts(all) {
+    var q = (current.q || '').trim().toLowerCase();
+    var sub = current.cat ? findSub(current.cat) : null;
+    return all.filter(function (p) {
+      if (p.inStock === 0 || p.inStock === false) return false;
+      if (sub && !sub.match(p)) return false;
+      if (q) {
+        var hay = (p.name + ' ' + p.category + ' ' + (p.regionLabel || '')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderList() {
+    var all = window.CHAUHAN_CATALOG || [];
+    if (!all.length) return false;
+    var list = filterProducts(all);
+    var sub = current.cat ? findSub(current.cat) : null;
+    $('cat-title-h2').textContent = sub ? sub.label : (current.q ? 'Search: "' + current.q + '"' : 'All Categories');
+    $('crumb-here').textContent = sub ? sub.label : 'Categories';
+    $('cat-count').textContent = list.length + ' piece' + (list.length === 1 ? '' : 's');
+    $('cat-clear').style.display = (current.cat || current.q) ? 'inline-block' : 'none';
+    $('cat-loading').style.display = 'none';
+    if (!list.length) { $('cat-grid').innerHTML = ''; $('cat-empty').style.display = 'block'; return true; }
+    $('cat-empty').style.display = 'none';
+    $('cat-grid').innerHTML = list.map(function (p) {
+      var img = p.image || '';
+      return '<a class="p-card" href="product?sku=' + encodeURIComponent(p.sku || p.id) + '">' +
+        '<div class="p-img">' +
+          (p.badge ? '<span class="p-badge">' + esc(p.badge) + '</span>' : '') +
+          '<div class="im" style="background-image:url(\'' + esc(img) + '\')"></div>' +
+        '</div>' +
+        '<div class="p-name">' + esc(p.name) + '</div>' +
+        '<div class="p-price">' + fmt(p.price) +
+          (p.mrp && p.mrp > p.price ? '<span class="p-mrp">' + fmt(p.mrp) + '</span>' : '') +
+        '</div></a>';
+    }).join('');
+    return true;
+  }
+
+  renderHub();
+  var initInput = $('cat-search-in');
+  if (current.q) initInput.value = current.q;
+  var debounce = null;
+  initInput.addEventListener('input', function () {
+    clearTimeout(debounce);
+    debounce = setTimeout(function () {
+      current.q = initInput.value.trim();
+      var url = new URL(location.href);
+      if (current.q) url.searchParams.set('q', current.q); else url.searchParams.delete('q');
+      history.replaceState(null, '', url.toString());
+      renderList();
+    }, 200);
+  });
+
+  var rendered = renderList();
+  if (!rendered) {
+    window.addEventListener('catalog-ready', function () { renderList(); });
+    var tries = 0;
+    var poll = setInterval(function () { if (renderList() || ++tries > 60) clearInterval(poll); }, 150);
+  }
+})();
+</script>
+</body>
+</html>

@@ -43,6 +43,13 @@ export async function onRequest(context) {
       return json({ error: 'Missing required fields: razorpay_payment_id, items, total' }, 400);
     }
 
+    // COD is disabled site-wide as of 2026-07-11. Reject any COD orders at the API
+    // boundary even if a stale client tab tries to submit one — protects Shiprocket
+    // pipeline from unverified pickups.
+    if (payment_method === 'cod') {
+      return json({ error: 'Cash on Delivery is temporarily unavailable. Please pay online.' }, 400);
+    }
+
     // Verify the Razorpay signature whenever the checkout went through an Order.
     // A failed check means the "payment" cannot be trusted — reject it.
     let paymentVerified = false;
