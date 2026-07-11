@@ -99,11 +99,11 @@
       '  .nav-icons .ni-hide{display:none}',
       '  .nav-drawer{display:flex}',
       '}',
-      /* footer: gold brand on deep green */
-      'footer.site .logo-name{color:#C9A75F!important}',
-      'footer.site .logo-sub{color:rgba(201,167,95,.85)!important}',
-      'footer.site .fbrand{display:flex;flex-direction:column;align-items:flex-start}',
-      '@media(max-width:560px){footer.site .fbrand{align-items:center}}',
+      /* footer: same brand SVG as header, sized down for the column,
+         and a light brightness bump so the gold pops on deep green */
+      'footer.site .fbrand{display:flex;flex-direction:column;align-items:flex-start;gap:14px}',
+      'footer.site .brand-logo-footer{max-height:none;height:auto;width:180px;max-width:100%;filter:brightness(1.15) saturate(1.05)}',
+      '@media(max-width:560px){footer.site .fbrand{align-items:center}footer.site .brand-logo-footer{width:150px}}',
       /* Apple-TV 3D tilt (hover scale is guarded per-page under @media(hover:hover)) */
       '.fx-tilt{transform-style:preserve-3d;will-change:transform;transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s cubic-bezier(.22,1,.36,1)}',
       '.fx-tilt.fx-active{transition:transform .06s linear,box-shadow .3s;box-shadow:0 24px 50px -18px rgba(6,40,26,.45),0 8px 20px -10px rgba(0,0,0,.3)}'
@@ -158,7 +158,8 @@
         items.map(function (i) { return '<a href="' + i[1] + '">' + i[0] + '</a>'; }).join('') + '</div>';
     };
     return '<div class="fwrap">' +
-      '<div class="fbrand">' + LOTUS(40) + '<div class="logo-name" style="margin-top:8px">SAUBHAGYA</div><div class="logo-sub">FINE JEWELLERY</div>' +
+      '<div class="fbrand">' +
+      '<img class="brand-logo brand-logo-footer" src="images/brand/saubhagya-logo.svg?v=3" alt="Saubhagya Jewellery">' +
       '<p>Premium designer imitation jewellery: temple, Kundan/Polki and American Diamond. High-quality artificial jewellery, handcrafted and dispatched insured across India.</p></div>' +
       col('COMPANY', company) + col('POLICY', policy) +
       '<div class="fcol"><div class="fhead">STORE LOCATION</div>' +
