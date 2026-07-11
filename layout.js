@@ -133,7 +133,7 @@
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<a class="logo logo-real" href="index.html" aria-label="Saubhagya Jewellery home">' +
-      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=1" alt="Saubhagya Jewellery"></a>' +
+      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=2" alt="Saubhagya Jewellery"></a>' +
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
       '<a class="ni-hide" href="' + APP + '" aria-label="Shop">Shop All</a>' +
