@@ -31,4 +31,26 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self "https://checkout.razorpay.com"), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), fullscreen=(self), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  X-XSS-Protection: 1; mode=block
+  X-DNS-Prefetch-Control: on
+
+# Ban search engines from account/cart/checkout via header too (belt + robots.txt).
+/cart*
+  X-Robots-Tag: noindex, follow
+/checkout*
+  X-Robots-Tag: noindex, follow
+/account*
+  X-Robots-Tag: noindex, follow
+/signin*
+  X-Robots-Tag: noindex, follow
+/signup*
+  X-Robots-Tag: noindex, follow
+/success*
+  X-Robots-Tag: noindex, follow
+/api/*
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
 

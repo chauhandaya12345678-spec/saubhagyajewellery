@@ -101,7 +101,7 @@ export async function onRequest(context) {
 
   // Patch the shell. Uses exact-string replace so it's stable + fast.
   html = html
-    .replace('<title>Loading… | Saubhagya</title>', `<title>${esc(title)}</title>`)
+    .replace('<title>Handcrafted Imitation Jewellery | Saubhagya Jewellery</title>', `<title>${esc(title)}</title>`)
     .replace(
       '<meta name="description" content="Handcrafted premium imitation jewellery from our Mumbai workshop. Free insured shipping across India.">',
       `<meta name="description" content="${esc(desc)}">`
