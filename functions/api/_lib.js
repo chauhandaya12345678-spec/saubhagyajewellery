@@ -159,13 +159,60 @@ export async function pushToShiprocket(env, order) {
   }
 }
 
-/** Record Shiprocket ids on the order row; tolerates pre-migration schema. */
+/** Record Shiprocket result on the order row + append an event log entry so
+ *  a missing order in the Shiprocket panel is always diagnosable from D1. */
 export async function recordShiprocketResult(db, orderId, sr) {
-  if (!sr || !sr.pushed) return;
+  const ok = !!(sr && sr.pushed);
+  const detail = ok
+    ? JSON.stringify({ shiprocket_order_id: sr.shiprocket_order_id, shipment_id: sr.shipment_id })
+    : String((sr && sr.error) || 'unknown').slice(0, 500);
+
+  // Bump attempt counter + save error text on the order row. Tolerate rows
+  // that haven't been migrated yet.
   try {
-    await db.prepare("UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime('now') WHERE id = ?")
-      .bind(sr.shiprocket_order_id, sr.shipment_id, orderId).run();
-  } catch (e) { /* columns may not exist until migration runs */ }
+    if (ok) {
+      await db.prepare(
+        `UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?,
+                            shiprocket_error = NULL,
+                            shiprocket_attempts = COALESCE(shiprocket_attempts,0) + 1,
+                            shiprocket_last_attempt_at = datetime('now'),
+                            updated_at = datetime('now')
+          WHERE id = ?`
+      ).bind(sr.shiprocket_order_id, sr.shipment_id, orderId).run();
+    } else {
+      await db.prepare(
+        `UPDATE orders SET shiprocket_error = ?,
+                            shiprocket_attempts = COALESCE(shiprocket_attempts,0) + 1,
+                            shiprocket_last_attempt_at = datetime('now'),
+                            updated_at = datetime('now')
+          WHERE id = ?`
+      ).bind(detail, orderId).run();
+    }
+  } catch (e) {
+    // Pre-migration schema — fall back to the original narrow update
+    try {
+      if (ok) {
+        await db.prepare("UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime('now') WHERE id = ?")
+          .bind(sr.shiprocket_order_id, sr.shipment_id, orderId).run();
+      }
+    } catch (e2) {}
+  }
+
+  // Append-only event log — never blocks even if the table isn't migrated yet.
+  try {
+    await db.prepare(
+      'INSERT INTO order_events (order_id, kind, ok, detail) VALUES (?, ?, ?, ?)'
+    ).bind(orderId, 'shiprocket_push', ok ? 1 : 0, detail).run();
+  } catch (e) { /* order_events table not yet created */ }
+}
+
+/** Generic append-only event log for anything worth debugging later. Never throws. */
+export async function logOrderEvent(db, orderId, kind, ok, detail) {
+  try {
+    await db.prepare(
+      'INSERT INTO order_events (order_id, kind, ok, detail) VALUES (?, ?, ?, ?)'
+    ).bind(orderId, kind, ok ? 1 : 0, String(detail || '').slice(0, 1000)).run();
+  } catch (e) {}
 }
 
 function esc(s) {

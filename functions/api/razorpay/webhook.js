@@ -79,7 +79,7 @@ export async function onRequest(context) {
 
     let shiprocket = { pushed: false, error: 'skipped (test mode)' };
     if (!isTest) {
-      shiprocket = await pushToShiprocket(env, {
+      const orderForPush = {
         id: orderId,
         name: notes.customer_name || 'Guest',
         email: notes.customer_email || p.email || '',
@@ -88,8 +88,15 @@ export async function onRequest(context) {
         items,
         totalPaise: p.amount,
         paymentMethod: 'razorpay',
-      });
-      await recordShiprocketResult(db, orderId, shiprocket);
+      };
+      // Cap the push at 22s so Razorpay's 5s webhook expectation isn't
+      // starved forever by a slow Shiprocket. Failures land in
+      // orders.shiprocket_error and order_events for retry sweeper.
+      shiprocket = await Promise.race([
+        pushToShiprocket(env, orderForPush),
+        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (Shiprocket >22s)' }), 22000)),
+      ]).catch(e => ({ pushed: false, error: 'push exception: ' + e.message }));
+      try { await recordShiprocketResult(db, orderId, shiprocket); } catch (e) {}
 
       // Backstop path also sends the confirmation email (browser never called save)
       const emailJob = sendOrderEmail(env, {

@@ -142,10 +142,11 @@ export async function onRequest(context) {
       ).run();
     }
 
-    // Shiprocket push MUST await before the response — Pages Functions kill the
-    // isolate right after `return`, so waitUntil never actually runs on free
-    // tier. Race it against a 12 s cap so a slow Shiprocket can't hang the
-    // buyer; the email is truly optional so it goes on waitUntil.
+    // Shiprocket push MUST await before the response — Pages Functions kill
+    // the isolate right after `return`, so waitUntil never actually runs on
+    // free tier. Cap at 22s (safe under the 30s wall limit). Every attempt
+    // is logged to order_events + shiprocket_error is written to the order
+    // row so /api/orders/retry-shiprocket can sweep failures later.
     let shiprocket = { pushed: false, note: 'skipped (test mode)' };
     if (!isTest) {
       const orderForJobs = {
@@ -161,18 +162,21 @@ export async function onRequest(context) {
       const srPromise = pushToShiprocket(env, orderForJobs);
       const capped = Promise.race([
         srPromise,
-        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (Shiprocket >12s)' }), 12000)),
+        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (Shiprocket >22s)' }), 22000)),
       ]);
       try {
         shiprocket = await capped;
-        await recordShiprocketResult(db, orderId, shiprocket);
       } catch (e) {
         shiprocket = { pushed: false, error: 'push exception: ' + e.message };
       }
-      // Email genuinely doesn't need to block; try waitUntil, fall back to sync
-      const emailJob = sendOrderEmail(env, orderForJobs);
+      // Always record — success writes SR ids, failure writes reason for
+      // manual/scheduled retry. Never throws.
+      try { await recordShiprocketResult(db, orderId, shiprocket); } catch (e) {}
+
+      // Order-confirmation email: try waitUntil first, but await inline as a
+      // fallback so it also survives free-tier isolate termination.
+      const emailJob = sendOrderEmail(env, orderForJobs).catch(() => {});
       if (context.waitUntil) context.waitUntil(emailJob);
-      else emailJob.catch(() => {});
     }
 
     return json({
