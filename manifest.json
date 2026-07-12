@@ -1,0 +1,23 @@
+{
+  "name": "Saubhagya Jewellery",
+  "short_name": "Saubhagya",
+  "description": "Handcrafted premium imitation jewellery from Mumbai. Free insured shipping across India.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAFAFA",
+  "theme_color": "#0B3C26",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    { "src": "/images/brand/saubhagya-logo.svg?v=4", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Categories", "url": "/categories.html", "description": "Shop by category" },
+    { "name": "Bridal Sets", "url": "/categories.html?cat=bridal-set", "description": "Kundan, Polki, Meenakari" },
+    { "name": "Gifting", "url": "/gifting.html", "description": "Under ₹2,999" },
+    { "name": "Track Order", "url": "/track-orders.html", "description": "Enter phone number" }
+  ]
+}

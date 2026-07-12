@@ -149,8 +149,8 @@
     return '<header class="site">' +
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
-      '<a class="logo logo-real" href="index.html">' +
-      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=4" alt="Saubhagya Jewellery">' +
+      '<a class="logo logo-real" href="index.html" title="Saubhagya Jewellery — Home">' +
+      '<img class="brand-logo" src="images/brand/saubhagya-logo.svg?v=4" alt="Saubhagya Jewellery" title="Saubhagya Jewellery" width="240" height="64">' +
       '<span class="sr-only">Saubhagya Jewellery — handcrafted imitation jewellery, Mumbai. Home.</span>' +
       '</a>' +
       '<nav class="navlinks">' + links + '</nav>' +
