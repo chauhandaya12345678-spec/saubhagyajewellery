@@ -166,3 +166,23 @@ footer.site{background:#06281a;color:#fff;padding:60px 40px 30px}
   header.site{padding-top:env(safe-area-inset-top)}
   footer.site{padding-bottom:max(30px,env(safe-area-inset-bottom))}
 }
+/* ============================================================
+ * Cross-Document View Transitions (Chrome 126+, Safari 18.2+)
+ * Progressive enhancement — old browsers ignore the at-rule and
+ * navigate normally. Nothing here can break Razorpay (modal, not
+ * a page nav), Shiprocket (server-side), or checkout (form POST).
+ * Wrapped in prefers-reduced-motion so a11y users get instant nav.
+ * ============================================================ */
+@media (prefers-reduced-motion: no-preference){
+  @view-transition{navigation:auto}
+  /* Persistent header + footer: stay pinned during page swap */
+  header.site{view-transition-name:site-nav}
+  footer.site{view-transition-name:site-footer}
+  /* Smooth default crossfade */
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:.45s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+  /* Persistent regions don't animate — they just stay */
+  ::view-transition-group(site-nav),::view-transition-group(site-footer){animation-duration:0s}
+  /* Shared product image: match by per-SKU name (set inline via JS) */
+  ::view-transition-group(*){animation-duration:.5s;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+}
+/* Fallback: reduced-motion users + old browsers get plain nav — no rules needed */
