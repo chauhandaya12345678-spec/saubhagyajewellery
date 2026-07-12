@@ -319,7 +319,7 @@
     var cfg = window.CC_PAYMENTS || {};
     var lines = cart.map(function(ci) {
       var p = products[ci.id] || {};
-      return { id: ci.id, name: p.name || ci.id, price: p.price || 0, qty: ci.qty };
+      return { id: ci.id, name: p.name || ci.id, price: p.price || 0, qty: ci.qty, image: p.image || '' };
     });
     subtotal = lines.reduce(function(s, l) { return s + l.price * l.qty; }, 0);
 
@@ -397,10 +397,42 @@
         // Buyer closed the modal without paying: cart is untouched, re-arm the button
         modal: { ondismiss: resetBtn }
       };
-      try { new Razorpay(opts).open(); } catch(e) {
-        $('co-error').textContent = 'Could not open payment window: ' + e.message;
-        $('co-error').style.display = 'block';
-        resetBtn();
+
+      // Magic Checkout — only when explicitly enabled via CC_PAYMENTS.useMagicCheckout.
+      // Requires: (1) Razorpay has manually enabled Magic Checkout on this account
+      // (raise a request with your Razorpay SPOC — not a self-serve toggle), and
+      // (2) the order was created with line_items via create-razorpay-order's
+      // `magic: true` flag (see doPayment below). Until both are true, Razorpay
+      // silently falls back to Standard Checkout, so this is safe to leave on.
+      if (cfg.useMagicCheckout) {
+        opts.one_click_checkout = true;
+        opts.show_coupons = true;
+      }
+
+      var openCheckout = function () {
+        try { new Razorpay(opts).open(); } catch(e) {
+          $('co-error').textContent = 'Could not open payment window: ' + e.message;
+          $('co-error').style.display = 'block';
+          resetBtn();
+        }
+      };
+
+      if (cfg.useMagicCheckout && typeof Razorpay !== 'undefined' && !window.__magicCheckoutScriptLoaded) {
+        // magic-checkout.js is a distinct script from checkout.js (already
+        // loaded statically in <head> for the default path). Load it once,
+        // lazily, only on the Magic Checkout path.
+        var s = document.createElement('script');
+        s.src = 'https://checkout.razorpay.com/v1/magic-checkout.js';
+        s.onload = function () { window.__magicCheckoutScriptLoaded = true; openCheckout(); };
+        s.onerror = function () {
+          // Script failed (e.g. account not yet enabled for Magic Checkout, or
+          // network block) — fail safe to Standard Checkout rather than stall.
+          opts.one_click_checkout = false;
+          openCheckout();
+        };
+        document.head.appendChild(s);
+      } else {
+        openCheckout();
       }
     };
 
@@ -413,7 +445,8 @@
           name: name, email: v.email, phone: v.phone,
           address: [v.addr, v.city, v.state, v.pin].filter(Boolean).join(', '),
           address_json: address,
-          test_mode: false
+          test_mode: false,
+          magic: !!cfg.useMagicCheckout
         })
       }).then(function(r) { return r.json(); })
         // create-razorpay-order returns { id, amount, currency, key_id }

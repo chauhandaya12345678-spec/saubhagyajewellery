@@ -29,6 +29,18 @@
   .auth-logged { text-align: center; padding: 40px 0; }
   .auth-logged h2 { font-family: 'Cormorant Garamond',serif; font-size: 24px; color: #1A1A1A; margin: 0; }
   .auth-logged button { margin-top: 16px; padding: 12px 24px; background: transparent; border: 1px solid #C5A059; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1.5px; cursor: pointer; }
+  /* Auth mode tabs — email/password vs phone/OTP */
+  .auth-tabs { display: flex; gap: 8px; margin-bottom: 24px; background: #f3ede1; padding: 4px; border-radius: 6px; }
+  .auth-tab { flex: 1; text-align: center; padding: 10px 8px; font-family: 'Montserrat',sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #6a6a6a; cursor: pointer; border-radius: 4px; transition: background .2s, color .2s; user-select: none; }
+  .auth-tab.active { background: #fff; color: #0B3C26; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .otp-phone-row { display: flex; gap: 8px; }
+  .otp-phone-row .auth-input { flex: 1; }
+  .otp-send-btn { flex: none; width: 128px; padding: 0 10px; background: #0B3C26; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 1px; cursor: pointer; }
+  .otp-send-btn:disabled { background: #b9c4bd; cursor: not-allowed; }
+  .otp-code-input { letter-spacing: 8px; font-size: 20px; text-align: center; font-weight: 600; }
+  .otp-resend { text-align: center; font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; margin: -4px 0 14px; }
+  .otp-resend a { color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; cursor: pointer; }
+  .otp-resend.disabled a { color: #b9b9b9; border-color: #ddd; cursor: default; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -45,28 +57,52 @@
     <h1 class="auth-title">Welcome Back</h1>
     <p class="auth-sub">Sign in to see your orders</p>
 
-    <label class="auth-label">Email or Phone</label>
-    <input class="auth-input" id="auth-identifier" placeholder="Email or 10-digit phone number">
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-email" data-tab="email">EMAIL / PASSWORD</div>
+      <div class="auth-tab" id="tab-otp" data-tab="otp">PHONE / OTP</div>
+    </div>
 
-    <label class="auth-label">Password</label>
-    <input class="auth-input" id="auth-password" type="password" placeholder="Your password">
+    <!-- ── Email / Password (existing flow, unchanged) ── -->
+    <div id="sec-email">
+      <label class="auth-label">Email or Phone</label>
+      <input class="auth-input" id="auth-identifier" placeholder="Email or 10-digit phone number">
 
-    <div style="text-align:right;margin:-8px 0 14px;">
-      <a href="forgot-password.html" style="font-family:'Montserrat',sans-serif;font-size:11px;color:#C5A059;text-decoration:none;">Forgot password?</a>
+      <label class="auth-label">Password</label>
+      <input class="auth-input" id="auth-password" type="password" placeholder="Your password">
+
+      <div style="text-align:right;margin:-8px 0 14px;">
+        <a href="forgot-password.html" style="font-family:'Montserrat',sans-serif;font-size:11px;color:#C5A059;text-decoration:none;">Forgot password?</a>
+      </div>
+
+      <button class="auth-btn" id="auth-submit">SIGN IN</button>
+
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
+        <div style="flex:1;height:1px;background:#eae5d8;"></div>
+        <span style="font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:2px;color:#9a9a9a;">OR</span>
+        <div style="flex:1;height:1px;background:#eae5d8;"></div>
+      </div>
+
+      <a href="magic-link.html" style="display:block;width:100%;padding:14px;background:transparent;color:#0B3C26;border:1px solid #0B3C26;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;text-align:center;text-decoration:none;box-sizing:border-box;">EMAIL ME A SIGN-IN LINK</a>
+    </div>
+
+    <!-- ── Phone / OTP (new flow) ── -->
+    <div id="sec-otp" style="display:none">
+      <label class="auth-label">Mobile Number</label>
+      <div class="otp-phone-row">
+        <input class="auth-input" id="otp-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+        <button class="otp-send-btn" id="otp-send">SEND OTP</button>
+      </div>
+
+      <div id="otp-code-wrap" style="display:none">
+        <label class="auth-label">6-Digit Code</label>
+        <input class="auth-input otp-code-input" id="otp-code" type="tel" inputmode="numeric" maxlength="6" placeholder="000000">
+        <div class="otp-resend disabled" id="otp-resend-wrap">Resend code in <span id="otp-timer">30</span>s</div>
+        <button class="auth-btn" id="otp-verify">VERIFY &amp; SIGN IN</button>
+      </div>
     </div>
 
     <div class="auth-error" id="auth-error" style="display:none"></div>
     <div class="auth-success" id="auth-success" style="display:none"></div>
-
-    <button class="auth-btn" id="auth-submit">SIGN IN</button>
-
-    <div style="display:flex;align-items:center;gap:12px;margin:16px 0;">
-      <div style="flex:1;height:1px;background:#eae5d8;"></div>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:2px;color:#9a9a9a;">OR</span>
-      <div style="flex:1;height:1px;background:#eae5d8;"></div>
-    </div>
-
-    <a href="magic-link.html" style="display:block;width:100%;padding:14px;background:transparent;color:#0B3C26;border:1px solid #0B3C26;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;text-align:center;text-decoration:none;box-sizing:border-box;">EMAIL ME A SIGN-IN LINK</a>
 
     <div class="auth-link">New here? <a href="signup.html">Create an account</a></div>
   </div>
@@ -139,6 +175,107 @@
   $('auth-password').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') $('auth-submit').click();
   });
+
+  /* ── Tab switch: Email/Password vs Phone/OTP ── */
+  function showError(msg) { $('auth-success').style.display = 'none'; $('auth-error').style.color = '#c0392b'; $('auth-error').textContent = msg; $('auth-error').style.display = 'block'; }
+  function showInfo(msg) { $('auth-error').style.display = 'none'; $('auth-success').textContent = msg; $('auth-success').style.display = 'block'; }
+  function clearMsgs() { $('auth-error').style.display = 'none'; $('auth-success').style.display = 'none'; }
+
+  $('tab-email').addEventListener('click', function () {
+    $('tab-email').classList.add('active'); $('tab-otp').classList.remove('active');
+    $('sec-email').style.display = 'block'; $('sec-otp').style.display = 'none';
+    clearMsgs();
+  });
+  $('tab-otp').addEventListener('click', function () {
+    $('tab-otp').classList.add('active'); $('tab-email').classList.remove('active');
+    $('sec-otp').style.display = 'block'; $('sec-email').style.display = 'none';
+    clearMsgs();
+  });
+
+  /* ── Phone / OTP flow ── */
+  var otpTimer = null, otpSeconds = 0;
+  function startResendTimer() {
+    otpSeconds = 30;
+    var wrap = $('otp-resend-wrap');
+    wrap.classList.add('disabled');
+    $('otp-timer').textContent = otpSeconds;
+    if (otpTimer) clearInterval(otpTimer);
+    otpTimer = setInterval(function () {
+      otpSeconds -= 1;
+      if (otpSeconds <= 0) {
+        clearInterval(otpTimer);
+        wrap.classList.remove('disabled');
+        wrap.innerHTML = '<a id="otp-resend-link">Resend code</a>';
+        $('otp-resend-link').addEventListener('click', function () { sendOtp(true); });
+      } else {
+        $('otp-timer').textContent = otpSeconds;
+      }
+    }, 1000);
+  }
+
+  function sendOtp(isResend) {
+    var phone = ($('otp-phone').value || '').replace(/\D/g, '');
+    if (phone.length !== 10) { showError('Enter a valid 10-digit mobile number.'); return; }
+    clearMsgs();
+    $('otp-send').textContent = 'SENDING…';
+    $('otp-send').disabled = true;
+    fetch('/api/auth/send-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      $('otp-send').disabled = false;
+      if (d.success) {
+        $('otp-send').textContent = 'OTP SENT';
+        $('otp-code-wrap').style.display = 'block';
+        showInfo(isResend ? 'A new code has been sent.' : 'Code sent to +91 ' + phone + '.');
+        $('otp-code').value = '';
+        $('otp-code').focus();
+        startResendTimer();
+      } else {
+        $('otp-send').textContent = 'SEND OTP';
+        showError(d.error || 'Could not send OTP.');
+      }
+    }).catch(function () {
+      $('otp-send').disabled = false;
+      $('otp-send').textContent = 'SEND OTP';
+      showError('Network error. Please try again.');
+    });
+  }
+
+  $('otp-send').addEventListener('click', function () { sendOtp(false); });
+  $('otp-phone').addEventListener('keydown', function (e) { if (e.key === 'Enter') sendOtp(false); });
+
+  $('otp-verify').addEventListener('click', function () {
+    var phone = ($('otp-phone').value || '').replace(/\D/g, '');
+    var code = ($('otp-code').value || '').replace(/\D/g, '');
+    if (phone.length !== 10) { showError('Enter a valid 10-digit mobile number.'); return; }
+    if (code.length < 4) { showError('Enter the 6-digit code.'); return; }
+    clearMsgs();
+    $('otp-verify').textContent = 'VERIFYING…';
+    $('otp-verify').disabled = true;
+    fetch('/api/auth/verify-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, code: code })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      $('otp-verify').disabled = false;
+      $('otp-verify').textContent = 'VERIFY & SIGN IN';
+      if (d.success) {
+        try { localStorage.setItem('cc_user', JSON.stringify(d.user)); } catch (e) {}
+        try { localStorage.setItem('cc_token', d.token); } catch (e) {}
+        if (window.MPA) window.MPA.init();
+        $('auth-form').style.display = 'none';
+        $('auth-logged').style.display = 'block';
+        $('auth-uname').textContent = 'Hi, ' + (d.user.name || '');
+      } else {
+        showError(d.error || 'Could not verify code.');
+      }
+    }).catch(function () {
+      $('otp-verify').disabled = false;
+      $('otp-verify').textContent = 'VERIFY & SIGN IN';
+      showError('Network error. Please try again.');
+    });
+  });
+  $('otp-code').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('otp-verify').click(); });
 
   /* ── Magic link auto-verify (URL ?ml=token from email click-through) ─ */
   var mlParams = new URLSearchParams(window.location.search);
