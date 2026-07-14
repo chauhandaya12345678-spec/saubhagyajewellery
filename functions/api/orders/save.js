@@ -50,10 +50,14 @@ export async function onRequest(context) {
       return json({ error: 'Cash on Delivery is temporarily unavailable. Please pay online.' }, 400);
     }
 
-    // Verify the Razorpay signature whenever the checkout went through an Order.
-    // A failed check means the "payment" cannot be trusted — reject it.
+    // Verify the Razorpay signature whenever the payment went through an Order.
+    // When RAZORPAY_KEY_SECRET is configured (always in production), we REQUIRE
+    // both order_id and signature — rejecting without them prevents forged orders.
     let paymentVerified = false;
-    if (razorpay_order_id && razorpay_signature && env.RAZORPAY_KEY_SECRET) {
+    if (env.RAZORPAY_KEY_SECRET) {
+      if (!razorpay_order_id || !razorpay_signature) {
+        return json({ error: 'Missing payment verification data (order_id and signature required)' }, 400);
+      }
       const expected = await hmacSha256Hex(env.RAZORPAY_KEY_SECRET, `${razorpay_order_id}|${razorpay_payment_id}`);
       if (expected !== razorpay_signature) {
         return json({ error: 'Payment signature verification failed' }, 400);

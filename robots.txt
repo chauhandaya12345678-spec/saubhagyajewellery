@@ -1,28 +1,4 @@
 User-agent: *
 Allow: /
 
-# Non-indexable transactional pages — save crawl budget
-Disallow: /cart
-Disallow: /cart.html
-Disallow: /checkout
-Disallow: /checkout.html
-Disallow: /account
-Disallow: /account.html
-Disallow: /signin
-Disallow: /signin.html
-Disallow: /signup
-Disallow: /signup.html
-Disallow: /forgot-password
-Disallow: /forgot-password.html
-Disallow: /reset-password
-Disallow: /reset-password.html
-Disallow: /magic-link
-Disallow: /magic-link.html
-Disallow: /success
-Disallow: /success.html
-Disallow: /404.html
-
-# Block API traffic from search crawlers
-Disallow: /api/
-
 Sitemap: https://saubhagyajewellery.com/sitemap.xml

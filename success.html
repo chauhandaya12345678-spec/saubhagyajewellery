@@ -33,19 +33,6 @@
   .sx-small { font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a; line-height:1.6; }
   .sx-name { font-family:'Montserrat',sans-serif; font-size:13px; color:#1A1A1A; line-height:1.6; }
   .sx-btns { display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap; }
-  /* set-password prompt: turn the auto-created guest account into a real one */
-  .sx-pw { margin-top:26px; padding:22px 22px 20px; border:1px solid #eee5d6; border-radius:10px; background:#faf8f3; }
-  .sx-pw h3 { font-family:'Cormorant Garamond',serif; font-size:20px; color:#0B3C26; margin:0 0 6px; }
-  .sx-pw p { font-family:'Montserrat',sans-serif; font-size:12px; color:#6a6a6a; margin:0 0 14px; line-height:1.6; }
-  .sx-pw-row { display:flex; gap:10px; flex-wrap:wrap; }
-  .sx-pw input { flex:1; min-width:160px; height:44px; padding:0 14px; border:1px solid #ddd6c6; border-radius:6px; font-family:'Montserrat',sans-serif; font-size:14px; outline:none; background:#fff; }
-  .sx-pw input:focus { border-color:#C5A059; }
-  .sx-pw button { height:44px; padding:0 22px; background:#0B3C26; color:#fff; border:none; border-radius:6px; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1.5px; cursor:pointer; }
-  .sx-pw button:disabled { opacity:.5; cursor:not-allowed; }
-  .sx-pw-msg { font-family:'Montserrat',sans-serif; font-size:12px; margin-top:10px; min-height:16px; }
-  .sx-pw-msg.err { color:#c0392b; }
-  .sx-pw-msg.ok { color:#0B3C26; }
-  .sx-pw.done { background:#e8f0e8; border-color:#c9dcc9; }
   .sx-btn { padding:14px 28px; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:2px; cursor:pointer; text-decoration:none; }
   .sx-btn.primary { background:#0B3C26; color:#fff; border:none; }
   .sx-btn.ghost { background:transparent; color:#1A1A1A; border:1px solid #C5A059; }
@@ -94,17 +81,6 @@
 
     <div class="sx-loading" id="sx-loading">FETCHING YOUR ORDER&hellip;</div>
 
-    <!-- Set a password so guest can sign in on any device / browser -->
-    <div class="sx-pw" id="sx-pw" style="display:none">
-      <h3>Set a password to sign in anywhere</h3>
-      <p>Your account was created automatically for this order. Add a password so you can sign in on your phone, your laptop, or any browser — and see your full order history.</p>
-      <div class="sx-pw-row">
-        <input id="sx-pw-input" type="password" placeholder="Choose a password (min 6 characters)" autocomplete="new-password" minlength="6">
-        <button id="sx-pw-btn" type="button">SAVE PASSWORD</button>
-      </div>
-      <div class="sx-pw-msg" id="sx-pw-msg"></div>
-    </div>
-
     <div class="sx-btns">
       <a class="sx-btn primary" href="index.html">CONTINUE SHOPPING</a>
       <a class="sx-btn ghost" href="track-orders.html">VIEW MY ORDERS</a>
@@ -140,62 +116,9 @@
     return m ? m[1] : '';
   }
 
-  /* Show the "Set a password" card only when there's a guest identity to
-   * upgrade AND we haven't already saved a real password. `cc_pw_set=1` in
-   * localStorage suppresses it on repeat visits to the success page. */
-  function maybeShowSetPassword(view) {
-    try {
-      if (localStorage.getItem('cc_pw_set') === '1') return;
-      var u = null;
-      try { u = JSON.parse(localStorage.getItem('cc_user') || 'null'); } catch(e) {}
-      var email = (u && u.email) || (view && view.email) || '';
-      var phone = (u && u.phone) || (view && view.phone) || '';
-      if (!email && !phone) return;
-      $('sx-pw').style.display = 'block';
-      $('sx-pw').dataset.email = email;
-      $('sx-pw').dataset.phone = phone;
-      $('sx-pw').dataset.name = (u && u.name) || (view && view.customer) || 'Guest';
-    } catch(e) {}
-  }
-  $('sx-pw-btn').addEventListener('click', function () {
-    var pw = ($('sx-pw-input').value || '').trim();
-    var msg = $('sx-pw-msg');
-    if (pw.length < 6) { msg.className = 'sx-pw-msg err'; msg.textContent = 'Please choose at least 6 characters.'; return; }
-    var d = $('sx-pw').dataset;
-    var body = { name: d.name || 'Guest', password: pw };
-    if (d.email) body.email = d.email;
-    else if (d.phone) body.phone = d.phone;
-    $('sx-pw-btn').disabled = true;
-    $('sx-pw-btn').textContent = 'SAVING…';
-    fetch('/api/auth/signup', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    }).then(function (r) { return r.json(); }).then(function (res) {
-      if (res && res.success) {
-        try { localStorage.setItem('cc_pw_set', '1'); } catch(e) {}
-        if (res.token) { try { localStorage.setItem('cc_token', res.token); } catch(e) {} }
-        if (res.user) { try { localStorage.setItem('cc_user', JSON.stringify(res.user)); } catch(e) {} }
-        $('sx-pw').classList.add('done');
-        $('sx-pw').innerHTML = '<h3>✓ Password saved</h3><p>You can now sign in on any device with ' +
-          (d.email ? d.email : ('+91 ' + d.phone)) + ' and this password.</p>';
-      } else {
-        msg.className = 'sx-pw-msg err';
-        msg.textContent = (res && res.error) || 'Could not save password. Try again.';
-        $('sx-pw-btn').disabled = false;
-        $('sx-pw-btn').textContent = 'SAVE PASSWORD';
-      }
-    }).catch(function () {
-      msg.className = 'sx-pw-msg err';
-      msg.textContent = 'Network error. Try again.';
-      $('sx-pw-btn').disabled = false;
-      $('sx-pw-btn').textContent = 'SAVE PASSWORD';
-    });
-  });
-
   function show(view) {
     $('sx-loading').style.display = 'none';
     $('sx-oid').textContent = view.id || (localStorage.getItem('cc_lastorderid') || '');
-    maybeShowSetPassword(view);
     if (view.status) { $('sx-status').textContent = view.status.toUpperCase(); $('sx-status').style.display = 'inline-block'; }
     var pin = pinFrom(view);
     if (pin) {

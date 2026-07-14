@@ -3,115 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Create Account | Saubhagya</title>
-<meta name="robots" content="noindex,nofollow">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=13">
-<script src="layout.js?v=13"></script>
-<script src="mpa.js?v=13" defer></script>
-<style>
-  * { box-sizing: border-box; }
-  body { background: #FAFAFA; margin: 0; }
-  .auth-wrap { max-width: 440px; margin: 0 auto; padding: 40px 24px 80px; }
-  .auth-title { font-family: 'Cormorant Garamond',serif; font-size: 28px; color: #1A1A1A; text-align: center; margin: 0 0 6px; }
-  .auth-sub { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; text-align: center; margin: 0 0 28px; }
-  .auth-label { display: block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 1.5px; color: #6a6a6a; margin-bottom: 6px; text-transform: uppercase; }
-  .auth-input { width: 100%; height: 48px; padding: 0 14px; border: 1px solid #ddd6c6; font-family: 'Montserrat',sans-serif; font-size: 14px; outline: none; background: #fff; margin-bottom: 14px; }
-  .auth-input:focus { border-color: #C5A059; }
-  .auth-btn { display: block; width: 100%; padding: 16px; background: #0B3C26; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; }
-  .auth-btn:hover { background: #06281a; }
-  .auth-error { color: #c0392b; font-family: 'Montserrat',sans-serif; font-size: 11px; text-align: center; margin: 12px 0; }
-  .auth-success { color: #0B3C26; font-family: 'Montserrat',sans-serif; font-size: 13px; text-align: center; margin: 12px 0; }
-  .auth-link { text-align: center; margin-top: 18px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; }
-  .auth-link a { color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; }
-</style>
+<title>Sign In | Saubhagya</title>
+<meta http-equiv="refresh" content="0;url=signin.html">
+<script>window.location.href='signin.html';</script>
 </head>
 <body>
-<x-layout page=""></x-layout>
-<main>
-<div class="auth-wrap">
-  <h1 class="auth-title">Create Account</h1>
-  <p class="auth-sub">Track orders, save wishlists and checkout faster.</p>
-
-  <label class="auth-label">Full Name</label>
-  <input class="auth-input" id="signup-name" placeholder="Your full name">
-
-  <label class="auth-label">Email</label>
-  <input class="auth-input" id="signup-email" type="email" placeholder="you@email.com">
-
-  <label class="auth-label">Phone Number</label>
-  <input class="auth-input" id="signup-phone" type="tel" placeholder="10-digit mobile" maxlength="10">
-
-  <label class="auth-label">Password</label>
-  <input class="auth-input" id="signup-password" type="password" placeholder="Choose a password (min 6 characters)">
-
-  <label style="display:flex;gap:9px;align-items:flex-start;font-family:'Montserrat',sans-serif;font-size:11.5px;color:#4a4a4a;line-height:1.55;cursor:pointer;margin:6px 0 6px;">
-    <input type="checkbox" id="signup-consent" style="margin-top:3px;accent-color:#0B3C26;">
-    <span>I am 18+ and agree to the <a href="terms.html" style="color:#0B3C26;">Terms</a>, <a href="privacy-policy.html" style="color:#0B3C26;">Privacy Policy</a> and <a href="cookie-policy.html" style="color:#0B3C26;">Cookie Policy</a>.</span>
-  </label>
-  <label style="display:flex;gap:9px;align-items:flex-start;font-family:'Montserrat',sans-serif;font-size:11.5px;color:#4a4a4a;line-height:1.55;cursor:pointer;margin:0 0 14px;">
-    <input type="checkbox" id="signup-marketing" style="margin-top:3px;accent-color:#0B3C26;">
-    <span>Email me new drops, offers and edits (optional, unsubscribe anytime).</span>
-  </label>
-
-  <div class="auth-error" id="signup-error" style="display:none"></div>
-  <div class="auth-success" id="signup-success" style="display:none"></div>
-
-  <button class="auth-btn" id="signup-submit">CREATE ACCOUNT</button>
-  <div class="auth-link">Already have an account? <a href="signin.html">Sign in</a></div>
-</div>
-</main>
-<x-footer></x-footer>
-
-<script>
-(function () {
-  'use strict';
-  var $ = function(id) { return document.getElementById(id); };
-
-  $('signup-submit').addEventListener('click', function() {
-    var name = ($('signup-name').value || '').trim();
-    var email = ($('signup-email').value || '').trim();
-    var phone = ($('signup-phone').value || '').trim();
-    var pw = ($('signup-password').value || '').trim();
-
-    if (!name) { $('signup-error').textContent = 'Name is required.'; $('signup-error').style.display = 'block'; return; }
-    if (!email && !phone) { $('signup-error').textContent = 'Email or phone is required.'; $('signup-error').style.display = 'block'; return; }
-    if (pw.length < 6) { $('signup-error').textContent = 'Password must be at least 6 characters.'; $('signup-error').style.display = 'block'; return; }
-    if (!$('signup-consent').checked) { $('signup-error').textContent = 'Please confirm age 18+ and accept the policies.'; $('signup-error').style.display = 'block'; return; }
-    var marketing = !!$('signup-marketing').checked;
-
-    $('signup-error').style.display = 'none';
-    $('signup-submit').textContent = 'CREATING…';
-    $('signup-submit').disabled = true;
-
-    fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, email: email || null, phone: phone || null, password: pw, marketing_consent: marketing, age_confirmed: true })
-    }).then(function(r) { return r.json(); })
-      .then(function(d) {
-        $('signup-submit').textContent = 'CREATE ACCOUNT';
-        $('signup-submit').disabled = false;
-        if (d.success) {
-          try { localStorage.setItem('cc_user', JSON.stringify(d.user)); } catch(e) {}
-          try { localStorage.setItem('cc_token', d.token); } catch(e) {}
-          $('signup-success').textContent = 'Account created! Redirecting…';
-          $('signup-success').style.display = 'block';
-          setTimeout(function() { window.location.href = 'index.html'; }, 1500);
-        } else {
-          $('signup-error').textContent = d.error || 'Sign up failed.';
-          $('signup-error').style.display = 'block';
-        }
-      }).catch(function() {
-        $('signup-submit').textContent = 'CREATE ACCOUNT';
-        $('signup-submit').disabled = false;
-        $('signup-error').textContent = 'Network error. Please try again.';
-        $('signup-error').style.display = 'block';
-      });
-  });
-})();
-</script>
+<p style="font-family:Montserrat,sans-serif;text-align:center;padding:60px 20px;color:#6a6a6a;">
+  Redirecting to sign in… <a href="signin.html">Click here</a> if you are not redirected.
+</p>
 </body>
 </html>
