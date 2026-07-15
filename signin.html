@@ -46,6 +46,8 @@
     <h1 class="auth-title">Welcome Back</h1>
     <p class="auth-sub">Sign in with your mobile number — we'll text you a code</p>
 
+    <div id="recaptcha-container"></div>
+
     <div id="phone-section">
       <label class="auth-label">Mobile Number</label>
       <input class="auth-input" id="phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
@@ -105,18 +107,12 @@ $('auth-logout').addEventListener('click', function() {
 function showError(msg) { $('auth-success').style.display='none'; $('auth-error').textContent=msg; $('auth-error').style.display='block'; }
 function showInfo(msg) { $('auth-error').style.display='none'; $('auth-success').textContent=msg; $('auth-success').style.display='block'; }
 
-// Create reCAPTCHA ONCE at page load — bound to send button
 var pendingPhone = '';
-window.recaptchaVerifier = new RecaptchaVerifier(auth, 'send-btn', {
-  size: 'normal',
-  callback: function() {
-    // reCAPTCHA solved → now send OTP
-    doSendOTP(pendingPhone);
-  },
-  'expired-callback': function() {
-    $('send-btn').disabled = false;
-    $('send-btn').textContent = 'SEND OTP';
-  }
+
+// Invisible reCAPTCHA — no UI. verify() → callback → OTP
+window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+  size: 'invisible',
+  callback: function() { doSendOTP(pendingPhone); }
 });
 
 function doSendOTP(phone) {
@@ -137,7 +133,6 @@ function doSendOTP(phone) {
       $('send-btn').disabled = false;
       $('send-btn').textContent = 'SEND OTP';
       showError(err.message || 'Could not send OTP. Try again.');
-      if (window.recaptchaVerifier) { window.recaptchaVerifier.clear(); window.recaptchaVerifier = null; }
     });
 }
 
@@ -147,7 +142,7 @@ $('send-btn').addEventListener('click', function() {
   $('auth-error').style.display = 'none';
   $('auth-success').style.display = 'none';
   pendingPhone = phone;
-  // reCAPTCHA checkbox will appear → user clicks → callback fires → doSendOTP runs
+  window.recaptchaVerifier.verify(); // invisible check → callback → OTP
 });
 
 $('verify-btn').addEventListener('click', function() {

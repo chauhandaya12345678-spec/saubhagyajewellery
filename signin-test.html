@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign In | Saubhagya</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="site.css?v=14">
+<script src="layout.js?v=13"></script>
+<script src="mpa.js?v=13" defer></script>
+<style>
+  *{box-sizing:border-box}body{background:#FAFAFA;margin:0}
+  .w{max-width:440px;margin:0 auto;padding:40px 24px}
+  .t{font-family:'Cormorant Garamond',serif;font-size:28px;text-align:center}
+  .s{font-family:'Montserrat',sans-serif;font-size:12px;color:#9a9a9a;text-align:center;margin:6px 0 28px}
+  .inp{width:100%;height:48px;padding:0 14px;border:1px solid #ddd6c6;font-family:'Montserrat',sans-serif;font-size:14px;outline:none;background:#fff;margin-bottom:14px}
+  .btn{display:block;width:100%;padding:16px;background:#0B3C26;color:#fff;border:none;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;cursor:pointer}
+  .btn:disabled{opacity:.6}
+  .e{color:#c0392b;font-family:'Montserrat',sans-serif;font-size:11px;text-align:center;margin:12px 0;display:none}
+  .ok{color:#0B3C26;font-family:'Montserrat',sans-serif;font-size:13px;text-align:center;margin:12px 0;display:none}
+</style>
+</head>
+<body>
+<x-layout page=""></x-layout>
+<main><div class="w">
+<h1 class="t">Welcome Back</h1>
+<p class="s">Sign in with your mobile number</p>
+<div id="s1">
+  <input class="inp" id="ph" type="tel" maxlength="10" placeholder="10-digit mobile number">
+  <button class="btn" id="sb" type="button">SEND OTP</button>
+</div>
+<div id="s2" style="display:none">
+  <input class="inp" id="otp" type="tel" maxlength="6" placeholder="000000" style="letter-spacing:8px;font-size:20px;text-align:center;font-weight:600">
+  <button class="btn" id="vb" type="button">VERIFY & SIGN IN</button>
+</div>
+<div class="e" id="err"></div>
+<div class="ok" id="inf"></div>
+</div></main>
+<x-footer></x-footer>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import { getAuth, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyBTOVlCY_seyeR49jEtsKBgjCNAMsA4rtw",
+  authDomain: "saubhagya-jewellery.firebaseapp.com",
+  projectId: "saubhagya-jewellery",
+  storageBucket: "saubhagya-jewellery.firebasestorage.app",
+  messagingSenderId: "520764963734",
+  appId: "1:520764963734:web:bf3e568a4bce172b33fbb7"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+auth.settings.appVerificationDisabledForTesting = true;
+var $=function(id){return document.getElementById(id);};
+var cr = null;
+$('sb').onclick = function(){
+  var ph = $('ph').value.replace(/\D/g,'');
+  if(ph.length!==10){$('err').textContent='Enter valid 10-digit number';$('err').style.display='block';return;}
+  $('sb').disabled=true;$('sb').textContent='SENDING…';$('err').style.display='none';
+  signInWithPhoneNumber(auth, '+91'+ph)
+    .then(function(r){cr=r;$('sb').textContent='OTP SENT';$('s1').style.display='none';$('s2').style.display='block';$('inf').textContent='Sent to +91'+ph;$('inf').style.display='block';})
+    .catch(function(e){$('sb').disabled=false;$('sb').textContent='SEND OTP';$('err').textContent=e.message;$('err').style.display='block';});
+};
+$('vb').onclick = function(){
+  var cd = $('otp').value.replace(/\D/g,'');
+  if(!cd||cd.length<4){$('err').textContent='Enter code';$('err').style.display='block';return;}
+  $('vb').disabled=true;$('vb').textContent='VERIFYING…';$('err').style.display='none';
+  cr.confirm(cd)
+    .then(function(r){$('inf').textContent='VERIFIED! Phone: '+r.user.phoneNumber;$('inf').style.display='block';$('s2').style.display='none';})
+    .catch(function(e){$('vb').disabled=false;$('vb').textContent='VERIFY & SIGN IN';$('err').textContent=e.message;$('err').style.display='block';});
+};
+</script>
+</body>
+</html>
