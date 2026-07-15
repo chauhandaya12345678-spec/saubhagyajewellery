@@ -14,7 +14,7 @@ export async function onRequest(context) {
   };
 
   if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
-  if (request.method === 'GET') {
+  if (request.method === 'GET' || request.method === 'HEAD') {
     return new Response(JSON.stringify({ ok: true }), {
       headers: { 'Content-Type': 'application/json', ...cors },
     });
