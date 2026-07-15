@@ -47,10 +47,11 @@
     <h1 class="auth-title">Welcome Back</h1>
     <p class="auth-sub">Sign in with your mobile number — we'll text you a code</p>
 
+    <div id="recaptcha-container"></div>
+
     <div id="phone-section">
       <label class="auth-label">Mobile Number</label>
       <input class="auth-input" id="phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
-      <div id="recaptcha-container"></div>
       <button class="auth-btn" id="send-btn" type="button">SEND OTP</button>
     </div>
 
@@ -126,6 +127,7 @@ $('send-btn').addEventListener('click', function() {
       confirmationResult = result;
       $('send-btn').textContent = 'OTP SENT';
       $('phone-section').style.display = 'none';
+      $('recaptcha-container').style.visibility = 'hidden';
       $('otp-section').style.display = 'block';
       showInfo('Code sent to +91 ' + phone);
       $('otp-input').focus();
@@ -134,7 +136,6 @@ $('send-btn').addEventListener('click', function() {
       $('send-btn').disabled = false;
       $('send-btn').textContent = 'SEND OTP';
       showError(err.message || 'Could not send OTP. Try again.');
-      window.recaptchaVerifier.render().then(function(wid) { window.recaptchaWidgetId = wid; });
     });
 });
 
