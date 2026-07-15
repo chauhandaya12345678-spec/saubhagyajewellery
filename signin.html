@@ -85,6 +85,25 @@ const auth = getAuth(app);
 
 var $ = function(id) { return document.getElementById(id); };
 window.confirmationResult = null;
+window.recaptchaVerifier = null;
+
+// Initialize invisible Recaptcha ONCE globally (singleton — Gemini fix)
+function initRecaptcha() {
+  if (!window.recaptchaVerifier) {
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'send-btn', {
+      'size': 'invisible',
+      'callback': function(response) { /* silently passed */ },
+      'expired-callback': function() { resetRecaptcha(); }
+    });
+  }
+}
+
+function resetRecaptcha() {
+  if (window.recaptchaVerifier) {
+    window.recaptchaVerifier.clear();
+    window.recaptchaVerifier = null;
+  }
+}
 
 // Already logged in?
 var user = null;
@@ -113,13 +132,10 @@ $('send-btn').addEventListener('click', function() {
   $('send-btn').disabled = true;
   $('send-btn').textContent = 'SENDING…';
 
-  // Invisible reCAPTCHA — bound to button, no container div, no checkbox
-  var verifier = new RecaptchaVerifier(auth, 'send-btn', {
-    'size': 'invisible',
-    'callback': function() { /* passed silently */ }
-  });
+  // Use singleton verifier (Gemini fix — no new instance per click)
+  initRecaptcha();
 
-  signInWithPhoneNumber(auth, '+91' + phone, verifier)
+  signInWithPhoneNumber(auth, '+91' + phone, window.recaptchaVerifier)
     .then(function(result) {
       window.confirmationResult = result;
       $('send-btn').textContent = 'OTP SENT';
@@ -131,6 +147,7 @@ $('send-btn').addEventListener('click', function() {
     .catch(function(err) {
       $('send-btn').disabled = false;
       $('send-btn').textContent = 'SEND OTP';
+      resetRecaptcha(); // Clear on failure for clean retry
       showError(err.message || 'Could not send OTP. Try again.');
     });
 });
