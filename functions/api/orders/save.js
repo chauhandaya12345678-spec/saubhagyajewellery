@@ -163,7 +163,20 @@ export async function onRequest(context) {
         totalPaise: total,
         paymentMethod: method,
       };
-      const srPromise = pushToShiprocket(env, orderForJobs);
+
+      // ── Validate shipping address before pushing to Shiprocket ──
+      // A missing or short pincode causes Shiprocket to reject the order
+      // and repeated retries lock the account. Skip push and store the
+      // error so the admin can fix the address and retry manually.
+      let addrCheck = addressJson;
+      if (typeof addrCheck === 'string') { try { addrCheck = JSON.parse(addrCheck); } catch (e) { addrCheck = {}; } }
+      addrCheck = addrCheck || {};
+      const pin = String(addrCheck.pin || '').replace(/\D/g, '');
+      if (pin.length !== 6) {
+        shiprocket = { pushed: false, error: 'skipped — invalid pincode "' + (addrCheck.pin || '') + '" — update address in Razorpay and retry via /api/orders/retry-shiprocket' };
+        try { await recordShiprocketResult(db, orderId, shiprocket); } catch (e) {}
+      } else {
+        const srPromise = pushToShiprocket(env, orderForJobs);
       const capped = Promise.race([
         srPromise,
         new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (Shiprocket >22s)' }), 22000)),
@@ -181,6 +194,7 @@ export async function onRequest(context) {
       // fallback so it also survives free-tier isolate termination.
       const emailJob = sendOrderEmail(env, orderForJobs).catch(() => {});
       if (context.waitUntil) context.waitUntil(emailJob);
+      }  // end else (valid pincode — push to Shiprocket)
     }
 
     return json({

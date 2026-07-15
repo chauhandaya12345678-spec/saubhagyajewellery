@@ -37,6 +37,18 @@ export async function onRequest(context) {
   async function retryOne(row) {
     const items = safeParse(row.items, []);
     const address = row.address || '{}';
+    // ── Validate pincode before pushing ──
+    // Prevents invalid addresses from locking the Shiprocket account
+    let addrCheck = address;
+    if (typeof addrCheck === 'string') { try { addrCheck = JSON.parse(addrCheck); } catch (e) { addrCheck = {}; } }
+    addrCheck = addrCheck || {};
+    const pin = String(addrCheck.pin || '').replace(/\D/g, '');
+    if (pin.length !== 6) {
+      const skip = { pushed: false, error: 'skipped — invalid pincode "' + (addrCheck.pin || '') + '" — update address and retry' };
+      await recordShiprocketResult(db, row.id, skip);
+      await logOrderEvent(db, row.id, 'shiprocket_retry', 0, skip.error);
+      return { id: row.id, ...skip };
+    }
     const orderForPush = {
       id: row.id,
       name: row.name || 'Guest',
