@@ -109,10 +109,11 @@ function showInfo(msg) { $('auth-error').style.display='none'; $('auth-success')
 
 var pendingPhone = '';
 
-// Invisible reCAPTCHA — no UI. verify() → callback → OTP
+// Normal reCAPTCHA — visible checkbox, proven reliable
 window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-  size: 'invisible',
-  callback: function() { doSendOTP(pendingPhone); }
+  size: 'normal',
+  callback: function() { $('send-btn').disabled = false; },
+  'expired-callback': function() { $('send-btn').disabled = true; }
 });
 
 function doSendOTP(phone) {
