@@ -16,7 +16,7 @@ export async function onRequest(context) {
   if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
   if (request.method === 'GET' || request.method === 'HEAD') {
     return new Response(JSON.stringify({ ok: true }), {
-      headers: { 'Content-Type': 'application/json', ...cors },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...cors },
     });
   }
   if (request.method !== 'POST') {
@@ -33,7 +33,7 @@ export async function onRequest(context) {
     console.log('[abandoned]', event, JSON.stringify(data).slice(0, 500));
 
     return new Response(JSON.stringify({ ok: true }), {
-      headers: { 'Content-Type': 'application/json', ...cors },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...cors },
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message }), {
