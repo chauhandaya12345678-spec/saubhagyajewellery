@@ -8,6 +8,7 @@
  */
 export async function onRequest(context) {
   const { request, env } = context;
+  const FIREBASE_API_KEY = 'AIzaSyBTOVlCY_seyeR49jEtsKBgjCNAMsA4rtw';
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -27,20 +28,21 @@ export async function onRequest(context) {
       return json({ error: 'Invalid phone number' }, 400);
     }
 
-    // Verify Firebase ID token via Google's public API
+    // Verify Firebase ID token via Firebase REST API (works with App Check)
     const verifyRes = await fetch(
-      `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${encodeURIComponent(idToken)}`
+      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken }) }
     );
-    const tokenInfo = await verifyRes.json().catch(() => ({}));
+    const verifyData = await verifyRes.json().catch(() => ({}));
 
-    if (!verifyRes.ok || tokenInfo.error) {
+    if (!verifyRes.ok || !verifyData.users || !verifyData.users.length) {
       return json({ error: 'Invalid or expired authentication' }, 401);
     }
 
     // Confirm the verified phone matches
-    const verifiedPhone = String(tokenInfo.phone_number || '').replace(/\D/g, '').slice(-10);
+    const fbPhone = (verifyData.users[0].phoneNumber || '').replace(/\D/g, '').slice(-10);
     const reqPhone = String(phone).replace(/\D/g, '').slice(-10);
-    if (verifiedPhone !== reqPhone) {
+    if (fbPhone !== reqPhone) {
       return json({ error: 'Phone number mismatch' }, 400);
     }
 
