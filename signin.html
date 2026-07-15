@@ -46,8 +46,6 @@
     <h1 class="auth-title">Welcome Back</h1>
     <p class="auth-sub">Sign in with your mobile number — we'll text you a code</p>
 
-    <div id="recaptcha-container"></div>
-
     <div id="phone-section">
       <label class="auth-label">Mobile Number</label>
       <input class="auth-input" id="phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
@@ -107,10 +105,9 @@ $('auth-logout').addEventListener('click', function() {
 function showError(msg) { $('auth-success').style.display='none'; $('auth-error').textContent=msg; $('auth-error').style.display='block'; }
 function showInfo(msg) { $('auth-error').style.display='none'; $('auth-success').textContent=msg; $('auth-success').style.display='block'; }
 
-// Create reCAPTCHA ONCE at page load (Firebase official pattern)
-// signInWithPhoneNumber runs ONLY in callback — after reCAPTCHA verified
+// Create reCAPTCHA ONCE at page load — bound to send button
 var pendingPhone = '';
-window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+window.recaptchaVerifier = new RecaptchaVerifier(auth, 'send-btn', {
   size: 'normal',
   callback: function() {
     // reCAPTCHA solved → now send OTP
