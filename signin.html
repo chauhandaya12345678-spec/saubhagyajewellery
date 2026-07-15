@@ -46,12 +46,10 @@
     <h1 class="auth-title">Welcome Back</h1>
     <p class="auth-sub">Sign in with your mobile number — we'll text you a code</p>
 
-    <div id="recaptcha-container"></div>
-
     <div id="phone-section">
       <label class="auth-label">Mobile Number</label>
       <input class="auth-input" id="phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
-      <button class="auth-btn" id="send-btn" type="button" disabled>SEND OTP</button>
+      <button class="auth-btn" id="send-btn" type="button">SEND OTP</button>
     </div>
 
     <div id="otp-section" style="display:none">
@@ -107,21 +105,21 @@ $('auth-logout').addEventListener('click', function() {
 function showError(msg) { $('auth-success').style.display='none'; $('auth-error').textContent=msg; $('auth-error').style.display='block'; }
 function showInfo(msg) { $('auth-error').style.display='none'; $('auth-success').textContent=msg; $('auth-success').style.display='block'; }
 
-var pendingPhone = '';
-
-// Normal reCAPTCHA — visible checkbox, proven reliable
-window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-  size: 'normal',
-  callback: function() { $('send-btn').disabled = false; },
-  'expired-callback': function() { $('send-btn').disabled = true; }
-});
-
-function doSendOTP(phone) {
-  $('recaptcha-container').style.display = 'none';
+$('send-btn').addEventListener('click', function() {
+  var phone = ($('phone-input').value || '').replace(/\D/g, '');
+  if (phone.length !== 10) { showError('Enter a valid 10-digit mobile number.'); return; }
+  $('auth-error').style.display = 'none';
+  $('auth-success').style.display = 'none';
   $('send-btn').disabled = true;
   $('send-btn').textContent = 'SENDING…';
 
-  signInWithPhoneNumber(auth, '+91' + phone, window.recaptchaVerifier)
+  // Invisible reCAPTCHA — bound to button, no container div, no checkbox
+  var verifier = new RecaptchaVerifier(auth, 'send-btn', {
+    'size': 'invisible',
+    'callback': function() { /* passed silently */ }
+  });
+
+  signInWithPhoneNumber(auth, '+91' + phone, verifier)
     .then(function(result) {
       window.confirmationResult = result;
       $('send-btn').textContent = 'OTP SENT';
@@ -135,14 +133,6 @@ function doSendOTP(phone) {
       $('send-btn').textContent = 'SEND OTP';
       showError(err.message || 'Could not send OTP. Try again.');
     });
-}
-
-$('send-btn').addEventListener('click', function() {
-  var phone = ($('phone-input').value || '').replace(/\D/g, '');
-  if (phone.length !== 10) { showError('Enter a valid 10-digit mobile number.'); return; }
-  $('auth-error').style.display = 'none';
-  $('auth-success').style.display = 'none';
-  doSendOTP(phone);
 });
 
 $('verify-btn').addEventListener('click', function() {
@@ -164,7 +154,6 @@ $('verify-btn').addEventListener('click', function() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ idToken: idToken, phone: phone })
         }).then(function(r) { return r.json(); }).catch(function() {
-          // Localhost fallback — no Cloudflare Functions, use Firebase result directly
           return { success: true, token: 'local_'+Date.now().toString(36), user: { id: 0, name: '', phone: phone } };
         });
       });
