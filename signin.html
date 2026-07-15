@@ -141,8 +141,7 @@ $('send-btn').addEventListener('click', function() {
   if (phone.length !== 10) { showError('Enter a valid 10-digit mobile number.'); return; }
   $('auth-error').style.display = 'none';
   $('auth-success').style.display = 'none';
-  pendingPhone = phone;
-  window.recaptchaVerifier.verify(); // invisible check → callback → OTP
+  doSendOTP(phone);
 });
 
 $('verify-btn').addEventListener('click', function() {
