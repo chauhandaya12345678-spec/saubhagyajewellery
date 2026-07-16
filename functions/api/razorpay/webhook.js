@@ -59,10 +59,12 @@ export async function onRequest(context) {
 
       // Update existing order's address if it was empty
       const notes = o.notes || {};
-      const paymentId = notes.payment_id || (event.payload.payment?.entity?.id) || '';
+      // order.paid webhook: payment is at event.payload.payment.entity
+      const paymentEntity = event.payload.payment?.entity || {};
+      const paymentId = notes.payment_id || paymentEntity.id || '';
       if (!paymentId) return json({ ok: true, event: 'order.paid', note: 'no payment_id' });
 
-      const existing = await db.prepare('SELECT id, address, shiprocket_order_id FROM orders WHERE razorpay_payment_id = ?')
+      const existing = await db.prepare('SELECT id, address, items, shiprocket_order_id, total FROM orders WHERE razorpay_payment_id = ?')
         .bind(paymentId).first().catch(() => null);
       if (!existing) return json({ ok: true, event: 'order.paid', note: 'order not found (browser save.js already saved?)' });
 
@@ -79,14 +81,19 @@ export async function onRequest(context) {
 
       // Push to ShipPrime now that we have the address
       if (!existing.shiprocket_order_id) {
+        // Parse items from existing order
+        let orderItems = [];
+        if (existing.items) {
+          try { orderItems = typeof existing.items === 'string' ? JSON.parse(existing.items) : existing.items; } catch (e) {}
+        }
         const orderForPush = {
           id: existing.id,
           name: cd.name || notes.customer_name || 'Guest',
           email: cd.email || notes.customer_email || '',
           phone: cd.contact || notes.customer_phone || '',
           address: addressJson,
-          items: [],
-          totalPaise: o.amount || 0,
+          items: orderItems,
+          totalPaise: o.amount || existing.total || 0,
           paymentMethod: 'razorpay',
         };
         const sp = await pushToShipPrime(env, orderForPush);
