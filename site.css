@@ -33,7 +33,7 @@ h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;color:#1A1A1A;ma
 header.site{position:fixed;top:0;left:0;width:100%;z-index:1000;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,160,89,.18)}
 /* Navbar is fixed — push body content down */
 body{padding-top:118px}
-@media(max-width:900px){body{padding-top:60px}}
+@media(max-width:900px){body{padding-top:70px}}
 .nav{display:flex;align-items:center;gap:20px;padding:16px 40px;max-width:1280px;margin:0 auto}
 /* nav */}
 .navlinks{flex:1;display:flex;gap:20px;flex-wrap:wrap;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase}
