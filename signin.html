@@ -178,9 +178,9 @@ $('verify-btn').addEventListener('click', function() {
         try { localStorage.setItem('cc_user', JSON.stringify(d.user)); } catch(e) {}
         try { localStorage.setItem('cc_token', d.token); } catch(e) {}
         if (window.MPA) window.MPA.init();
-        $('auth-form').style.display = 'none';
-        $('auth-logged').style.display = 'block';
-        $('auth-uname').textContent = 'Hi, ' + (d.user.name || '');
+        // Redirect to previous page or home instead of showing "Hi Guest"
+        var ref = document.referrer;
+        window.location.href = (ref && ref.indexOf('/signin') === -1) ? ref : '/index.html';
       } else {
         showError(d.error || 'Sign in failed.');
         $('verify-btn').disabled = false;
@@ -196,6 +196,9 @@ $('verify-btn').addEventListener('click', function() {
 
 $('otp-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') $('verify-btn').click();
+});
+$('otp-input').addEventListener('input', function() {
+  if (this.value.replace(/\D/g, '').length === 6) $('verify-btn').click();
 });
 </script>
 </body>

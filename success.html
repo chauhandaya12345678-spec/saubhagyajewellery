@@ -18,25 +18,10 @@
   .sx-h1 { font-family:'Cormorant Garamond',serif; font-weight:500; font-size:36px; color:#1A1A1A; margin:22px 0 6px; }
   .sx-sub { font-family:'Montserrat',sans-serif; font-weight:300; font-size:13px; line-height:1.7; color:#6a6a6a; margin:0 auto; max-width:460px; }
   .sx-sub strong { color:#0B3C26; font-weight:600; letter-spacing:1px; font-variant-numeric:tabular-nums; }
-  .sx-eta { display:inline-block; margin-top:14px; padding:8px 16px; background:#f4efe4; border:1px solid #e4d9c2; border-radius:6px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26; }
-  .sx-eta strong { font-weight:600; }
-  .sx-card { background:#fff; border:1px solid #eae5d8; padding:22px; margin-top:28px; }
-  .sx-kicker { font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:2px; color:#C5A059; margin-bottom:12px; }
-  .sx-line { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f3ede1; font-family:'Montserrat',sans-serif; font-size:13px; color:#1A1A1A; }
-  .sx-line span:last-child { color:#0B3C26; font-weight:500; }
-  .sx-meta { display:flex; justify-content:space-between; padding:8px 0; font-family:'Montserrat',sans-serif; font-size:13px; color:#4a4a4a; }
-  .sx-total { display:flex; justify-content:space-between; align-items:baseline; padding-top:14px; margin-top:8px; border-top:1px solid #eae5d8; }
-  .sx-total .l { font-family:'Cormorant Garamond',serif; font-size:18px; color:#1A1A1A; }
-  .sx-total .v { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#0B3C26; }
-  .sx-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
-  @media(max-width:640px){ .sx-grid { grid-template-columns:1fr; } }
-  .sx-small { font-family:'Montserrat',sans-serif; font-size:12px; color:#7a7a7a; line-height:1.6; }
-  .sx-name { font-family:'Montserrat',sans-serif; font-size:13px; color:#1A1A1A; line-height:1.6; }
   .sx-btns { display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap; }
   .sx-btn { padding:14px 28px; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:2px; cursor:pointer; text-decoration:none; }
   .sx-btn.primary { background:#0B3C26; color:#fff; border:none; }
   .sx-btn.ghost { background:transparent; color:#1A1A1A; border:1px solid #C5A059; }
-  .sx-status { display:inline-block; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; padding:4px 10px; background:#C5A059; color:#fff; margin-top:10px; }
   .sx-loading { text-align:center; padding:40px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:2px; color:#9a9a9a; }
 </style>
 </head>
@@ -49,154 +34,29 @@
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
       </div>
       <h1 class="sx-h1">Order Confirmed</h1>
-      <p class="sx-sub">Thank you. Your order <strong id="sx-oid">&nbsp;</strong> is confirmed and saved to your account.
-        View it anytime under <a href="track-orders.html" style="color:#0B3C26;">My Orders</a> — it opens pre-filled with your number, so nothing gets lost.
-        A tracking link arrives on WhatsApp and email once your piece is dispatched.</p>
-      <span class="sx-status" id="sx-status" style="display:none"></span>
-      <div><span class="sx-eta" id="sx-eta" style="display:none"></span></div>
+      <p class="sx-sub">Thank you! Your order <strong id="sx-oid"></strong> is confirmed. Redirecting to tracking page…</p>
     </div>
-
-    <div id="sx-summary" style="display:none">
-      <div class="sx-card">
-        <div class="sx-kicker">ORDER SUMMARY</div>
-        <div id="sx-lines"></div>
-        <div class="sx-meta" id="sx-ship-row" style="display:none"><span>Shipping &amp; handling</span><span id="sx-ship"></span></div>
-        <div class="sx-meta" id="sx-disc-row" style="display:none"><span>Discount</span><span id="sx-disc"></span></div>
-        <div class="sx-total"><span class="l">Total Paid</span><span class="v" id="sx-total"></span></div>
-      </div>
-      <div class="sx-grid">
-        <div class="sx-card" style="margin-top:0">
-          <div class="sx-kicker">SHIP TO</div>
-          <div class="sx-name" id="sx-cust"></div>
-          <div class="sx-small" id="sx-addr"></div>
-          <div class="sx-small" id="sx-phone" style="margin-top:6px"></div>
-        </div>
-        <div class="sx-card" style="margin-top:0">
-          <div class="sx-kicker">WHAT HAPPENS NEXT</div>
-          <div class="sx-small">Your piece is packed and handed to our courier within 2&ndash;4 business days (10&ndash;14 for made-to-order bridal sets). The tracking link lands on WhatsApp and email the moment it ships.</div>
-          <div class="sx-small" id="sx-pay" style="margin-top:10px; color:#9a9a9a"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sx-loading" id="sx-loading">FETCHING YOUR ORDER&hellip;</div>
-
+    <div class="sx-loading" id="sx-loading">LOADING TRACKING…</div>
     <div class="sx-btns">
       <a class="sx-btn primary" href="index.html">CONTINUE SHOPPING</a>
-      <a class="sx-btn ghost" href="track-orders.html">VIEW MY ORDERS</a>
+      <a class="sx-btn ghost" id="sx-track-link" href="track-orders.html">VIEW ORDER TRACKING</a>
       <a class="sx-btn ghost" id="sx-wa" href="https://wa.me/919987008435" target="_blank" rel="noopener">NEED HELP?</a>
     </div>
   </div>
 </main>
 <x-footer></x-footer>
-
 <script>
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var fmt = function (rupees) { return '₹' + Number(rupees || 0).toLocaleString('en-IN'); };
   var orderId = new URLSearchParams(location.search).get('order_id') || '';
-
-  // Delivery estimate by PIN zone: Mumbai 2-4d, Maharashtra 3-5d, India 5-8d
-  function etaForPin(pin, from) {
-    var p = String(pin || '').replace(/\D/g, '');
-    var lo = 5, hi = 8;
-    if (/^40[01]/.test(p)) { lo = 2; hi = 4; }
-    else if (/^4[1-4]/.test(p)) { lo = 3; hi = 5; }
-    var base = from ? new Date(from) : new Date();
-    if (isNaN(base.getTime())) base = new Date();
-    var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var f = function (d) { return d.getDate() + ' ' + M[d.getMonth()]; };
-    var a = new Date(base.getTime() + lo * 86400000), b = new Date(base.getTime() + hi * 86400000);
-    return f(a) + ' – ' + f(b);
-  }
-  function pinFrom(view) {
-    if (view.pin) return view.pin;
-    var m = String(view.address || '').match(/\b(\d{6})\b/);
-    return m ? m[1] : '';
-  }
-
-  function show(view) {
-    $('sx-loading').style.display = 'none';
-    $('sx-oid').textContent = view.id || (localStorage.getItem('cc_lastorderid') || '');
-    if (view.status) { $('sx-status').textContent = view.status.toUpperCase(); $('sx-status').style.display = 'inline-block'; }
-    var pin = pinFrom(view);
-    if (pin) {
-      $('sx-eta').innerHTML = '<strong>Estimated delivery:</strong> ' + etaForPin(pin, view.createdAt);
-      $('sx-eta').style.display = 'inline-block';
-    }
-    if (view.lines && view.lines.length) {
-      $('sx-summary').style.display = 'block';
-      $('sx-lines').innerHTML = view.lines.map(function (l) {
-        return '<div class="sx-line"><span></span><span></span></div>';
-      }).join('');
-      var rows = $('sx-lines').children;
-      view.lines.forEach(function (l, i) {
-        rows[i].children[0].textContent = l.name + ' · x' + l.qty;
-        rows[i].children[1].textContent = l.lineText;
-      });
-      if (view.shippingText) { $('sx-ship').textContent = view.shippingText; $('sx-ship-row').style.display = 'flex'; }
-      if (view.discountText) { $('sx-disc').textContent = '−' + view.discountText; $('sx-disc-row').style.display = 'flex'; }
-      $('sx-total').textContent = view.totalText || '';
-      $('sx-cust').textContent = view.customer || '';
-      $('sx-addr').textContent = view.address || '';
-      $('sx-phone').textContent = view.phone || '';
-      $('sx-pay').textContent = view.paymentId ? 'Payment: ' + view.paymentId : '';
-    }
-    var oid = $('sx-oid').textContent.trim();
-    if (oid) $('sx-wa').href = 'https://wa.me/919987008435?text=' + encodeURIComponent('Hi Saubhagya, I need help with my order ' + oid);
-  }
-
-  function fromServer(o) {
-    var addr = o.address || {};
-    if (typeof addr === 'string') { try { addr = JSON.parse(addr); } catch (e) { addr = { street: addr }; } }
-    return {
-      id: o.id,
-      status: o.status,
-      lines: (o.items || []).map(function (i) {
-        return { name: i.name || i.id, qty: i.qty || 1, lineText: fmt((i.price || 0) * (i.qty || 1)) };
-      }),
-      totalText: fmt((o.total || 0) / 100),
-      shippingText: '',
-      discountText: o.discount > 0 ? fmt(o.discount / 100) : '',
-      customer: o.name || '',
-      address: [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).join(', '),
-      pin: addr.pin || '',
-      createdAt: o.created_at ? o.created_at.replace(' ', 'T') + 'Z' : null,
-      phone: o.phone || '',
-      paymentId: o.razorpay_payment_id || ''
-    };
-  }
-
-  function fromLocal() {
-    try {
-      var lo = JSON.parse(localStorage.getItem('cc_lastorder') || 'null');
-      if (!lo) return null;
-      return {
-        id: lo.id, status: 'confirmed', lines: lo.lines || [],
-        totalText: lo.totalText, shippingText: lo.shippingText || '', discountText: lo.discountText || '',
-        customer: lo.customer, address: lo.address, phone: lo.phone, paymentId: lo.paymentId
-      };
-    } catch (e) { return null; }
-  }
-
-  // The order is saved with fetch({keepalive}) as this page loads, so the
-  // first lookup can race it — retry a few times before local fallback.
-  function attempt(n) {
-    if (!orderId) { show(fromLocal() || {}); return; }
-    fetch('/api/orders/track?order_id=' + encodeURIComponent(orderId))
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        if (d && d.success && d.orders && d.orders.length) show(fromServer(d.orders[0]));
-        else if (n < 3) setTimeout(function () { attempt(n + 1); }, 1200);
-        else show(fromLocal() || {});
-      })
-      .catch(function () {
-        if (n < 3) setTimeout(function () { attempt(n + 1); }, 1200);
-        else show(fromLocal() || {});
-      });
-  }
-  attempt(0);
+  var phone = '';
+  try { var u = JSON.parse(localStorage.getItem('cc_user') || 'null'); phone = u && u.phone ? u.phone : ''; } catch(e) {}
+  $('sx-oid').textContent = orderId || (localStorage.getItem('cc_lastorderid') || '');
+  var trackUrl = '/track-orders.html?order_id=' + encodeURIComponent(orderId);
+  if (phone) trackUrl += '&phone=' + encodeURIComponent(phone);
+  $('sx-track-link').href = trackUrl;
+  if (orderId) { setTimeout(function() { window.location.href = trackUrl; }, 2000); }
 })();
 </script>
 </body>

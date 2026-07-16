@@ -200,9 +200,9 @@
     var fallbackStatus = o.status || 'confirmed';
     var displayStatus = spStatus || fallbackStatus.toUpperCase();
     var statusLabel = SP_LABELS[displayStatus] || displayStatus;
-    var hasAWB = o.awb && o.awb.trim();
+    var awb = o.awb && o.awb.trim();
     var eta = etaForOrder(o);
-    var trackUrl = hasAWB ? 'https://shipprime.live/saubhagyajewellery/track/' + o.awb : '';
+    var trackUrl = awb ? 'https://shipprime.live/saubhagyajewellery/track/' + awb : '';
     var name = o.name || 'Customer';
     var address = '';
     try { var a = JSON.parse(o.address || '{}'); address = [a.city, a.state].filter(Boolean).join(', '); } catch(e) {}
@@ -225,7 +225,7 @@
       // ETA
       (eta ? '<div class="eta-text">📅 Est. delivery: <strong>' + eta + '</strong></div>' : '') +
       // AWB & tracking
-      (hasAWB ? '<div style="margin-top:10px;"><span style="font-family:\'Montserrat\',sans-serif;font-size:11px;color:#6a6a6a;">AWB: ' + esc(o.awb) + '</span>' +
+      (awb ? '<div style="margin-top:10px;"><span style="font-family:\'Montserrat\',sans-serif;font-size:11px;color:#6a6a6a;">AWB: ' + esc(awb) + '</span>' +
         '<a class="track-link" href="' + trackUrl + '" target="_blank" rel="noopener" style="margin-left:10px;">🔗 Track Live →</a></div>' : '') +
       // Items
       '<div style="margin-top:12px;">' + itemsHtml(o.items) + '</div>' +
