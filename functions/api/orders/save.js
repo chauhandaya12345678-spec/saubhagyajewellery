@@ -9,12 +9,12 @@
  *   test_mode: bool,
  *   create_account: bool (auto-create user account for guest)
  * }
- * Returns: { success: true, order_id, user_id?, session_token?, shiprocket? }
+ * Returns: { success: true, order_id, user_id?, session_token?, shipprime? }
  *
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
- * payment id) → push to Shiprocket custom-channel order (skipped for tests).
+ * payment id) → push to ShipPrime order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShiprocketResult, normEmail, normPhone, sendOrderEmail } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -44,7 +44,7 @@ export async function onRequest(context) {
     }
 
     // COD is disabled site-wide as of 2026-07-11. Reject any COD orders at the API
-    // boundary even if a stale client tab tries to submit one — protects Shiprocket
+    // boundary even if a stale client tab tries to submit one — protects ShipPrime pipeline
     // pipeline from unverified pickups.
     if (payment_method === 'cod') {
       return json({ error: 'Cash on Delivery is temporarily unavailable. Please pay online.' }, 400);
@@ -146,12 +146,12 @@ export async function onRequest(context) {
       ).run();
     }
 
-    // Shiprocket push MUST await before the response — Pages Functions kill
+    // ShipPrime push MUST await before the response — Pages Functions kill
     // the isolate right after `return`, so waitUntil never actually runs on
     // free tier. Cap at 22s (safe under the 30s wall limit). Every attempt
-    // is logged to order_events + shiprocket_error is written to the order
-    // row so /api/orders/retry-shiprocket can sweep failures later.
-    let shiprocket = { pushed: false, note: 'skipped (test mode)' };
+    // is logged to order_events + shipprime_error is written to the order
+    // row so /api/orders/retry-shipprime can sweep failures later.
+    let shipprimeResult = { pushed: false, note: 'skipped (test mode)' };
     if (!isTest) {
       const orderForJobs = {
         id: orderId,
@@ -164,8 +164,8 @@ export async function onRequest(context) {
         paymentMethod: method,
       };
 
-      // ── Validate shipping address before pushing to Shiprocket ──
-      // A missing or short pincode causes Shiprocket to reject the order
+      // ── Validate shipping address before pushing to ShipPrime ──
+      // A missing or short pincode causes ShipPrime to reject the order
       // and repeated retries lock the account. Skip push and store the
       // error so the admin can fix the address and retry manually.
       let addrCheck = addressJson;
@@ -173,28 +173,28 @@ export async function onRequest(context) {
       addrCheck = addrCheck || {};
       const pin = String(addrCheck.pin || '').replace(/\D/g, '');
       if (pin.length !== 6) {
-        shiprocket = { pushed: false, error: 'skipped — invalid pincode "' + (addrCheck.pin || '') + '" — update address in Razorpay and retry via /api/orders/retry-shiprocket' };
-        try { await recordShiprocketResult(db, orderId, shiprocket); } catch (e) {}
+        shipprimeResult = { pushed: false, error: 'skipped — invalid pincode "' + (addrCheck.pin || '') + '" — update address in Razorpay and retry via /api/orders/retry-shipprime' };
+        try { await recordShipprimeResult(db, orderId, shipprimeResult); } catch (e) {}
       } else {
         const srPromise = pushToShipPrime(env, orderForJobs);
       const capped = Promise.race([
         srPromise,
-        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (Shiprocket >22s)' }), 22000)),
+        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (ShipPrime >22s)' }), 22000)),
       ]);
       try {
-        shiprocket = await capped;
+        shipprimeResult = await capped;
       } catch (e) {
-        shiprocket = { pushed: false, error: 'push exception: ' + e.message };
+        shipprimeResult = { pushed: false, error: 'push exception: ' + e.message };
       }
       // Always record — success writes SR ids, failure writes reason for
       // manual/scheduled retry. Never throws.
-      try { await recordShiprocketResult(db, orderId, shiprocket); } catch (e) {}
+      try { await recordShipprimeResult(db, orderId, shipprimeResult); } catch (e) {}
 
       // Order-confirmation email: try waitUntil first, but await inline as a
       // fallback so it also survives free-tier isolate termination.
       const emailJob = sendOrderEmail(env, orderForJobs).catch(() => {});
       if (context.waitUntil) context.waitUntil(emailJob);
-      }  // end else (valid pincode — push to Shiprocket)
+      }  // end else (valid pincode — push to ShipPrime)
     }
 
     return json({
@@ -203,7 +203,7 @@ export async function onRequest(context) {
       user_id: userId,
       session_token: sessionToken,
       payment_verified: paymentVerified,
-      shiprocket,
+      shipprimeResult,
       message: `Order ${orderId} confirmed.`,
     });
   } catch (err) {

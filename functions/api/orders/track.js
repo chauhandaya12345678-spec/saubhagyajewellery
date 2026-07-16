@@ -59,12 +59,9 @@ export async function onRequest(context) {
     }
 
     // Parse JSON fields for each order
-    // Map legacy shiprocket_order_id column → awb (ShipPrime AWB is stored there)
-    // Map legacy shiprocket_shipment_id → shipprime_order_id
     const orders = results.map(o => ({
       ...o,
-      awb: o.awb || o.shiprocket_order_id || '',
-      shipprime_order_id: o.shiprocket_shipment_id || '',
+      awb: o.shipprime_awb || o.awb || '',
       items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items,
       address: typeof o.address === 'string' ? JSON.parse(o.address) : o.address,
     }));

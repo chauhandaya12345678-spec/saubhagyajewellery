@@ -13,7 +13,7 @@
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
  *   Events: payment.captured, order.paid
  */
-import { hmacSha256Hex, pushToShipPrime, recordShiprocketResult, sendOrderEmail } from '../_lib.js';
+import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -64,7 +64,7 @@ export async function onRequest(context) {
       const paymentId = notes.payment_id || paymentEntity.id || '';
       if (!paymentId) return json({ ok: true, event: 'order.paid', note: 'no payment_id' });
 
-      const existing = await db.prepare('SELECT id, address, items, shiprocket_order_id, total FROM orders WHERE razorpay_payment_id = ?')
+      const existing = await db.prepare('SELECT id, address, items, shipprime_awb, total FROM orders WHERE razorpay_payment_id = ?')
         .bind(paymentId).first().catch(() => null);
       if (!existing) return json({ ok: true, event: 'order.paid', note: 'order not found (browser save.js already saved?)' });
 
@@ -80,7 +80,7 @@ export async function onRequest(context) {
         .bind(addressJson, existing.id).run();
 
       // Push to ShipPrime now that we have the address
-      if (!existing.shiprocket_order_id) {
+      if (!existing.shipprime_awb) {
         // Validate pincode before pushing (same logic as save.js)
         const pin = String(address.pin || '').replace(/\D/g, '');
         if (pin.length !== 6) {
@@ -104,7 +104,7 @@ export async function onRequest(context) {
         };
         const sp = await pushToShipPrime(env, orderForPush);
         if (sp.pushed) {
-          await db.prepare('UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
+          await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
             .bind(sp.awb || '', sp.shipPrimeOrderId || '', existing.id).run();
         }
         return json({ ok: true, event: 'order.paid', order_id: existing.id, address_updated: true, shipprime: sp });
@@ -190,7 +190,7 @@ export async function onRequest(context) {
       ]).catch(e => ({ pushed: false, error: 'push exception: ' + e.message }));
 
       if (sp && sp.pushed) {
-        await db.prepare('UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
+        await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
           .bind(sp.awb || '', sp.shipPrimeOrderId || '', orderId).run();
       }
 
