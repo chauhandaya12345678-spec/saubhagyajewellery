@@ -2,54 +2,136 @@
  * Saubhagya – Razorpay Webhook (server-side backstop)
  * POST /api/razorpay/webhook
  *
- * Handles `payment.captured`: if the browser never called /api/orders/save
- * (tab closed, network drop), the order is rebuilt here from the Razorpay
- * order notes and saved + pushed to Shiprocket. Idempotent on payment id.
+ * Handles:
+ *   `payment.captured`: if browser never called /api/orders/save (tab closed,
+ *     network drop), the order is rebuilt here from Razorpay notes.
+ *   `order.paid` (NEW): fires AFTER Magic Checkout captures the shipping address.
+ *     We UPDATE the existing order with the real address + push to ShipPrime.
  *
  * Configure in Razorpay Dashboard → Settings → Webhooks:
  *   URL:    https://saubhagyajewellery.com/api/razorpay/webhook
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
- *   Event:  payment.captured
+ *   Events: payment.captured, order.paid
  */
-import { hmacSha256Hex, pushToShiprocket, recordShiprocketResult, sendOrderEmail } from '../_lib.js';
+import { hmacSha256Hex, pushToShipPrime, recordShiprocketResult, sendOrderEmail } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
-  if (request.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
-  }
+  const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
+    status, headers: { 'Content-Type': 'application/json' },
+  });
+  if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
   const secret = env.RAZORPAY_WEBHOOK_SECRET;
-  if (!secret) {
-    return new Response(JSON.stringify({ error: 'RAZORPAY_WEBHOOK_SECRET not configured' }), { status: 501, headers: { 'Content-Type': 'application/json' } });
-  }
+  if (!secret) return json({ error: 'RAZORPAY_WEBHOOK_SECRET not configured' }, 501);
 
   const raw = await request.text();
   const signature = request.headers.get('x-razorpay-signature') || '';
   const expected = await hmacSha256Hex(secret, raw);
-  if (expected !== signature) {
-    return new Response(JSON.stringify({ error: 'Invalid signature' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
-  }
+  if (expected !== signature) return json({ error: 'Invalid signature' }, 401);
 
   try {
     const event = JSON.parse(raw);
+    const db = env.DB;
+
+    // ═══ order.paid — Magic Checkout address fix ═══
+    // This event fires AFTER payment with the full order object including
+    // customer_details.shipping_address that Magic Checkout captured.
+    if (event.event === 'order.paid') {
+      const o = event.payload.order.entity;
+      const cd = o.customer_details || {};
+      const shipAddr = cd.shipping_address || {};
+
+      // Build address from Magic Checkout order
+      let address = {};
+      if (shipAddr.street1 || shipAddr.line1 || shipAddr.city) {
+        address = {
+          street: shipAddr.street1 || shipAddr.line1 || '',
+          apt: shipAddr.street2 || shipAddr.line2 || '',
+          city: shipAddr.city || '',
+          state: shipAddr.state || '',
+          pin: shipAddr.zipcode || shipAddr.pincode || '',
+        };
+      } else {
+        // No address in order.paid — nothing to update
+        return json({ ok: true, event: 'order.paid', note: 'no address in payload' });
+      }
+
+      // Update existing order's address if it was empty
+      const notes = o.notes || {};
+      const paymentId = notes.payment_id || (event.payload.payment?.entity?.id) || '';
+      if (!paymentId) return json({ ok: true, event: 'order.paid', note: 'no payment_id' });
+
+      const existing = await db.prepare('SELECT id, address, shiprocket_order_id FROM orders WHERE razorpay_payment_id = ?')
+        .bind(paymentId).first().catch(() => null);
+      if (!existing) return json({ ok: true, event: 'order.paid', note: 'order not found (browser save.js already saved?)' });
+
+      // Only update if address was empty
+      let addrStr = '';
+      try { addrStr = existing.address || ''; if (typeof addrStr === 'string') { const a = JSON.parse(addrStr); if (Object.keys(a).length > 0 && a.pin) addrStr = 'has_address'; } } catch (e) {}
+      if (addrStr === 'has_address') {
+        return json({ ok: true, event: 'order.paid', order_id: existing.id, note: 'address already present, skipping' });
+      }
+
+      const addressJson = JSON.stringify(address);
+      await db.prepare('UPDATE orders SET address = ?, updated_at = datetime(\'now\') WHERE id = ?')
+        .bind(addressJson, existing.id).run();
+
+      // Push to ShipPrime now that we have the address
+      if (!existing.shiprocket_order_id) {
+        const orderForPush = {
+          id: existing.id,
+          name: cd.name || notes.customer_name || 'Guest',
+          email: cd.email || notes.customer_email || '',
+          phone: cd.contact || notes.customer_phone || '',
+          address: addressJson,
+          items: [],
+          totalPaise: o.amount || 0,
+          paymentMethod: 'razorpay',
+        };
+        const sp = await pushToShipPrime(env, orderForPush);
+        if (sp.pushed) {
+          await db.prepare('UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
+            .bind(sp.awb || '', sp.shipPrimeOrderId || '', existing.id).run();
+        }
+        return json({ ok: true, event: 'order.paid', order_id: existing.id, address_updated: true, shipprime: sp });
+      }
+
+      return json({ ok: true, event: 'order.paid', order_id: existing.id, address_updated: true });
+    }
+
+    // ═══ payment.captured — backstop save ═══
     if (event.event !== 'payment.captured') {
-      return new Response(JSON.stringify({ ok: true, ignored: event.event }), { headers: { 'Content-Type': 'application/json' } });
+      return json({ ok: true, ignored: event.event });
     }
 
     const p = event.payload.payment.entity;
-    const db = env.DB;
 
     const existing = await db.prepare('SELECT id FROM orders WHERE razorpay_payment_id = ?').bind(p.id).first().catch(() => null);
-    if (existing) {
-      return new Response(JSON.stringify({ ok: true, order_id: existing.id, duplicate: true }), { headers: { 'Content-Type': 'application/json' } });
-    }
+    if (existing) return json({ ok: true, order_id: existing.id, duplicate: true });
 
     const notes = p.notes || {};
     let items = [];
     try { items = JSON.parse(notes.cart || '[]'); } catch (e) {}
-    let addressJson = notes.address_json || '';
-    if (!addressJson) addressJson = JSON.stringify({ street: notes.shipping_address || '' });
+
+    // Build address — try multiple sources
+    let addressObj = {};
+    if (notes.address_json) {
+      try { addressObj = JSON.parse(notes.address_json); } catch (e) {}
+    } else if (notes.shipping_address) {
+      addressObj = { street: notes.shipping_address };
+    }
+    // Also check payment.shipping_address (Magic Checkout puts address here)
+    if (!addressObj.pin && !addressObj.street && p.shipping_address) {
+      const sa = p.shipping_address;
+      addressObj = {
+        street: sa.street1 || sa.line1 || '',
+        city: sa.city || '',
+        state: sa.state || '',
+        pin: sa.zipcode || sa.pincode || '',
+      };
+    }
+    const addressJson = JSON.stringify(addressObj);
     const isTest = notes.test_mode === '1' ? 1 : 0;
 
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -77,7 +159,7 @@ export async function onRequest(context) {
       ).run();
     }
 
-    let shiprocket = { pushed: false, error: 'skipped (test mode)' };
+    let sp; // ShipPrime result
     if (!isTest) {
       const orderForPush = {
         id: orderId,
@@ -89,32 +171,28 @@ export async function onRequest(context) {
         totalPaise: p.amount,
         paymentMethod: 'razorpay',
       };
-      // Cap the push at 22s so Razorpay's 5s webhook expectation isn't
-      // starved forever by a slow Shiprocket. Failures land in
-      // orders.shiprocket_error and order_events for retry sweeper.
-      shiprocket = await Promise.race([
-        pushToShiprocket(env, orderForPush),
-        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (Shiprocket >22s)' }), 22000)),
+      sp = await Promise.race([
+        pushToShipPrime(env, orderForPush),
+        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (ShipPrime >22s)' }), 22000)),
       ]).catch(e => ({ pushed: false, error: 'push exception: ' + e.message }));
-      try { await recordShiprocketResult(db, orderId, shiprocket); } catch (e) {}
 
-      // Backstop path also sends the confirmation email (browser never called save)
+      if (sp && sp.pushed) {
+        await db.prepare('UPDATE orders SET shiprocket_order_id = ?, shiprocket_shipment_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
+          .bind(sp.awb || '', sp.shipPrimeOrderId || '', orderId).run();
+      }
+
       const emailJob = sendOrderEmail(env, {
-        id: orderId,
-        name: notes.customer_name || 'Guest',
+        id: orderId, name: notes.customer_name || 'Guest',
         email: notes.customer_email || p.email || '',
         phone: notes.customer_phone || p.contact || '',
-        address: addressJson,
-        items,
-        totalPaise: p.amount,
-        paymentMethod: 'razorpay',
+        address: addressJson, items,
+        totalPaise: p.amount, paymentMethod: 'razorpay',
       });
       if (context.waitUntil) context.waitUntil(emailJob); else await emailJob;
     }
 
-    return new Response(JSON.stringify({ ok: true, order_id: orderId, shiprocket }), { headers: { 'Content-Type': 'application/json' } });
+    return json({ ok: true, order_id: orderId, shipprime: sp || { pushed: false } });
   } catch (err) {
-    // Return 500 so Razorpay retries the delivery later.
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return json({ error: err.message }, 500);
   }
 }

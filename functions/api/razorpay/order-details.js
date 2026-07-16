@@ -66,13 +66,21 @@ export async function onRequest(context) {
       || payment.notes?.customer_phone
       || '';
 
-    // Address: try order.customer_details first, then notes
+    // Address: try order.customer_details → payment.shipping_address → notes
     let address = {};
     if (order.customer_details?.shipping_address) {
       const a = order.customer_details.shipping_address;
       address = {
         street: a.street1 || a.line1 || '',
         apt: a.street2 || a.line2 || '',
+        city: a.city || '',
+        state: a.state || '',
+        pin: a.zipcode || a.pincode || '',
+      };
+    } else if (payment.shipping_address) {
+      const a = payment.shipping_address;
+      address = {
+        street: a.street1 || a.line1 || '',
         city: a.city || '',
         state: a.state || '',
         pin: a.zipcode || a.pincode || '',
