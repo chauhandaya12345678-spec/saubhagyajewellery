@@ -159,6 +159,72 @@ export async function pushToShiprocket(env, order) {
   }
 }
 
+/**
+ * Push a confirmed order to ShipPrime (replaces Shiprocket).
+ * ShipPrime uses a simple Bearer token — no login, no session management.
+ * 
+ * order = { id, name, email, phone, address, items, totalPaise, paymentMethod }
+ * Returns { pushed, awb?, courier?, orderId?, labelUrl?, error? } — never throws.
+ */
+export async function pushToShipPrime(env, order) {
+  try {
+    const token = env.SHIPPRIME_TOKEN;
+    if (!token) return { pushed: false, error: 'SHIPPRIME_TOKEN not configured' };
+
+    let addr = order.address;
+    if (typeof addr === 'string') { try { addr = JSON.parse(addr); } catch (e) { addr = {}; } }
+    addr = addr || {};
+
+    const items = (order.items || []).map(l => ({
+      name: l.name || l.id || 'Jewellery item',
+      sku: String(l.id || l.sku || 'SKU'),
+      quantity: l.qty || 1,
+      price: Math.round(l.price || 0),
+      hsnCode: '7117', // imitation jewellery
+    }));
+
+    const bp = {
+      paymentMethod: order.paymentMethod === 'cod' ? 'COD' : 'PREPAID',
+      weightGrams: Number(env.SHIPPRIME_WEIGHT_GRAMS || 300),
+      declaredValue: Math.round((order.totalPaise || 0) / 100) || items.reduce((s, i) => s + i.price * i.quantity, 0),
+      items,
+      pickupAddress: {
+        name: env.SHIPPRIME_PICKUP_NAME || 'Saubhagya Jewellery',
+        phone: env.SHIPPRIME_PICKUP_PHONE || '9987008435',
+        address1: env.SHIPPRIME_PICKUP_ADDRESS1 || 'Kandivali East',
+        address2: env.SHIPPRIME_PICKUP_ADDRESS2 || '',
+        city: env.SHIPPRIME_PICKUP_CITY || 'Mumbai',
+        state: env.SHIPPRIME_PICKUP_STATE || 'Maharashtra',
+        pincode: env.SHIPPRIME_PICKUP_PIN || '400101',
+        country: 'India',
+      },
+      deliveryAddress: {
+        name: (order.name || 'Customer').split(' ').slice(0, 5).join(' ').slice(0, 200),
+        phone: String(order.phone || '').replace(/\D/g, '').slice(-10) || '9999999999',
+        address1: (addr.street || addr.address1 || 'Address').slice(0, 250),
+        address2: (addr.apt || addr.address2 || '').slice(0, 250),
+        city: (addr.city || 'Mumbai').slice(0, 100),
+        state: (addr.state || 'Maharashtra').slice(0, 100),
+        pincode: String(addr.pin || '').replace(/\D/g, '').slice(0, 6) || '400001',
+        country: 'India',
+      },
+    };
+
+    const res = await fetch('https://api.shipprime.live/v1/forward', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(bp),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.status === 'SUCCESS') {
+      return { pushed: true, awb: data.awb, courier: data.courier, labelUrl: data.labelUrl, shipPrimeOrderId: String(data.orderId) };
+    }
+    return { pushed: false, error: 'ShipPrime: ' + (data.message || data.code || res.status) };
+  } catch (err) {
+    return { pushed: false, error: 'ShipPrime push error: ' + err.message };
+  }
+}
+
 /** Record Shiprocket result on the order row + append an event log entry so
  *  a missing order in the Shiprocket panel is always diagnosable from D1. */
 export async function recordShiprocketResult(db, orderId, sr) {

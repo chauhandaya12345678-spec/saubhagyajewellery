@@ -14,7 +14,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to Shiprocket custom-channel order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShiprocket, recordShiprocketResult, normEmail, normPhone, sendOrderEmail } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShiprocketResult, normEmail, normPhone, sendOrderEmail } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -176,7 +176,7 @@ export async function onRequest(context) {
         shiprocket = { pushed: false, error: 'skipped — invalid pincode "' + (addrCheck.pin || '') + '" — update address in Razorpay and retry via /api/orders/retry-shiprocket' };
         try { await recordShiprocketResult(db, orderId, shiprocket); } catch (e) {}
       } else {
-        const srPromise = pushToShiprocket(env, orderForJobs);
+        const srPromise = pushToShipPrime(env, orderForJobs);
       const capped = Promise.race([
         srPromise,
         new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (Shiprocket >22s)' }), 22000)),
