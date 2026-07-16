@@ -87,13 +87,13 @@
         <div class="co-line"><span>Taxes</span><span>Inclusive of all taxes</span></div>
         <div class="co-total"><span>Total</span><span id="co-total-amt"></span></div>
 
-        <!-- Phone capture (shown for guests, hidden for logged-in users) — Razorpay handles OTP -->
-        <div id="co-phone-section" style="display:none; margin-top:16px; padding:16px; border:1px solid #eae5d8; border-radius:8px; background:#faf8f3;">
-          <label style="display:block; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; color:#6a6a6a; margin-bottom:6px; text-transform:uppercase;">Mobile Number for Order Tracking</label>
-          <div style="display:flex; gap:8px;">
-            <input id="co-phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" style="flex:1; height:44px; padding:0 12px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff;">
-          </div>
-          <div style="font-family:'Montserrat',sans-serif; font-size:10px; color:#9a9a9a; margin-top:6px;">You'll receive OTP via Razorpay on the next step</div>
+        <!-- Name + Phone (shown for guests, hidden for logged-in) -->
+        <div id="co-guest-fields" style="display:none; margin-top:16px; padding:16px; border:1px solid #eae5d8; border-radius:14px; background:#faf8f3;">
+          <label style="display:block; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; color:#6a6a6a; margin-bottom:6px; text-transform:uppercase;">Your Name</label>
+          <input id="co-name-input" type="text" placeholder="Full name for delivery" style="width:100%; height:44px; padding:0 12px; margin-bottom:12px; border:1px solid #ddd6c6; border-radius:10px; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff;">
+          <label style="display:block; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; color:#6a6a6a; margin-bottom:6px; text-transform:uppercase;">Mobile Number</label>
+          <input id="co-phone-input" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit number" style="width:100%; height:44px; padding:0 12px; border:1px solid #ddd6c6; border-radius:10px; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff;">
+          <div style="font-family:'Montserrat',sans-serif; font-size:10px; color:#9a9a9a; margin-top:6px;">OTP via Razorpay on next step</div>
         </div>
 
         <button class="co-btn" id="co-submit">PLACE ORDER</button>
@@ -161,23 +161,33 @@
     if (window.MPA) { try { window.MPA.init(); } catch(err) {} }
   }
 
-  // ── Phone capture for guests (no OTP here — Razorpay handles it) ──
+  // ── Guest fields: name + phone ──
   var verifiedPhone = '';
+  var guestName = '';
 
-  function initPhoneSection() {
+  function initGuestFields() {
+    // Check localStorage first (works even before mpa.js loads)
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem('cc_user') || 'null'); } catch(e) {}
     var ua = null;
     try { ua = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
-    if (ua && ua.phone) { verifiedPhone = ua.phone; $('co-phone-section').style.display = 'none'; return; }
-    $('co-phone-section').style.display = 'block';
+    var user = ua || stored;
+    if (user && user.phone) {
+      verifiedPhone = String(user.phone || '').replace(/\\D/g, '').slice(-10);
+      guestName = user.name || '';
+      $('co-guest-fields').style.display = 'none';
+      return;
+    }
+    $('co-guest-fields').style.display = 'block';
   }
 
-  // Capture phone number from input when user clicks PLACE ORDER
-  function capturePhone() {
-    var ph = ($('co-phone-input').value || '').replace(/\D/g, '');
+  function captureGuestFields() {
+    var ph = ($('co-phone-input').value || '').replace(/\\D/g, '');
+    guestName = ($('co-name-input').value || '').trim();
     if (ph.length === 10) {
       verifiedPhone = ph;
-      // Save as pending lead for WhatsApp retargeting
       try { localStorage.setItem('cc_lead_phone', ph); } catch(e) {}
+      if (guestName) { try { localStorage.setItem('cc_lead_name', guestName); } catch(e) {} }
     }
     return ph.length === 10;
   }
@@ -320,7 +330,7 @@
         description: lines.map(function(l) { return l.name; }).join(', ').slice(0, 200),
         image: 'images/banners/saubhagya-logo.png',
         order_id: orderId || undefined,
-        prefill: { contact: prefillPhone },
+        prefill: { name: guestName || undefined, contact: prefillPhone },
         notes: { cart: lines.map(function(l) { return l.id + 'x' + l.qty; }).join(',') },
         theme: { color: '#0B3C26' },
         handler: function(resp) {
@@ -410,7 +420,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: amountPaise, currency: 'INR', cart: lines,
-          name: (user && user.name) || '', email: (user && user.email) || '', phone: prefillPhone,
+          name: guestName || (user && user.name) || '', email: (user && user.email) || '', phone: prefillPhone,
           address: '', address_json: {},
           test_mode: false,
           magic: !!cfg.useMagicCheckout
@@ -433,7 +443,7 @@
       return;
     }
     // For guests: capture phone number (no OTP here, Razorpay handles it)
-    if (!verifiedPhone && !capturePhone()) {
+    if (!verifiedPhone && !captureGuestFields()) {
       $('co-error').textContent = 'Please enter a valid 10-digit mobile number.';
       $('co-error').style.display = 'block';
       return;
@@ -452,7 +462,7 @@
     });
   }
   loadCart();
-  initPhoneSection();
+  initGuestFields();
   if (cartItems.length) {
     fetch('/api/products')
       .then(function(r) { return r.json(); })

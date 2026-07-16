@@ -319,16 +319,31 @@
       return;
     }
 
-    // Priority 2: localStorage (last order + user phone)
-    var lastOrderId = null;
-    try { lastOrderId = localStorage.getItem('cc_lastorderid'); } catch(e) {}
+    // Priority 2: localStorage user (signed in, with or without recent order)
     var user = null;
     try { user = JSON.parse(localStorage.getItem('cc_user') || 'null'); } catch(e) {}
+    var lastOrderId = null;
+    try { lastOrderId = localStorage.getItem('cc_lastorderid'); } catch(e) {}
 
-    if (user && user.phone && lastOrderId) {
-      $('track-phone').value = String(user.phone || '').replace(/\D/g, '').slice(-10);
-      $('track-oid').value = lastOrderId;
-      doTrack();
+    if (user && user.phone) {
+      $('track-phone').value = String(user.phone || '').replace(/\\D/g, '').slice(-10);
+      if (lastOrderId) {
+        // User just bought something — track that order directly
+        $('track-oid').value = lastOrderId;
+        doTrack();
+        return;
+      }
+      // User signed in but no recent order — fetch all their orders by phone
+      fetch('/api/orders/track?phone=' + encodeURIComponent(user.phone))
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d && d.success && d.orders && d.orders.length) {
+            renderOrders(d.orders);
+          } else {
+            showGuest();
+          }
+        })
+        .catch(showGuest);
       return;
     }
 
