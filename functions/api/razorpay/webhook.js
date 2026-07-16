@@ -81,6 +81,12 @@ export async function onRequest(context) {
 
       // Push to ShipPrime now that we have the address
       if (!existing.shiprocket_order_id) {
+        // Validate pincode before pushing (same logic as save.js)
+        const pin = String(address.pin || '').replace(/\D/g, '');
+        if (pin.length !== 6) {
+          return json({ ok: true, event: 'order.paid', order_id: existing.id,
+            address_updated: true, shipprime: { pushed: false, error: 'invalid pincode: ' + (address.pin || 'empty') } });
+        }
         // Parse items from existing order
         let orderItems = [];
         if (existing.items) {

@@ -184,6 +184,7 @@ export async function pushToShipPrime(env, order) {
     }));
 
     const bp = {
+      clientReferenceId: order.id,
       paymentMethod: order.paymentMethod === 'cod' ? 'COD' : 'PREPAID',
       weightGrams: Number(env.SHIPPRIME_WEIGHT_GRAMS || 300),
       declaredValue: Math.round((order.totalPaise || 0) / 100) || items.reduce((s, i) => s + i.price * i.quantity, 0),
