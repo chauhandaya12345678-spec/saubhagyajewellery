@@ -18,12 +18,16 @@ export async function onRequest(context) {
   const db = env.DB;
   const results = [];
 
-  // Delete specific old test orders (CC-20260712*, CC-20260715*)
+  // Delete specific old test orders
   try {
-    const old = await db.prepare(
+    // First list what we have
+    const all = await db.prepare("SELECT id, created_at FROM orders ORDER BY created_at DESC").all();
+    results.push(`All orders: ${JSON.stringify((all.results||[]).map(o => o.id))}`);
+
+    const del = await db.prepare(
       "DELETE FROM orders WHERE id LIKE 'CC-20260712-%' OR id LIKE 'CC-20260715-%'"
     ).run();
-    results.push(`Deleted ${old.changes || 0} test orders`);
+    results.push(`Deleted ${del.changes || 0} test orders`);
   } catch (e) {
     results.push(`Order delete error: ${e.message}`);
   }
