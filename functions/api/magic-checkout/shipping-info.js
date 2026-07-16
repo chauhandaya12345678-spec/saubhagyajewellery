@@ -36,9 +36,11 @@ export async function onRequest(context) {
 
   // Map every address — echo exact ID back (Razorpay crashes if ID mismatches)
   const result = addresses.map(a => ({
-    id: a.id,                           // MUST echo exact ID from request
-    serviceability: true,
+    id: a.id,
+    serviceable: true,
+    shipping_fee: 0,
     cod: false,
+    cod_fee: 0,
     shipping_methods: [{
       id: 'standard',
       name: 'Standard Delivery',
