@@ -28,6 +28,8 @@
     s.textContent = [
       /* ── professional 3-zone header (overrides site.css) ────────── */
       'header.site{position:fixed;top:0;left:0;width:100%;z-index:1000;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,160,89,.20)}',
+      'body{padding-top:118px}',
+      '@media(max-width:900px){body{padding-top:60px}}',
       '.nav{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:14px 40px}',
       '.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;flex:none;order:0}',
       '.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}',

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=18">
+<link rel="stylesheet" href="site.css?v=14">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
@@ -30,14 +30,12 @@
   .cart-item-qty span { width: 30px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; user-select: none; }
   .cart-item-qty .cq { border-left: 1px solid #ddd6c6; border-right: 1px solid #ddd6c6; width: 34px; font-size: 12px; }
   .cart-item-remove { font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 1px; color: #9a9a9a; cursor: pointer; margin-top: 8px; }
-  .cart-summary { margin-top: 28px; padding: 20px; background: #fff; border: 1px solid #eae5d8; }
+  .cart-summary { margin-top: 28px; padding: 20px; background: #fff; border: 1px solid #eae5d8; border-radius: 16px; max-width: 420px; margin-left: auto; margin-right: auto; }
   .cart-summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #4a4a4a; }
   .cart-summary-total { display: flex; justify-content: space-between; padding: 14px 0 0; margin-top: 8px; border-top: 1px solid #eae5d8; }
-  .cart-summary-total span:first-child { font-family: 'Cormorant Garamond',serif; font-size: 18px; color: #1A1A1A; }
   .cart-summary-total span:last-child { font-family: 'Cormorant Garamond',serif; font-size: 22px; font-weight: 600; color: #0B3C26; }
-  .cart-checkout { display: block; width: 100%; margin-top: 16px; padding: 16px; background: #0B3C26; color: #fff; border: none; border-radius: 8px; font-family: 'Montserrat',sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; cursor: pointer; text-align: center; text-decoration: none; box-shadow: 0 6px 18px rgba(11,60,38,.22); transition: background .25s, transform .25s; }
-  .cart-checkout:hover { background: #06281a; }
-  .cart-checkout:active { transform: scale(.98); }
+  .cart-checkout { display: block; width: 100%; margin-top: 16px; padding: 16px; background: #0B3C26; color: #fff; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; cursor: pointer; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(6,40,26,.18); transition: all .4s cubic-bezier(.22,1,.36,1); }
+  .cart-checkout:hover { background: #06281a; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,40,26,.28); }
   .cart-continue { display: block; margin-top: 12px; text-align: center; font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; letter-spacing: 1px; }
   .cart-continue a { color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; padding-bottom: 1px; }
   .cart-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; letter-spacing: 2px; }
