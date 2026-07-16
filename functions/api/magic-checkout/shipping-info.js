@@ -34,9 +34,10 @@ export async function onRequest(context) {
 
   console.log('[shipping-info] addresses count:', addresses.length);
 
-  // Map every address — echo exact ID back (Razorpay crashes if ID mismatches)
+  // BULLETPROOF: Both keys at both levels — Razorpay changes field names (serviceable vs serviceability)
   const result = addresses.map(a => ({
     id: a.id,
+    serviceability: true,
     serviceable: true,
     shipping_fee: 0,
     cod: false,
@@ -45,6 +46,8 @@ export async function onRequest(context) {
       id: 'standard',
       name: 'Standard Delivery',
       shipping_fee: 0,
+      serviceable: true,
+      serviceability: true,
     }],
   }));
 
