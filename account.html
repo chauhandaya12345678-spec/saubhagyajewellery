@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=21">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
@@ -17,12 +17,12 @@
   body { background:#FAFAFA; margin:0; }
   .ac-wrap { max-width:900px; margin:0 auto; padding:30px 24px 80px; }
   .ac-head { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
-  .ac-h1 { font-family:'Cormorant Garamond',serif; font-size:32px; color:#1A1A1A; margin:0; }
+  .ac-h1 { font-family:'Playfair Display',serif; font-size:32px; color:#1A1A1A; margin:0; }
   .ac-sub { font-family:'Montserrat',sans-serif; font-size:12px; color:#9a9a9a; }
-  .ac-signout { font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1.5px; color:#c0392b; background:none; border:1px solid #ddd6c6; padding:8px 16px; cursor:pointer; border-radius:14px; box-shadow:0 2px 8px rgba(6,40,26,.08); transition:all .3s; }
+  .ac-signout { font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; color:#c0392b; background:none; border:1px solid #ddd6c6; padding:8px 16px; cursor:pointer; border-radius:14px; box-shadow:0 2px 8px rgba(6,40,26,.08); transition:all .3s; }
   .ac-signout:hover { border-color:#c0392b; transform:translateY(-2px); box-shadow:0 4px 12px rgba(6,40,26,.15); }
   .ac-section { margin-bottom:30px; }
-  .ac-section h2 { font-family:'Cormorant Garamond',serif; font-size:22px; color:#0B3C26; margin:0 0 14px; }
+  .ac-section h2 { font-family:'Playfair Display',serif; font-size:22px; color:#0B3C26; margin:0 0 14px; }
   .ac-empty { padding:24px; text-align:center; font-family:'Montserrat',sans-serif; font-size:13px; color:#9a9a9a; background:#fff; border:1px solid #eae5d8; border-radius:8px; }
   .ac-empty a { color:#0B3C26; }
   .ac-cards { display:flex; flex-direction:column; gap:12px; }
@@ -31,12 +31,12 @@
   .ac-fav-card { display:block; text-decoration:none; color:inherit; border:1px solid #eae5d8; border-radius:8px; overflow:hidden; background:#fff; }
   .ac-fav-img { width:100%; aspect-ratio:4/5; object-fit:cover; background:#f0ede5; display:block; }
   .ac-fav-body { padding:8px 10px 12px; }
-  .ac-fav-name { font-family:'Cormorant Garamond',serif; font-size:14px; color:#1A1A1A; line-height:1.3; }
+  .ac-fav-name { font-family:'Playfair Display',serif; font-size:14px; color:#1A1A1A; line-height:1.3; }
   .ac-fav-price { font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26; font-weight:500; margin-top:3px; }
   .ac-guest { text-align:center; padding:60px 20px; }
-  .ac-guest h2 { font-family:'Cormorant Garamond',serif; font-size:26px; color:#1A1A1A; margin:0 0 10px; }
+  .ac-guest h2 { font-family:'Playfair Display',serif; font-size:26px; color:#1A1A1A; margin:0 0 10px; }
   .ac-guest p { font-family:'Montserrat',sans-serif; font-size:13px; color:#6a6a6a; margin:0 0 20px; }
-  .ac-guest a { display:inline-block; padding:12px 26px; background:#0B3C26; color:#fff; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:2px; text-decoration:none; }
+  .ac-guest a { display:inline-block; padding:12px 26px; background:#0B3C26; color:#fff; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; text-decoration:none; }
 </style>
 </head>
 <body>
@@ -69,7 +69,7 @@
             <div style="color:#9a9a9a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Member since</div>
             <div id="pf-since" style="color:#1A1A1A;">—</div>
           </div>
-          <div style="margin-top:14px;font-family:'Montserrat',sans-serif;font-size:11px;color:#9a9a9a;">
+          <div style="margin-top:14px;font-family:'Montserrat',sans-serif;font-size:13px;color:#9a9a9a;">
             To change your email or phone, write to <a href="mailto:care@saubhagyajewellery.com" style="color:#0B3C26;">care@saubhagyajewellery.com</a>.
           </div>
         </div>
@@ -106,7 +106,7 @@
       return '<a href="track-orders.html?order_id=' + encodeURIComponent(o.id) + '&phone=' + phone + '" style="text-decoration:none;color:inherit"><div style="border:1px solid rgba(197,160,89,.25);border-radius:10px;padding:14px 16px;background:#fff">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">' +
         '<span style="font-family:\'Montserrat\',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:#0B3C26">' + esc(o.id) + '</span>' +
-        '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:2px;padding:4px 10px;border-radius:20px;background:#0B3C26;color:#fff">' + status + '</span>' +
+        '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:1.5px;padding:4px 10px;border-radius:20px;background:#0B3C26;color:#fff">' + status + '</span>' +
         '</div>' +
         '<div style="font-family:\'Montserrat\',sans-serif;font-size:12px;color:#6a6a6a;margin-top:6px">' + fmt(o.total) + ' · ' + fmtDate(o.created_at) + '</div>' +
       '</div></a>';

@@ -11,8 +11,8 @@
 <meta property="og:description" content="Track your Saubhagya order by phone and order ID.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=21">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Track Orders"}]}</script>
@@ -22,13 +22,13 @@
   .track-row { display:flex; gap:10px; flex-wrap:wrap; }
   .track-row input { flex:1; min-width:140px; height:44px; padding:0 14px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff; border-radius:12px; }
   .track-row input:focus { border-color:#C5A059; }
-  .track-btn { height:44px; padding:0 28px; background:#0B3C26; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:2px; cursor:pointer; white-space:nowrap; align-self:flex-start; border-radius:14px; box-shadow:0 2px 8px rgba(6,40,26,.15); transition:all .4s cubic-bezier(.22,1,.36,1); }
+  .track-btn { height:44px; padding:0 28px; background:#0B3C26; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; white-space:nowrap; align-self:flex-start; border-radius:14px; box-shadow:0 2px 8px rgba(6,40,26,.15); transition:all .4s cubic-bezier(.22,1,.36,1); }
   .track-btn:disabled { opacity:.6; cursor:not-allowed; }
   .track-btn:hover:not(:disabled) { background:#06281a; transform:translateY(-2px); box-shadow:0 6px 20px rgba(6,40,26,.25); }
 
   .order-card { border:1px solid rgba(197,160,89,.25); border-radius:12px; padding:20px; background:#fff; margin-bottom:20px; }
   .order-id-font { font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; letter-spacing:1px; color:#0B3C26; font-variant-numeric:tabular-nums; }
-  .order-date { font-family:'Montserrat',sans-serif; font-size:11px; color:#9a9a9a; margin-top:3px; }
+  .order-date { font-family:'Montserrat',sans-serif; font-size:13px; color:#9a9a9a; margin-top:3px; }
   .order-total { font-family:'Montserrat',sans-serif; font-size:15px; font-weight:600; color:#0B3C26; margin-left:auto; }
 
   /* Progress bar */
@@ -42,17 +42,17 @@
   .progress-line { flex:0 0 auto; height:2px; background:#e0dcd0; margin:0 -4px; margin-bottom:20px; z-index:0; }
   .progress-line.done { background:#0B3C26; }
 
-  .status-badge { display:inline-block; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:500; letter-spacing:2px; padding:5px 14px; border-radius:20px; }
+  .status-badge { display:inline-block; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:500; letter-spacing:1.5px; padding:5px 14px; border-radius:20px; }
   .status-CONFIRMED, .status-PACKED { background:#C5A059; color:#fff; }
   .status-SHIPPED, .status-OUT_FOR_DELIVERY { background:#0B3C26; color:#fff; }
   .status-DELIVERED { background:#27ae60; color:#fff; }
   .status-CANCELLED, .status-LOST, .status-RTO { background:#c0392b; color:#fff; }
 
-  .track-link { display:inline-block; margin-top:12px; padding:10px 20px; background:#0B3C26; color:#fff; text-decoration:none; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; border-radius:8px; }
+  .track-link { display:inline-block; margin-top:12px; padding:10px 20px; background:#0B3C26; color:#fff; text-decoration:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1px; border-radius:8px; }
   .track-link:hover { background:#06281a; }
 
   .guest-box { text-align:center; padding:30px 20px; border:1px solid #eae5d8; border-radius:12px; background:#faf8f3; }
-  .guest-box h3 { font-family:'Cormorant Garamond',serif; font-size:18px; margin:0 0 8px; }
+  .guest-box h3 { font-family:'Playfair Display',serif; font-size:18px; margin:0 0 8px; }
   .guest-box p { font-family:'Montserrat',sans-serif; font-size:12px; color:#6a6a6a; margin:0 0 12px; }
   .guest-box a { color:#0B3C26; text-decoration:none; border-bottom:1px solid #C5A059; }
 
@@ -92,8 +92,8 @@
 
   <!-- Manual lookup (always available below orders) -->
   <div id="track-manual" style="display:none; margin-top:24px; padding-top:24px; border-top:1px solid #eae5d8;">
-    <h3 style="font-family:'Cormorant Garamond',serif;font-size:16px;margin:0 0 4px;">Look up another order</h3>
-    <p style="font-family:'Montserrat',sans-serif;font-size:11px;color:#9a9a9a;margin:0 0 12px;">Enter your phone number and order ID.</p>
+    <h3 style="font-family:'Playfair Display',serif;font-size:16px;margin:0 0 4px;">Look up another order</h3>
+    <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:#9a9a9a;margin:0 0 12px;">Enter your phone number and order ID.</p>
     <div class="track-form">
       <div class="track-row">
         <input id="track-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
@@ -173,7 +173,7 @@
       var link = 'product.html?sku=' + encodeURIComponent(sku);
       return '<a href="' + link + '" style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f3ede1;text-decoration:none;color:inherit">' +
         (img ? '<img src="' + esc(img) + '" alt="" style="width:44px;height:56px;object-fit:cover;border-radius:6px;background:#f0ede5;flex:none">' : '<div style="width:44px;height:56px;border-radius:6px;background:#eae5d8;flex:none"></div>') +
-        '<div style="flex:1;min-width:0"><div style="font-family:\'Cormorant Garamond\',serif;font-size:14px;color:#1A1A1A;line-height:1.3">' + esc(name) + '</div>' +
+        '<div style="flex:1;min-width:0"><div style="font-family:\'Playfair Display\',serif;font-size:14px;color:#1A1A1A;line-height:1.3">' + esc(name) + '</div>' +
         '<div style="font-family:\'Montserrat\',sans-serif;font-size:10px;color:#9a9a9a;margin-top:2px">Qty ' + (i.qty || 1) + '</div></div></a>';
     }).join('');
   }
@@ -213,7 +213,7 @@
         '<div>' +
           '<div class="order-id-font">' + esc(o.id) + '</div>' +
           '<div class="order-date">Placed ' + fmtDate(o.created_at) + (address ? ' · ' + esc(address) : '') + '</div>' +
-          '<div style="font-family:\'Montserrat\',sans-serif;font-size:11px;color:#6a6a6a;margin-top:2px;">👤 ' + esc(name) + '</div>' +
+          '<div style="font-family:\'Montserrat\',sans-serif;font-size:13px;color:#6a6a6a;margin-top:2px;">👤 ' + esc(name) + '</div>' +
         '</div>' +
         '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">' +
           '<span class="status-badge status-' + displayStatus + '">' + statusLabel + '</span>' +
@@ -225,7 +225,7 @@
       // ETA
       (eta ? '<div class="eta-text">📅 Est. delivery: <strong>' + eta + '</strong></div>' : '') +
       // AWB & tracking
-      (awb ? '<div style="margin-top:10px;"><span style="font-family:\'Montserrat\',sans-serif;font-size:11px;color:#6a6a6a;">AWB: ' + esc(awb) + '</span>' +
+      (awb ? '<div style="margin-top:10px;"><span style="font-family:\'Montserrat\',sans-serif;font-size:13px;color:#6a6a6a;">AWB: ' + esc(awb) + '</span>' +
         '<a class="track-link" href="' + trackUrl + '" target="_blank" rel="noopener" style="margin-left:10px;">🔗 Track Live →</a></div>' : '') +
       // Items
       '<div style="margin-top:12px;">' + itemsHtml(o.items) + '</div>' +

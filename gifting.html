@@ -18,16 +18,16 @@
 <meta property="og:url" content="https://saubhagyajewellery.com/gifting">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=21">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
   body { background: #FAFAFA; margin: 0; }
   .gf-hero { max-width: 1280px; margin: 0 auto; padding: 46px 40px 8px; text-align: center; }
-  .gf-kicker { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 4px; color: #C5A059; margin-bottom: 12px; }
-  .gf-title { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 40px; color: #1A1A1A; margin: 0 0 8px; }
+  .gf-kicker { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #C5A059; margin-bottom: 12px; }
+  .gf-title { font-family:'Playfair Display',serif; font-weight: 500; font-size: 40px; color: #1A1A1A; margin: 0 0 8px; }
   .gf-title em { font-style: italic; color: #0B3C26; }
   .gf-sub { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; color: #6a6a6a; margin: 0; }
   .gf-tabs { max-width: 1280px; margin: 34px auto 0; padding: 0 40px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
@@ -35,7 +35,7 @@
   .gf-tab.on { background: #0B3C26; color: #fff; border-color: #0B3C26; }
   .gf-tab:hover { background: #0B3C26; color: #fff; }
   .gf-heads { max-width: 1280px; margin: 34px auto 12px; padding: 0 40px; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .gf-heads h2 { font-family: 'Cormorant Garamond',serif; font-weight: 500; font-size: 24px; color: #1A1A1A; margin: 0; }
+  .gf-heads h2 { font-family:'Playfair Display',serif; font-weight: 500; font-size: 24px; color: #1A1A1A; margin: 0; }
   .gf-heads .count { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; }
   .gf-list { max-width: 1280px; margin: 0 auto; padding: 0 40px 60px; }
   .gf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
@@ -44,12 +44,12 @@
   .p-img .im { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.22,1,.36,1); }
   @media(hover:hover) { .p-card:hover .p-img .im { transform: scale(1.05); } }
   .p-badge { position: absolute; top: 12px; left: 12px; font-family: 'Montserrat',sans-serif; font-size: 9px; letter-spacing: 1.5px; padding: 4px 10px; background: #0B3C26; color: #fff; border-radius: 3px; }
-  .p-name { font-family: 'Cormorant Garamond',serif; font-size: 17px; color: #1A1A1A; margin-top: 10px; }
+  .p-name { font-family:'Playfair Display',serif; font-size: 17px; color: #1A1A1A; margin-top: 10px; }
   .p-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B3C26; font-weight: 500; margin-top: 3px; }
-  .p-mrp { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #9a9a9a; text-decoration: line-through; margin-left: 8px; font-weight: 300; }
+  .p-mrp { font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; text-decoration: line-through; margin-left: 8px; font-weight: 300; }
   .gf-empty { text-align: center; padding: 60px 24px; font-family: 'Montserrat',sans-serif; color: #9a9a9a; }
-  .gf-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; color: #9a9a9a; }
-  .crumb { max-width: 1280px; margin: 0 auto; padding: 18px 40px 0; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1px; color: #9a9a9a; }
+  .gf-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; color: #9a9a9a; }
+  .crumb { max-width: 1280px; margin: 0 auto; padding: 18px 40px 0; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 1px; color: #9a9a9a; }
   .crumb a { color: #0B3C26; text-decoration: none; }
   .crumb i { margin: 0 8px; color: #C5A059; font-style: normal; }
   @media (max-width: 900px) {

@@ -7,8 +7,8 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=21">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
@@ -26,7 +26,7 @@
   body { background: #FAFAFA; margin: 0; }
   .co-wrap { max-width: 780px; margin: 0 auto; padding: 20px 24px 80px; }
   .co-grid { display: grid; grid-template-columns: 1fr; gap: 0; align-items: start; }
-  .co-title { font-family: 'Cormorant Garamond',serif; font-size: 24px; color: #1A1A1A; margin: 0 0 6px; }
+  .co-title { font-family:'Playfair Display',serif; font-size: 24px; color: #1A1A1A; margin: 0 0 6px; }
   .co-sub { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; margin: 0 0 22px; }
   .co-summary { background: #fff; border: 1px solid #eae5d8; padding: 20px; max-width: 520px; margin: 0 auto; }
   .co-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #4a4a4a; }
@@ -42,14 +42,14 @@
   .co-x { flex: none; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd6c6; border-radius: 50%; color: #9a9a9a; font-size: 13px; cursor: pointer; background: #fff; line-height: 1; }
   .co-x:hover { color: #c0392b; border-color: #c0392b; }
   .co-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid #eae5d8; }
-  .co-total span:first-child { font-family: 'Cormorant Garamond',serif; font-size: 16px; }
-  .co-total span:last-child { font-family: 'Cormorant Garamond',serif; font-size: 20px; font-weight: 600; color: #0B3C26; }
-  .co-btn { display: block; width: 100%; padding: 16px; background: #0B3C26; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; cursor: pointer; margin-top: 16px; border-radius: 14px; box-shadow: 0 2px 8px rgba(6,40,26,.15); transition: all .4s cubic-bezier(.22,1,.36,1); }
+  .co-total span:first-child { font-family:'Playfair Display',serif; font-size: 16px; }
+  .co-total span:last-child { font-family:'Playfair Display',serif; font-size: 20px; font-weight: 600; color: #0B3C26; }
+  .co-btn { display: block; width: 100%; padding: 16px; background: #0B3C26; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; margin-top: 16px; border-radius: 14px; box-shadow: 0 2px 8px rgba(6,40,26,.15); transition: all .4s cubic-bezier(.22,1,.36,1); }
   .co-btn:disabled { opacity: .6; cursor: not-allowed; }
   .co-btn:hover:not(:disabled) { background: #06281a; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,40,26,.25); }
-  .co-error { color: #c0392b; font-family: 'Montserrat',sans-serif; font-size: 11px; text-align: center; margin-top: 12px; }
+  .co-error { color: #c0392b; font-family: 'Montserrat',sans-serif; font-size:13px; text-align: center; margin-top: 12px; }
   .co-empty { text-align: center; padding: 60px 24px; }
-  .co-empty h1 { font-family: 'Cormorant Garamond',serif; font-size: 24px; margin: 0 0 10px; }
+  .co-empty h1 { font-family:'Playfair Display',serif; font-size: 24px; margin: 0 0 10px; }
   .co-empty a { color: #0B3C26; }
   .co-noreturn { font-family: 'Montserrat',sans-serif; font-size: 10.5px; color: #9a9a9a; line-height: 1.6; margin-top: 12px; }
   .co-noreturn a { color: #0B3C26; }
@@ -57,7 +57,7 @@
   @keyframes coSpin { to { transform: rotate(360deg); } }
   .co-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(250,250,250,.96); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
   .co-spinner { width: 34px; height: 34px; border: 3px solid #C5A059; border-top-color: #0B3C26; border-radius: 50%; animation: coSpin 1s linear infinite; }
-  .co-overlay-text { font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 2px; color: #0B3C26; }
+  .co-overlay-text { font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; color: #0B3C26; }
   @media (max-width: 700px) {
     .co-summary { max-width: 100%; }
     .co-wrap { padding: 10px 14px 60px; }
@@ -79,7 +79,7 @@
 
     <div class="co-grid">
       <div class="co-summary" id="co-summary">
-        <h2 style="font-family:'Cormorant Garamond',serif;font-size:18px;color:#1A1A1A;margin:0 0 14px;">Order Summary</h2>
+        <h2 style="font-family:'Playfair Display',serif;font-size:18px;color:#1A1A1A;margin:0 0 14px;">Order Summary</h2>
         <div id="co-items"></div>
         <div class="co-line"><span>Subtotal</span><span id="co-subtotal">₹0</span></div>
         <div class="co-line" id="co-disc-row" style="display:none"><span>Discount (10%)</span><span id="co-disc"></span></div>
