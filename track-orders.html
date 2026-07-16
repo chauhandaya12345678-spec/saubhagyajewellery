@@ -4,30 +4,66 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Track Your Order | Saubhagya</title>
-<meta name="description" content="Track your Saubhagya order. Enter your phone number and order ID to check status.">
+<meta name="description" content="Track your Saubhagya order with live shipping status.">
 <link rel="canonical" href="https://saubhagyajewellery.com/track-orders">
 <meta name="robots" content="index,follow">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Saubhagya">
 <meta property="og:title" content="Track Your Order | Saubhagya">
 <meta property="og:description" content="Track your Saubhagya order by phone and order ID.">
-<meta property="og:url" content="https://saubhagyajewellery.com/track-orders">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=14">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
-<script type="application/ld+json">{"@context":"https://***@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Track Orders"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Track Orders"}]}</script>
 <style>
-  .track-form { display:flex; flex-direction:column; gap:12px; margin:18px 0 0; max-width:480px; }
+  .track-wrap { max-width: 640px; margin: 0 auto; }
+  .track-form { display:flex; flex-direction:column; gap:12px; margin:18px 0 0; }
   .track-row { display:flex; gap:12px; flex-wrap:wrap; }
-  .track-row input { flex:1; min-width:180px; height:52px; padding:0 16px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:14px; outline:none; background:#fff; }
+  .track-row input { flex:1; min-width:160px; height:52px; padding:0 16px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:14px; outline:none; background:#fff; border-radius:8px; }
   .track-row input:focus { border-color:#C5A059; }
-  .track-btn { height:52px; padding:0 28px; background:#0B3C26; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:2px; cursor:pointer; white-space:nowrap; align-self:flex-start; }
+  .track-btn { height:52px; padding:0 28px; background:#0B3C26; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:2px; cursor:pointer; white-space:nowrap; align-self:flex-start; border-radius:8px; }
   .track-btn:disabled { opacity:.6; cursor:not-allowed; }
-  .order-card { border:1px solid rgba(197,160,89,.3); border-radius:10px; padding:18px 20px; background:#fff; margin-bottom:16px; }
-  .order-id-font { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; letter-spacing:1px; color:#0B3C26; font-variant-numeric:tabular-nums; }
+  .track-btn:hover:not(:disabled) { background:#06281a; }
+
+  .order-card { border:1px solid rgba(197,160,89,.25); border-radius:12px; padding:20px; background:#fff; margin-bottom:20px; }
+  .order-id-font { font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; letter-spacing:1px; color:#0B3C26; font-variant-numeric:tabular-nums; }
+  .order-date { font-family:'Montserrat',sans-serif; font-size:11px; color:#9a9a9a; margin-top:3px; }
+  .order-total { font-family:'Montserrat',sans-serif; font-size:15px; font-weight:600; color:#0B3C26; margin-left:auto; }
+
+  /* Progress bar */
+  .progress-bar { display:flex; align-items:center; justify-content:space-between; margin:20px 0 8px; position:relative; }
+  .progress-step { display:flex; flex-direction:column; align-items:center; z-index:1; flex:1; }
+  .progress-dot { width:16px; height:16px; border-radius:50%; background:#e0dcd0; transition:background .3s; }
+  .progress-dot.done { background:#0B3C26; }
+  .progress-dot.current { background:#C5A059; box-shadow:0 0 0 4px rgba(197,160,89,.3); }
+  .progress-label { font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:.5px; color:#9a9a9a; margin-top:6px; text-align:center; }
+  .progress-label.done { color:#0B3C26; font-weight:600; }
+  .progress-line { flex:0 0 auto; height:2px; background:#e0dcd0; margin:0 -4px; margin-bottom:20px; z-index:0; }
+  .progress-line.done { background:#0B3C26; }
+
+  .status-badge { display:inline-block; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:500; letter-spacing:2px; padding:5px 14px; border-radius:20px; }
+  .status-CONFIRMED, .status-PACKED { background:#C5A059; color:#fff; }
+  .status-SHIPPED, .status-OUT_FOR_DELIVERY { background:#0B3C26; color:#fff; }
+  .status-DELIVERED { background:#27ae60; color:#fff; }
+  .status-CANCELLED, .status-LOST, .status-RTO { background:#c0392b; color:#fff; }
+
+  .track-link { display:inline-block; margin-top:12px; padding:10px 20px; background:#0B3C26; color:#fff; text-decoration:none; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; border-radius:8px; }
+  .track-link:hover { background:#06281a; }
+
+  .guest-box { text-align:center; padding:30px 20px; border:1px solid #eae5d8; border-radius:12px; background:#faf8f3; }
+  .guest-box h3 { font-family:'Cormorant Garamond',serif; font-size:18px; margin:0 0 8px; }
+  .guest-box p { font-family:'Montserrat',sans-serif; font-size:12px; color:#6a6a6a; margin:0 0 12px; }
+  .guest-box a { color:#0B3C26; text-decoration:none; border-bottom:1px solid #C5A059; }
+
+  .eta-text { font-family:'Montserrat',sans-serif; font-size:12px; color:#6a6a6a; margin-top:8px; }
+  .eta-text strong { color:#0B3C26; }
+
+  @media (max-width:600px) {
+    .progress-label { font-size:8px; }
+    .track-row { flex-direction:column; }
+    .track-btn { width:100%; }
+  }
 </style>
 </head>
 <body>
@@ -37,22 +73,41 @@
 <section class="ph">
   <div class="kicker">ORDER STATUS</div>
   <h1>Track Orders</h1>
-  <p class="lede">Enter your phone number and order ID to check your delivery status.</p>
+  <p class="lede" id="track-lede">Loading your orders…</p>
 </section>
 <section class="prose">
-<div id="track-app">
-  <h2>Look Up Your Order</h2>
-  <p>Both phone number and order ID are required for privacy.</p>
-  <div class="track-form">
-    <div class="track-row">
-      <input id="track-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
-      <input id="track-oid" type="text" placeholder="Order ID (CC-...)" style="text-transform:uppercase;">
+<div class="track-wrap">
+
+  <!-- Auto-loaded orders (signed in or URL params) -->
+  <div id="track-results" style="display:flex;flex-direction:column;gap:0;"></div>
+
+  <!-- Guest: no data -->
+  <div id="track-guest" style="display:none;">
+    <div class="guest-box">
+      <h3>Sign in to view your orders</h3>
+      <p>Your orders are linked to your account. Sign in or enter your details below to track a specific order.</p>
+      <a href="account.html">Sign In →</a>
     </div>
-    <button class="track-btn" id="track-btn">TRACK</button>
   </div>
-  <div id="track-status" style="margin-top:12px;"></div>
-  <div id="track-results" style="display:flex;flex-direction:column;gap:16px;margin-top:20px;"></div>
+
+  <!-- Manual lookup (always available below orders) -->
+  <div id="track-manual" style="display:none; margin-top:24px; padding-top:24px; border-top:1px solid #eae5d8;">
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:16px;margin:0 0 4px;">Look up another order</h3>
+    <p style="font-family:'Montserrat',sans-serif;font-size:11px;color:#9a9a9a;margin:0 0 12px;">Enter your phone number and order ID.</p>
+    <div class="track-form">
+      <div class="track-row">
+        <input id="track-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+        <input id="track-oid" type="text" placeholder="Order ID (CC-...)" style="text-transform:uppercase;">
+      </div>
+      <button class="track-btn" id="track-btn">TRACK</button>
+    </div>
+  </div>
+
+  <div id="track-status" style="margin-top:10px;"></div>
 </div>
+</section>
+</main>
+<x-footer></x-footer>
 
 <script>
 (function () {
@@ -60,19 +115,54 @@
   var $ = function(id) { return document.getElementById(id); };
   var fmt = function (paise) { return '₹' + Number((paise || 0) / 100).toLocaleString('en-IN'); };
   var fmtDate = function(d) { if (!d) return ''; return new Date(String(d).replace(' ', 'T') + 'Z').toLocaleDateString('en-IN', { month:'short', day:'numeric', year:'numeric' }); };
+  var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+
   var CATALOG = {};
   function hydrateCatalog() {
-    var list = window.CHAUHAN_CATALOG || [];
-    list.forEach(function(p) { CATALOG[p.id || p.sku] = p; });
-  }
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>\"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]; }); }
-
-  function maskPhone(ph) {
-    var d = String(ph || '').replace(/\D/g, '').slice(-10);
-    if (d.length < 6) return '***';
-    return '+91 ' + d.slice(0, 5) + 'XXXXX';
+    (window.CHAUHAN_CATALOG || []).forEach(function(p) { CATALOG[p.id || p.sku] = p; });
   }
 
+  // ── ShipPrime status mapping ──
+  var SP_STEPS = ['CONFIRMED', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+  var SP_LABELS = {
+    CONFIRMED: 'Confirmed', PACKED: 'Packed', SHIPPED: 'Shipped',
+    OUT_FOR_DELIVERY: 'Out for Delivery', DELIVERED: 'Delivered',
+    UNDELIVERED: 'Undelivered', RTO_INITIATED: 'Return Started', RTO: 'Returned',
+    CANCELLED: 'Cancelled', LOST: 'Lost'
+  };
+
+  function getStepIndex(status) {
+    return SP_STEPS.indexOf(status);
+  }
+
+  function progressBar(spStatus, fallbackStatus) {
+    var status = spStatus || fallbackStatus || 'CONFIRMED';
+    var idx = getStepIndex(status);
+    if (idx < 0) idx = 0; // unknown → show as CONFIRMED
+
+    var steps = [
+      { key: 'CONFIRMED', emoji: '✅', label: 'Confirmed' },
+      { key: 'PACKED', emoji: '📦', label: 'Packed' },
+      { key: 'SHIPPED', emoji: '🚚', label: 'Shipped' },
+      { key: 'OUT_FOR_DELIVERY', emoji: '📮', label: 'Out for Delivery' },
+      { key: 'DELIVERED', emoji: '🏠', label: 'Delivered' }
+    ];
+
+    var html = '<div class="progress-bar">';
+    for (var i = 0; i < steps.length; i++) {
+      var s = steps[i];
+      var done = i <= idx;
+      if (i > 0) html += '<div class="progress-line' + (done ? ' done' : '') + '" style="flex:0 0 ' + (100/(steps.length-1)) + '%;min-width:20px;"></div>';
+      html += '<div class="progress-step">';
+      html += '<div class="progress-dot' + (done ? (i === idx ? ' current' : ' done') : '') + '"></div>';
+      html += '<div class="progress-label' + (done ? ' done' : '') + '">' + s.emoji + '<br>' + s.label + '</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  // ── Items HTML ──
   function itemsHtml(items) {
     items = items || [];
     return items.map(function(i) {
@@ -81,21 +171,22 @@
       var img = i.image || p.image || '';
       var name = p.name || i.name || sku;
       var link = 'product.html?sku=' + encodeURIComponent(sku);
-      return '<a href="' + link + '" style="display:flex;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #f3ede1;text-decoration:none;color:inherit">' +
-        (img ? '<img src="' + esc(img) + '" alt="" style="width:52px;height:64px;object-fit:cover;border-radius:6px;background:#f0ede5;flex:none">' : '<div style="width:52px;height:64px;border-radius:6px;background:#eae5d8;flex:none"></div>') +
-        '<div style="flex:1;min-width:0"><div style="font-family:\'Cormorant Garamond\',serif;font-size:15px;color:#1A1A1A;line-height:1.3">' + esc(name) + '</div>' +
-        '<div style="font-family:\'Montserrat\',sans-serif;font-size:11px;color:#9a9a9a;margin-top:2px">Qty ' + (i.qty || 1) + '</div></div>' +
-        '</a>';
+      return '<a href="' + link + '" style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f3ede1;text-decoration:none;color:inherit">' +
+        (img ? '<img src="' + esc(img) + '" alt="" style="width:44px;height:56px;object-fit:cover;border-radius:6px;background:#f0ede5;flex:none">' : '<div style="width:44px;height:56px;border-radius:6px;background:#eae5d8;flex:none"></div>') +
+        '<div style="flex:1;min-width:0"><div style="font-family:\'Cormorant Garamond\',serif;font-size:14px;color:#1A1A1A;line-height:1.3">' + esc(name) + '</div>' +
+        '<div style="font-family:\'Montserrat\',sans-serif;font-size:10px;color:#9a9a9a;margin-top:2px">Qty ' + (i.qty || 1) + '</div></div></a>';
     }).join('');
   }
 
+  // ── ETA calculation ──
   function etaForOrder(o) {
     var pin = '';
     try { var a = JSON.parse(o.address || '{}'); pin = a.pin || ''; } catch(e) {}
     if (!pin) { var m = String(o.address || '').match(/\b(\d{6})\b/); pin = m ? m[1] : ''; }
     if (!pin) return '';
     var p = String(pin).replace(/\D/g, ''), lo = 5, hi = 8;
-    if (/^40[01]/.test(p)) { lo = 2; hi = 4; } else if (/^4[1-4]/.test(p)) { lo = 3; hi = 5; }
+    if (/^40[01]/.test(p)) { lo = 2; hi = 4; }
+    else if (/^4[1-4]/.test(p)) { lo = 3; hi = 5; }
     var base = o.created_at ? new Date(String(o.created_at).replace(' ', 'T') + 'Z') : new Date();
     if (isNaN(base.getTime())) base = new Date();
     var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -103,25 +194,77 @@
     return f(new Date(base.getTime() + lo*86400000)) + ' – ' + f(new Date(base.getTime() + hi*86400000));
   }
 
-  function orderCard(o) {
-    var statusLabel = (o.status || 'confirmed').toUpperCase();
+  // ── Render order card ──
+  function orderCard(o, spData) {
+    var spStatus = spData ? spData.currentStatus : null;
+    var fallbackStatus = o.status || 'confirmed';
+    var displayStatus = spStatus || fallbackStatus.toUpperCase();
+    var statusLabel = SP_LABELS[displayStatus] || displayStatus;
     var hasAWB = o.awb && o.awb.trim();
     var eta = etaForOrder(o);
+    var trackUrl = hasAWB ? 'https://shipprime.live/saubhagyajewellery/track/' + o.awb : '';
+    var name = o.name || 'Customer';
+    var address = '';
+    try { var a = JSON.parse(o.address || '{}'); address = [a.city, a.state].filter(Boolean).join(', '); } catch(e) {}
+
     return '<div class="order-card">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
-        '<div><div class="order-id-font">' + esc(o.id) + '</div>' +
-        '<div style="font-family:\'Montserrat\',sans-serif;font-size:11px;font-weight:300;color:#9a9a9a;margin-top:3px;">Placed ' + fmtDate(o.created_at) + '</div></div>' +
-        '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:2px;padding:5px 12px;border-radius:20px;background:' + (statusLabel === 'CONFIRMED' ? '#0B3C26' : '#C5A059') + ';color:#fff;">' + statusLabel + '</span>' +
+      // Header
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">' +
+        '<div>' +
+          '<div class="order-id-font">' + esc(o.id) + '</div>' +
+          '<div class="order-date">Placed ' + fmtDate(o.created_at) + (address ? ' · ' + esc(address) : '') + '</div>' +
+          '<div style="font-family:\'Montserrat\',sans-serif;font-size:11px;color:#6a6a6a;margin-top:2px;">👤 ' + esc(name) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">' +
+          '<span class="status-badge status-' + displayStatus + '">' + statusLabel + '</span>' +
+          '<span class="order-total">' + fmt(o.total) + '</span>' +
+        '</div>' +
       '</div>' +
-      '<div style="margin-top:10px">' + itemsHtml(o.items) + '</div>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid #f3ede1;">' +
-        '<span style="font-family:\'Montserrat\',sans-serif;font-size:12px;color:#6a6a6a;">' + (eta ? 'Est. delivery <strong style="color:#0B3C26;font-weight:600;">' + eta + '</strong>' : '') + '</span>' +
-        '<span style="font-family:\'Montserrat\',sans-serif;font-size:14px;font-weight:600;color:#0B3C26;font-variant-numeric:tabular-nums;">' + fmt(o.total) + '</span>' +
-      '</div>' +
-      (hasAWB ? '<div style="margin-top:10px;padding:10px 12px;background:#e8f0e8;border-radius:6px;font-family:\'Montserrat\',sans-serif;font-size:12px;"><strong style="color:#0B3C26;">AWB: ' + esc(o.awb) + '</strong> <a href="' + esc(o.awb_url || '#') + '" target="_blank" style="margin-left:12px;color:#0B3C26;border-bottom:1px solid #C5A059;text-decoration:none;">Track via Shiprocket →</a></div>' : '') +
+      // Progress bar
+      progressBar(displayStatus, fallbackStatus) +
+      // ETA
+      (eta ? '<div class="eta-text">📅 Est. delivery: <strong>' + eta + '</strong></div>' : '') +
+      // AWB & tracking
+      (hasAWB ? '<div style="margin-top:10px;"><span style="font-family:\'Montserrat\',sans-serif;font-size:11px;color:#6a6a6a;">AWB: ' + esc(o.awb) + '</span>' +
+        '<a class="track-link" href="' + trackUrl + '" target="_blank" rel="noopener" style="margin-left:10px;">🔗 Track Live →</a></div>' : '') +
+      // Items
+      '<div style="margin-top:12px;">' + itemsHtml(o.items) + '</div>' +
     '</div>';
   }
 
+  // ── Fetch ShipPrime tracking status ──
+  function fetchShipPrimeStatus(awb) {
+    if (!awb) return Promise.resolve(null);
+    return fetch('/api/orders/shipprime-track?awb=' + encodeURIComponent(awb))
+      .then(function(r) { return r.json(); })
+      .then(function(d) { return d && d.success ? d : null; })
+      .catch(function() { return null; });
+  }
+
+  // ── Render multiple orders ──
+  function renderOrders(orders) {
+    $('track-guest').style.display = 'none';
+    $('track-lede').textContent = orders.length === 1 ? 'Your order' : 'Your orders (' + orders.length + ')';
+
+    // Fetch ShipPrime status for all orders with AWB
+    var spPromises = orders.map(function(o) {
+      return o.awb ? fetchShipPrimeStatus(o.awb) : Promise.resolve(null);
+    });
+
+    Promise.all(spPromises).then(function(spResults) {
+      $('track-results').innerHTML = orders.map(function(o, i) {
+        return orderCard(o, spResults[i]);
+      }).join('');
+      // Show manual lookup below
+      $('track-manual').style.display = 'block';
+      // Pre-fill phone if available
+      if (orders.length && orders[0].phone) {
+        $('track-phone').value = String(orders[0].phone || '').replace(/\D/g, '').slice(-10);
+      }
+    });
+  }
+
+  // ── Manual track ──
   function doTrack() {
     var phone = ($('track-phone').value || '').replace(/\D/g, '');
     var oid = ($('track-oid').value || '').trim().toUpperCase();
@@ -136,43 +279,100 @@
     }
 
     $('track-status').innerHTML = '<span style="color:#9a9a9a;font-family:Montserrat,sans-serif;font-size:12px;">Searching…</span>';
-    $('track-results').innerHTML = '';
     $('track-btn').disabled = true;
 
-    var url = '/api/orders/track?order_id=' + encodeURIComponent(oid) + '&phone=' + encodeURIComponent(phone);
-
-    fetch(url).then(function(r) { return r.json(); }).then(function(d) {
-      $('track-status').innerHTML = '';
-      $('track-btn').disabled = false;
-      if (!d || !d.success || !d.orders || !d.orders.length) {
-        $('track-results').innerHTML = '<div style="padding:24px;text-align:center;color:#9a9a9a;font-family:Montserrat,sans-serif;font-size:13px;">No matching order found. Check your phone number and order ID.</div>';
-        return;
-      }
-      // Verify phone matches (security — cross-check)
-      var matches = d.orders.filter(function(o) {
-        var oPhone = String(o.phone || '').replace(/\D/g, '').slice(-10);
-        return oPhone === phone;
+    fetch('/api/orders/track?order_id=' + encodeURIComponent(oid) + '&phone=' + encodeURIComponent(phone))
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        $('track-status').innerHTML = '';
+        $('track-btn').disabled = false;
+        if (!d || !d.success || !d.orders || !d.orders.length) {
+          $('track-guest').style.display = 'none';
+          $('track-results').innerHTML = '<div style="padding:24px;text-align:center;color:#9a9a9a;font-family:Montserrat,sans-serif;font-size:13px;">No matching order found. Check your phone number and order ID.</div>';
+          return;
+        }
+        renderOrders(d.orders);
+      }).catch(function() {
+        $('track-status').innerHTML = '<span style="color:#c0392b;font-family:Montserrat,sans-serif;font-size:12px;">Network error. Please try again.</span>';
+        $('track-btn').disabled = false;
       });
-      if (!matches.length) {
-        $('track-results').innerHTML = '<div style="padding:24px;text-align:center;color:#c0392b;font-family:Montserrat,sans-serif;font-size:13px;">Phone number does not match this order. Please check and try again.</div>';
-        return;
-      }
-      $('track-results').innerHTML = matches.map(orderCard).join('');
-    }).catch(function() {
-      $('track-status').innerHTML = '<span style="color:#c0392b;font-family:Montserrat,sans-serif;font-size:12px;">Network error. Please try again.</span>';
-      $('track-btn').disabled = false;
-    });
   }
 
+  // ── Auto-detect ──
+  function autoDetect() {
+    var url = new URL(window.location.href);
+    var urlOrderId = url.searchParams.get('order_id');
+    var urlPhone = url.searchParams.get('phone');
+    var urlEmail = url.searchParams.get('email');
+
+    // Priority 1: URL params
+    if (urlOrderId && (urlPhone || urlEmail)) {
+      $('track-phone').value = urlPhone || '';
+      $('track-oid').value = urlOrderId;
+      if (urlPhone) doTrack();
+      else {
+        fetch('/api/orders/track?order_id=' + encodeURIComponent(urlOrderId))
+          .then(function(r) { return r.json(); })
+          .then(function(d) { if (d && d.success) renderOrders(d.orders); else showGuest(); })
+          .catch(showGuest);
+      }
+      return;
+    }
+
+    // Priority 2: localStorage (last order + user phone)
+    var lastOrderId = null;
+    try { lastOrderId = localStorage.getItem('cc_lastorderid'); } catch(e) {}
+    var user = null;
+    try { user = JSON.parse(localStorage.getItem('cc_user') || 'null'); } catch(e) {}
+
+    if (user && user.phone && lastOrderId) {
+      $('track-phone').value = String(user.phone || '').replace(/\D/g, '').slice(-10);
+      $('track-oid').value = lastOrderId;
+      doTrack();
+      return;
+    }
+
+    // Priority 3: logged-in user via MPA
+    var mpaUser = null;
+    try { mpaUser = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
+    if (mpaUser && (mpaUser.phone || mpaUser.email)) {
+      var params = mpaUser.email ? 'email=' + encodeURIComponent(mpaUser.email) : '';
+      if (mpaUser.phone) params += (params ? '&' : '') + 'phone=' + encodeURIComponent(mpaUser.phone);
+      fetch('/api/orders/track?' + params)
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          if (d && d.success && d.orders && d.orders.length) {
+            renderOrders(d.orders);
+          } else {
+            showGuest();
+          }
+        })
+        .catch(showGuest);
+      return;
+    }
+
+    // Nothing found → show guest message + manual form
+    showGuest();
+  }
+
+  function showGuest() {
+    $('track-guest').style.display = 'block';
+    $('track-manual').style.display = 'block';
+    $('track-lede').textContent = 'Sign in or enter your details to track your order.';
+  }
+
+  // ── Button handlers ──
   $('track-btn').addEventListener('click', doTrack);
   $('track-oid').addEventListener('keydown', function(e) { if (e.key === 'Enter') doTrack(); });
   $('track-phone').addEventListener('keydown', function(e) { if (e.key === 'Enter') $('track-oid').focus(); });
 
+  // ── Init ──
   function boot() {
     hydrateCatalog();
     if (!window.CHAUHAN_CATALOG || !window.CHAUHAN_CATALOG.length) {
       window.addEventListener('catalog-ready', function once() { window.removeEventListener('catalog-ready', once); hydrateCatalog(); });
     }
+    autoDetect();
   }
   if (!document.querySelector('script[src^="catalog.js"]')) {
     var cs = document.createElement('script'); cs.src = 'catalog.js?v=13'; document.head.appendChild(cs);
@@ -183,7 +383,7 @@
 </script>
 
 <a class="btn" href="https://wa.me/919987008435">Chat on WhatsApp</a>
-  <div class="back"><a href="index.html">&larr; Back to shopping</a></div>
+<div class="back"><a href="index.html">&larr; Back to shopping</a></div>
 </section>
 </main>
 <x-footer></x-footer>

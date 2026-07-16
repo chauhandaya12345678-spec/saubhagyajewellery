@@ -102,7 +102,8 @@
     if (!orders.length) { $('ac-orders').innerHTML = '<div class="ac-empty">No orders yet. <a href="index.html">Start shopping →</a></div>'; return; }
     $('ac-orders').innerHTML = orders.map(function(o) {
       var status = (o.status || 'confirmed').toUpperCase();
-      return '<a href="track-orders.html" style="text-decoration:none;color:inherit"><div style="border:1px solid rgba(197,160,89,.25);border-radius:10px;padding:14px 16px;background:#fff">' +
+      var phone = String(o.phone || '').replace(/\D/g, '').slice(-10);
+      return '<a href="track-orders.html?order_id=' + encodeURIComponent(o.id) + '&phone=' + phone + '" style="text-decoration:none;color:inherit"><div style="border:1px solid rgba(197,160,89,.25);border-radius:10px;padding:14px 16px;background:#fff">' +
         '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">' +
         '<span style="font-family:\'Montserrat\',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:#0B3C26">' + esc(o.id) + '</span>' +
         '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:2px;padding:4px 10px;border-radius:20px;background:#0B3C26;color:#fff">' + status + '</span>' +
