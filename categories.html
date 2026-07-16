@@ -88,19 +88,7 @@
   }
   /* Scroll into cat-hub anchor on filter tap — offset for sticky header */
   .cat-filterbar { scroll-margin-top: 84px; }
-  /* QUICK ADD button — appears on hover, same as home page */
-  .tr-quick {
-    position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 3;
-    padding: 11px 0; background: rgba(255,255,255,.96);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    color: #0B3C26; font-family: 'Montserrat',sans-serif; font-size: 10px;
-    font-weight: 600; letter-spacing: 2px; text-align: center; border: none;
-    cursor: pointer; opacity: 0; transition: opacity .35s ease, transform .35s ease;
-    border-radius: 14px; box-shadow: 0 4px 14px rgba(6,40,26,.18);
-    transform: translateY(8px);
-  }
-  .p-card:hover .tr-quick { opacity: 1; transform: translateY(0); }
-  .tr-quick:hover { background: #0B3C26; color: #fff; box-shadow: 0 6px 20px rgba(6,40,26,.25); }
+
 </style>
 </head>
 <body>
@@ -217,19 +205,16 @@
       var sku = p.sku || p.id;
       var vtn = 'prod-' + String(sku).replace(/[^A-Za-z0-9_-]/g, '');
       var altText = esc(p.name + ' — ' + (p.category || 'handcrafted jewellery') + ' from Saubhagya Jewellery');
-      return '<div class="p-card">' +
-        '<a href="product?sku=' + encodeURIComponent(sku) + '" title="' + esc(p.name) + '" style="display:block;text-decoration:none;color:inherit">' +
+      return '<a class="p-card" href="product?sku=' + encodeURIComponent(sku) + '" title="' + esc(p.name) + '">' +
         '<div class="p-img">' +
           (p.badge ? '<span class="p-badge">' + esc(p.badge) + '</span>' : '') +
           '<img class="im" src="' + esc(img) + '" alt="' + altText + '" title="' + esc(p.name) + ' — Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500" style="view-transition-name:' + vtn + '">' +
+          '<button class="tr-quick" data-sku="' + esc(sku) + '">QUICK ADD</button>' +
         '</div>' +
-        '<h3 class="p-name" style="pointer-events:none">' + esc(p.name) + '</h3>' +
-        '<div class="p-price" style="pointer-events:none">' + fmt(p.price) +
+        '<h3 class="p-name">' + esc(p.name) + '</h3>' +
+        '<div class="p-price">' + fmt(p.price) +
           (p.mrp && p.mrp > p.price ? '<span class="p-mrp">' + fmt(p.mrp) + '</span>' : '') +
-        '</div>' +
-        '</a>' +
-        '<button class="tr-quick" data-sku="' + esc(sku) + '">QUICK ADD</button>' +
-        '</div>';
+        '</div></a>';
     }).join('');
     return true;
   }
@@ -282,15 +267,13 @@
     }, 200);
   });
 
-  // QUICK ADD handler
+  // Quick-add: ONE delegated listener (matches home page pattern)
   $('cat-grid').addEventListener('click', function(e) {
     var btn = e.target.closest('.tr-quick');
     if (!btn) return;
     e.preventDefault();
-    e.stopPropagation();
-    var sku = btn.getAttribute('data-sku');
-    btn.textContent = 'ADDED!';
-    if (window.addToCart) window.addToCart(sku, 1);
+    if (window.MPA) window.MPA.addToCart(btn.getAttribute('data-sku'), 1);
+    btn.textContent = '✓ ADDED';
     setTimeout(function() { btn.textContent = 'QUICK ADD'; }, 1400);
   });
 
