@@ -26,9 +26,10 @@
   .cart-item-info { flex: 1; min-width: 0; }
   .cart-item-name { font-family: 'Cormorant Garamond',serif; font-size: 18px; color: #1A1A1A; }
   .cart-item-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B3C26; margin-top: 4px; }
-  .cart-item-qty { display: flex; align-items: center; gap: 0; margin-top: 10px; border: 1px solid #ddd6c6; width: fit-content; }
-  .cart-item-qty span { width: 30px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; user-select: none; }
+  .cart-item-qty { display: flex; align-items: center; gap: 0; margin-top: 10px; border: 1px solid #ddd6c6; border-radius: 14px; overflow: hidden; width: fit-content; }
+  .cart-item-qty span { width: 30px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; user-select: none; transition: all .2s; }
   .cart-item-qty .cq { border-left: 1px solid #ddd6c6; border-right: 1px solid #ddd6c6; width: 34px; font-size: 12px; }
+  .cart-item-qty span:not(.cq):hover { background: #0B3C26; color: #fff; }
   .cart-item-remove { font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 1px; color: #9a9a9a; cursor: pointer; margin-top: 8px; }
   .cart-summary { margin-top: 28px; padding: 20px; background: #fff; border: 1px solid #eae5d8; border-radius: 16px; max-width: 420px; margin-left: auto; margin-right: auto; }
   .cart-summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #4a4a4a; }
