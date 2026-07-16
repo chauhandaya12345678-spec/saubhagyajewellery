@@ -59,7 +59,8 @@
   .pdp-pincheck-title { font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:2px; color:#6a6a6a; margin-bottom:8px; }
   .pdp-pincheck-row { display:flex; gap:8px; }
   .pdp-pincheck input { flex:1; height:38px; padding:0 12px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff; border-radius:4px; }
-  .pdp-pincheck button { height:38px; padding:0 18px; background:#0B3C26; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; cursor:pointer; border-radius:4px; }
+  .pdp-pincheck button { height:38px; padding:0 18px; background:#0B3C26; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; cursor:pointer; border-radius:14px; box-shadow:0 2px 8px rgba(6,40,26,.12); transition:all .3s; }
+  .pdp-pincheck button:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(6,40,26,.2); }
   .pdp-pincheck-result { margin-top:8px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B3C26; min-height:16px; }
   .pdp-pincheck-result.err { color:#c0392b; }
   .pdp-noreturn a { color: #0B3C26; }
@@ -111,7 +112,8 @@
     .pdp-mobile-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(197,160,89,.28); box-shadow: 0 -6px 24px rgba(6,40,26,.08); transform: translateY(120%); transition: transform .4s cubic-bezier(.22,1,.36,1); }
     .pdp-mobile-bar.on { transform: translateY(0); }
     .pdp-mobile-bar .price { flex: none; font-family: 'Cormorant Garamond',serif; font-size: 18px; font-weight: 600; color: #0B3C26; align-self: center; padding: 0 4px; }
-    .pdp-mobile-bar button { flex: 1; height: 48px; border: none; border-radius: 8px; font-family: 'Montserrat',sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.8px; cursor: pointer; }
+    .pdp-mobile-bar button { flex: 1; height: 48px; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.8px; cursor: pointer; box-shadow: 0 2px 8px rgba(6,40,26,.12); transition: all .3s; }
+  .pdp-mobile-bar button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(6,40,26,.2); }
     .pdp-mobile-bar .add { background: #fff; color: #0B3C26; border: 1px solid #0B3C26; }
     .pdp-mobile-bar .buy { background: #0B3C26; color: #fff; box-shadow: 0 6px 16px rgba(11,60,38,.24); }
     .pdp-mobile-bar .buy:hover { background: #06281a; }

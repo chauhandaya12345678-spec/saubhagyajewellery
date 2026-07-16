@@ -3,17 +3,6 @@ html,body{margin:0;padding:0;overflow-x:hidden;max-width:100%}
 body{background:#FAFAFA;color:#1A1A1A;font-family:'Montserrat',sans-serif;font-weight:400;line-height:1.6}
 a{color:inherit;text-decoration:none}
 img{max-width:100%}
-/* ── Apple TV pill button style: all buttons & button-like links ── */
-a.btn,.co-btn,.track-btn,.auth-btn,.sx-btn,a[class*="btn"],.btn{
-  border-radius:14px !important;
-  box-shadow:0 2px 8px rgba(6,40,26,.12),0 1px 2px rgba(0,0,0,.06);
-  transition:all .4s cubic-bezier(.22,1,.36,1);
-  cursor:pointer;
-}
-a.btn:hover,.co-btn:hover,.track-btn:hover,.auth-btn:hover,.sx-btn:hover,a[class*="btn"]:hover,.btn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 6px 20px rgba(6,40,26,.18),0 2px 6px rgba(0,0,0,.08);
-}
 /* Navbar links — smooth hover */
 .navlink{transition:color .3s,border-color .3s}
 .navlink:hover{color:#0B3C26;border-bottom-color:#C5A059}
