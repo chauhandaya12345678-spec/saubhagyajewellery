@@ -18,13 +18,12 @@ export async function onRequest(context) {
   const db = env.DB;
   const results = [];
 
-  // Delete orders not from today
-  const today = new Date().toISOString().slice(0, 10);
+  // Delete specific old test orders (CC-20260712*, CC-20260715*)
   try {
     const old = await db.prepare(
-      "DELETE FROM orders WHERE created_at < ?"
-    ).bind(today).run();
-    results.push(`Deleted ${old.changes || 0} old orders (before ${today})`);
+      "DELETE FROM orders WHERE id LIKE 'CC-20260712-%' OR id LIKE 'CC-20260715-%'"
+    ).run();
+    results.push(`Deleted ${old.changes || 0} test orders`);
   } catch (e) {
     results.push(`Order delete error: ${e.message}`);
   }
