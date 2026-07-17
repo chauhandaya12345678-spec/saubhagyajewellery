@@ -42,6 +42,9 @@ export async function onRequest(context) {
       const cd = o.customer_details || {};
       const shipAddr = cd.shipping_address || {};
 
+      // Log raw shipping address for debugging
+      console.log('RAZORPAY_SHIPPING_ADDRESS', JSON.stringify({cd_name: cd.name, shipAddr}));
+
       // Build address from Magic Checkout order
       let address = {};
       if (shipAddr.street1 || shipAddr.line1 || shipAddr.city) {
@@ -68,13 +71,7 @@ export async function onRequest(context) {
         .bind(paymentId).first().catch(() => null);
       if (!existing) return json({ ok: true, event: 'order.paid', note: 'order not found (browser save.js already saved?)' });
 
-      // Only update if address was empty
-      let addrStr = '';
-      try { addrStr = existing.address || ''; if (typeof addrStr === 'string') { const a = JSON.parse(addrStr); if (Object.keys(a).length > 0 && a.pin) addrStr = 'has_address'; } } catch (e) {}
-      if (addrStr === 'has_address') {
-        return json({ ok: true, event: 'order.paid', order_id: existing.id, note: 'address already present, skipping' });
-      }
-
+      // Always update address from Razorpay (it's more complete than save.js data)
       const addressJson = JSON.stringify(address);
       await db.prepare('UPDATE orders SET address = ?, updated_at = datetime(\'now\') WHERE id = ?')
         .bind(addressJson, existing.id).run();
