@@ -422,7 +422,7 @@
     return fetch('/api/addresses/save', { method: 'POST', headers: headers, body: JSON.stringify(body) })
       .then(function(r){ return r.json(); })
       .then(function(d) {
-        if (d && d.success && d.address_id) return { address_id: d.address_id, address: payload };
+        if (d && d.success) return { address_id: d.address_id || null, address: payload }; // address_id=0 OK when addresses table not migrated
         $('co-error').textContent = (d && d.error) ? d.error : 'Could not save address.';
         $('co-error').style.display = 'block';
         return null;

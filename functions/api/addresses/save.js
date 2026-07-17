@@ -95,11 +95,21 @@ export async function onRequest(context) {
     }
 
     // De-dup check: same phone + normalized address1 + pincode
-    const dupe = await db.prepare(
-      `SELECT id FROM addresses
-        WHERE phone = ? AND LOWER(TRIM(address1)) = ? AND pincode = ?
-        LIMIT 1`
-    ).bind(phone, norm(address1), pincode).first();
+    // Gracefully handle missing table (migration not yet run) — order flow
+    // still works because save.js also stores address JSON on the order row.
+    let dupe = null;
+    try {
+      dupe = await db.prepare(
+        `SELECT id FROM addresses
+          WHERE phone = ? AND LOWER(TRIM(address1)) = ? AND pincode = ?
+          LIMIT 1`
+      ).bind(phone, norm(address1), pincode).first();
+    } catch (e) {
+      if (/no such table/i.test(e.message)) {
+        return json({ success: true, address_id: 0, warning: 'addresses table not migrated yet — address will still travel with the order' });
+      }
+      throw e;
+    }
 
     if (dupe) {
       // Refresh existing row instead of duplicating
@@ -123,10 +133,18 @@ export async function onRequest(context) {
       await db.prepare('UPDATE addresses SET is_default = 0 WHERE phone = ?').bind(phone).run();
     }
 
-    const res = await db.prepare(
-      `INSERT INTO addresses (user_id, phone, email, full_name, address1, address2, landmark, city, state, pincode, is_default, label)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).bind(userId, phone, email, full_name, address1, address2, landmark, city, state, pincode, isDefault, label).run();
+    let res;
+    try {
+      res = await db.prepare(
+        `INSERT INTO addresses (user_id, phone, email, full_name, address1, address2, landmark, city, state, pincode, is_default, label)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(userId, phone, email, full_name, address1, address2, landmark, city, state, pincode, isDefault, label).run();
+    } catch (e) {
+      if (/no such table/i.test(e.message)) {
+        return json({ success: true, address_id: 0, warning: 'addresses table not migrated yet — address will still travel with the order' });
+      }
+      throw e;
+    }
 
     return json({ success: true, address_id: res.meta.last_row_id, created: true });
   } catch (err) {

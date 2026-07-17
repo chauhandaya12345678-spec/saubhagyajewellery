@@ -39,24 +39,30 @@ export async function onRequest(context) {
     const session = token ? await resolveSessionUser(db, token) : null;
 
     let rows;
-    if (session) {
-      // Signed-in: fetch by user_id OR by session's phone (covers pre-signup guest addresses)
-      const sPhone = String(session.phone || '').replace(/\D/g, '').slice(-10);
-      rows = await db.prepare(
-        `SELECT * FROM addresses
-          WHERE user_id = ? OR (phone = ? AND ? != '')
-          ORDER BY last_used_at DESC LIMIT 10`
-      ).bind(session.user_id, sPhone, sPhone).all();
-    } else if (phoneQ && phoneQ.length === 10) {
-      // Guest by phone number — only recent 5, no email/user_id revealed
-      rows = await db.prepare(
-        `SELECT id, full_name, address1, address2, landmark, city, state, pincode, is_default, label, last_used_at, usage_count
-           FROM addresses
-          WHERE phone = ?
-          ORDER BY last_used_at DESC LIMIT 5`
-      ).bind(phoneQ).all();
-    } else {
-      return json({ error: 'Provide phone or sign in' }, 400);
+    try {
+      if (session) {
+        const sPhone = String(session.phone || '').replace(/\D/g, '').slice(-10);
+        rows = await db.prepare(
+          `SELECT * FROM addresses
+            WHERE user_id = ? OR (phone = ? AND ? != '')
+            ORDER BY last_used_at DESC LIMIT 10`
+        ).bind(session.user_id, sPhone, sPhone).all();
+      } else if (phoneQ && phoneQ.length === 10) {
+        rows = await db.prepare(
+          `SELECT id, full_name, address1, address2, landmark, city, state, pincode, is_default, label, last_used_at, usage_count
+             FROM addresses
+            WHERE phone = ?
+            ORDER BY last_used_at DESC LIMIT 5`
+        ).bind(phoneQ).all();
+      } else {
+        return json({ error: 'Provide phone or sign in' }, 400);
+      }
+    } catch (e) {
+      // Table not migrated yet — return empty list so checkout can still proceed
+      if (/no such table/i.test(e.message)) {
+        return json({ success: true, addresses: [], warning: 'addresses table not migrated yet' });
+      }
+      throw e;
     }
 
     return json({ success: true, addresses: rows.results || [] });
