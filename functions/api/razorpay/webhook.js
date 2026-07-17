@@ -104,8 +104,8 @@ export async function onRequest(context) {
         };
         const sp = await pushToShipPrime(env, orderForPush);
         if (sp.pushed) {
-          await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
-            .bind(sp.awb || '', sp.shipPrimeOrderId || '', existing.id).run();
+          await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, name = ?, updated_at = datetime(\'now\') WHERE id = ?')
+            .bind(sp.awb || '', sp.shipPrimeOrderId || '', cd.name || notes.customer_name || 'Guest', existing.id).run();
         }
         return json({ ok: true, event: 'order.paid', order_id: existing.id, address_updated: true, shipprime: sp });
       }
@@ -190,8 +190,8 @@ export async function onRequest(context) {
       ]).catch(e => ({ pushed: false, error: 'push exception: ' + e.message }));
 
       if (sp && sp.pushed) {
-        await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
-          .bind(sp.awb || '', sp.shipPrimeOrderId || '', orderId).run();
+        await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, name = ?, updated_at = datetime(\'now\') WHERE id = ?')
+          .bind(sp.awb || '', sp.shipPrimeOrderId || '', notes.customer_name || 'Guest', orderId).run();
       }
 
       const emailJob = sendOrderEmail(env, {
