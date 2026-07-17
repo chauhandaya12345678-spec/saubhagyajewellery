@@ -125,6 +125,15 @@
   var fmtDate = function(d) { if (!d) return ''; return new Date(String(d).replace(' ', 'T') + 'Z').toLocaleDateString('en-IN', { month:'short', day:'numeric', year:'numeric' }); };
   var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
 
+  // Helper: build fetch options with Bearer session token if available
+  function authOpts() {
+    try {
+      var t = localStorage.getItem('cc_token');
+      if (t) return { headers: { 'Authorization': 'Bearer ' + t } };
+    } catch(e) {}
+    return {};
+  }
+
   var CATALOG = {};
   function hydrateCatalog() {
     (window.CHAUHAN_CATALOG || []).forEach(function(p) { CATALOG[p.id || p.sku] = p; });
@@ -289,7 +298,7 @@
     $('track-status').innerHTML = '<span style="color:#9a9a9a;font-family:Montserrat,sans-serif;font-size:12px;">Searching…</span>';
     $('track-btn').disabled = true;
 
-    fetch('/api/orders/track?order_id=' + encodeURIComponent(oid) + '&phone=' + encodeURIComponent(phone))
+    fetch('/api/orders/track?order_id=' + encodeURIComponent(oid) + '&phone=' + encodeURIComponent(phone), authOpts())
       .then(function(r) { return r.json(); })
       .then(function(d) {
         $('track-status').innerHTML = '';
@@ -319,7 +328,7 @@
       $('track-oid').value = urlOrderId;
       if (urlPhone) doTrack();
       else {
-        fetch('/api/orders/track?order_id=' + encodeURIComponent(urlOrderId))
+        fetch('/api/orders/track?order_id=' + encodeURIComponent(urlOrderId), authOpts())
           .then(function(r) { return r.json(); })
           .then(function(d) { if (d && d.success) renderOrders(d.orders); else showGuest(); })
           .catch(showGuest);
@@ -342,7 +351,7 @@
         return;
       }
       // User signed in but no recent order — fetch all their orders by phone
-      fetch('/api/orders/track?phone=' + encodeURIComponent(user.phone))
+      fetch('/api/orders/track?phone=' + encodeURIComponent(user.phone), authOpts())
         .then(function(r) { return r.json(); })
         .then(function(d) {
           if (d && d.success && d.orders && d.orders.length) {
@@ -361,7 +370,7 @@
     if (mpaUser && (mpaUser.phone || mpaUser.email)) {
       var params = mpaUser.email ? 'email=' + encodeURIComponent(mpaUser.email) : '';
       if (mpaUser.phone) params += (params ? '&' : '') + 'phone=' + encodeURIComponent(mpaUser.phone);
-      fetch('/api/orders/track?' + params)
+      fetch('/api/orders/track?' + params, authOpts())
         .then(function(r) { return r.json(); })
         .then(function(d) {
           if (d && d.success && d.orders && d.orders.length) {

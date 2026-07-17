@@ -1,64 +1,107 @@
 /**
  * Saubhagya – Track Orders API
- * GET /api/orders/track?email=xxx&phone=xxx   → all orders for a user
- * GET /api/orders/track?order_id=CC-XXXX      → single order by ID
- * Returns: { success: true, orders: [...] }
+ *
+ * Access rules (2026-07-17 hardening — was previously fully open):
+ *   1. `order_id + phone` — single-order lookup. Only returns the row when
+ *      the stored phone (last 10 digits) matches. This is what track-orders.html
+ *      calls for guests.
+ *   2. Bearer session token from Authorization header. Returns all orders
+ *      for the authenticated user (email OR phone match).
+ *   3. Legacy `email + phone` / `email` / `phone` / `user_id` still work but
+ *      only when the caller also presents a valid session token — anonymous
+ *      broad lookups by phone alone are the leak we are closing.
+ *
+ * Rate limit: per-IP, 20 lookups per 10 min (in-memory Cloudflare Workers
+ * global; resets on isolate recycle — good enough deterrent).
  */
+
+const RATE_BUCKETS = new Map(); // ip -> { count, resetAt }
+
+function rateOk(ip) {
+  const now = Date.now();
+  const b = RATE_BUCKETS.get(ip);
+  if (!b || b.resetAt < now) {
+    RATE_BUCKETS.set(ip, { count: 1, resetAt: now + 10 * 60 * 1000 });
+    return true;
+  }
+  b.count++;
+  return b.count <= 20;
+}
+
+async function resolveSessionUser(db, token) {
+  if (!token || !token.startsWith('sess_')) return null;
+  try {
+    const row = await db.prepare(
+      'SELECT s.user_id, u.email, u.phone FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ? LIMIT 1'
+    ).bind(token).first();
+    return row || null;
+  } catch (e) { return null; }
+}
+
 export async function onRequest(context) {
   const { request, env } = context;
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
+  const json = (o, s = 200) => new Response(JSON.stringify(o), {
+    status: s, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', ...corsHeaders },
+  });
+
   if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
-  if (request.method !== 'GET') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
-  }
+  if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405);
+
+  const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+  if (!rateOk(ip)) return json({ error: 'Too many lookups, try again later' }, 429);
 
   try {
     const db = env.DB;
     const url = new URL(request.url);
     const orderId = url.searchParams.get('order_id');
-    const email = url.searchParams.get('email');
-    const phone = url.searchParams.get('phone');
-    const userId = url.searchParams.get('user_id');
+    const emailQ = url.searchParams.get('email');
+    const phoneQ = url.searchParams.get('phone');
+    const userIdQ = url.searchParams.get('user_id');
 
-    let results;
+    // Bearer token (optional but expands access)
+    const authHeader = request.headers.get('authorization') || '';
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    const session = token ? await resolveSessionUser(db, token) : null;
 
-    if (orderId) {
+    let results = [];
+
+    // Path 1: order_id + phone (unauthenticated single-order lookup, matches guest UX)
+    if (orderId && phoneQ) {
+      const phoneDigits = String(phoneQ).replace(/\D/g, '').slice(-10);
       const order = await db.prepare('SELECT * FROM orders WHERE id = ?').bind(orderId).first();
-      results = order ? [order] : [];
-    } else if (userId) {
-      // Direct user_id lookup (fastest — integer FK index)
-      results = await db.prepare(
-        'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC'
-      ).bind(parseInt(userId, 10)).all();
-      results = results.results || [];
-    } else if (email && phone) {
-      // Account view: orders may carry either identifier depending on checkout form
-      results = await db.prepare(
-        'SELECT * FROM orders WHERE email = ? OR phone = ? ORDER BY created_at DESC'
-      ).bind(email, phone).all();
-      results = results.results || [];
-    } else if (email) {
-      results = await db.prepare(
-        'SELECT * FROM orders WHERE email = ? ORDER BY created_at DESC'
-      ).bind(email).all();
-      results = results.results || [];
-    } else if (phone) {
-      results = await db.prepare(
-        'SELECT * FROM orders WHERE phone = ? ORDER BY created_at DESC'
-      ).bind(phone).all();
-      results = results.results || [];
-    } else {
-      return new Response(JSON.stringify({ error: 'Provide order_id, email, or phone' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
+      if (!order) return json({ success: true, orders: [] });
+      const rowPhone = String(order.phone || '').replace(/\D/g, '').slice(-10);
+      if (rowPhone !== phoneDigits) {
+        return json({ error: 'Order not found or phone mismatch' }, 403);
+      }
+      results = [order];
+    }
+    // Path 2: signed-in session — broad access to own orders
+    else if (session) {
+      const sEmail = session.email || null;
+      const sPhone = session.phone || null;
+      const rows = await db.prepare(
+        'SELECT * FROM orders WHERE user_id = ? OR (email IS NOT NULL AND email = ?) OR (phone IS NOT NULL AND phone = ?) ORDER BY created_at DESC LIMIT 100'
+      ).bind(session.user_id, sEmail, sPhone).all();
+      results = rows.results || [];
+    }
+    // Path 3: order_id alone — must present phone
+    else if (orderId) {
+      return json({ error: 'Provide phone with order_id, or sign in' }, 401);
+    }
+    // Legacy paths without session are now blocked (was the leak)
+    else if (emailQ || phoneQ || userIdQ) {
+      return json({ error: 'Sign in required for broad order lookup' }, 401);
+    }
+    else {
+      return json({ error: 'Provide order_id + phone, or sign in' }, 400);
     }
 
-    // Parse JSON fields for each order
     const orders = results.map(o => ({
       ...o,
       awb: o.shipprime_awb || o.awb || '',
@@ -66,17 +109,8 @@ export async function onRequest(context) {
       address: typeof o.address === 'string' ? JSON.parse(o.address) : o.address,
     }));
 
-    return new Response(JSON.stringify({ success: true, orders }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache',
-        ...corsHeaders,
-      },
-    });
+    return json({ success: true, orders });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
+    return json({ error: err.message }, 500);
   }
 }

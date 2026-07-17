@@ -140,7 +140,9 @@
   function loadOrders(user) {
     var url = user.phone ? '/api/orders/track?phone=' + encodeURIComponent(user.phone)
                         : '/api/orders/track?email=' + encodeURIComponent(user.email);
-    fetch(url).then(function(r) { return r.json(); }).then(function(d) {
+    var opts = {};
+    try { var t = localStorage.getItem('cc_token'); if (t) opts.headers = { 'Authorization': 'Bearer ' + t }; } catch(e) {}
+    fetch(url, opts).then(function(r) { return r.json(); }).then(function(d) {
       var list = (d && d.success && d.orders) ? d.orders : [];
       if (user.phone && user.email) {
         list = list.filter(function(o) { return String(o.phone||'').replace(/\D/g,'').slice(-10) === String(user.phone).replace(/\D/g,'').slice(-10); });

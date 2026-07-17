@@ -33,6 +33,7 @@ export async function onRequest(context) {
     if (!keySecret) return json({ error: 'Razorpay not configured' }, 500);
 
     const auth = btoa(keyId + ':' + keySecret);
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
     // Fetch payment details from Razorpay (includes email, contact)
     const payRes = await fetch(`https://api.razorpay.com/v1/payments/${razorpay_payment_id}`, {
@@ -40,15 +41,24 @@ export async function onRequest(context) {
     });
     const payment = await payRes.json().catch(() => ({}));
 
-    // Fetch order details (may include customer_details from Magic Checkout)
+    // Fetch order details — poll up to 3 attempts (Magic Checkout populates
+    // customer_details.shipping_address asynchronously, sometimes lagging the
+    // client-side payment success by 3-8 seconds).
     let order = {};
     if (razorpay_order_id) {
-      try {
-        const orderRes = await fetch(`https://api.razorpay.com/v1/orders/${razorpay_order_id}`, {
-          headers: { 'Authorization': 'Basic ' + auth },
-        });
-        order = await orderRes.json().catch(() => ({}));
-      } catch (e) { /* order fetch is best-effort */ }
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const orderRes = await fetch(`https://api.razorpay.com/v1/orders/${razorpay_order_id}`, {
+            headers: { 'Authorization': 'Basic ' + auth },
+          });
+          order = await orderRes.json().catch(() => ({}));
+          const shipAddr = order.customer_details && order.customer_details.shipping_address;
+          if (shipAddr && (shipAddr.street1 || shipAddr.line1) && (shipAddr.zipcode || shipAddr.pincode)) {
+            break; // got a real address, stop polling
+          }
+        } catch (e) { /* order fetch is best-effort */ }
+        if (attempt < 2) await sleep(3000); // 3s between tries
+      }
     }
 
     // Extract customer info

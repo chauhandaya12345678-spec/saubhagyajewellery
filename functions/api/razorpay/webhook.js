@@ -150,9 +150,10 @@ export async function onRequest(context) {
     const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
     const orderId = `CC-${dateStr}-${rand}`;
 
+    let webhookInsertRes;
     try {
-      await db.prepare(
-        `INSERT INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address,
+      webhookInsertRes = await db.prepare(
+        `INSERT OR IGNORE INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address,
                              razorpay_payment_id, razorpay_order_id, payment_method, test_mode, status)
          VALUES (?, NULL, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, 'razorpay', ?, 'confirmed')`
       ).bind(
@@ -162,13 +163,19 @@ export async function onRequest(context) {
       ).run();
     } catch (e) {
       if (!/no such column/i.test(e.message)) throw e;
-      await db.prepare(
-        `INSERT INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address, razorpay_payment_id, status)
+      webhookInsertRes = await db.prepare(
+        `INSERT OR IGNORE INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address, razorpay_payment_id, status)
          VALUES (?, NULL, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'confirmed')`
       ).bind(
         orderId, notes.customer_email || p.email || null, notes.customer_phone || p.contact || null,
         notes.customer_name || 'Guest', JSON.stringify(items), p.amount, p.amount, addressJson, p.id
       ).run();
+    }
+
+    // If save.js already inserted between our dupe check and INSERT, IGNORE fires.
+    if (webhookInsertRes && webhookInsertRes.meta && webhookInsertRes.meta.changes === 0) {
+      const existRow = await db.prepare('SELECT id FROM orders WHERE razorpay_payment_id = ?').bind(p.id).first();
+      return json({ ok: true, order_id: existRow ? existRow.id : null, duplicate: true, note: 'save.js won race' });
     }
 
     let sp; // ShipPrime result

@@ -91,10 +91,34 @@ export async function pushToShipPrime(env, order) {
       hsnCode: '7117', // imitation jewellery
     }));
 
+    // Per-item weight: use explicit weightGrams if catalog has it, else guess by
+    // name/category. Overshoots slightly on purpose so ShipPrime pickup courier
+    // never surcharges. Update these once you weigh production pieces.
+    const guessWeight = (l) => {
+      if (l.weightGrams && Number(l.weightGrams) > 0) return Number(l.weightGrams);
+      const s = String((l.category || '') + ' ' + (l.name || '')).toLowerCase();
+      if (/bridal.*set|full set/.test(s)) return 500;
+      if (/haaram|rani.*haar|long.*necklace/.test(s)) return 220;
+      if (/waist|vanki/.test(s)) return 250;
+      if (/set(?!.*earring)/.test(s)) return 300;   // necklace-set
+      if (/choker/.test(s)) return 130;
+      if (/necklace|mala/.test(s)) return 180;
+      if (/pendant/.test(s)) return 40;
+      if (/tikka|passa|nath/.test(s)) return 25;
+      if (/jhumka|drop|earring|stud/.test(s)) return 35;
+      return 100; // safe default
+    };
+    const totalWeight = (order.items || []).reduce(
+      (s, l) => s + guessWeight(l) * (l.qty || 1), 0
+    );
+    // Add 40g packing (box + bubble + polybag). Floor 100g, ceiling 2kg.
+    const packingWeight = 40;
+    const finalWeight = Math.max(100, Math.min(2000, totalWeight + packingWeight));
+
     const bp = {
       clientReferenceId: order.id,
       paymentMethod: order.paymentMethod === 'cod' ? 'COD' : 'PREPAID',
-      weightGrams: Number(env.SHIPPRIME_WEIGHT_GRAMS || 300),
+      weightGrams: Number(env.SHIPPRIME_WEIGHT_GRAMS_OVERRIDE) || finalWeight,
       declaredValue: Math.round((order.totalPaise || 0) / 100) || items.reduce((s, i) => s + i.price * i.quantity, 0),
       items,
       pickupAddress: {

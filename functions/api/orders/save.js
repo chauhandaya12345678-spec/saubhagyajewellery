@@ -124,9 +124,13 @@ export async function onRequest(context) {
     const method = payment_method === 'cod' ? 'cod' : 'razorpay';
     const isTest = test_mode ? 1 : 0;
 
+    // INSERT OR IGNORE guards against a race where webhook.js fires between
+    // our SELECT-dupe check and INSERT — a UNIQUE index on razorpay_payment_id
+    // makes the second INSERT a silent no-op instead of a duplicate row.
+    let insertRes;
     try {
-      await db.prepare(
-        `INSERT INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address,
+      insertRes = await db.prepare(
+        `INSERT OR IGNORE INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address,
                              razorpay_payment_id, razorpay_order_id, payment_method, test_mode, status)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')`
       ).bind(
@@ -137,13 +141,20 @@ export async function onRequest(context) {
     } catch (e) {
       if (!/no such column/i.test(e.message)) throw e;
       // Pre-migration schema fallback
-      await db.prepare(
-        `INSERT INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address, razorpay_payment_id, status)
+      insertRes = await db.prepare(
+        `INSERT OR IGNORE INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address, razorpay_payment_id, status)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmed')`
       ).bind(
         orderId, userId, email || null, phone || null, name || 'Guest',
         itemsJson, total, subtotal || total, discount || 0, addressJson, razorpay_payment_id
       ).run();
+    }
+
+    // If IGNORE fired (webhook won the race), return the existing row instead
+    if (insertRes && insertRes.meta && insertRes.meta.changes === 0) {
+      const existing = await db.prepare('SELECT id FROM orders WHERE razorpay_payment_id = ?')
+        .bind(razorpay_payment_id).first();
+      if (existing) return json({ success: true, order_id: existing.id, duplicate: true, note: 'webhook won race' });
     }
 
     // ShipPrime push MUST await before the response — Pages Functions kill
