@@ -34,7 +34,7 @@ export async function onRequest(context) {
     const {
       razorpay_payment_id, razorpay_order_id, razorpay_signature,
       items, total, subtotal, discount, name, address,
-      create_account, test_mode, payment_method,
+      create_account, test_mode, payment_method, address_id,
     } = body;
     const email = normEmail(body.email);
     const phone = normPhone(body.phone);
@@ -155,6 +155,19 @@ export async function onRequest(context) {
       const existing = await db.prepare('SELECT id FROM orders WHERE razorpay_payment_id = ?')
         .bind(razorpay_payment_id).first();
       if (existing) return json({ success: true, order_id: existing.id, duplicate: true, note: 'webhook won race' });
+    }
+
+    // Attach the addresses.id to this order (best-effort — column exists after
+    // migrate-2026-07-17-addresses.sql runs). Also bump usage counter on the
+    // address so the "last used" chip on checkout is accurate.
+    if (address_id) {
+      try {
+        await db.prepare('UPDATE orders SET address_id = ? WHERE id = ?')
+          .bind(Number(address_id), orderId).run();
+        await db.prepare(
+          "UPDATE addresses SET last_used_at = datetime('now'), usage_count = usage_count + 1 WHERE id = ?"
+        ).bind(Number(address_id)).run();
+      } catch (e) { /* pre-migration schema — ignore */ }
     }
 
     // ShipPrime push MUST await before the response — Pages Functions kill

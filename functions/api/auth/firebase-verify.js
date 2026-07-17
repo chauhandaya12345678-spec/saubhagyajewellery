@@ -8,7 +8,9 @@
  */
 export async function onRequest(context) {
   const { request, env } = context;
-  const FIREBASE_API_KEY = 'AIzaSyBTOVlCY_seyeR49jEtsKBgjCNAMsA4rtw';
+  // Prefer env var. Fallback keeps behavior when deploy hasn't set it yet.
+  // Set in Cloudflare Pages → Settings → Environment variables → FIREBASE_API_KEY.
+  const FIREBASE_API_KEY = env.FIREBASE_API_KEY || 'AIzaSyBTOVlCY_seyeR49jEtsKBgjCNAMsA4rtw';
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
