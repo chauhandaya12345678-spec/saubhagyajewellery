@@ -38,7 +38,14 @@ export async function onRequest(context) {
     const verifyData = await verifyRes.json().catch(() => ({}));
 
     if (!verifyRes.ok || !verifyData.users || !verifyData.users.length) {
-      return json({ error: 'Invalid or expired authentication' }, 401);
+      return json({ 
+        error: 'Invalid or expired authentication', 
+        debug: { 
+          firebase_status: verifyRes.status, 
+          firebase_error: verifyData.error?.message || 'no users returned',
+          key_used: FIREBASE_API_KEY.slice(0, 8) + '...',
+        }
+      }, 401);
     }
 
     // Confirm the verified phone matches
