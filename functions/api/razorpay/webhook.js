@@ -78,11 +78,13 @@ export async function onRequest(context) {
 
       // Push to ShipPrime now that we have the address
       if (!existing.shipprime_awb) {
-        // Validate pincode before pushing (same logic as save.js)
+        // Validate address before pushing (mirror save.js + _lib.js checks)
         const pin = String(address.pin || '').replace(/\D/g, '');
-        if (pin.length !== 6) {
+        const streetOk = String(address.street || '').trim().length >= 5;
+        const cityOk = String(address.city || '').trim().length >= 2;
+        if (pin.length !== 6 || !streetOk || !cityOk) {
           return json({ ok: true, event: 'order.paid', order_id: existing.id,
-            address_updated: true, shipprime: { pushed: false, error: 'invalid pincode: ' + (address.pin || 'empty') } });
+            address_updated: true, shipprime: { pushed: false, error: 'incomplete address after order.paid — street="' + address.street + '", city="' + address.city + '", pin="' + address.pin + '"' } });
         }
         // Parse items from existing order
         let orderItems = [];

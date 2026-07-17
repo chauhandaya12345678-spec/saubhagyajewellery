@@ -165,15 +165,17 @@ export async function onRequest(context) {
       };
 
       // ── Validate shipping address before pushing to ShipPrime ──
-      // A missing or short pincode causes ShipPrime to reject the order
-      // and repeated retries lock the account. Skip push and store the
-      // error so the admin can fix the address and retry manually.
+      // Empty street/city/pin previously fell through _lib.js fallbacks
+      // ("Address, Mumbai, 400001") producing undeliverable labels.
+      // Now: skip push entirely; order.paid webhook or admin retry fills it.
       let addrCheck = addressJson;
       if (typeof addrCheck === 'string') { try { addrCheck = JSON.parse(addrCheck); } catch (e) { addrCheck = {}; } }
       addrCheck = addrCheck || {};
       const pin = String(addrCheck.pin || '').replace(/\D/g, '');
-      if (pin.length !== 6) {
-        shipprimeResult = { pushed: false, error: 'skipped — invalid pincode "' + (addrCheck.pin || '') + '" — update address in Razorpay and retry via /api/orders/retry-shipprime' };
+      const street = String(addrCheck.street || addrCheck.address1 || '').trim();
+      const city = String(addrCheck.city || '').trim();
+      if (pin.length !== 6 || street.length < 5 || city.length < 2) {
+        shipprimeResult = { pushed: false, error: 'skipped — incomplete address (pin="' + (addrCheck.pin || '') + '", street="' + street + '", city="' + city + '") — will retry when order.paid webhook fires' };
         try { await recordShipprimeResult(db, orderId, shipprimeResult); } catch (e) {}
       } else {
         const srPromise = pushToShipPrime(env, orderForJobs);

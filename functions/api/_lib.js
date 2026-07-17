@@ -74,6 +74,15 @@ export async function pushToShipPrime(env, order) {
     if (typeof addr === 'string') { try { addr = JSON.parse(addr); } catch (e) { addr = {}; } }
     addr = addr || {};
 
+    // Hard-reject incomplete addresses — silent fallbacks like "Address, Mumbai, 400001"
+    // create undeliverable ShipPrime labels (see order #4748410 for the failure mode).
+    const streetRaw = String(addr.street || addr.address1 || '').trim();
+    const pinRaw = String(addr.pin || addr.pincode || '').replace(/\D/g, '');
+    const cityRaw = String(addr.city || '').trim();
+    if (streetRaw.length < 5 || pinRaw.length !== 6 || cityRaw.length < 2) {
+      return { pushed: false, error: 'incomplete address — street/city/pin required (got street="' + streetRaw + '", city="' + cityRaw + '", pin="' + pinRaw + '")' };
+    }
+
     const items = (order.items || []).map(l => ({
       name: l.name || l.id || 'Jewellery item',
       sku: String(l.id || l.sku || 'SKU'),
@@ -101,11 +110,11 @@ export async function pushToShipPrime(env, order) {
       deliveryAddress: {
         name: (order.name || 'Customer').split(' ').slice(0, 5).join(' ').slice(0, 200),
         phone: String(order.phone || '').replace(/\D/g, '').slice(-10) || '9999999999',
-        address1: (addr.street || addr.address1 || 'Address').slice(0, 250),
+        address1: streetRaw.slice(0, 250),
         address2: (addr.apt || addr.address2 || '').slice(0, 250),
-        city: (addr.city || 'Mumbai').slice(0, 100),
-        state: (addr.state || 'Maharashtra').slice(0, 100),
-        pincode: String(addr.pin || '').replace(/\D/g, '').slice(0, 6) || '400001',
+        city: cityRaw.slice(0, 100),
+        state: String(addr.state || '').trim().slice(0, 100) || 'Maharashtra',
+        pincode: pinRaw,
         country: 'India',
       },
     };

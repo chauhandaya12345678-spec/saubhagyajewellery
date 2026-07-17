@@ -58,7 +58,16 @@
   .cat-empty a { color: #0B3C26; }
   .cat-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; color: #9a9a9a; }
   @keyframes catFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-  .cat-grid > .p-card { animation: catFadeUp .5s cubic-bezier(.22,1,.36,1) both; }
+  .cat-grid > .p-card { animation: catFadeUp .5s cubic-bezier(.22,1,.36,1) both; will-change: opacity; }
+  /* Stronger 3D lift so category cards feel as alive as the home page */
+  @media(hover:hover){
+    .cat-grid > .p-card:hover {
+      transform: translateY(-8px) scale(1.012);
+      box-shadow: 0 12px 24px -6px rgba(6,40,26,.25),
+                  0 40px 60px -30px rgba(6,40,26,.32),
+                  0 0 0 1px rgba(197,160,89,.38);
+    }
+  }
   .cat-grid > .p-card:nth-child(1) { animation-delay: .02s; } .cat-grid > .p-card:nth-child(2) { animation-delay: .06s; }
   .cat-grid > .p-card:nth-child(3) { animation-delay: .10s; } .cat-grid > .p-card:nth-child(4) { animation-delay: .14s; }
   .cat-grid > .p-card:nth-child(5) { animation-delay: .18s; } .cat-grid > .p-card:nth-child(6) { animation-delay: .22s; }
@@ -87,7 +96,7 @@
     .cat-card { aspect-ratio: 3/4; }
   }
   /* Scroll into cat-hub anchor on filter tap — offset for sticky header */
-  .cat-filterbar { scroll-margin-top: 84px; }
+  .cat-filterbar { scroll-margin-top: 130px; }
 
 </style>
 </head>

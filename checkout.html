@@ -173,7 +173,7 @@
     try { ua = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
     var user = ua || stored;
     if (user && user.phone) {
-      verifiedPhone = String(user.phone || '').replace(/\\D/g, '').slice(-10);
+      verifiedPhone = String(user.phone || '').replace(/\D/g, '').slice(-10);
       guestName = user.name || '';
       $('co-guest-fields').style.display = 'none';
       return;
@@ -182,7 +182,7 @@
   }
 
   function captureGuestFields() {
-    var ph = ($('co-phone-input').value || '').replace(/\\D/g, '');
+    var ph = ($('co-phone-input').value || '').replace(/\D/g, '');
     guestName = ($('co-name-input').value || '').trim();
     if (ph.length === 10) {
       verifiedPhone = ph;
@@ -348,7 +348,7 @@
             })
           }).then(function(r) { return r.json(); })
           .then(function(details) {
-            var custName = details.name || (user && user.name) || 'Guest';
+            var custName = details.name || guestName || (user && user.name) || 'Guest';
             var custEmail = details.email || (user && user.email) || '';
             var custPhone = details.phone || prefillPhone || '';
             var custAddr = details.address || '{}';
@@ -366,7 +366,7 @@
             });
           }).catch(function() {
             // Fallback: use whatever we have
-            var custName = (user && user.name) || 'Guest';
+            var custName = guestName || (user && user.name) || 'Guest';
             var custEmail = (user && user.email) || '';
             var custPhone = prefillPhone || '';
 
