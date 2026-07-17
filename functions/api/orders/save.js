@@ -202,7 +202,7 @@ export async function onRequest(context) {
         shipprimeResult = { pushed: false, error: 'skipped — incomplete address (pin="' + (addrCheck.pin || '') + '", street="' + street + '", city="' + city + '") — will retry when order.paid webhook fires' };
         try { await recordShipprimeResult(db, orderId, shipprimeResult); } catch (e) {}
       } else {
-        const srPromise = pushToShipPrime(env, orderForJobs);
+        const srPromise = pushToShipPrime(env, orderForJobs, db);
       const capped = Promise.race([
         srPromise,
         new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (ShipPrime >22s)' }), 22000)),

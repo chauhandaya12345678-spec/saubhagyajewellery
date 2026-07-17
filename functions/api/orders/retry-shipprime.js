@@ -60,7 +60,7 @@ export async function onRequest(context) {
         totalPaise: row.total || 0,
         paymentMethod: row.payment_method || 'razorpay',
       };
-      const sp = await pushToShipPrime(env, orderForPush);
+      const sp = await pushToShipPrime(env, orderForPush, db);
       try { await recordShipprimeResult(db, row.id, sp); } catch (e) {}
       if (sp.pushed) {
         try { await logOrderEvent(db, row.id, 'shipprime_retry_ok', 1, 'AWB ' + sp.awb); } catch (e) {}

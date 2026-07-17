@@ -101,7 +101,7 @@ export async function onRequest(context) {
           totalPaise: o.amount || existing.total || 0,
           paymentMethod: 'razorpay',
         };
-        const sp = await pushToShipPrime(env, orderForPush);
+        const sp = await pushToShipPrime(env, orderForPush, db);
         if (sp.pushed) {
           await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, name = ?, updated_at = datetime(\'now\') WHERE id = ?')
             .bind(sp.awb || '', sp.shipPrimeOrderId || '', cd.name || notes.customer_name || 'Guest', existing.id).run();
@@ -191,7 +191,7 @@ export async function onRequest(context) {
         paymentMethod: 'razorpay',
       };
       sp = await Promise.race([
-        pushToShipPrime(env, orderForPush),
+        pushToShipPrime(env, orderForPush, db),
         new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (ShipPrime >22s)' }), 22000)),
       ]).catch(e => ({ pushed: false, error: 'push exception: ' + e.message }));
 

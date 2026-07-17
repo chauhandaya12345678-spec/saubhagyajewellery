@@ -65,10 +65,38 @@ export async function verifyPassword(plain, stored) {
  * order = { id, name, email, phone, address, items, totalPaise, paymentMethod }
  * Returns { pushed, awb?, courier?, orderId?, labelUrl?, error? } — never throws.
  */
-export async function pushToShipPrime(env, order) {
+export async function pushToShipPrime(env, order, db) {
   try {
     const token = env.SHIPPRIME_TOKEN;
     if (!token) return { pushed: false, error: 'SHIPPRIME_TOKEN not configured' };
+
+    // Load pickup address from D1 settings (preferred) or env vars (fallback)
+    let pickup = {
+      name: env.SHIPPRIME_PICKUP_NAME || 'Saubhagya Jewellery',
+      phone: env.SHIPPRIME_PICKUP_PHONE || '9987008435',
+      address1: env.SHIPPRIME_PICKUP_ADDRESS1 || 'Kandivali East',
+      address2: env.SHIPPRIME_PICKUP_ADDRESS2 || '',
+      city: env.SHIPPRIME_PICKUP_CITY || 'Mumbai',
+      state: env.SHIPPRIME_PICKUP_STATE || 'Maharashtra',
+      pincode: env.SHIPPRIME_PICKUP_PIN || '400101',
+    };
+    if (db) {
+      try {
+        const keys = ['pickup_name','pickup_phone','pickup_address1','pickup_address2','pickup_city','pickup_state','pickup_pin'];
+        const rows = await db.prepare(`SELECT key, value FROM settings WHERE key IN (${keys.map(()=>'?').join(',')})`).bind(...keys).all();
+        if (rows.results && rows.results.length) {
+          for (const r of rows.results) {
+            if (r.key === 'pickup_name') pickup.name = r.value || pickup.name;
+            if (r.key === 'pickup_phone') pickup.phone = r.value || pickup.phone;
+            if (r.key === 'pickup_address1') pickup.address1 = r.value || pickup.address1;
+            if (r.key === 'pickup_address2') pickup.address2 = r.value || pickup.address2;
+            if (r.key === 'pickup_city') pickup.city = r.value || pickup.city;
+            if (r.key === 'pickup_state') pickup.state = r.value || pickup.state;
+            if (r.key === 'pickup_pin') pickup.pincode = r.value || pickup.pincode;
+          }
+        }
+      } catch (e) { /* settings table may not exist yet, use fallback */ }
+    }
 
     let addr = order.address;
     if (typeof addr === 'string') { try { addr = JSON.parse(addr); } catch (e) { addr = {}; } }
@@ -122,13 +150,13 @@ export async function pushToShipPrime(env, order) {
       declaredValue: Math.round((order.totalPaise || 0) / 100) || items.reduce((s, i) => s + i.price * i.quantity, 0),
       items,
       pickupAddress: {
-        name: env.SHIPPRIME_PICKUP_NAME || 'Saubhagya Jewellery',
-        phone: env.SHIPPRIME_PICKUP_PHONE || '9987008435',
-        address1: env.SHIPPRIME_PICKUP_ADDRESS1 || 'Kandivali East',
-        address2: env.SHIPPRIME_PICKUP_ADDRESS2 || '',
-        city: env.SHIPPRIME_PICKUP_CITY || 'Mumbai',
-        state: env.SHIPPRIME_PICKUP_STATE || 'Maharashtra',
-        pincode: env.SHIPPRIME_PICKUP_PIN || '400101',
+        name: pickup.name,
+        phone: pickup.phone,
+        address1: pickup.address1,
+        address2: pickup.address2,
+        city: pickup.city,
+        state: pickup.state,
+        pincode: pickup.pincode,
         country: 'India',
       },
       deliveryAddress: {
