@@ -14,7 +14,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to ShipPrime order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -220,6 +220,13 @@ export async function onRequest(context) {
       // fallback so it also survives free-tier isolate termination.
       const emailJob = sendOrderEmail(env, orderForJobs).catch(() => {});
       if (context.waitUntil) context.waitUntil(emailJob);
+
+      // WhatsApp: order confirmed notification
+      const waJob = sendWhatsAppMessage(env, orderForJobs.phone, 'order_confirmed',
+        [orderForJobs.name || 'Customer', orderId, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + orderId + '&phone=' + (orderForJobs.phone || '')]
+      ).catch(() => {});
+      if (context.waitUntil) context.waitUntil(waJob);
+
       }  // end else (valid pincode — push to ShipPrime)
     }
 
