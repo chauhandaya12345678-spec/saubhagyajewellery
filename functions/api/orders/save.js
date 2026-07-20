@@ -157,6 +157,12 @@ export async function onRequest(context) {
       if (existing) return json({ success: true, order_id: existing.id, duplicate: true, note: 'webhook won race' });
     }
 
+    // Tracking token for WhatsApp link (privacy: no phone in URL)
+    const trackToken = crypto.randomUUID().slice(0, 8);
+    try {
+      await db.prepare("UPDATE orders SET track_token = ? WHERE id = ?").bind(trackToken, orderId).run();
+    } catch(e) {}
+
     // Attach the addresses.id to this order (best-effort — column exists after
     // migrate-2026-07-17-addresses.sql runs). Also bump usage counter on the
     // address so the "last used" chip on checkout is accurate.
@@ -223,7 +229,7 @@ export async function onRequest(context) {
 
       // WhatsApp: order confirmed notification
       const waJob = sendWhatsAppMessage(env, orderForJobs.phone, 'order_confirmed',
-        [orderForJobs.name || 'Customer', orderId, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + orderId + '&phone=' + (orderForJobs.phone || '')]
+        [orderForJobs.name || 'Customer', orderId, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + orderId + '&token=' + trackToken]
       ).catch(() => {});
       if (context.waitUntil) context.waitUntil(waJob);
 

@@ -33,7 +33,7 @@ export async function onRequest(context) {
 
     // Find order by AWB
     const order = await db.prepare(
-      'SELECT id, phone, name, status, updated_at FROM orders WHERE shipprime_awb = ?'
+      'SELECT id, phone, name, track_token, status, updated_at FROM orders WHERE shipprime_awb = ?'
     ).bind(awb).first().catch(() => null);
 
     if (!order) {
@@ -63,8 +63,9 @@ export async function onRequest(context) {
         : newStatus.toLowerCase() === 'out_for_delivery' ? 'order_out_for_delivery'
         : 'order_delivered';
       try {
+        const token = order.track_token || order.phone || '';
         const wa = await sendWhatsAppMessage(env, order.phone, templateName,
-          [order.name || 'Customer', order.id, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + order.id + '&phone=' + (order.phone || '')]
+          [order.name || 'Customer', order.id, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + order.id + '&token=' + token]
         );
         if (!wa.sent) {
           console.log('WA_DEBUG: template', templateName, 'not sent —', wa.error, '(create templates in Meta dashboard)');

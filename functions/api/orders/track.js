@@ -62,6 +62,7 @@ export async function onRequest(context) {
     const emailQ = url.searchParams.get('email');
     const phoneQ = url.searchParams.get('phone');
     const userIdQ = url.searchParams.get('user_id');
+    const tokenQ = url.searchParams.get('token');
 
     // Bearer token (optional but expands access)
     const authHeader = request.headers.get('authorization') || '';
@@ -81,6 +82,14 @@ export async function onRequest(context) {
       }
       results = [order];
     }
+    // Path 1b: order_id + token (WhatsApp link, privacy-safe)
+    else if (orderId && tokenQ) {
+      const order = await db.prepare('SELECT * FROM orders WHERE id = ?').bind(orderId).first();
+      if (!order || order.track_token !== tokenQ) {
+        return json({ success: true, orders: [] });
+      }
+      results = [order];
+    }
     // Path 2: signed-in session — broad access to own orders
     else if (session) {
       const sEmail = session.email || null;
@@ -90,9 +99,9 @@ export async function onRequest(context) {
       ).bind(session.user_id, sEmail, sPhone).all();
       results = rows.results || [];
     }
-    // Path 3: order_id alone — must present phone
+    // Path 3: order_id alone — must present phone or token
     else if (orderId) {
-      return json({ error: 'Provide phone with order_id, or sign in' }, 401);
+      return json({ error: 'Provide token, phone with order_id, or sign in' }, 401);
     }
     // Legacy paths without session are now blocked (was the leak)
     else if (emailQ || phoneQ || userIdQ) {
