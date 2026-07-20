@@ -186,6 +186,36 @@ export async function pushToShipPrime(env, order, db) {
   }
 }
 
+/** Send WhatsApp order notification via Meta Cloud API.
+ *  Returns { sent: bool, error? } — never throws. */
+export async function sendWhatsAppMessage(env, toPhone, templateName, params) {
+  try {
+    const phoneId = env.WHATSAPP_PHONE_ID;
+    const token = env.WHATSAPP_TOKEN;
+    if (!phoneId || !token) return { sent: false, error: 'WHATSAPP_PHONE_ID/TOKEN not configured' };
+    const cleanPhone = String(toPhone).replace(/\D/g, '').slice(-10);
+    if (cleanPhone.length !== 10 || cleanPhone === '0000000000') return { sent: false, error: 'invalid phone' };
+    const res = await fetch(`https://graph.facebook.com/v22.0/${phoneId}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to: '91' + cleanPhone,
+        type: 'template',
+        template: {
+          name: templateName,
+          language: { code: 'en' },
+          components: params && params.length ? [{ type: 'body', parameters: params.map(v => ({ type: 'text', text: String(v) })) }] : undefined,
+        },
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    return res.ok ? { sent: true, msgId: data.messages?.[0]?.id } : { sent: false, error: data.error?.message || res.status };
+  } catch (err) {
+    return { sent: false, error: err.message };
+  }
+}
+
 /** Record Shipprime result on the order row + append an event log entry so
  *  a missing order in the Shipprime panel is always diagnosable from D1. */
 export async function recordShipprimeResult(db, orderId, sp) {
