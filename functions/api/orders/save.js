@@ -228,7 +228,7 @@ export async function onRequest(context) {
       if (context.waitUntil) context.waitUntil(emailJob);
 
       // WhatsApp: order confirmed notification
-      const waJob = sendWhatsAppMessage(env, orderForJobs.phone, 'order_confirmed',
+      const waJob = sendWhatsAppMessage(env, orderForJobs.phone, 'confirm_order',
         [orderForJobs.name || 'Customer', orderId, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + orderId + '&token=' + trackToken]
       ).catch(() => {});
       if (context.waitUntil) context.waitUntil(waJob);
