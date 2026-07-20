@@ -321,14 +321,15 @@
     var urlOrderId = url.searchParams.get('order_id');
     var urlPhone = url.searchParams.get('phone');
     var urlEmail = url.searchParams.get('email');
+    var urlToken = url.searchParams.get('token');
 
     // Priority 1: URL params
-    if (urlOrderId && (urlPhone || urlEmail)) {
+    if (urlOrderId && (urlPhone || urlEmail || urlToken)) {
       $('track-phone').value = urlPhone || '';
       $('track-oid').value = urlOrderId;
       if (urlPhone) doTrack();
       else {
-        fetch('/api/orders/track?order_id=' + encodeURIComponent(urlOrderId), authOpts())
+        fetch('/api/orders/track?order_id=' + encodeURIComponent(urlOrderId) + (urlToken ? '&token=' + encodeURIComponent(urlToken) : '&phone=' + encodeURIComponent(urlEmail)), authOpts())
           .then(function(r) { return r.json(); })
           .then(function(d) { if (d && d.success) renderOrders(d.orders); else showGuest(); })
           .catch(showGuest);
