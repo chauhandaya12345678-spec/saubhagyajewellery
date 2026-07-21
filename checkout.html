@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=21">
+<link rel="stylesheet" href="site.css?v=24">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
@@ -32,7 +32,7 @@
   .addr-list { display:flex; flex-direction:column; gap:10px; margin-bottom: 14px; }
   .addr-item { border:1px solid #eae5d8; border-radius:12px; padding:12px 14px; cursor:pointer; transition:border-color .2s, background .2s; position:relative; }
   .addr-item:hover { border-color:#C5A880; }
-  .addr-item.selected { border-color:#0B291C; background:#faf8f3; box-shadow: 0 1px 6px rgba(152,32,22,.08); }
+  .addr-item.selected { border-color:#0B291C; background:#faf8f3; box-shadow: 0 1px 6px rgba(11,41,28,.08); }
   .addr-item input[type=radio] { position:absolute; right:14px; top:14px; accent-color:#0B291C; width:16px; height:16px; }
   .addr-item .name { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; color:#0B291C; margin-bottom:3px; }
   .addr-item .badge-def { display:inline-block; background:#C5A880; color:#fff; font-size:9px; font-weight:600; letter-spacing:1px; padding:2px 6px; border-radius:4px; margin-left:6px; }
@@ -77,9 +77,9 @@
   .co-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid #eae5d8; }
   .co-total span:first-child { font-family:'Playfair Display',serif; font-size: 16px; }
   .co-total span:last-child { font-family:'Playfair Display',serif; font-size: 20px; font-weight: 600; color: #0B291C; }
-  .co-btn { display:block; width:100%; padding:16px; background:#0B291C; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; margin-top:16px; border-radius:14px; box-shadow:0 2px 8px rgba(152,32,22,.15); transition:all .4s cubic-bezier(.25,1,.5,1); }
+  .co-btn { display:block; width:100%; padding:16px; background:#0B291C; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; margin-top:16px; border-radius:14px; box-shadow:0 2px 8px rgba(11,41,28,.15); transition:all .4s cubic-bezier(.25,1,.5,1); }
   .co-btn:disabled { opacity:.6; cursor:not-allowed; }
-  @media (hover:hover) { .co-btn:hover:not(:disabled) { background:#071B12; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.25); } }
+  @media (hover:hover) { .co-btn:hover:not(:disabled) { background:#071B12; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.25); } }
   .co-error { color:#c0392b; font-family:'Montserrat',sans-serif; font-size:13px; text-align:center; margin-top:12px; }
   .co-empty { text-align:center; padding:60px 24px; }
   .co-empty h1 { font-family:'Playfair Display',serif; font-size: 24px; margin: 0 0 10px; }

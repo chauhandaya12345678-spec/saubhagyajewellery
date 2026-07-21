@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=21">
+<link rel="stylesheet" href="site.css?v=24">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
@@ -39,7 +39,7 @@
   .cat-card { position: relative; display: block; border-radius: 10px; overflow: hidden; text-decoration: none; aspect-ratio: 1/1; background: #eae5d8; }
   .cat-card .bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.25,1,.5,1); }
   @media(hover:hover) { .cat-card:hover .bg { transform: scale(1.05); } }
-  .cat-card .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(152,32,22,.85) 0%, rgba(152,32,22,0) 55%); }
+  .cat-card .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,41,28,.85) 0%, rgba(11,41,28,0) 55%); }
   .cat-card .lbl { position: absolute; left: 14px; right: 14px; bottom: 14px; color: #fff; font-family:'Playfair Display',serif; font-size: 18px; line-height: 1.15; }
   .cat-card .lbl .arr { display: block; margin-top: 4px; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; color: #C5A880; }
   .cat-card.is-active { outline: 3px solid #C5A880; outline-offset: 2px; }
@@ -63,8 +63,8 @@
   @media(hover:hover){
     .cat-grid > .p-card:hover {
       transform: translateY(-8px) scale(1.012);
-      box-shadow: 0 12px 24px -6px rgba(152,32,22,.25),
-                  0 40px 60px -30px rgba(152,32,22,.32),
+      box-shadow: 0 12px 24px -6px rgba(11,41,28,.25),
+                  0 40px 60px -30px rgba(11,41,28,.32),
                   0 0 0 1px rgba(90,136,0,.38);
     }
   }
