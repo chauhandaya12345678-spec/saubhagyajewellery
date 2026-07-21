@@ -83,7 +83,6 @@ body{padding-top:118px}
 .card-photo,.tr-img .im,.p-img .im{width:100%;height:100%;object-fit:cover;display:block;transition:transform .9s cubic-bezier(.25,1,.5,1)}
 @media(hover:hover){.card:hover .card-photo,.tr-card:hover .tr-img .im,.p-card:hover .p-img .im{transform:scale(1.06)}}
 .card-ph{font-size:9px;letter-spacing:1.5px;color:#b3ab98}
-.card-tag,.tr-badge,.p-badge{position:absolute;top:12px;left:12px;background:linear-gradient(135deg,#982016,#7a1810);padding:5px 11px;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;letter-spacing:1.4px;color:#5A8800;z-index:2;border-radius:4px;box-shadow:0 2px 6px rgba(152,32,22,.28)}
 .card-name,.tr-name,.p-name{font-family:'Playfair Display',serif;font-size:18px;color:#1A1A1A;margin:14px 6px 0;line-height:1.28;font-weight:500}
 .card-price,.tr-price,.p-price{font-family:'Montserrat',sans-serif;font-size:13.5px;font-weight:600;color:#982016;margin:5px 6px 0;letter-spacing:.3px}
 .card-price small,.tr-mrp,.p-mrp{color:#9a9a9a;font-weight:400;font-size:13px;text-decoration:line-through;margin-left:8px;letter-spacing:0}
@@ -164,7 +163,6 @@ footer.site{background:#7a1810;color:#fff;padding:60px 40px 30px}
   .card-name,.tr-name,.p-name{font-size:14px;margin:10px 4px 0;line-height:1.25}
   .card-price,.tr-price,.p-price{font-size:12.5px;margin:4px 4px 0}
   .card-price small,.tr-mrp,.p-mrp{font-size:10.5px;margin-left:5px}
-  .card-tag,.tr-badge,.p-badge{top:8px;left:8px;padding:3px 8px;font-size:8.5px;letter-spacing:1px}
   .card-off{top:8px;right:8px;padding:3px 7px;font-size:8.5px}
   /* Mobile: quick-add always visible so buyer never needs to hover */
   .tr-quick{opacity:1;transform:none;font-size:9.5px;padding:9px 0}

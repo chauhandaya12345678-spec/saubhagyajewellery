@@ -6,5 +6,8 @@ Disallow: /checkout
 Disallow: /checkout.html
 Disallow: /admin
 Disallow: /admin/
+Disallow: /api/
+Disallow: /functions/
+Disallow: /build/
 
 Sitemap: https://saubhagyajewellery.com/sitemap.xml

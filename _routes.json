@@ -1,7 +1,10 @@
 {
   "version": 1,
   "include": [
-    "/api/*"
+    "/api/*",
+    "/product",
+    "/product.html",
+    "/sitemap.xml"
   ],
   "exclude": []
 }
