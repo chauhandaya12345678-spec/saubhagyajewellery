@@ -63,7 +63,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=22">
+<link rel="stylesheet" href="site.css?v=23">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
@@ -89,7 +89,7 @@
    * shows on desktop instead of a center crop; slides are hard-clipped
    * so neighbouring banners can never bleed into view. */
   .hm-hero-wrap { max-width: 1280px; margin: 34px auto 0; padding: 0 48px; }
-  .hm-hero { position: relative; width: 100%; aspect-ratio: 1200 / 630; max-height: 640px; overflow: hidden; isolation: isolate; border-radius: 20px; border: 1px solid rgba(90,136,0,.35); box-shadow: 0 50px 90px -42px rgba(152,32,22,.5), 0 20px 48px -28px rgba(0,0,0,.28); animation: ccFadeUp 1.1s cubic-bezier(.25,1,.5,1) .15s both; }
+  .hm-hero { position: relative; width: 100%; aspect-ratio: 1200 / 630; max-height: 640px; overflow: hidden; isolation: isolate; border-radius: 20px; border: 1px solid rgba(90,136,0,.35); box-shadow: 0 50px 90px -42px rgba(11,41,28,.5), 0 20px 48px -28px rgba(0,0,0,.28); animation: ccFadeUp 1.1s cubic-bezier(.25,1,.5,1) .15s both; }
   .hm-hero-track { display: flex; width: 100%; height: 100%; transition: transform 1.1s cubic-bezier(.65,0,.18,1); }
   .hm-hero-slide { position: relative; flex: 0 0 100%; min-width: 100%; height: 100%; overflow: hidden; }
   .hm-hero-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform 1s cubic-bezier(.25,1,.5,1); }
@@ -110,8 +110,8 @@
   .hm-hero-dot.active { background: #fff; transform: scale(1.3); }
 
   .hm-ctas { display: flex; gap: 18px; margin: 42px 0 0; justify-content: center; animation: ccFadeUp 1.1s cubic-bezier(.25,1,.5,1) .4s both; flex-wrap: wrap; padding: 0 24px; }
-  .hm-btn { font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; padding: 17px 36px; cursor: pointer; text-decoration: none; text-align: center; border-radius: 14px; box-shadow: 0 2px 8px rgba(152,32,22,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .hm-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.25); }
+  .hm-btn { font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; padding: 17px 36px; cursor: pointer; text-decoration: none; text-align: center; border-radius: 14px; box-shadow: 0 2px 8px rgba(11,41,28,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .hm-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.25); }
   .hm-btn.primary { background: #0B291C; color: #fff; border: none; }
   .hm-btn.primary:hover { background: #071B12; }
   .hm-btn.ghost { background: transparent; color: #1A1A1A; border: 1px solid #C5A880; }
@@ -173,7 +173,7 @@
     .hm-h1 { font-size: 28px; line-height: 1.2; }
     .hm-hero-wrap { padding: 0 14px; margin-top: 22px; }
     /* Phones: taller crop reads better than a thin strip. Rounded, softer shadow. */
-    .hm-hero { aspect-ratio: 4/5; max-height: 560px; border-radius: 16px; box-shadow: 0 20px 40px -20px rgba(152,32,22,.35); }
+    .hm-hero { aspect-ratio: 4/5; max-height: 560px; border-radius: 16px; box-shadow: 0 20px 40px -20px rgba(11,41,28,.35); }
     .hm-hero-caption { left: 20px; bottom: 24px; right: 20px; }
     .hm-hero-caption .t { font-size: 24px; line-height: 1.16; }
     .hm-hero-caption .k { font-size: 9px; letter-spacing: 3px; }
