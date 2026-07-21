@@ -8,37 +8,37 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=21">
+<link rel="stylesheet" href="site.css?v=20">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
   * { box-sizing: border-box; }
-  body { background: #FAFAFA; margin: 0; }
+  body { background: #F9F6F0; margin: 0; }
   .cart-wrap { max-width: 900px; margin: 0 auto; padding: 20px 24px 80px; }
   .cart-empty { text-align: center; padding: 60px 24px; }
   .cart-empty h1 { font-family:'Playfair Display',serif; font-size: 28px; color: #1A1A1A; margin: 0 0 10px; }
   .cart-empty p { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6a6a6a; margin: 0 0 24px; }
-  .cart-empty a { display: inline-block; padding: 14px 28px; background: #0B3C26; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; text-decoration: none; border-radius: 14px; box-shadow: 0 2px 8px rgba(6,40,26,.15); transition: all .4s cubic-bezier(.22,1,.36,1); }
-  .cart-empty a:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,40,26,.25); background: #06281a; }
+  .cart-empty a { display: inline-block; padding: 14px 28px; background: #0B291C; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; text-decoration: none; border-radius: 14px; box-shadow: 0 2px 8px rgba(6,40,26,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .cart-empty a:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,40,26,.25); background: #071B12; }
   .cart-item { display: flex; gap: 16px; padding: 20px 0; border-bottom: 1px solid #eae5d8; }
   .cart-item-img { width: 80px; height: 100px; flex: none; object-fit: cover; background: #eae5d8; border-radius: 10px; }
   .cart-item-info { flex: 1; min-width: 0; }
   .cart-item-name { font-family:'Playfair Display',serif; font-size: 18px; color: #1A1A1A; }
-  .cart-item-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B3C26; margin-top: 4px; }
+  .cart-item-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B291C; margin-top: 4px; }
   .cart-item-qty { display: flex; align-items: center; gap: 0; margin-top: 10px; border: 1px solid #ddd6c6; border-radius: 14px; overflow: hidden; width: fit-content; }
   .cart-item-qty span { width: 30px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; user-select: none; transition: all .2s; }
   .cart-item-qty .cq { border-left: 1px solid #ddd6c6; border-right: 1px solid #ddd6c6; width: 34px; font-size: 12px; }
-  .cart-item-qty span:not(.cq):hover { background: #0B3C26; color: #fff; }
+  .cart-item-qty span:not(.cq):hover { background: #0B291C; color: #fff; }
   .cart-item-remove { font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing: 1px; color: #9a9a9a; cursor: pointer; margin-top: 8px; }
   .cart-summary { margin-top: 28px; padding: 20px; background: #fff; border: 1px solid #eae5d8; border-radius: 16px; max-width: 420px; margin-left: auto; margin-right: auto; }
   .cart-summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #4a4a4a; }
   .cart-summary-total { display: flex; justify-content: space-between; padding: 14px 0 0; margin-top: 8px; border-top: 1px solid #eae5d8; }
-  .cart-summary-total span:last-child { font-family:'Playfair Display',serif; font-size: 22px; font-weight: 600; color: #0B3C26; }
-  .cart-checkout { display: block; width: 100%; margin-top: 16px; padding: 16px; background: #0B3C26; color: #fff; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size: 12px; font-weight: 600; letter-spacing:1.5px; cursor: pointer; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(6,40,26,.18); transition: all .4s cubic-bezier(.22,1,.36,1); }
-  .cart-checkout:hover { background: #06281a; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,40,26,.28); }
+  .cart-summary-total span:last-child { font-family:'Playfair Display',serif; font-size: 22px; font-weight: 600; color: #0B291C; }
+  .cart-checkout { display: block; width: 100%; margin-top: 16px; padding: 16px; background: #0B291C; color: #fff; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size: 12px; font-weight: 600; letter-spacing:1.5px; cursor: pointer; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(6,40,26,.18); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .cart-checkout:hover { background: #071B12; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,40,26,.28); }
   .cart-continue { display: block; margin-top: 12px; text-align: center; font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; letter-spacing: 1px; }
-  .cart-continue a { color: #0B3C26; text-decoration: none; border-bottom: 1px solid #C5A059; padding-bottom: 1px; }
+  .cart-continue a { color: #0B291C; text-decoration: none; border-bottom: 1px solid #C5A880; padding-bottom: 1px; }
   .cart-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; letter-spacing:1.5px; }
   @media (max-width: 640px) {
     .cart-wrap { padding: 10px 14px calc(96px + env(safe-area-inset-bottom)); }
@@ -70,7 +70,7 @@
     <div id="cart-items"></div>
     <div class="cart-summary" id="cart-summary" style="display:none">
       <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal"></span></div>
-      <div class="cart-summary-row"><span>Shipping</span><span id="cart-shipping" style="color:#0B3C26;">FREE (included)</span></div>
+      <div class="cart-summary-row"><span>Shipping</span><span id="cart-shipping" style="color:#0B291C;">FREE (included)</span></div>
       <div class="cart-summary-total"><span>Estimated Total</span><span id="cart-total"></span></div>
       <a class="cart-checkout" href="checkout.html" id="cart-checkout-btn">PROCEED TO CHECKOUT</a>
     </div>

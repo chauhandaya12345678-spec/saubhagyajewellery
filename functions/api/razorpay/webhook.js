@@ -13,7 +13,7 @@
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
  *   Events: payment.captured, order.paid
  */
-import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail } from '../_lib.js';
+import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail, decrementStock } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -177,6 +177,9 @@ export async function onRequest(context) {
       const existRow = await db.prepare('SELECT id FROM orders WHERE razorpay_payment_id = ?').bind(p.id).first();
       return json({ ok: true, order_id: existRow ? existRow.id : null, duplicate: true, note: 'save.js won race' });
     }
+
+    // Inventory: decrement stock_count (best-effort, mirrors save.js).
+    await decrementStock(db, items);
 
     let sp; // ShipPrime result
     if (!isTest) {

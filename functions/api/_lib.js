@@ -37,6 +37,25 @@ export async function hmacSha256Hex(secret, message) {
   return [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+/* Decrement stock_count for each paid line item. Only touches SKUs that
+   already have a non-null stock_count (most products don't track it yet —
+   see build/stock-update-examples.sql). Never throws: a missing column on
+   a pre-migration DB, or a bad SKU, must not block order confirmation. */
+export async function decrementStock(db, items) {
+  try {
+    for (const l of (items || [])) {
+      const sku = String(l.sku || l.id || '').trim();
+      const qty = Number(l.qty || 1);
+      if (!sku || !(qty > 0)) continue;
+      await db.prepare(
+        "UPDATE products SET stock_count = MAX(0, stock_count - ?), updated_at = datetime('now') WHERE sku = ? AND stock_count IS NOT NULL"
+      ).bind(qty, sku).run();
+    }
+  } catch (e) {
+    // pre-migration schema (no stock_count column yet) or transient DB error — ignore
+  }
+}
+
 export async function sha256Hex(message) {
   const digest = await crypto.subtle.digest('SHA-256', enc.encode(message));
   return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -321,7 +340,7 @@ export async function sendOrderEmail(env, order) {
 
     const rows = (order.items || []).map(l =>
       `<tr><td style="padding:8px 0;border-bottom:1px solid #f0ece1;font:14px Georgia,serif;color:#1A1A1A">${esc(l.name)} &times; ${l.qty || 1}</td>` +
-      `<td style="padding:8px 0;border-bottom:1px solid #f0ece1;text-align:right;font:14px Arial,sans-serif;color:#0B3C26">${inr((l.price || 0) * 100 * (l.qty || 1))}</td></tr>`
+      `<td style="padding:8px 0;border-bottom:1px solid #f0ece1;text-align:right;font:14px Arial,sans-serif;color:#0B291C">${inr((l.price || 0) * 100 * (l.qty || 1))}</td></tr>`
     ).join('');
 
     const pay = order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid online';
@@ -329,26 +348,26 @@ export async function sendOrderEmail(env, order) {
     const html =
 `<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
   <div style="text-align:center;padding:26px 0 14px">
-    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B3C26">SAUBHAGYA</div>
-    <div style="font-size:9px;letter-spacing:5px;color:#C5A059;margin-top:3px">FINE JEWELLERY</div>
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B291C">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A880;margin-top:3px">FINE JEWELLERY</div>
   </div>
-  <div style="background:#0B3C26;color:#fff;padding:22px 24px;text-align:center">
+  <div style="background:#0B291C;color:#fff;padding:22px 24px;text-align:center">
     <div style="font:600 20px Georgia,serif">Order Confirmed</div>
     <div style="font-size:13px;opacity:.85;margin-top:6px">Order <strong>${esc(order.id)}</strong></div>
   </div>
   <div style="padding:24px">
-    <p style="font-size:14px;line-height:1.6;color:#4a4a4a;margin:0 0 18px">Hi ${esc((order.name || 'there').split(' ')[0])}, thank you for your order. We're preparing your piece for dispatch. You can track it anytime at <a href="https://saubhagyajewellery.com/track-orders.html" style="color:#0B3C26">My Orders</a> using your phone number.</p>
+    <p style="font-size:14px;line-height:1.6;color:#4a4a4a;margin:0 0 18px">Hi ${esc((order.name || 'there').split(' ')[0])}, thank you for your order. We're preparing your piece for dispatch. You can track it anytime at <a href="https://saubhagyajewellery.com/track-orders.html" style="color:#0B291C">My Orders</a> using your phone number.</p>
     <table style="width:100%;border-collapse:collapse">${rows}
       <tr><td style="padding:12px 0 0;font:600 16px Georgia,serif">Total (${esc(pay)})</td>
-      <td style="padding:12px 0 0;text-align:right;font:600 18px Georgia,serif;color:#0B3C26">${inr(order.totalPaise)}</td></tr>
+      <td style="padding:12px 0 0;text-align:right;font:600 18px Georgia,serif;color:#0B291C">${inr(order.totalPaise)}</td></tr>
     </table>
     <div style="margin-top:20px;padding:14px 16px;background:#faf8f3;border:1px solid #eee5d6;border-radius:6px">
-      <div style="font-size:10px;letter-spacing:2px;color:#C5A059;margin-bottom:6px">SHIP TO</div>
+      <div style="font-size:10px;letter-spacing:2px;color:#C5A880;margin-bottom:6px">SHIP TO</div>
       <div style="font-size:13px;line-height:1.6;color:#1A1A1A">${esc(order.name || '')}<br>${esc(addrLine)}<br>${esc(order.phone || '')}</div>
-      <div style="font-size:12px;color:#0B3C26;margin-top:10px"><strong>Estimated delivery:</strong> ${esc(eta.text)}</div>
+      <div style="font-size:12px;color:#0B291C;margin-top:10px"><strong>Estimated delivery:</strong> ${esc(eta.text)}</div>
     </div>
     <p style="font-size:12px;line-height:1.7;color:#9a9a9a;margin-top:20px">Ready pieces dispatch in 2–4 business days (10–14 for made-to-order bridal). A tracking link arrives on WhatsApp &amp; email once shipped. All sales are final; manufacturing defects are repaired or replaced.</p>
-    <p style="font-size:12px;color:#9a9a9a">Questions? <a href="https://wa.me/919987008435" style="color:#0B3C26">WhatsApp us</a>.</p>
+    <p style="font-size:12px;color:#9a9a9a">Questions? <a href="https://wa.me/919987008435" style="color:#0B291C">WhatsApp us</a>.</p>
   </div>
 </div>`;
 
@@ -383,15 +402,15 @@ export async function sendWelcomeEmail(env, user) {
     const html =
 `<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
   <div style="text-align:center;padding:26px 0 14px">
-    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B3C26">SAUBHAGYA</div>
-    <div style="font-size:9px;letter-spacing:5px;color:#C5A059;margin-top:3px">FINE JEWELLERY</div>
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B291C">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A880;margin-top:3px">FINE JEWELLERY</div>
   </div>
   <div style="padding:8px 24px 24px">
-    <h2 style="font:600 20px Georgia,serif;color:#0B3C26;margin:0 0 12px">Welcome, ${first}</h2>
-    <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 14px">Your Saubhagya account is ready. Every order you place is saved to it — track them anytime at <a href="https://saubhagyajewellery.com/track-orders.html" style="color:#0B3C26">My Orders</a> with your phone number.</p>
+    <h2 style="font:600 20px Georgia,serif;color:#0B291C;margin:0 0 12px">Welcome, ${first}</h2>
+    <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 14px">Your Saubhagya account is ready. Every order you place is saved to it — track them anytime at <a href="https://saubhagyajewellery.com/track-orders.html" style="color:#0B291C">My Orders</a> with your phone number.</p>
     <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 18px">Handcrafted temple, Kundan/Polki and American Diamond jewellery — free insured shipping across India, every price all-inclusive.</p>
-    <a href="https://saubhagyajewellery.com/" style="display:inline-block;padding:13px 26px;background:#0B3C26;color:#fff;text-decoration:none;font-size:11px;letter-spacing:2px">EXPLORE COLLECTIONS</a>
-    <p style="font-size:12px;color:#9a9a9a;margin-top:22px">Questions? <a href="https://wa.me/919987008435" style="color:#0B3C26">WhatsApp us</a> or reply to this email.</p>
+    <a href="https://saubhagyajewellery.com/" style="display:inline-block;padding:13px 26px;background:#0B291C;color:#fff;text-decoration:none;font-size:11px;letter-spacing:2px">EXPLORE COLLECTIONS</a>
+    <p style="font-size:12px;color:#9a9a9a;margin-top:22px">Questions? <a href="https://wa.me/919987008435" style="color:#0B291C">WhatsApp us</a> or reply to this email.</p>
   </div>
 </div>`;
     const res = await fetch('https://api.resend.com/emails', {
@@ -424,13 +443,13 @@ export async function sendMagicLinkEmail(env, email, name, token) {
     const html =
 `<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
   <div style="text-align:center;padding:26px 0 14px">
-    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B3C26">SAUBHAGYA</div>
-    <div style="font-size:9px;letter-spacing:5px;color:#C5A059;margin-top:3px">JEWELLERY</div>
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B291C">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A880;margin-top:3px">JEWELLERY</div>
   </div>
   <div style="padding:8px 24px 24px">
-    <h2 style="font:600 20px Georgia,serif;color:#0B3C26;margin:0 0 12px">Sign in to your account</h2>
+    <h2 style="font:600 20px Georgia,serif;color:#0B291C;margin:0 0 12px">Sign in to your account</h2>
     <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 20px">Hi ${first}, click below to sign in instantly. Link expires in 15 minutes and works only once.</p>
-    <a href="${link}" style="display:inline-block;padding:14px 32px;background:#0B3C26;color:#fff;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:4px">SIGN IN TO SAUBHAGYA</a>
+    <a href="${link}" style="display:inline-block;padding:14px 32px;background:#0B291C;color:#fff;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:4px">SIGN IN TO SAUBHAGYA</a>
     <p style="font-size:12px;color:#9a9a9a;margin-top:20px">If you didn't request this, ignore this email.</p>
   </div>
 </div>`;
@@ -464,14 +483,14 @@ export async function sendPasswordResetEmail(env, email, name, token) {
     const html =
 `<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
   <div style="text-align:center;padding:26px 0 14px">
-    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B3C26">SAUBHAGYA</div>
-    <div style="font-size:9px;letter-spacing:5px;color:#C5A059;margin-top:3px">JEWELLERY</div>
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B291C">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A880;margin-top:3px">JEWELLERY</div>
   </div>
   <div style="padding:8px 24px 24px">
-    <h2 style="font:600 20px Georgia,serif;color:#0B3C26;margin:0 0 12px">Reset your password</h2>
+    <h2 style="font:600 20px Georgia,serif;color:#0B291C;margin:0 0 12px">Reset your password</h2>
     <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 8px">Hi ${first}, we received a request to reset your Saubhagya account password.</p>
     <p style="font-size:14px;line-height:1.7;color:#4a4a4a;margin:0 0 20px">Click below to set a new password. Link expires in 1 hour.</p>
-    <a href="${link}" style="display:inline-block;padding:14px 32px;background:#0B3C26;color:#fff;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:4px">RESET PASSWORD</a>
+    <a href="${link}" style="display:inline-block;padding:14px 32px;background:#0B291C;color:#fff;text-decoration:none;font-size:13px;letter-spacing:1px;border-radius:4px">RESET PASSWORD</a>
     <p style="font-size:12px;color:#9a9a9a;margin-top:20px">If you didn't request this, ignore this email. Your password won't change.</p>
   </div>
 </div>`;

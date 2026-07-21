@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
+Disallow: /cart
+Disallow: /cart.html
+Disallow: /checkout
+Disallow: /checkout.html
+Disallow: /admin
+Disallow: /admin/
 
 Sitemap: https://saubhagyajewellery.com/sitemap.xml

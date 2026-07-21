@@ -14,7 +14,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to ShipPrime order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -156,6 +156,11 @@ export async function onRequest(context) {
         .bind(razorpay_payment_id).first();
       if (existing) return json({ success: true, order_id: existing.id, duplicate: true, note: 'webhook won race' });
     }
+
+    // Inventory: decrement stock_count for SKUs that track it. Best-effort —
+    // never blocks order confirmation (see decrementStock in _lib.js).
+    const itemsArr = typeof items === 'string' ? JSON.parse(items) : items;
+    await decrementStock(db, itemsArr);
 
     // Tracking token for WhatsApp link (privacy: no phone in URL)
     const trackToken = crypto.randomUUID().slice(0, 8);

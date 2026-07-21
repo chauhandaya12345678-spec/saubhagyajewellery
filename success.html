@@ -8,22 +8,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=21">
+<link rel="stylesheet" href="site.css?v=20">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <style>
   .sx-wrap { max-width:720px; margin:0 auto; padding:60px 24px 100px; }
   .sx-center { text-align:center; }
-  .sx-check { width:64px; height:64px; margin:0 auto; border-radius:50%; background:#0B3C26; display:flex; align-items:center; justify-content:center; }
+  .sx-check { width:64px; height:64px; margin:0 auto; border-radius:50%; background:#0B291C; display:flex; align-items:center; justify-content:center; }
   .sx-h1 { font-family:'Playfair Display',serif; font-weight:500; font-size:36px; color:#1A1A1A; margin:22px 0 6px; }
   .sx-sub { font-family:'Montserrat',sans-serif; font-weight:300; font-size:13px; line-height:1.7; color:#6a6a6a; margin:0 auto; max-width:460px; }
-  .sx-sub strong { color:#0B3C26; font-weight:600; letter-spacing:1px; font-variant-numeric:tabular-nums; }
+  .sx-sub strong { color:#0B291C; font-weight:600; letter-spacing:1px; font-variant-numeric:tabular-nums; }
   .sx-btns { display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap; }
-  .sx-btn { padding:14px 28px; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; text-decoration:none; border-radius:14px; box-shadow:0 2px 8px rgba(6,40,26,.15); transition:all .4s cubic-bezier(.22,1,.36,1); display:inline-block; }
-  .sx-btn.primary { background:#0B3C26; color:#fff; border:none; }
-  .sx-btn.primary:hover { background:#06281a; transform:translateY(-2px); box-shadow:0 6px 20px rgba(6,40,26,.25); }
-  .sx-btn.ghost { background:transparent; color:#1A1A1A; border:1px solid #C5A059; }
-  .sx-btn.ghost:hover { background:#C5A059; color:#fff; transform:translateY(-2px); }
+  .sx-btn { padding:14px 28px; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; text-decoration:none; border-radius:14px; box-shadow:0 2px 8px rgba(6,40,26,.15); transition:all .4s cubic-bezier(.25,1,.5,1); display:inline-block; }
+  .sx-btn.primary { background:#0B291C; color:#fff; border:none; }
+  .sx-btn.primary:hover { background:#071B12; transform:translateY(-2px); box-shadow:0 6px 20px rgba(6,40,26,.25); }
+  .sx-btn.ghost { background:transparent; color:#1A1A1A; border:1px solid #C5A880; }
+  .sx-btn.ghost:hover { background:#C5A880; color:#fff; transform:translateY(-2px); }
   .sx-loading { text-align:center; padding:40px; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:1.5px; color:#9a9a9a; }
 </style>
 </head>
@@ -33,7 +33,7 @@
   <div class="sx-wrap">
     <div class="sx-center">
       <div class="sx-check">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C5A880" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
       </div>
       <h1 class="sx-h1">Order Confirmed</h1>
       <p class="sx-sub">Thank you! Your order <strong id="sx-oid"></strong> is confirmed. Redirecting to tracking page…</p>

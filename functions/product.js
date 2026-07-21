@@ -40,11 +40,14 @@ export async function onRequest(context) {
   const sku = url.searchParams.get('sku');
 
   // No sku → let the static file serve as-is (shows "Loading…" then falls
-  // through to Product Not Found via client JS).
-  if (!sku) return env.ASSETS.fetch(new Request(new URL('/product.html', url), request));
+  // through to Product Not Found via client JS). next() continues Pages'
+  // own asset resolution for this exact request — using env.ASSETS.fetch()
+  // with a re-pointed '/product.html' URL instead causes an infinite 308
+  // (Pages' clean-URL layer redirects /product.html → /product → here).
+  if (!sku) return next();
 
-  // Fetch the raw shell HTML from Pages assets.
-  const shellRes = await env.ASSETS.fetch(new Request(new URL('/product.html', url), request));
+  // Get the raw shell HTML via the same asset-resolution path (see above).
+  const shellRes = await next();
   if (!shellRes.ok) return shellRes;
   let html = await shellRes.text();
 
@@ -68,6 +71,15 @@ export async function onRequest(context) {
   const image = abs(p.image);
   const inStock = (p.inStock === 0 || p.inStock === false) ? false : true;
 
+  // Review stats for AggregateRating (best-effort — table may be empty for new SKUs)
+  let reviewStats = null;
+  try {
+    const rs = await env.DB.prepare(
+      'SELECT COUNT(*) AS count, AVG(rating) AS average FROM reviews WHERE product_sku = ?'
+    ).bind(p.sku).first();
+    if (rs && rs.count > 0) reviewStats = { count: rs.count, average: Math.round(rs.average * 10) / 10 };
+  } catch (e) { /* reviews table not reachable — skip aggregateRating */ }
+
   // Product JSON-LD (rich-result eligible on Google Search)
   const productLd = {
     '@context': 'https://schema.org',
@@ -89,6 +101,13 @@ export async function onRequest(context) {
       seller: { '@type': 'Organization', name: 'Saubhagya Jewellery' },
     },
   };
+  if (reviewStats) {
+    productLd.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: String(reviewStats.average),
+      reviewCount: String(reviewStats.count),
+    };
+  }
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -129,6 +148,9 @@ export async function onRequest(context) {
       `<meta property="product:price:amount" content="${p.price}">` +
       `<meta property="product:price:currency" content="INR">` +
       `<meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` +
+      `<meta name="twitter:title" content="${esc(title)}">` +
+      `<meta name="twitter:description" content="${esc(desc)}">` +
+      `<meta name="twitter:image" content="${esc(image)}">` +
       `<script type="application/ld+json">${JSON.stringify(productLd)}</script>` +
       `<script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>` +
       `</head>`

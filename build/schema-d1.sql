@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS products (
   image      TEXT    NOT NULL DEFAULT '',
   altImage   TEXT    NOT NULL DEFAULT '',
   inStock    INTEGER NOT NULL DEFAULT 1,
+  stock_count INTEGER,
+  weightGrams INTEGER,
   created_at TEXT    NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT    NOT NULL DEFAULT (datetime('now'))
 );
