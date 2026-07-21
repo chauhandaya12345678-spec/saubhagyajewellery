@@ -28,19 +28,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=23">
+<link rel="stylesheet" href="site.css?v=20">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
-  .pdp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px 80px; }
-  #pdp-crumb { margin-bottom: 18px; max-width: 1080px; padding-left: 48px; padding-right: 48px; }
+  .pdp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px 80px; animation: fadeUp .6s cubic-bezier(.25,1,.5,1); }
+  #pdp-crumb { margin: 0 auto 18px; max-width: 1080px; padding-left: 48px; padding-right: 48px; }
   /* image capped at a regular card size instead of half the monitor */
   .pdp-grid { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 56px; align-items: start; justify-content: center; }
   .pdp-img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 12px; background: #f0ede5; }
-  .pdp-img-wrap { position: relative; overflow: hidden; border-radius: 12px; max-width: 440px; }
+  .pdp-img-wrap { position: relative; overflow: hidden; border-radius: 12px; max-width: 440px; margin: 0 auto; }
   @media(hover:hover){ .pdp-img-wrap:hover .pdp-img { transform: scale(1.05); transition: transform 0.5s cubic-bezier(.25,1,.5,1); } }
   .pdp-badge { display: inline-block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; padding: 5px 12px; background: #C5A880; color: #fff; margin-bottom: 14px; }
   .pdp-cat { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #C5A880; margin-bottom: 8px; text-transform: uppercase; }
@@ -57,7 +57,7 @@
   .pdp-swatch.on { border-color: #C5A880; box-shadow: 0 0 0 2px rgba(90,136,0,.25); }
   .pdp-tax { font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; margin-bottom: 6px; }
   .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B291C; margin-bottom: 4px; }
-  .pdp-stock { display:inline-flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; color:#0B291C; margin-bottom:12px; }
+  .pdp-stock { display:inline-flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; color:#0B291C; margin-bottom:12px; animation:pulse 2s infinite; }
   .pdp-stock.low { color:#c0392b; }
   .pdp-stock .dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
   .pdp-noreturn { font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; margin-bottom: 22px; }
@@ -68,8 +68,8 @@
   .pdp-pincheck-title { font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; color:#6a6a6a; margin-bottom:8px; }
   .pdp-pincheck-row { display:flex; gap:8px; }
   .pdp-pincheck input { flex:1; height:38px; padding:0 12px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff; border-radius:4px; }
-  .pdp-pincheck button { height:38px; padding:0 18px; background:#0B291C; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; cursor:pointer; border-radius:14px; box-shadow:0 2px 8px rgba(11,41,28,.12); transition:all .3s; }
-  .pdp-pincheck button:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(11,41,28,.2); }
+  .pdp-pincheck button { height:38px; padding:0 18px; background:#0B291C; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; cursor:pointer; border-radius:14px; box-shadow:0 2px 8px rgba(152,32,22,.12); transition:all .3s; }
+  .pdp-pincheck button:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(152,32,22,.2); }
   .pdp-pincheck-result { margin-top:8px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B291C; min-height:16px; }
   .pdp-pincheck-result.err { color:#c0392b; }
   .pdp-noreturn a { color: #0B291C; }
@@ -96,9 +96,21 @@
   .rv-textarea { min-height: 90px; resize: vertical; }
   .rv-starpick { display: flex; gap: 6px; margin-bottom: 12px; cursor: pointer; font-size: 22px; color: #ddd6c6; user-select: none; }
   .rv-starpick span.on { color: #C5A880; }
-  .rv-submit { padding: 13px 26px; background: #0B291C; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; border-radius: 14px; box-shadow: 0 2px 8px rgba(11,41,28,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .rv-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.25); background: #071B12; }
+  .rv-submit { padding: 13px 26px; background: #0B291C; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; border-radius: 14px; box-shadow: 0 2px 8px rgba(152,32,22,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .rv-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.25); background: #071B12; }
   .rv-msg { font-family: 'Montserrat',sans-serif; font-size: 12px; margin-top: 10px; }
+  /* thumbnail strip (Issue 2) */
+  .pdp-thumbs { display:flex; gap:8px; margin-top:12px; justify-content:center; flex-wrap:wrap; }
+  .pdp-thumb { width:64px; height:64px; border-radius:8px; border:2px solid transparent; cursor:pointer; overflow:hidden; opacity:.6; transition:all .25s; background:#f0ede5; }
+  .pdp-thumb.on { border-color:#C5A880; opacity:1; }
+  .pdp-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  /* review form labels + char count (Issue 5) */
+  .rv-label { font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1px; color:#9a9a9a; margin-bottom:4px; display:block; text-transform:uppercase; }
+  .rv-char-count { font-family:'Montserrat',sans-serif; font-size:11px; color:#9a9a9a; text-align:right; margin-top:-8px; margin-bottom:10px; }
+  .rv-empty-nice { font-family:'Montserrat',sans-serif; font-size:13px; color:#9a9a9a; padding:24px 0; text-align:center; line-height:1.7; }
+  /* animations (Issue 6) */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
   .pdp-qtyrow { display: flex; align-items: stretch; gap: 10px; margin: 0 0 14px; }
   .pdp-qty { display: flex; align-items: stretch; border: 1px solid #ddd6c6; border-radius: 14px; overflow: hidden; }
   .pdp-qty span { display: flex; align-items: center; justify-content: center; font-family: 'Montserrat',sans-serif; font-size: 14px; cursor: pointer; user-select: none; transition: all .2s; }
@@ -106,10 +118,11 @@
   .pdp-qty .pdp-q:hover { background: #0B291C; color: #fff; }
   .pdp-qty .pdp-v { width: 36px; font-size: 13px; border-left: 1px solid #ddd6c6; border-right: 1px solid #ddd6c6; }
   .pdp-qty .pdp-v:hover { background: transparent; }
-  .pdp-add { flex: 1; height: 48px; border: none; background: #0B291C; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; white-space: nowrap; border-radius: 14px; box-shadow: 0 2px 8px rgba(11,41,28,.18); transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .pdp-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.28); background: #071B12; }
+  .pdp-add { flex: 1; height: 48px; border: none; background: #0B291C; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; white-space: nowrap; border-radius: 14px; box-shadow: 0 2px 8px rgba(152,32,22,.18); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .pdp-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.28); background: #071B12; }
+  .pdp-add:active { transform: scale(.96); transition: transform .1s; }
   .pdp-buy { width: 100%; height: 48px; border: 1px solid #0B291C; background: transparent; color: #0B291C; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; margin-bottom: 24px; border-radius: 14px; transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .pdp-buy:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(11,41,28,.12); background: #0B291C; color: #fff; }
+  .pdp-buy:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(152,32,22,.12); background: #0B291C; color: #fff; }
   .pdp-desc { font-family: 'Montserrat',sans-serif; font-size: 13px; line-height: 1.8; color: #6a6a6a; max-width: 460px; }
   .pdp-desc strong { color: #1A1A1A; }
   .pdp-loading { text-align: center; padding: 80px 24px; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; letter-spacing:1.5px; }
@@ -123,6 +136,7 @@
     .pdp-name { font-size: 26px; }
     .pdp-price { font-size: 22px; }
     .pdp-img-wrap { max-width: 100%; }
+    .pdp-img { aspect-ratio: 1/1; }
     .pdp-desc { max-width: 100%; }
     /* Bigger tap targets */
     .pdp-qty span { padding: 0 12px; }
@@ -131,13 +145,13 @@
     .pdp-add { height: 52px; font-size: 12px; letter-spacing: 2.2px; }
     .pdp-buy { height: 52px; font-size: 12px; letter-spacing: 2.2px; }
     /* Sticky bottom CTA bar on mobile — visible after user scrolls past the fold */
-    .pdp-mobile-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(90,136,0,.28); box-shadow: 0 -6px 24px rgba(11,41,28,.08); transform: translateY(120%); transition: transform .4s cubic-bezier(.25,1,.5,1); }
+    .pdp-mobile-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(90,136,0,.28); box-shadow: 0 -6px 24px rgba(152,32,22,.08); transform: translateY(120%); transition: transform .4s cubic-bezier(.25,1,.5,1); }
     .pdp-mobile-bar.on { transform: translateY(0); }
     .pdp-mobile-bar .price { flex: none; font-family:'Playfair Display',serif; font-size: 18px; font-weight: 600; color: #0B291C; align-self: center; padding: 0 4px; }
-    .pdp-mobile-bar button { flex: 1; height: 48px; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 1.8px; cursor: pointer; box-shadow: 0 2px 8px rgba(11,41,28,.12); transition: all .3s; }
-  .pdp-mobile-bar button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(11,41,28,.2); }
+    .pdp-mobile-bar button { flex: 1; height: 48px; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 1.8px; cursor: pointer; box-shadow: 0 2px 8px rgba(152,32,22,.12); transition: all .3s; }
+  .pdp-mobile-bar button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(152,32,22,.2); }
     .pdp-mobile-bar .add { background: #fff; color: #0B291C; border: 1px solid #0B291C; }
-    .pdp-mobile-bar .buy { background: #0B291C; color: #fff; box-shadow: 0 6px 16px rgba(11,41,28,.24); }
+    .pdp-mobile-bar .buy { background: #0B291C; color: #fff; box-shadow: 0 6px 16px rgba(152,32,22,.24); }
     .pdp-mobile-bar .buy:hover { background: #071B12; }
   }
   @media (min-width: 901px) { .pdp-mobile-bar { display: none; } }
@@ -159,6 +173,7 @@
         <div class="pdp-img-wrap">
           <button class="pdp-fav" id="pdp-fav" title="Save to favourites" aria-label="Save to favourites">♡</button>
           <img class="pdp-img" id="pdp-image" src="" alt="">
+          <div class="pdp-thumbs" id="pdp-thumbs"></div>
         </div>
         <div>
           <div class="pdp-cat" id="pdp-cat"></div>
@@ -205,17 +220,21 @@
             </div>
             <div class="rv-form">
               <h3>Write a review</h3>
+              <label class="rv-label">Your rating</label>
               <div class="rv-starpick" id="rv-starpick" title="Tap to rate">
                 <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
               </div>
-              <input class="rv-input" id="rv-name" placeholder="Your name" maxlength="60">
+              <label class="rv-label" for="rv-name">Your name</label>
+              <input class="rv-input" id="rv-name" placeholder="e.g. Priya M." maxlength="60">
+              <label class="rv-label" for="rv-text">Your review</label>
               <textarea class="rv-textarea" id="rv-text" placeholder="How was the piece? Fit, finish, occasion…" maxlength="600"></textarea>
+              <div class="rv-char-count" id="rv-char-count">0 / 600</div>
               <button class="rv-submit" id="rv-submit">SUBMIT REVIEW</button>
               <div class="rv-msg" id="rv-msg"></div>
             </div>
           </div>
           <div class="rv-right">
-            <div id="rv-list"><div class="rv-empty">Be the first to review this piece.</div></div>
+            <div id="rv-list"><div class="rv-empty-nice">Be the first to review —<br>your feedback helps others find their perfect piece.</div></div>
           </div>
         </div>
       </div>
@@ -273,6 +292,7 @@
        the browser expands that exact image into the PDP hero. */
     $('pdp-image').style.viewTransitionName = 'prod-' + String(p.sku || sku).replace(/[^A-Za-z0-9_-]/g, '');
     renderSwatches(p);
+    renderThumbs(p);
     $('pdp-price').textContent = fmt(p.price);
     if (p.mrp && p.mrp > p.price) {
       $('pdp-mrp').textContent = fmt(p.mrp);
@@ -303,28 +323,51 @@
     // rewrite) so crawlers see it in the first response — no client duplicate needed.
   }
 
-  /* Color/finish swatches — reads p.variants ([{image,label}]) if the
-     catalog provides it, else falls back to image + altImage. Hidden
-     entirely when fewer than 2 distinct images exist (no fake variants). */
+  /* Color/finish swatches — reads p.variants([{image,label}]) or image+altImage.
+     Always shown when at least one image exists (gate removed). */
+  function getImageOpts(p) {
+    var opts = Array.isArray(p.variants) && p.variants.length
+      ? p.variants.filter(function (v) { return v && v.image; }).slice(0, 6)
+      : [p.image, p.altImage].filter(Boolean).map(function (img) { return { image: img }; });
+    var seen = {};
+    return opts.filter(function (o) { if (seen[o.image]) return false; seen[o.image] = 1; return true; });
+  }
+
+  function switchMainImage(src) {
+    $('pdp-image').src = src;
+    // sync swatch active state
+    $('pdp-swatches').querySelectorAll('.pdp-swatch').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-img') === src);
+    });
+    // sync thumb active state
+    $('pdp-thumbs').querySelectorAll('.pdp-thumb').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-img') === src);
+    });
+  }
+
   function renderSwatches(p) {
     var box = $('pdp-swatches');
-    var opts = Array.isArray(p.variants) && p.variants.length
-      ? p.variants.filter(function (v) { return v && v.image; }).slice(0, 3)
-      : [p.image, p.altImage].filter(Boolean).map(function (img) { return { image: img }; });
-    // de-dupe by image URL
-    var seen = {};
-    opts = opts.filter(function (o) { if (seen[o.image]) return false; seen[o.image] = 1; return true; });
-    if (opts.length < 2) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    var opts = getImageOpts(p);
+    if (!opts.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
     box.innerHTML = opts.map(function (o, i) {
       return '<button type="button" class="pdp-swatch' + (i === 0 ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" aria-label="' + (o.label || ('View ' + (i + 1))) + '"><img src="' + o.image + '" alt="' + (o.label || '') + '" loading="lazy"></button>';
     }).join('');
     box.style.display = 'flex';
     box.querySelectorAll('.pdp-swatch').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        box.querySelectorAll('.pdp-swatch').forEach(function (b) { b.classList.remove('on'); });
-        btn.classList.add('on');
-        $('pdp-image').src = btn.getAttribute('data-img');
-      });
+      btn.addEventListener('click', function () { switchMainImage(btn.getAttribute('data-img')); });
+    });
+  }
+
+  function renderThumbs(p) {
+    var box = $('pdp-thumbs');
+    var opts = getImageOpts(p);
+    if (opts.length < 2) { box.innerHTML = ''; return; }
+    box.innerHTML = opts.map(function (o, i) {
+      return '<div class="pdp-thumb' + (i === 0 ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" role="button" tabindex="0" aria-label="' + (o.label || ('Image ' + (i + 1))) + '"><img src="' + o.image + '" alt="' + (o.label || '') + '" loading="lazy"></div>';
+    }).join('');
+    box.querySelectorAll('.pdp-thumb').forEach(function (btn) {
+      btn.addEventListener('click', function () { switchMainImage(btn.getAttribute('data-img')); });
+      btn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') switchMainImage(btn.getAttribute('data-img')); });
     });
   }
 
@@ -452,6 +495,13 @@
   });
   paintStars();
 
+  var rvTextArea = $('rv-text'), rvCharCount = $('rv-char-count');
+  if (rvTextArea && rvCharCount) {
+    rvTextArea.addEventListener('input', function () {
+      rvCharCount.textContent = rvTextArea.value.length + ' / 600';
+    });
+  }
+
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
   function loadReviews() {
@@ -462,11 +512,14 @@
         if (d.count > 0) $('rv-avg').textContent = '★ ' + d.average + ' · ' + d.count + ' review' + (d.count > 1 ? 's' : '');
         if (d.reviews && d.reviews.length) {
           $('rv-list').innerHTML = d.reviews.map(function(r) {
+            var stars = '★'.repeat(Math.max(1, Math.min(5, r.rating))) + '☆'.repeat(Math.max(0, 5 - Math.min(5, r.rating)));
             return '<div class="rv-item">' +
-              '<div class="rv-stars">' + '★'.repeat(Math.max(1, Math.min(5, r.rating))) + '</div>' +
+              '<div class="rv-stars">' + stars + '</div>' +
               '<div class="rv-name">' + esc(r.name) + '</div>' +
               '<div class="rv-text">' + esc(r.review_text) + '</div></div>';
           }).join('');
+        } else {
+          $('rv-list').innerHTML = '<div class="rv-empty-nice">Be the first to review —<br>your feedback helps others find their perfect piece.</div>';
         }
       }).catch(function() {});
   }

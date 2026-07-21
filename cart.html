@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=23">
+<link rel="stylesheet" href="site.css?v=20">
 <script src="layout.js?v=13"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
@@ -19,8 +19,8 @@
   .cart-empty { text-align: center; padding: 60px 24px; }
   .cart-empty h1 { font-family:'Playfair Display',serif; font-size: 28px; color: #1A1A1A; margin: 0 0 10px; }
   .cart-empty p { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6a6a6a; margin: 0 0 24px; }
-  .cart-empty a { display: inline-block; padding: 14px 28px; background: #0B291C; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; text-decoration: none; border-radius: 14px; box-shadow: 0 2px 8px rgba(11,41,28,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .cart-empty a:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.25); background: #071B12; }
+  .cart-empty a { display: inline-block; padding: 14px 28px; background: #0B291C; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; text-decoration: none; border-radius: 14px; box-shadow: 0 2px 8px rgba(152,32,22,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .cart-empty a:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.25); background: #071B12; }
   .cart-item { display: flex; gap: 16px; padding: 20px 0; border-bottom: 1px solid #eae5d8; }
   .cart-item-img { width: 80px; height: 100px; flex: none; object-fit: cover; background: #eae5d8; border-radius: 10px; }
   .cart-item-info { flex: 1; min-width: 0; }
@@ -35,8 +35,8 @@
   .cart-summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #4a4a4a; }
   .cart-summary-total { display: flex; justify-content: space-between; padding: 14px 0 0; margin-top: 8px; border-top: 1px solid #eae5d8; }
   .cart-summary-total span:last-child { font-family:'Playfair Display',serif; font-size: 22px; font-weight: 600; color: #0B291C; }
-  .cart-checkout { display: block; width: 100%; margin-top: 16px; padding: 16px; background: #0B291C; color: #fff; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size: 12px; font-weight: 600; letter-spacing:1.5px; cursor: pointer; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(11,41,28,.18); transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .cart-checkout:hover { background: #071B12; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.28); }
+  .cart-checkout { display: block; width: 100%; margin-top: 16px; padding: 16px; background: #0B291C; color: #fff; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size: 12px; font-weight: 600; letter-spacing:1.5px; cursor: pointer; text-align: center; text-decoration: none; box-shadow: 0 2px 8px rgba(152,32,22,.18); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .cart-checkout:hover { background: #071B12; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.28); }
   .cart-continue { display: block; margin-top: 12px; text-align: center; font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; letter-spacing: 1px; }
   .cart-continue a { color: #0B291C; text-decoration: none; border-bottom: 1px solid #C5A880; padding-bottom: 1px; }
   .cart-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; letter-spacing:1.5px; }
@@ -51,7 +51,7 @@
     .cart-summary { padding: 16px; border-radius: 10px; }
     .cart-summary-total span:last-child { font-size: 20px; }
     /* Sticky checkout button so it's always in thumb reach */
-    .cart-summary { position: sticky; bottom: calc(env(safe-area-inset-bottom) + 8px); z-index: 20; box-shadow: 0 -10px 30px rgba(11,41,28,.08); }
+    .cart-summary { position: sticky; bottom: calc(env(safe-area-inset-bottom) + 8px); z-index: 20; box-shadow: 0 -10px 30px rgba(152,32,22,.08); }
   }
 </style>
 </head>
