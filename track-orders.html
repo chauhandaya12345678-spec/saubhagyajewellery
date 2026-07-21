@@ -21,15 +21,15 @@
   .track-form { display:flex; flex-direction:column; gap:10px; margin:14px 0 0; }
   .track-row { display:flex; gap:10px; flex-wrap:wrap; }
   .track-row input { flex:1; min-width:140px; height:44px; padding:0 14px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff; border-radius:12px; }
-  .track-row input:focus { border-color:#5A8800; }
-  .track-btn { height:44px; padding:0 28px; background:#982016; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; white-space:nowrap; align-self:flex-start; border-radius:14px; box-shadow:0 2px 8px rgba(152,32,22,.15); transition:all .4s cubic-bezier(.25,1,.5,1); }
+  .track-row input:focus { border-color:#C5A880; }
+  .track-btn { height:44px; padding:0 28px; background:#0B291C; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; white-space:nowrap; align-self:flex-start; border-radius:14px; box-shadow:0 2px 8px rgba(152,32,22,.15); transition:all .4s cubic-bezier(.25,1,.5,1); }
   .track-btn:disabled { opacity:.6; cursor:not-allowed; }
-  .track-btn:hover:not(:disabled) { background:#7a1810; transform:translateY(-2px); box-shadow:0 6px 20px rgba(152,32,22,.25); }
+  .track-btn:hover:not(:disabled) { background:#071B12; transform:translateY(-2px); box-shadow:0 6px 20px rgba(152,32,22,.25); }
 
   .order-card { border:1px solid rgba(90,136,0,.25); border-radius:12px; padding:20px; background:#fff; margin-bottom:20px; }
-  .order-id-font { font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; letter-spacing:1px; color:#982016; font-variant-numeric:tabular-nums; }
+  .order-id-font { font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; letter-spacing:1px; color:#0B291C; font-variant-numeric:tabular-nums; }
   .order-date { font-family:'Montserrat',sans-serif; font-size:13px; color:#9a9a9a; margin-top:3px; }
-  .order-total { font-family:'Montserrat',sans-serif; font-size:15px; font-weight:600; color:#982016; margin-left:auto; }
+  .order-total { font-family:'Montserrat',sans-serif; font-size:15px; font-weight:600; color:#0B291C; margin-left:auto; }
 
   /* Progress bar - absolute connector line under dots, no overflow */
   .progress-bar { position:relative; display:flex; justify-content:space-between; margin:22px 4px 8px; padding:0 12px; }
@@ -40,32 +40,32 @@
   .progress-bar::after {
     content:''; position:absolute; top:8px; left:calc(10% + 12px);
     width: calc(var(--pb-done, 0) * (80% - 24px));
-    height:2px; background:#982016; z-index:0; border-radius:2px;
+    height:2px; background:#0B291C; z-index:0; border-radius:2px;
     transition:width .4s cubic-bezier(.25,1,.5,1);
   }
   .progress-step { position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; min-width:0; }
   .progress-dot { width:16px; height:16px; border-radius:50%; background:#e0dcd0; transition:background .3s, box-shadow .3s; }
-  .progress-dot.done { background:#982016; }
-  .progress-dot.current { background:#5A8800; box-shadow:0 0 0 4px rgba(90,136,0,.3); }
+  .progress-dot.done { background:#0B291C; }
+  .progress-dot.current { background:#C5A880; box-shadow:0 0 0 4px rgba(90,136,0,.3); }
   .progress-label { font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:.5px; color:#9a9a9a; margin-top:8px; text-align:center; line-height:1.3; word-break:break-word; }
-  .progress-label.done { color:#982016; font-weight:600; }
+  .progress-label.done { color:#0B291C; font-weight:600; }
 
   .status-badge { display:inline-block; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:500; letter-spacing:1.5px; padding:5px 14px; border-radius:20px; }
-  .status-CONFIRMED, .status-PACKED { background:#5A8800; color:#fff; }
-  .status-SHIPPED, .status-OUT_FOR_DELIVERY { background:#982016; color:#fff; }
+  .status-CONFIRMED, .status-PACKED { background:#C5A880; color:#fff; }
+  .status-SHIPPED, .status-OUT_FOR_DELIVERY { background:#0B291C; color:#fff; }
   .status-DELIVERED { background:#27ae60; color:#fff; }
   .status-CANCELLED, .status-LOST, .status-RTO { background:#c0392b; color:#fff; }
 
-  .track-link { display:inline-block; margin-top:12px; padding:10px 20px; background:#982016; color:#fff; text-decoration:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1px; border-radius:8px; }
-  .track-link:hover { background:#7a1810; }
+  .track-link { display:inline-block; margin-top:12px; padding:10px 20px; background:#0B291C; color:#fff; text-decoration:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1px; border-radius:8px; }
+  .track-link:hover { background:#071B12; }
 
   .guest-box { text-align:center; padding:30px 20px; border:1px solid #eae5d8; border-radius:12px; background:#faf8f3; }
   .guest-box h3 { font-family:'Playfair Display',serif; font-size:18px; margin:0 0 8px; }
   .guest-box p { font-family:'Montserrat',sans-serif; font-size:12px; color:#6a6a6a; margin:0 0 12px; }
-  .guest-box a { color:#982016; text-decoration:none; border-bottom:1px solid #5A8800; }
+  .guest-box a { color:#0B291C; text-decoration:none; border-bottom:1px solid #C5A880; }
 
   .eta-text { font-family:'Montserrat',sans-serif; font-size:12px; color:#6a6a6a; margin-top:8px; }
-  .eta-text strong { color:#982016; }
+  .eta-text strong { color:#0B291C; }
 
   @media (max-width:600px) {
     .progress-label { font-size:8px; }

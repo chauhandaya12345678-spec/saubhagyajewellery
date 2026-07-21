@@ -31,16 +31,16 @@
   .co-card h2 { font-family:'Playfair Display',serif; font-size: 18px; color:#1A1A1A; margin: 0 0 14px; font-weight: 500; }
   .addr-list { display:flex; flex-direction:column; gap:10px; margin-bottom: 14px; }
   .addr-item { border:1px solid #eae5d8; border-radius:12px; padding:12px 14px; cursor:pointer; transition:border-color .2s, background .2s; position:relative; }
-  .addr-item:hover { border-color:#5A8800; }
-  .addr-item.selected { border-color:#982016; background:#faf8f3; box-shadow: 0 1px 6px rgba(152,32,22,.08); }
-  .addr-item input[type=radio] { position:absolute; right:14px; top:14px; accent-color:#982016; width:16px; height:16px; }
-  .addr-item .name { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; color:#982016; margin-bottom:3px; }
-  .addr-item .badge-def { display:inline-block; background:#5A8800; color:#fff; font-size:9px; font-weight:600; letter-spacing:1px; padding:2px 6px; border-radius:4px; margin-left:6px; }
+  .addr-item:hover { border-color:#C5A880; }
+  .addr-item.selected { border-color:#0B291C; background:#faf8f3; box-shadow: 0 1px 6px rgba(152,32,22,.08); }
+  .addr-item input[type=radio] { position:absolute; right:14px; top:14px; accent-color:#0B291C; width:16px; height:16px; }
+  .addr-item .name { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; color:#0B291C; margin-bottom:3px; }
+  .addr-item .badge-def { display:inline-block; background:#C5A880; color:#fff; font-size:9px; font-weight:600; letter-spacing:1px; padding:2px 6px; border-radius:4px; margin-left:6px; }
   .addr-item .line { font-family:'Montserrat',sans-serif; font-size:12.5px; color:#4a4a4a; line-height:1.5; }
   .addr-item .used { font-family:'Montserrat',sans-serif; font-size:10px; color:#9a9a9a; margin-top:4px; letter-spacing:.5px; }
   .addr-item .actions { position:absolute; right:36px; top:14px; }
-  .addr-item .actions a { font-family:'Montserrat',sans-serif; font-size:10px; color:#982016; text-decoration:none; border-bottom:1px solid #5A8800; padding-bottom:1px; }
-  .addr-new { border:1px dashed #5A8800; color:#982016; padding:12px 14px; border-radius:12px; cursor:pointer; text-align:center; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:1.2px; transition:background .2s; }
+  .addr-item .actions a { font-family:'Montserrat',sans-serif; font-size:10px; color:#0B291C; text-decoration:none; border-bottom:1px solid #C5A880; padding-bottom:1px; }
+  .addr-new { border:1px dashed #C5A880; color:#0B291C; padding:12px 14px; border-radius:12px; cursor:pointer; text-align:center; font-family:'Montserrat',sans-serif; font-size:12px; letter-spacing:1.2px; transition:background .2s; }
   .addr-new:hover { background:#faf8f3; }
   .addr-new.selected { background:#faf8f3; border-style:solid; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -53,13 +53,13 @@
     font-family:'Montserrat',sans-serif; font-size:13px; color:#1A1A1A;
     outline:none; background:#fff; transition:border-color .2s;
   }
-  .form-row input:focus, .form-row select:focus { border-color:#5A8800; }
+  .form-row input:focus, .form-row select:focus { border-color:#C5A880; }
   .form-row input.err, .form-row select.err { border-color:#c0392b; }
   .form-row select { appearance:none; padding-right:32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236a6a6a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position: right 12px center; }
   .form-row small { display:block; font-family:'Montserrat',sans-serif; font-size:10.5px; color:#9a9a9a; margin-top:4px; }
-  .form-row .hint-ok { color:#982016; }
+  .form-row .hint-ok { color:#0B291C; }
   .save-check { display:flex; align-items:center; gap:8px; margin-top:14px; }
-  .save-check input { width:16px; height:16px; accent-color:#982016; }
+  .save-check input { width:16px; height:16px; accent-color:#0B291C; }
   .save-check label { font-family:'Montserrat',sans-serif; font-size:12px; color:#4a4a4a; cursor:pointer; margin:0; letter-spacing:0; text-transform:none; }
   .co-summary { position:sticky; top:130px; }
   .co-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #4a4a4a; }
@@ -67,30 +67,30 @@
   .co-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
   .co-item-name { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #1A1A1A; line-height: 1.4; }
   .co-item-bot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-  .co-item-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #982016; font-weight: 500; }
+  .co-item-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B291C; font-weight: 500; }
   .co-qty { display: inline-flex; align-items: center; border: 1px solid #ddd6c6; border-radius: 14px; overflow: hidden; }
-  .co-qbtn { width: 28px; height: 28px; border: none; background: #fff; color: #982016; font-size: 15px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
-  .co-qbtn:hover { background: #982016; color: #fff; }
+  .co-qbtn { width: 28px; height: 28px; border: none; background: #fff; color: #0B291C; font-size: 15px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  .co-qbtn:hover { background: #0B291C; color: #fff; }
   .co-qv { min-width: 30px; text-align: center; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #1A1A1A; }
   .co-x { flex: none; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd6c6; border-radius: 50%; color: #9a9a9a; font-size: 13px; cursor: pointer; background: #fff; line-height: 1; }
   .co-x:hover { color: #c0392b; border-color: #c0392b; }
   .co-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 10px; border-top: 1px solid #eae5d8; }
   .co-total span:first-child { font-family:'Playfair Display',serif; font-size: 16px; }
-  .co-total span:last-child { font-family:'Playfair Display',serif; font-size: 20px; font-weight: 600; color: #982016; }
-  .co-btn { display:block; width:100%; padding:16px; background:#982016; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; margin-top:16px; border-radius:14px; box-shadow:0 2px 8px rgba(152,32,22,.15); transition:all .4s cubic-bezier(.25,1,.5,1); }
+  .co-total span:last-child { font-family:'Playfair Display',serif; font-size: 20px; font-weight: 600; color: #0B291C; }
+  .co-btn { display:block; width:100%; padding:16px; background:#0B291C; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; margin-top:16px; border-radius:14px; box-shadow:0 2px 8px rgba(152,32,22,.15); transition:all .4s cubic-bezier(.25,1,.5,1); }
   .co-btn:disabled { opacity:.6; cursor:not-allowed; }
-  @media (hover:hover) { .co-btn:hover:not(:disabled) { background:#7a1810; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.25); } }
+  @media (hover:hover) { .co-btn:hover:not(:disabled) { background:#071B12; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.25); } }
   .co-error { color:#c0392b; font-family:'Montserrat',sans-serif; font-size:13px; text-align:center; margin-top:12px; }
   .co-empty { text-align:center; padding:60px 24px; }
   .co-empty h1 { font-family:'Playfair Display',serif; font-size: 24px; margin: 0 0 10px; }
-  .co-empty a { color:#982016; }
+  .co-empty a { color:#0B291C; }
   .co-noreturn { font-family:'Montserrat',sans-serif; font-size:10.5px; color:#9a9a9a; line-height:1.6; margin-top:12px; }
-  .co-noreturn a { color:#982016; }
+  .co-noreturn a { color:#0B291C; }
   .co-secure { text-align:center; font-size:10px; color:#9a9a9a; letter-spacing:1px; margin-top:12px; font-family:'Montserrat',sans-serif; }
   @keyframes coSpin { to { transform: rotate(360deg); } }
   .co-overlay { position: fixed; inset: 0; z-index: 99999; background: rgba(250,250,250,.96); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
-  .co-spinner { width: 34px; height: 34px; border: 3px solid #5A8800; border-top-color: #982016; border-radius: 50%; animation: coSpin 1s linear infinite; }
-  .co-overlay-text { font-family:'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; color: #982016; }
+  .co-spinner { width: 34px; height: 34px; border: 3px solid #C5A880; border-top-color: #0B291C; border-radius: 50%; animation: coSpin 1s linear infinite; }
+  .co-overlay-text { font-family:'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; color: #0B291C; }
   @media (max-width: 760px) {
     .co-grid { grid-template-columns: 1fr; gap: 12px; }
     .co-summary { position: static; top: auto; }
@@ -106,7 +106,7 @@
   <div class="co-empty" id="co-empty" style="display:none">
     <h1>Your bag is empty</h1>
     <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:#6a6a6a;">Add pieces to your bag before checkout.</p>
-    <a href="index.html" style="color:#982016;text-decoration:none;border-bottom:1px solid #5A8800;">&larr; Continue Shopping</a>
+    <a href="index.html" style="color:#0B291C;text-decoration:none;border-bottom:1px solid #C5A880;">&larr; Continue Shopping</a>
   </div>
   <div id="co-content">
     <h1 class="co-title">Checkout</h1>
@@ -494,7 +494,7 @@
           address_id: String(pack.address_id || ''),
           cart: lines.map(function(l){ return l.id + 'x' + l.qty; }).join(',')
         },
-        theme: { color: '#982016' },
+        theme: { color: '#0B291C' },
         handler: function(resp) {
           finalizeOrder({
             razorpay_payment_id: resp.razorpay_payment_id,
