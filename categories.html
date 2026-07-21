@@ -29,9 +29,9 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://saubhagyajewellery.com/categories"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Shop by Category | Saubhagya Jewellery","url":"https://saubhagyajewellery.com/categories","description":"Shop Saubhagya jewellery by category: necklaces, chokers, waist chains, jhumkas, earrings, pendants, bridal sets and South temple necklaces.","isPartOf":{"@type":"WebSite","name":"Saubhagya Jewellery","url":"https://saubhagyajewellery.com/"}}</script>
 <style>
-  body { background: #F9F6F0; margin: 0; }
+  body { background: #F0F5FA; margin: 0; }
   .cat-hero { max-width: 1280px; margin: 0 auto; padding: 46px 40px 6px; text-align: center; }
-  .cat-kicker { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #C5A880; margin-bottom: 12px; }
+  .cat-kicker { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #5A8800; margin-bottom: 12px; }
   .cat-title { font-family:'Playfair Display',serif; font-weight: 500; font-size: 40px; color: #1A1A1A; margin: 0 0 8px; }
   .cat-sub { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; color: #6a6a6a; margin: 0; }
   .cat-hub { max-width: 1280px; margin: 32px auto 0; padding: 0 40px; }
@@ -39,23 +39,23 @@
   .cat-card { position: relative; display: block; border-radius: 10px; overflow: hidden; text-decoration: none; aspect-ratio: 1/1; background: #eae5d8; }
   .cat-card .bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.25,1,.5,1); }
   @media(hover:hover) { .cat-card:hover .bg { transform: scale(1.05); } }
-  .cat-card .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(6,40,26,.85) 0%, rgba(6,40,26,0) 55%); }
+  .cat-card .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(152,32,22,.85) 0%, rgba(152,32,22,0) 55%); }
   .cat-card .lbl { position: absolute; left: 14px; right: 14px; bottom: 14px; color: #fff; font-family:'Playfair Display',serif; font-size: 18px; line-height: 1.15; }
-  .cat-card .lbl .arr { display: block; margin-top: 4px; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; color: #C5A880; }
-  .cat-card.is-active { outline: 3px solid #C5A880; outline-offset: 2px; }
+  .cat-card .lbl .arr { display: block; margin-top: 4px; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; color: #5A8800; }
+  .cat-card.is-active { outline: 3px solid #5A8800; outline-offset: 2px; }
   .cat-filterbar { max-width: 1280px; margin: 40px auto 12px; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
   .cat-filterbar h2 { font-family:'Playfair Display',serif; font-weight: 500; font-size: 24px; color: #1A1A1A; margin: 0; }
   .cat-filterbar .count { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; }
-  .cat-clear { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 1px; color: #0B291C; text-decoration: none; border-bottom: 1px solid #C5A880; padding-bottom: 2px; }
+  .cat-clear { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 1px; color: #982016; text-decoration: none; border-bottom: 1px solid #5A8800; padding-bottom: 2px; }
   .cat-search { max-width: 1280px; margin: 6px auto 0; padding: 0 40px; }
   .cat-search input { width: 100%; height: 46px; padding: 0 16px; border: 1px solid #d4cec0; border-radius: 4px; font: 400 14px 'Montserrat',sans-serif; outline: none; background: #fff; }
-  .cat-search input:focus { border-color: #C5A880; }
+  .cat-search input:focus { border-color: #5A8800; }
   .cat-list-wrap { max-width: 1280px; margin: 0 auto; padding: 8px 40px 60px; }
   /* card styling from site.css .p-card block */
   .cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
   .p-img .im { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
   .cat-empty { text-align: center; padding: 60px 24px; font-family: 'Montserrat',sans-serif; color: #9a9a9a; }
-  .cat-empty a { color: #0B291C; }
+  .cat-empty a { color: #982016; }
   .cat-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; color: #9a9a9a; }
   @keyframes catFadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
   .cat-grid > .p-card { animation: catFadeUp .5s cubic-bezier(.25,1,.5,1) both; will-change: opacity; }
@@ -63,9 +63,9 @@
   @media(hover:hover){
     .cat-grid > .p-card:hover {
       transform: translateY(-8px) scale(1.012);
-      box-shadow: 0 12px 24px -6px rgba(6,40,26,.25),
-                  0 40px 60px -30px rgba(6,40,26,.32),
-                  0 0 0 1px rgba(197,160,89,.38);
+      box-shadow: 0 12px 24px -6px rgba(152,32,22,.25),
+                  0 40px 60px -30px rgba(152,32,22,.32),
+                  0 0 0 1px rgba(90,136,0,.38);
     }
   }
   .cat-grid > .p-card:nth-child(1) { animation-delay: .02s; } .cat-grid > .p-card:nth-child(2) { animation-delay: .06s; }
@@ -74,8 +74,8 @@
   .cat-grid > .p-card:nth-child(7) { animation-delay: .26s; } .cat-grid > .p-card:nth-child(8) { animation-delay: .30s; }
   .cat-filterbar.pulse { animation: catFadeUp .5s cubic-bezier(.25,1,.5,1) both; }
   .crumb { max-width: 1280px; margin: 0 auto; padding: 18px 40px 0; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 1px; color: #9a9a9a; }
-  .crumb a { color: #0B291C; text-decoration: none; }
-  .crumb i { margin: 0 8px; color: #C5A880; font-style: normal; }
+  .crumb a { color: #982016; text-decoration: none; }
+  .crumb i { margin: 0 8px; color: #5A8800; font-style: normal; }
   @media (max-width: 900px) {
     .cat-hero { padding: 24px 16px 4px; }
     .cat-title { font-size: 26px; }

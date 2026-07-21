@@ -21,13 +21,13 @@
     }
     if (!d.querySelector('meta[name="theme-color"]')) {
       var tc = d.createElement('meta');
-      tc.name = 'theme-color'; tc.content = '#0B291C';
+      tc.name = 'theme-color'; tc.content = '#982016';
       d.head.appendChild(tc);
     }
     var s = d.createElement('style');
     s.textContent = [
       /* ── professional 3-zone header (overrides site.css) ────────── */
-      'header.site{position:fixed;top:0;left:0;width:100%;z-index:1000;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(197,160,89,.20)}',
+      'header.site{position:fixed;top:0;left:0;width:100%;z-index:1000;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(90,136,0,.20)}',
       'body{padding-top:118px}',
       '@media(max-width:900px){body{padding-top:70px}}',
       '.nav{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:14px 40px}',
@@ -36,47 +36,47 @@
       '.brand-logo{height:45px;width:auto;object-fit:contain;display:block;background:none}',
       '@media(max-width:480px){.brand-logo{height:36px}}',
       '.logo-stack{display:flex;flex-direction:column;align-items:flex-start;line-height:1}',
-      '.logo-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:#0B291C;letter-spacing:1.5px;line-height:1}',
-      '.logo-sub{font-size:8px;letter-spacing:5px;color:#C5A880;margin-top:4px}',
+      '.logo-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:#982016;letter-spacing:1.5px;line-height:1}',
+      '.logo-sub{font-size:8px;letter-spacing:5px;color:#5A8800;margin-top:4px}',
       '@media(max-width:480px){.logo-name{font-size:18px}}',
       '.navlinks{order:1;flex:1;display:flex;justify-content:center;gap:24px;flex-wrap:nowrap;font-size:12px;letter-spacing:.6px;margin:0}',
       '.navlink{padding-bottom:3px;border-bottom:1px solid transparent;white-space:nowrap;color:#1A1A1A;text-decoration:none;transition:border-color .3s,color .3s}',
-      '.navlink:hover,.navlink.is-active{border-bottom-color:#C5A880;color:#0B291C}',
+      '.navlink:hover,.navlink.is-active{border-bottom-color:#5A8800;color:#982016}',
       '.nav-icons{order:2;flex:none;display:flex;align-items:center;gap:18px;font-size:13px;letter-spacing:1px}',
       '.nav-icons a,.nav-icons button{color:#1A1A1A;text-decoration:none;white-space:nowrap;transition:color .3s;background:none;border:none;padding:0;font:inherit;letter-spacing:inherit;cursor:pointer}',
-      '.nav-icons a:hover,.nav-icons button:hover{color:#0B291C}',
+      '.nav-icons a:hover,.nav-icons button:hover{color:#982016}',
       '.nav-search-icon{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}',
-      '.nav-bag [data-mpa-cart-count]{align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:4px;border-radius:9px;background:#0B291C;color:#fff;font-size:10px;font-weight:600;line-height:1;vertical-align:middle}',
+      '.nav-bag [data-mpa-cart-count]{align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:4px;border-radius:9px;background:#982016;color:#fff;font-size:10px;font-weight:600;line-height:1;vertical-align:middle}',
       '.nav-bag [data-mpa-cart-count]:not([style*="none"]){display:inline-flex}',
       '.nav-burger{order:0;display:none;flex-direction:column;justify-content:center;gap:5px;width:34px;height:34px;padding:0;background:none;border:none;cursor:pointer}',
-      '.nav-burger span{display:block;height:2px;width:22px;background:#0B291C;border-radius:2px;transition:transform .35s,opacity .25s}',
+      '.nav-burger span{display:block;height:2px;width:22px;background:#982016;border-radius:2px;transition:transform .35s,opacity .25s}',
       '.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}',
       '.nav-burger.open span:nth-child(2){opacity:0}',
       '.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}',
       /* slide-down drawer */
-      '.nav-drawer{display:none;flex-direction:column;background:#fff;border-bottom:1px solid rgba(197,160,89,.2);overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.25,1,.5,1);padding-bottom:env(safe-area-inset-bottom);position:fixed;top:59px;left:0;right:0;z-index:70;isolation:isolate;box-shadow:0 12px 30px rgba(6,40,26,.12)}',
+      '.nav-drawer{display:none;flex-direction:column;background:#fff;border-bottom:1px solid rgba(90,136,0,.2);overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.25,1,.5,1);padding-bottom:env(safe-area-inset-bottom);position:fixed;top:59px;left:0;right:0;z-index:70;isolation:isolate;box-shadow:0 12px 30px rgba(152,32,22,.12)}',
       '.nav-drawer.open{max-height:calc(100vh - 59px);overflow-y:auto;-webkit-overflow-scrolling:touch}',
       '.nav-drawer a{padding:17px 22px;font:500 14px "Montserrat",sans-serif;letter-spacing:.6px;color:#1A1A1A;text-decoration:none;border-top:1px solid #f0ece1;transition:background .2s,color .2s;display:flex;align-items:center;justify-content:space-between}',
-      '.nav-drawer a::after{content:"›";color:#C5A880;font-size:20px;opacity:.6;transition:transform .25s}',
-      '.nav-drawer a:hover,.nav-drawer a:active{background:#faf8f3;color:#0B291C}',
+      '.nav-drawer a::after{content:"›";color:#5A8800;font-size:20px;opacity:.6;transition:transform .25s}',
+      '.nav-drawer a:hover,.nav-drawer a:active{background:#faf8f3;color:#982016}',
       '.nav-drawer a:hover::after,.nav-drawer a:active::after{transform:translateX(4px);opacity:1}',
-      '.nav-drawer a.is-active{color:#0B291C;background:#faf8f3}',
+      '.nav-drawer a.is-active{color:#982016;background:#faf8f3}',
       '.nav-drawer a:first-child{border-top:none}',
-      '.nav-drawer-backdrop{position:fixed;inset:0;top:64px;background:rgba(6,40,26,.4);z-index:59;opacity:0;pointer-events:none;transition:opacity .35s}',
+      '.nav-drawer-backdrop{position:fixed;inset:0;top:64px;background:rgba(152,32,22,.4);z-index:59;opacity:0;pointer-events:none;transition:opacity .35s}',
       '.nav-drawer-backdrop.on{opacity:1;pointer-events:auto}',
       /* header search sheet */
-      '.nav-search-sheet{position:fixed;top:0;left:0;right:0;background:#fff;padding:18px 20px 22px;box-shadow:0 12px 40px rgba(6,40,26,.14);transform:translateY(-100%);transition:transform .45s cubic-bezier(.25,1,.5,1);z-index:80;padding-top:calc(18px + env(safe-area-inset-top))}',
+      '.nav-search-sheet{position:fixed;top:0;left:0;right:0;background:#fff;padding:18px 20px 22px;box-shadow:0 12px 40px rgba(152,32,22,.14);transform:translateY(-100%);transition:transform .45s cubic-bezier(.25,1,.5,1);z-index:80;padding-top:calc(18px + env(safe-area-inset-top))}',
       '.nav-search-sheet.on{transform:translateY(0)}',
       '.nav-search-wrap{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px}',
       '.nav-search-form{flex:1;display:flex;align-items:center;gap:8px;border:1px solid #d4cec0;border-radius:8px;background:#fff;padding:0 6px 0 14px;transition:border-color .25s,box-shadow .25s}',
-      '.nav-search-form:focus-within{border-color:#C5A880;box-shadow:0 0 0 3px rgba(197,160,89,.15)}',
+      '.nav-search-form:focus-within{border-color:#5A8800;box-shadow:0 0 0 3px rgba(90,136,0,.15)}',
       '.nav-search-icon-l{width:18px;height:18px;stroke:#9a9a9a;stroke-width:2;fill:none;flex:none}',
       '.nav-search-input{flex:1;min-width:0;height:46px;border:none;background:transparent;font:400 15px "Montserrat",sans-serif;outline:none;color:#1A1A1A}',
       '.nav-search-input::-webkit-search-cancel-button{-webkit-appearance:none}',
-      '.nav-search-go{height:38px;padding:0 18px;background:#0B291C;color:#fff;border:none;border-radius:6px;font:600 11px "Montserrat",sans-serif;letter-spacing:1.5px;cursor:pointer;flex:none}',
-      '.nav-search-go:hover{background:#071B12}',
+      '.nav-search-go{height:38px;padding:0 18px;background:#982016;color:#fff;border:none;border-radius:6px;font:600 11px "Montserrat",sans-serif;letter-spacing:1.5px;cursor:pointer;flex:none}',
+      '.nav-search-go:hover{background:#7a1810}',
       '.nav-search-close{background:none;border:none;font-size:26px;color:#6a6a6a;cursor:pointer;padding:4px 10px;line-height:1;flex:none}',
-      '.nav-search-close:hover{color:#0B291C}',
+      '.nav-search-close:hover{color:#982016}',
       '.nav-search-hits{max-width:720px;margin:12px auto 0;background:#fff;border:1px solid #eee5d6;border-radius:10px;overflow:hidden;max-height:min(60vh,420px);overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}',
       '.nav-search-hits.on{display:block;animation:nshFade .25s ease}',
       '@keyframes nshFade{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}',
@@ -87,10 +87,10 @@
       '.nav-search-hit-meta{flex:1;min-width:0}',
       '.nav-search-hit-name{font-family:"Playfair Display",serif;font-size:15px;color:#1A1A1A;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       '.nav-search-hit-cat{font-family:"Montserrat",sans-serif;font-size:13px;color:#9a9a9a;margin-top:2px;letter-spacing:.4px}',
-      '.nav-search-hit-price{font-family:"Montserrat",sans-serif;font-size:13px;font-weight:500;color:#0B291C;flex:none}',
-      '.nav-search-more{display:block;padding:12px;text-align:center;font-family:"Montserrat",sans-serif;font-size:13px;letter-spacing:1.5px;color:#0B291C;background:#faf8f3;text-decoration:none;border-top:1px solid #eee5d6}',
+      '.nav-search-hit-price{font-family:"Montserrat",sans-serif;font-size:13px;font-weight:500;color:#982016;flex:none}',
+      '.nav-search-more{display:block;padding:12px;text-align:center;font-family:"Montserrat",sans-serif;font-size:13px;letter-spacing:1.5px;color:#982016;background:#faf8f3;text-decoration:none;border-top:1px solid #eee5d6}',
       '.nav-search-empty{padding:22px 16px;text-align:center;font-family:"Montserrat",sans-serif;font-size:12px;color:#9a9a9a}',
-      '.nav-search-backdrop{position:fixed;inset:0;background:rgba(6,40,26,.4);z-index:79;opacity:0;pointer-events:none;transition:opacity .3s}',
+      '.nav-search-backdrop{position:fixed;inset:0;background:rgba(152,32,22,.4);z-index:79;opacity:0;pointer-events:none;transition:opacity .3s}',
       '.nav-search-backdrop.on{opacity:1;pointer-events:auto}',
       /* mobile layout */
       '@media(max-width:900px){',
@@ -110,21 +110,21 @@
       'footer.site .brand-logo-footer{height:auto;width:200px;max-width:100%;object-fit:contain}',
       '@media(max-width:560px){footer.site .fbrand{align-items:center;text-align:center}footer.site .brand-logo-footer{width:170px}footer.site .fsocial{justify-content:center}}',
       'footer.site .fsocial{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}',
-      'footer.site .fsocial a{font:500 12px "Montserrat",sans-serif;letter-spacing:.5px;color:#C5A880;text-decoration:none;border-bottom:1px solid rgba(197,160,89,.35);padding-bottom:2px;transition:color .3s,border-color .3s}',
+      'footer.site .fsocial a{font:500 12px "Montserrat",sans-serif;letter-spacing:.5px;color:#5A8800;text-decoration:none;border-bottom:1px solid rgba(90,136,0,.35);padding-bottom:2px;transition:color .3s,border-color .3s}',
       'footer.site .fsocial a:hover{color:#fff;border-bottom-color:#fff}',
       /* cookie consent banner */
-      '.ck-banner{position:fixed;left:16px;right:16px;bottom:16px;background:#fff;border:1px solid #C5A880;border-radius:8px;box-shadow:0 12px 40px rgba(6,40,26,.18);padding:18px 22px;z-index:120;display:none;font-family:"Montserrat",sans-serif;font-size:12.5px;line-height:1.55;color:#3a3a3a;max-width:640px;margin:0 auto}',
+      '.ck-banner{position:fixed;left:16px;right:16px;bottom:16px;background:#fff;border:1px solid #5A8800;border-radius:8px;box-shadow:0 12px 40px rgba(152,32,22,.18);padding:18px 22px;z-index:120;display:none;font-family:"Montserrat",sans-serif;font-size:12.5px;line-height:1.55;color:#3a3a3a;max-width:640px;margin:0 auto}',
       '.ck-banner.on{display:block;animation:ckSlide .5s cubic-bezier(.25,1,.5,1) both}',
       '@keyframes ckSlide{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}',
       '.ck-banner p{margin:0 0 12px}',
-      '.ck-banner a{color:#0B291C;text-decoration:underline}',
+      '.ck-banner a{color:#982016;text-decoration:underline}',
       '.ck-btns{display:flex;gap:10px;flex-wrap:wrap}',
       '.ck-btn{border:none;padding:10px 18px;font:600 11px "Montserrat",sans-serif;letter-spacing:1.5px;cursor:pointer;border-radius:4px}',
-      '.ck-btn.primary{background:#0B291C;color:#fff}',
-      '.ck-btn.ghost{background:transparent;color:#0B291C;border:1px solid #C5A880}',
+      '.ck-btn.primary{background:#982016;color:#fff}',
+      '.ck-btn.ghost{background:transparent;color:#982016;border:1px solid #5A8800}',
       /* Apple-TV 3D tilt */
       '.fx-tilt{transform-style:preserve-3d;will-change:transform;transition:transform .45s cubic-bezier(.25,1,.5,1),box-shadow .45s cubic-bezier(.25,1,.5,1)}',
-      '.fx-tilt.fx-active{transition:transform .06s linear,box-shadow .3s;box-shadow:0 24px 50px -18px rgba(6,40,26,.45),0 8px 20px -10px rgba(0,0,0,.3)}'
+      '.fx-tilt.fx-active{transition:transform .06s linear,box-shadow .3s;box-shadow:0 24px 50px -18px rgba(152,32,22,.45),0 8px 20px -10px rgba(0,0,0,.3)}'
     ].join('');
     d.head.appendChild(s);
   })();
@@ -210,7 +210,7 @@
       social + '</div>' +
       col('COMPANY', company) + col('POLICY', policy) +
       '<details class="fcol fcol-support"><summary class="fhead">SELLER &amp; SUPPORT</summary>' +
-      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A880">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
+      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#5A8800">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
       '<a class="fwa" href="' + WHATSAPP + '" rel="noopener" target="_blank">WhatsApp Support &rarr;</a>' +
       '<a class="fwa" href="' + MAPS + '" rel="noopener" target="_blank" style="margin-top:8px;display:inline-block">Get Directions (Google Maps) &rarr;</a>' +
       '</details></div>' +

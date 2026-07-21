@@ -10,7 +10,7 @@
   <p>Enter your 10-digit phone number or your order ID (starts with "CC") to find your order.</p>
   <div style="display:flex;gap:12px;align-items:stretch;margin:18px 0 0;flex-wrap:wrap;">
     <input id="track-input" type="text" placeholder="Phone number or Order ID (CC-...)" style="flex:1;min-width:200px;height:52px;padding:0 16px;border:1px solid #ddd6c6;font-family:'Montserrat',sans-serif;font-size:14px;outline:none;background:#fff;">
-    <button id="track-btn" style="height:52px;padding:0 28px;background:#0B3C26;color:#fff;border:none;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;cursor:pointer;white-space:nowrap;">TRACK</button>
+    <button id="track-btn" style="height:52px;padding:0 28px;background:#982016;color:#fff;border:none;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:2px;cursor:pointer;white-space:nowrap;">TRACK</button>
   </div>
   <div id="track-status" style="margin-top:12px;"></div>
   <div id="track-results" style="display:flex;flex-direction:column;gap:16px;margin-top:20px;"></div>
@@ -59,33 +59,33 @@
     return f(new Date(base.getTime() + lo*86400000)) + ' – ' + f(new Date(base.getTime() + hi*86400000));
   }
 
-  var FID = "font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:#0B3C26;font-variant-numeric:tabular-nums;";
+  var FID = "font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:#982016;font-variant-numeric:tabular-nums;";
 
   function orderCard(o) {
     var statusLabel = (o.status || 'confirmed').toUpperCase();
     var hasAWB = o.awb && o.awb.trim();
     var eta = etaForOrder(o);
-    return '<div style="border:1px solid rgba(197,160,89,.3);border-radius:10px;padding:18px 20px;background:#fff;">' +
+    return '<div style="border:1px solid rgba(90,136,0,.3);border-radius:10px;padding:18px 20px;background:#fff;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">' +
         '<div><div style="' + FID + '">' + esc(o.id) + '</div>' +
         '<div style="font-family:\'Montserrat\',sans-serif;font-size:11px;font-weight:300;color:#9a9a9a;margin-top:3px;">Placed ' + fmtDate(o.created_at) + '</div></div>' +
-        '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:2px;padding:5px 12px;border-radius:20px;background:' + (statusLabel === 'CONFIRMED' ? '#0B3C26' : '#C5A059') + ';color:#fff;">' + statusLabel + '</span>' +
+        '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:2px;padding:5px 12px;border-radius:20px;background:' + (statusLabel === 'CONFIRMED' ? '#982016' : '#5A8800') + ';color:#fff;">' + statusLabel + '</span>' +
       '</div>' +
       '<div style="margin-top:10px">' + itemsHtml(o.items) + '</div>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid #f3ede1;">' +
-        '<span style="font-family:\'Montserrat\',sans-serif;font-size:12px;color:#6a6a6a;">' + (eta ? 'Est. delivery <strong style="color:#0B3C26;font-weight:600;">' + eta + '</strong>' : '') + '</span>' +
-        '<span style="font-family:\'Montserrat\',sans-serif;font-size:14px;font-weight:600;color:#0B3C26;font-variant-numeric:tabular-nums;">' + fmt(o.total) + '</span>' +
+        '<span style="font-family:\'Montserrat\',sans-serif;font-size:12px;color:#6a6a6a;">' + (eta ? 'Est. delivery <strong style="color:#982016;font-weight:600;">' + eta + '</strong>' : '') + '</span>' +
+        '<span style="font-family:\'Montserrat\',sans-serif;font-size:14px;font-weight:600;color:#982016;font-variant-numeric:tabular-nums;">' + fmt(o.total) + '</span>' +
       '</div>' +
-      (hasAWB ? '<div style="margin-top:10px;padding:10px 12px;background:#e8f0e8;border-radius:6px;font-family:\'Montserrat\',sans-serif;font-size:12px;"><strong style="color:#0B3C26;">AWB: ' + esc(o.awb) + '</strong> <a href="' + esc(o.awb_url || '#') + '" target="_blank" style="margin-left:12px;color:#0B3C26;border-bottom:1px solid #C5A059;text-decoration:none;">Track via Shiprocket →</a></div>' : '') +
+      (hasAWB ? '<div style="margin-top:10px;padding:10px 12px;background:#fdf0ef;border-radius:6px;font-family:\'Montserrat\',sans-serif;font-size:12px;"><strong style="color:#982016;">AWB: ' + esc(o.awb) + '</strong> <a href="' + esc(o.awb_url || '#') + '" target="_blank" style="margin-left:12px;color:#982016;border-bottom:1px solid #5A8800;text-decoration:none;">Track via Shiprocket →</a></div>' : '') +
     '</div>';
   }
 
   function mpaOrderCard(o) {
     var eta = etaForOrder(o);
-    return '<div style="border:1px solid rgba(197,160,89,.25);border-radius:10px;padding:14px 16px;background:#FAFAFA;cursor:pointer;" onclick="document.getElementById(\'track-input\').value=\'' + o.id + '\';document.getElementById(\'track-btn\').click();">' +
+    return '<div style="border:1px solid rgba(90,136,0,.25);border-radius:10px;padding:14px 16px;background:#F0F5FA;cursor:pointer;" onclick="document.getElementById(\'track-input\').value=\'' + o.id + '\';document.getElementById(\'track-btn\').click();">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
         '<span style="' + FID + '">' + o.id + '</span>' +
-        '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:2px;padding:4px 10px;border-radius:20px;background:#0B3C26;color:#fff;">' + (o.status || 'confirmed').toUpperCase() + '</span>' +
+        '<span style="font-family:\'Montserrat\',sans-serif;font-size:9px;font-weight:500;letter-spacing:2px;padding:4px 10px;border-radius:20px;background:#982016;color:#fff;">' + (o.status || 'confirmed').toUpperCase() + '</span>' +
       '</div>' +
       '<div style="font-family:\'Montserrat\',sans-serif;font-size:12px;font-weight:300;color:#6a6a6a;margin-top:6px;font-variant-numeric:tabular-nums;">' + fmt(o.total) + ' · ' + fmtDate(o.created_at) + (eta ? ' · arrives ' + eta : '') + '</div>' +
     '</div>';

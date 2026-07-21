@@ -22,6 +22,9 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Handcrafted Imitation Jewellery | Saubhagya Jewellery">
+<meta name="twitter:description" content="Handcrafted premium imitation jewellery from our Mumbai workshop. Free insured shipping across India.">
+<meta name="twitter:image" content="https://saubhagyajewellery.com/images/banners/Website_hero_banner_concept_art._202606221611.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -31,30 +34,30 @@
 <script src="catalog.js?v=13"></script>
 <style>
   * { box-sizing: border-box; }
-  body { background: #F9F6F0; margin: 0; }
+  body { background: #F0F5FA; margin: 0; }
   .pdp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px 80px; }
-  #pdp-crumb { margin-bottom: 18px; }
+  #pdp-crumb { margin-bottom: 18px; max-width: 1080px; padding-left: 48px; padding-right: 48px; }
   /* image capped at a regular card size instead of half the monitor */
   .pdp-grid { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 56px; align-items: start; justify-content: center; }
   .pdp-img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 12px; background: #f0ede5; }
   .pdp-img-wrap { position: relative; overflow: hidden; border-radius: 12px; max-width: 440px; }
   @media(hover:hover){ .pdp-img-wrap:hover .pdp-img { transform: scale(1.05); transition: transform 0.5s cubic-bezier(.25,1,.5,1); } }
-  .pdp-badge { display: inline-block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; padding: 5px 12px; background: #C5A880; color: #fff; margin-bottom: 14px; }
-  .pdp-cat { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #C5A880; margin-bottom: 8px; text-transform: uppercase; }
+  .pdp-badge { display: inline-block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; padding: 5px 12px; background: #5A8800; color: #fff; margin-bottom: 14px; }
+  .pdp-cat { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #5A8800; margin-bottom: 8px; text-transform: uppercase; }
   .pdp-name { font-family:'Playfair Display',serif; font-size: 36px; font-weight: 500; color: #1A1A1A; line-height: 1.15; margin: 0 0 6px; }
   .pdp-region { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; margin-bottom: 20px; }
   .pdp-price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
-  .pdp-price { font-family:'Playfair Display',serif; font-size: 28px; font-weight: 600; color: #0B291C; }
+  .pdp-price { font-family:'Playfair Display',serif; font-size: 28px; font-weight: 600; color: #982016; }
   .pdp-mrp { font-family: 'Montserrat',sans-serif; font-size: 15px; color: #9a9a9a; text-decoration: line-through; }
-  .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B291C; font-weight: 500; }
-  .pdp-swatches { display: flex; gap: 10px; margin-bottom: 16px; }
-  .pdp-swatch { width: 52px; height: 52px; border-radius: 10px; padding: 2px; border: 2px solid transparent; background: #f0ede5; cursor: pointer; transition: border-color .25s cubic-bezier(.25,1,.5,1), transform .25s cubic-bezier(.25,1,.5,1); }
-  .pdp-swatch img { width: 100%; height: 100%; object-fit: cover; border-radius: 7px; display: block; }
+  .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #982016; font-weight: 500; }
+  .pdp-swatches { display: flex; gap: 8px; margin: 10px 0 16px; flex-wrap: wrap; }
+  .pdp-swatch { width: 36px; height: 36px; border-radius: 50%; padding: 2px; border: 2px solid transparent; background: #f0ede5; cursor: pointer; transition: border-color .25s cubic-bezier(.25,1,.5,1), transform .25s cubic-bezier(.25,1,.5,1); }
+  .pdp-swatch img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
   .pdp-swatch:hover { transform: translateY(-2px); }
-  .pdp-swatch.on { border-color: #C5A880; }
+  .pdp-swatch.on { border-color: #5A8800; box-shadow: 0 0 0 2px rgba(90,136,0,.25); }
   .pdp-tax { font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; margin-bottom: 6px; }
-  .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B291C; margin-bottom: 4px; }
-  .pdp-stock { display:inline-flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; color:#0B291C; margin-bottom:12px; }
+  .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #982016; margin-bottom: 4px; }
+  .pdp-stock { display:inline-flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; color:#982016; margin-bottom:12px; }
   .pdp-stock.low { color:#c0392b; }
   .pdp-stock .dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
   .pdp-noreturn { font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; margin-bottom: 22px; }
@@ -65,21 +68,21 @@
   .pdp-pincheck-title { font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; color:#6a6a6a; margin-bottom:8px; }
   .pdp-pincheck-row { display:flex; gap:8px; }
   .pdp-pincheck input { flex:1; height:38px; padding:0 12px; border:1px solid #ddd6c6; font-family:'Montserrat',sans-serif; font-size:13px; outline:none; background:#fff; border-radius:4px; }
-  .pdp-pincheck button { height:38px; padding:0 18px; background:#0B291C; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; cursor:pointer; border-radius:14px; box-shadow:0 2px 8px rgba(6,40,26,.12); transition:all .3s; }
-  .pdp-pincheck button:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(6,40,26,.2); }
-  .pdp-pincheck-result { margin-top:8px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B291C; min-height:16px; }
+  .pdp-pincheck button { height:38px; padding:0 18px; background:#982016; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; cursor:pointer; border-radius:14px; box-shadow:0 2px 8px rgba(152,32,22,.12); transition:all .3s; }
+  .pdp-pincheck button:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(152,32,22,.2); }
+  .pdp-pincheck-result { margin-top:8px; font-family:'Montserrat',sans-serif; font-size:12px; color:#982016; min-height:16px; }
   .pdp-pincheck-result.err { color:#c0392b; }
-  .pdp-noreturn a { color: #0B291C; }
+  .pdp-noreturn a { color: #982016; }
   /* reviews — 2-column split: rating summary + form on the left, scrollable review list on the right */
   .rv-wrap { max-width: 1080px; margin: 30px auto 0; padding: 34px 0 0; border-top: 1px solid #eae5d8; }
   .rv-grid { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 48px; align-items: start; }
   .rv-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
   .rv-title { font-family:'Playfair Display',serif; font-size: 26px; color: #1A1A1A; margin: 0; }
-  .rv-avg { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #C5A880; }
+  .rv-avg { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #5A8800; }
   .rv-right { max-height: 560px; overflow-y: auto; padding-right: 6px; }
   .rv-item { padding: 14px 16px; border: 1px solid #f3ede1; border-radius: 12px; margin-bottom: 12px; background: #fff; }
   .rv-item:last-child { margin-bottom: 0; }
-  .rv-stars { color: #C5A880; font-size: 13px; letter-spacing:1.5px; }
+  .rv-stars { color: #5A8800; font-size: 13px; letter-spacing:1.5px; }
   .rv-name { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #1A1A1A; font-weight: 500; margin-top: 4px; }
   .rv-text { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6a6a6a; line-height: 1.7; margin-top: 6px; }
   .rv-empty { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; padding: 10px 0 4px; }
@@ -92,28 +95,29 @@
   .rv-input, .rv-textarea { width: 100%; padding: 12px 14px; border: 1px solid #ddd6c6; font-family: 'Montserrat',sans-serif; font-size: 13px; outline: none; background: #fff; margin-bottom: 10px; box-sizing: border-box; }
   .rv-textarea { min-height: 90px; resize: vertical; }
   .rv-starpick { display: flex; gap: 6px; margin-bottom: 12px; cursor: pointer; font-size: 22px; color: #ddd6c6; user-select: none; }
-  .rv-starpick span.on { color: #C5A880; }
-  .rv-submit { padding: 13px 26px; background: #0B291C; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; border-radius: 14px; box-shadow: 0 2px 8px rgba(6,40,26,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .rv-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,40,26,.25); background: #071B12; }
+  .rv-starpick span.on { color: #5A8800; }
+  .rv-submit { padding: 13px 26px; background: #982016; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; border-radius: 14px; box-shadow: 0 2px 8px rgba(152,32,22,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .rv-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.25); background: #7a1810; }
   .rv-msg { font-family: 'Montserrat',sans-serif; font-size: 12px; margin-top: 10px; }
   .pdp-qtyrow { display: flex; align-items: stretch; gap: 10px; margin: 0 0 14px; }
   .pdp-qty { display: flex; align-items: stretch; border: 1px solid #ddd6c6; border-radius: 14px; overflow: hidden; }
   .pdp-qty span { display: flex; align-items: center; justify-content: center; font-family: 'Montserrat',sans-serif; font-size: 14px; cursor: pointer; user-select: none; transition: all .2s; }
-  .pdp-qty .pdp-q { width: 34px; color: #0B291C; }
-  .pdp-qty .pdp-q:hover { background: #0B291C; color: #fff; }
+  .pdp-qty .pdp-q { width: 34px; color: #982016; }
+  .pdp-qty .pdp-q:hover { background: #982016; color: #fff; }
   .pdp-qty .pdp-v { width: 36px; font-size: 13px; border-left: 1px solid #ddd6c6; border-right: 1px solid #ddd6c6; }
   .pdp-qty .pdp-v:hover { background: transparent; }
-  .pdp-add { flex: 1; height: 48px; border: none; background: #0B291C; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; white-space: nowrap; border-radius: 14px; box-shadow: 0 2px 8px rgba(6,40,26,.18); transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .pdp-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(6,40,26,.28); background: #071B12; }
-  .pdp-buy { width: 100%; height: 48px; border: 1px solid #0B291C; background: transparent; color: #0B291C; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; margin-bottom: 24px; border-radius: 14px; transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .pdp-buy:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(6,40,26,.12); background: #0B291C; color: #fff; }
+  .pdp-add { flex: 1; height: 48px; border: none; background: #982016; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; white-space: nowrap; border-radius: 14px; box-shadow: 0 2px 8px rgba(152,32,22,.18); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .pdp-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(152,32,22,.28); background: #7a1810; }
+  .pdp-buy { width: 100%; height: 48px; border: 1px solid #982016; background: transparent; color: #982016; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; margin-bottom: 24px; border-radius: 14px; transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .pdp-buy:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(152,32,22,.12); background: #982016; color: #fff; }
   .pdp-desc { font-family: 'Montserrat',sans-serif; font-size: 13px; line-height: 1.8; color: #6a6a6a; max-width: 460px; }
   .pdp-desc strong { color: #1A1A1A; }
   .pdp-loading { text-align: center; padding: 80px 24px; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; letter-spacing:1.5px; }
   .pdp-error { text-align: center; padding: 80px 24px; }
   .pdp-error-title { font-family:'Playfair Display',serif; font-weight: 600; font-size: 28px; color: #1A1A1A; margin: 0 0 14px; }
-  .pdp-error a { color: #0B291C; text-decoration: none; border-bottom: 1px solid #C5A880; padding-bottom: 2px; }
+  .pdp-error a { color: #982016; text-decoration: none; border-bottom: 1px solid #5A8800; padding-bottom: 2px; }
   @media (max-width: 900px) {
+    #pdp-crumb { padding-left: 16px; padding-right: 16px; }
     .pdp-grid { grid-template-columns: 1fr; gap: 24px; }
     .pdp-wrap { padding: 0 16px calc(96px + env(safe-area-inset-bottom)); }
     .pdp-name { font-size: 26px; }
@@ -127,14 +131,14 @@
     .pdp-add { height: 52px; font-size: 12px; letter-spacing: 2.2px; }
     .pdp-buy { height: 52px; font-size: 12px; letter-spacing: 2.2px; }
     /* Sticky bottom CTA bar on mobile — visible after user scrolls past the fold */
-    .pdp-mobile-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(197,160,89,.28); box-shadow: 0 -6px 24px rgba(6,40,26,.08); transform: translateY(120%); transition: transform .4s cubic-bezier(.25,1,.5,1); }
+    .pdp-mobile-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(90,136,0,.28); box-shadow: 0 -6px 24px rgba(152,32,22,.08); transform: translateY(120%); transition: transform .4s cubic-bezier(.25,1,.5,1); }
     .pdp-mobile-bar.on { transform: translateY(0); }
-    .pdp-mobile-bar .price { flex: none; font-family:'Playfair Display',serif; font-size: 18px; font-weight: 600; color: #0B291C; align-self: center; padding: 0 4px; }
-    .pdp-mobile-bar button { flex: 1; height: 48px; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 1.8px; cursor: pointer; box-shadow: 0 2px 8px rgba(6,40,26,.12); transition: all .3s; }
-  .pdp-mobile-bar button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(6,40,26,.2); }
-    .pdp-mobile-bar .add { background: #fff; color: #0B291C; border: 1px solid #0B291C; }
-    .pdp-mobile-bar .buy { background: #0B291C; color: #fff; box-shadow: 0 6px 16px rgba(11,60,38,.24); }
-    .pdp-mobile-bar .buy:hover { background: #071B12; }
+    .pdp-mobile-bar .price { flex: none; font-family:'Playfair Display',serif; font-size: 18px; font-weight: 600; color: #982016; align-self: center; padding: 0 4px; }
+    .pdp-mobile-bar button { flex: 1; height: 48px; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 1.8px; cursor: pointer; box-shadow: 0 2px 8px rgba(152,32,22,.12); transition: all .3s; }
+  .pdp-mobile-bar button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(152,32,22,.2); }
+    .pdp-mobile-bar .add { background: #fff; color: #982016; border: 1px solid #982016; }
+    .pdp-mobile-bar .buy { background: #982016; color: #fff; box-shadow: 0 6px 16px rgba(152,32,22,.24); }
+    .pdp-mobile-bar .buy:hover { background: #7a1810; }
   }
   @media (min-width: 901px) { .pdp-mobile-bar { display: none; } }
 </style>
@@ -159,13 +163,13 @@
         <div>
           <div class="pdp-cat" id="pdp-cat"></div>
           <h1 class="pdp-name" id="pdp-name"></h1>
+          <div class="pdp-swatches" id="pdp-swatches" style="display:none"></div>
           <div class="pdp-region" id="pdp-region"></div>
           <div class="pdp-price-row">
             <span class="pdp-price" id="pdp-price"></span>
             <span class="pdp-mrp" id="pdp-mrp"></span>
             <span class="pdp-save" id="pdp-save"></span>
           </div>
-          <div class="pdp-swatches" id="pdp-swatches" style="display:none"></div>
           <div class="pdp-tax">incl. of all taxes</div>
           <div class="pdp-ship">Insured shipping across India · price includes delivery</div>
           <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
@@ -246,7 +250,17 @@
     ogTitle.setAttribute('content', p.name + ' | Saubhagya');
     var ogImg = document.querySelector('meta[property="og:image"]');
     if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
-    ogImg.setAttribute('content', (p.image || '').startsWith('http') ? p.image : 'https://saubhagyajewellery.com/' + (p.image || ''));
+    var absImg = (p.image || '').startsWith('http') ? p.image : 'https://saubhagyajewellery.com/' + (p.image || '');
+    ogImg.setAttribute('content', absImg);
+    var twTitle = document.querySelector('meta[name="twitter:title"]');
+    if (!twTitle) { twTitle = document.createElement('meta'); twTitle.setAttribute('name','twitter:title'); document.head.appendChild(twTitle); }
+    twTitle.setAttribute('content', p.name + ' | Saubhagya');
+    var twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (!twDesc) { twDesc = document.createElement('meta'); twDesc.setAttribute('name','twitter:description'); document.head.appendChild(twDesc); }
+    twDesc.setAttribute('content', p.description || 'Handcrafted premium imitation jewellery from our Mumbai workshop.');
+    var twImg = document.querySelector('meta[name="twitter:image"]');
+    if (!twImg) { twImg = document.createElement('meta'); twImg.setAttribute('name','twitter:image'); document.head.appendChild(twImg); }
+    twImg.setAttribute('content', absImg);
     // Breadcrumb — points to Categories hub (regional pages retired)
     $('pdp-crumb').innerHTML = '<a href="index.html">Home</a><i>/</i><a href="categories.html">Categories</a><i>/</i><span>' + p.name + '</span>';
     $('pdp-cat').textContent = p.category || '';
@@ -469,7 +483,7 @@
     try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
     if (!user || !(user.email || user.phone)) {
       msg.style.color = '#c0392b';
-      msg.innerHTML = 'Only verified buyers can review. Please <a href="signin.html" style="color:#0B291C">sign in</a> with the email or phone you used at checkout.';
+      msg.innerHTML = 'Only verified buyers can review. Please <a href="signin.html" style="color:#982016">sign in</a> with the email or phone you used at checkout.';
       return;
     }
     this.disabled = true;
@@ -483,7 +497,7 @@
       .then(function(d) {
         $('rv-submit').disabled = false;
         if (d && d.success) {
-          msg.style.color = '#0B291C'; msg.textContent = 'Thank you! Your review is live.';
+          msg.style.color = '#982016'; msg.textContent = 'Thank you! Your review is live.';
           $('rv-name').value = ''; $('rv-text').value = '';
           loadReviews();
         } else {
