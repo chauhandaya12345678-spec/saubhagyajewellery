@@ -107,8 +107,8 @@
       /* footer: same brand SVG as header, sized down for the column,
          and a light brightness bump so the gold pops on deep green */
       'footer.site .fbrand{display:flex;flex-direction:column;align-items:flex-start;gap:14px}',
-      'footer.site .brand-logo-footer{height:auto;width:200px;max-width:100%;object-fit:contain}',
-      '@media(max-width:560px){footer.site .fbrand{align-items:center;text-align:center}footer.site .brand-logo-footer{width:170px}footer.site .fsocial{justify-content:center}}',
+      'footer.site .brand-logo-footer{height:auto;width:280px;max-width:100%;object-fit:contain}',
+      '@media(max-width:560px){footer.site .fbrand{align-items:center;text-align:center}footer.site .brand-logo-footer{width:220px}footer.site .fsocial{justify-content:center}}',
       'footer.site .fsocial{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}',
       'footer.site .fsocial a{font:500 12px "Montserrat",sans-serif;letter-spacing:.5px;color:#C5A880;text-decoration:none;border-bottom:1px solid rgba(90,136,0,.35);padding-bottom:2px;transition:color .3s,border-color .3s}',
       'footer.site .fsocial a:hover{color:#fff;border-bottom-color:#fff}',
@@ -204,7 +204,7 @@
       '</div>';
     return '<div class="fwrap">' +
       '<div class="fbrand">' +
-      '<img class="brand-logo brand-logo-footer" src="images/brand/saubhagya-wordmark-white.png?v=1" alt="Saubhagya Jewellery">' +
+      '<img class="brand-logo brand-logo-footer" src="images/brand/saubhagya-wordmark-white.png?v=2" alt="Saubhagya Jewellery">' +
       '<p>Handcrafted premium imitation jewellery from our Mumbai warehouse. Every piece is manufactured in-house, inspected and dispatched insured across India.</p>' +
       social + '</div>' +
       col('COMPANY', company) + col('POLICY', policy) +

@@ -28,8 +28,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722d">
-<script src="layout.js?v=20260722d"></script>
+<link rel="stylesheet" href="site.css?v=20260722e">
+<script src="layout.js?v=20260722e"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
@@ -76,15 +76,18 @@
   /* reviews — single column: horizontal-scrolling review strip on top (never
      reserves empty vertical space, however many/few reviews exist), compact
      "write a review" form below it. */
-  .rv-wrap { max-width: 760px; margin: 20px auto 0; padding: 22px 0 0; border-top: 1px solid #eae5d8; }
-  .rv-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-  .rv-title { font-family:'Playfair Display',serif; font-size: 22px; color: #1A1A1A; margin: 0; }
+  .rv-wrap { max-width: 760px; margin: 16px auto 0; padding: 16px 0 0; border-top: 1px solid #eae5d8; }
+  .rv-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .rv-title { font-family:'Playfair Display',serif; font-size: 19px; color: #1A1A1A; margin: 0; }
   .rv-avg { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #C5A880; }
-  .rv-right { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 20px; scroll-snap-type: x proximity; }
-  .rv-item { flex: 0 0 240px; scroll-snap-align: start; padding: 12px 14px; border: 1px solid #f3ede1; border-radius: 12px; background: #fff; }
-  .rv-stars { color: #C5A880; font-size: 13px; letter-spacing:1.5px; }
-  .rv-name { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #1A1A1A; font-weight: 500; margin-top: 4px; }
-  .rv-text { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6a6a6a; line-height: 1.6; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  /* minimal, no card/box — plain text separated by a hairline divider, like a
+     product-review strip on a retail site rather than a stack of bordered tiles */
+  .rv-right { display: flex; gap: 0; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scroll-snap-type: x proximity; }
+  .rv-item { flex: 0 0 200px; scroll-snap-align: start; padding: 0 16px; border-left: 1px solid #eae5d8; }
+  .rv-item:first-child { border-left: none; padding-left: 0; }
+  .rv-stars { color: #C5A880; font-size: 12px; letter-spacing:1px; }
+  .rv-name { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #1A1A1A; font-weight: 500; margin-top: 3px; }
+  .rv-text { font-family: 'Montserrat',sans-serif; font-size: 12.5px; color: #6a6a6a; line-height: 1.55; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .rv-empty { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; padding: 4px 0 4px; }
   .rv-seeall { display: block; margin: 0 0 20px; padding: 10px 0; width: 100%; background: none; border: 1px solid #eae5d8; border-radius: 10px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: 1px; color: #0B291C; cursor: pointer; transition: border-color .25s, background .25s; }
   .rv-seeall:hover { border-color: #C5A880; background: #faf8f3; }
@@ -95,11 +98,13 @@
   .rv-modal-head h3 { font-family:'Playfair Display',serif; font-size: 19px; color: #1A1A1A; margin: 0; }
   .rv-modal-close { background: none; border: none; font-size: 26px; color: #9a9a9a; cursor: pointer; line-height: 1; padding: 0 4px; }
   .rv-modal-close:hover { color: #0B291C; }
-  .rv-modal-list { overflow-y: auto; padding: 12px 20px 20px; }
-  .rv-modal-list .rv-item { flex: none; margin-bottom: 10px; }
-  .rv-modal-list .rv-item:last-child { margin-bottom: 0; }
-  .rv-form { margin-top: 0; max-width: 100%; padding-top: 16px; border-top: 1px solid #f3ede1; }
-  .rv-form h3 { font-family:'Playfair Display',serif; font-size: 17px; color: #1A1A1A; margin: 0 0 10px; }
+  .rv-modal-list { overflow-y: auto; padding: 4px 20px 20px; }
+  .rv-modal-list .rv-item { flex: none; border-left: none; padding: 14px 0; border-bottom: 1px solid #f3ede1; }
+  .rv-modal-list .rv-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .rv-modal-list .rv-item:first-child { padding-top: 0; }
+  .rv-modal-list .rv-text { -webkit-line-clamp: unset; }
+  .rv-form { margin-top: 0; max-width: 100%; padding-top: 12px; border-top: 1px solid #f3ede1; }
+  .rv-form h3 { font-family:'Playfair Display',serif; font-size: 16px; color: #1A1A1A; margin: 0 0 8px; }
   .rv-form-row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 8px; }
   .rv-form-row > div { flex: 1; min-width: 160px; }
   .rv-input, .rv-textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd6c6; font-family: 'Montserrat',sans-serif; font-size: 13px; outline: none; background: #fff; margin-bottom: 8px; box-sizing: border-box; }

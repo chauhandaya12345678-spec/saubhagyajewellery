@@ -93,10 +93,15 @@ export async function onRequest(context) {
     // Path 2: signed-in session — broad access to own orders
     else if (session) {
       const sEmail = session.email || null;
-      const sPhone = session.phone || null;
+      // Match on last-10-digits suffix, not exact string — users.phone (from
+      // Firebase, often "+91XXXXXXXXXX") and orders.phone (from checkout,
+      // often bare 10 digits) rarely share the same format, so an exact `=`
+      // silently returned zero rows here while the phone+order_id path above
+      // (which does normalize) found the same order fine.
+      const sPhoneDigits = session.phone ? String(session.phone).replace(/\D/g, '').slice(-10) : null;
       const rows = await db.prepare(
-        'SELECT * FROM orders WHERE user_id = ? OR (email IS NOT NULL AND email = ?) OR (phone IS NOT NULL AND phone = ?) ORDER BY created_at DESC LIMIT 100'
-      ).bind(session.user_id, sEmail, sPhone).all();
+        `SELECT * FROM orders WHERE user_id = ? OR (email IS NOT NULL AND email = ?) OR (phone IS NOT NULL AND phone LIKE '%' || ?) ORDER BY created_at DESC LIMIT 100`
+      ).bind(session.user_id, sEmail, sPhoneDigits).all();
       results = rows.results || [];
     }
     // Path 3: order_id alone — must present phone or token

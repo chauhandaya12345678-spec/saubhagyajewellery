@@ -62,8 +62,11 @@ tr:hover td { background: #faf8f3; }
           <tr>
             <th>SKU</th>
             <th>Name</th>
+            <th>Price</th>
+            <th>MRP</th>
             <th>Stock Count</th>
             <th>Weight (g)</th>
+            <th>Image path</th>
             <th></th>
           </tr>
         </thead>
@@ -113,8 +116,11 @@ tr:hover td { background: #faf8f3; }
           return '<tr data-sku="' + esc(p.sku) + '">' +
             '<td class="ai-sku">' + esc(p.sku) + '</td>' +
             '<td class="ai-name">' + esc(p.name) + '</td>' +
+            '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price"></td>' +
+            '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.mrp != null ? p.mrp : '') + '" data-field="mrp"></td>' +
             '<td><input class="ai-num" type="number" min="0" step="1" value="' + (p.stock_count != null ? p.stock_count : '') + '" data-field="stock_count"></td>' +
             '<td><input class="ai-num" type="number" min="0" step="0.1" value="' + (p.weightGrams != null ? p.weightGrams : '') + '" data-field="weightGrams"></td>' +
+            '<td><input class="ai-input" style="width:180px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp"></td>' +
             '<td><button class="ai-save" type="button">SAVE</button><div class="ai-msg"></div></td>' +
             '</tr>';
         }).join('');
@@ -129,11 +135,17 @@ tr:hover td { background: #faf8f3; }
     var sku = row.getAttribute('data-sku');
     var scInput = row.querySelector('[data-field="stock_count"]');
     var wgInput = row.querySelector('[data-field="weightGrams"]');
+    var priceInput = row.querySelector('[data-field="price"]');
+    var mrpInput = row.querySelector('[data-field="mrp"]');
+    var imgInput = row.querySelector('[data-field="image"]');
     var btn = row.querySelector('.ai-save');
     var msg = row.querySelector('.ai-msg');
     var body = { sku: sku };
     if (scInput.value !== '') body.stock_count = parseInt(scInput.value, 10);
     if (wgInput.value !== '') body.weightGrams = parseFloat(wgInput.value);
+    if (priceInput.value !== '') body.price = parseInt(priceInput.value, 10);
+    if (mrpInput.value !== '') body.mrp = parseInt(mrpInput.value, 10);
+    if (imgInput.value.trim() !== '') body.image = imgInput.value.trim();
     btn.disabled = true; btn.textContent = '…'; msg.textContent = '';
     fetch('/api/admin/update-inventory', {
       method: 'POST',

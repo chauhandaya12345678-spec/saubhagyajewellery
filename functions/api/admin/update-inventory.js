@@ -1,6 +1,6 @@
 /**
  * PATCH /api/admin/update-inventory
- * Body: { sku, stock_count, weightGrams }
+ * Body: { sku, stock_count?, weightGrams?, price?, mrp?, image?, altImage? }
  * Header: x-admin-key: <ADMIN_KEY env var>
  */
 export async function onRequest(context) {
@@ -36,7 +36,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { sku, stock_count, weightGrams } = body || {};
+  const { sku, stock_count, weightGrams, price, mrp, image, altImage } = body || {};
   if (!sku) {
     return new Response(JSON.stringify({ error: 'sku required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -46,6 +46,8 @@ export async function onRequest(context) {
   const db = env.DB;
   const sc = stock_count !== undefined ? parseInt(stock_count, 10) : null;
   const wg = weightGrams !== undefined ? parseFloat(weightGrams) : null;
+  const pr = price !== undefined ? parseInt(price, 10) : null;
+  const mr = mrp !== undefined ? parseInt(mrp, 10) : null;
 
   if (sc !== null && isNaN(sc)) {
     return new Response(JSON.stringify({ error: 'stock_count must be a number' }), {
@@ -57,13 +59,27 @@ export async function onRequest(context) {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
+  if (pr !== null && isNaN(pr)) {
+    return new Response(JSON.stringify({ error: 'price must be a number' }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+  }
+  if (mr !== null && isNaN(mr)) {
+    return new Response(JSON.stringify({ error: 'mrp must be a number' }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+  }
 
   try {
-    const setClauses = [];
+    const setClauses = ["updated_at = datetime('now')"];
     const params = [];
     if (sc !== null) { setClauses.push('stock_count = ?'); params.push(sc); }
     if (wg !== null) { setClauses.push('weightGrams = ?'); params.push(wg); }
-    if (!setClauses.length) {
+    if (pr !== null) { setClauses.push('price = ?'); params.push(pr); }
+    if (mr !== null) { setClauses.push('mrp = ?'); params.push(mr); }
+    if (typeof image === 'string' && image) { setClauses.push('image = ?'); params.push(image); }
+    if (typeof altImage === 'string') { setClauses.push('altImage = ?'); params.push(altImage); }
+    if (setClauses.length === 1) {
       return new Response(JSON.stringify({ error: 'Nothing to update' }), {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });

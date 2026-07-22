@@ -6,6 +6,10 @@ Disallow: /checkout
 Disallow: /checkout.html
 Disallow: /admin
 Disallow: /admin/
+Disallow: /admin-inventory
+Disallow: /admin-inventory.html
+Disallow: /account
+Disallow: /account.html
 Disallow: /api/
 Disallow: /functions/
 Disallow: /build/
