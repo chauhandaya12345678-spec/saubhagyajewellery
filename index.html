@@ -63,8 +63,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722a">
-<script src="layout.js?v=20260722a"></script>
+<link rel="stylesheet" href="site.css?v=20260722b">
+<script src="layout.js?v=20260722b"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Saubhagya Jewellery","url":"https://saubhagyajewellery.com/","logo":"https://saubhagyajewellery.com/images/banners/saubhagya-logo.png","sameAs":["https://www.instagram.com/saubhagyajewellery","https://www.facebook.com/saubhagyajewellery"],"address":{"@type":"PostalAddress","streetAddress":"Tanaji Nagar Rd, opp Vishwakarma Mandir, Hanuman Nagar, Kandivali East","addressLocality":"Mumbai","addressRegion":"Maharashtra","postalCode":"400101","addressCountry":"IN"},"contactPoint":{"@type":"ContactPoint","telephone":"+91-99870-08435","contactType":"customer service","areaServed":"IN","availableLanguage":["English","Hindi"]}}</script>
@@ -151,23 +151,6 @@
   .tr-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; color: #9a9a9a; }
   .tr-img .im { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 
-  .seo-block { max-width: 860px; margin: 0 auto; padding: 40px 48px 60px; text-align: center; }
-  .seo-block h2 { font-family:'Playfair Display',serif; font-weight: 500; font-size: 30px; color: #1A1A1A; margin: 0 0 14px; }
-  .seo-lede { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; line-height: 1.85; color: #6a6a6a; margin: 0 auto 30px; max-width: 640px; }
-  .seo-block strong { color: #1A1A1A; font-weight: 500; }
-  .seo-block a { color: #0B291C; }
-  .seo-faq { text-align: left; margin: 0 auto; max-width: 720px; }
-  .seo-faq details { border-top: 1px solid #eae5d8; }
-  .seo-faq details:last-child { border-bottom: 1px solid #eae5d8; }
-  .seo-faq summary { position: relative; padding: 18px 40px 18px 4px; cursor: pointer; list-style: none; font-family:'Playfair Display',serif; font-size: 19px; color: #1A1A1A; user-select: none; transition: color .25s; }
-  .seo-faq summary::-webkit-details-marker { display: none; }
-  .seo-faq summary:hover { color: #0B291C; }
-  .seo-faq summary::after { content: '+'; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-family: 'Montserrat',sans-serif; font-size: 22px; color: #C5A880; font-weight: 300; transition: transform .3s ease; }
-  .seo-faq details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
-  .seo-faq details[open] summary { color: #0B291C; }
-  .seo-faq details p { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 13.5px; line-height: 1.85; color: #6a6a6a; margin: 0 0 12px; padding: 0 4px 6px; }
-  .seo-faq details p:last-child { padding-bottom: 20px; }
-
   @media (max-width: 900px) {
     .hm-head { padding: 110px 18px 6px; }
     .hm-h1 { font-size: 28px; line-height: 1.2; }
@@ -202,11 +185,6 @@
     .tr-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
     .hm-sec-head { margin-bottom: 24px; }
     .hm-sec-title { font-size: 24px; }
-    .seo-block { padding: 22px 16px 30px; }
-    .seo-block h2 { font-size: 22px; }
-    .seo-lede { font-size: 13.5px; margin-bottom: 22px; }
-    .seo-faq summary { padding: 16px 34px 16px 4px; font-size: 16.5px; }
-    .seo-faq details p { font-size: 13px; }
   }
   @media (max-width: 480px) {
     .hm-h1 { font-size: 24px; }
@@ -301,36 +279,6 @@
     <div class="tr-more"><a href="categories.html">VIEW ALL PRODUCTS &rarr;</a></div>
   </section>
 
-  <!-- SEO / TRUST — short visible intro + collapsible FAQ (Google reads inside <details>) -->
-  <section class="seo-block">
-    <h2>Handcrafted in Mumbai. Priced Directly from the Workshop.</h2>
-
-    <div class="seo-faq">
-      <details>
-        <summary>Shop by occasion, region and style</summary>
-        <p>Bride-to-be? Start with <a href="categories.html?cat=bridal-set">bridal sets</a>: temple sets from Madurai and Coimbatore, Kundan and Polki suites for North Indian ceremonies, Meenakari finishes for Rajasthani and Punjabi weddings. Reception look? <a href="categories.html?cat=premium-chokers">Premium chokers</a> and <a href="categories.html?cat=necklaces">designer necklaces</a> sit beautifully with lehengas and modern sarees. Sangeet or mehndi? Layer a light <a href="categories.html?cat=necklace-set">necklace set</a> with a matching <a href="categories.html?cat=waist-chains">waist chain</a> and a <a href="categories.html?cat=earrings">maang tikka or passa</a>.</p>
-        <p>Everyday: fashion <a href="categories.html?cat=fashion-earrings">jhumkas, studs and drops</a> under ₹500; delicate <a href="categories.html?cat=pendants">pendants</a>; solitaire studs for the office. Festive: seasonal boxes under ₹2,999 in the <a href="gifting.html">Gifting Edit</a>.</p>
-      </details>
-
-      <details>
-        <summary>Why shoppers across India trust Saubhagya</summary>
-        <p><strong>Made in-house, priced fairly.</strong> Pricing is all-inclusive: GST, insured shipping and manufacturing-defect cover are already in the sticker price. UPI, cards, net banking, EMI; COD on eligible pieces.</p>
-        <p><strong>Free insured shipping.</strong> Ready pieces dispatch in 2–4 business days from Mumbai; made-to-order bridal in 10–14 days. Mumbai (400/401): 2–4 days · Maharashtra: 3–5 · rest of India: 5–8.</p>
-        <p><strong>Defect-free promise.</strong> Manufacturing defects flagged within 48 hours (with continuous unboxing video) are repaired or replaced free. Full policy on <a href="trust.html">our standards page</a>.</p>
-        <p><strong>Human care.</strong> WhatsApp +91 99870 08435, 10 am–8 pm IST. 48-hr acknowledgement, 30-day resolution per <a href="grievances.html">grievance policy</a>.</p>
-      </details>
-
-      <details>
-        <summary>How every piece is made</summary>
-        <p>Base alloys cast in reusable moulds, hand-finished, then micron-plated in matte or high-gloss gold. Stones (American Diamond, Kundan, Polki, Meenakari, cultured pearls) hand-set by artisans from Jaipur, Coimbatore and Mumbai. Five-point inspection (plating uniformity, stone seating, clasp fit, weight tolerance, finish sheen) before boxing. Photos are of the actual production piece — what you see is what ships.</p>
-      </details>
-
-      <details>
-        <summary>Popular categories &amp; support</summary>
-        <p>Best-sellers: <a href="categories.html?cat=south-temple-necklace">South temple necklaces</a>, <a href="categories.html?cat=necklaces">Lakshmi haarams</a>, <a href="categories.html?cat=jhumkas">jhumkas</a>, <a href="categories.html?cat=earrings">maang tikkas</a> under ₹400, <a href="categories.html?cat=premium-chokers">Polki chokers</a>, <a href="categories.html?cat=bridal-set">bridal suites</a> from ₹1,599. Read the <a href="blogs.html">Saubhagya journal</a> or the <a href="es-policy.html">E&amp;S Policy</a>. Bulk orders and styling consults: <a href="contact.html">contact us</a> or <a href="https://wa.me/919987008435" rel="noopener">WhatsApp</a>.</p>
-      </details>
-    </div>
-  </section>
 </main>
 <x-footer></x-footer>
 

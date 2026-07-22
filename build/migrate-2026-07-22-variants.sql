@@ -1,0 +1,23 @@
+-- ============================================================
+-- Saubhagya Jewellery – Color variants column (already applied live 2026-07-22)
+-- ============================================================
+-- ALTER TABLE products ADD COLUMN variants TEXT;
+--
+-- HOW TO SET UP TO 6 COLOR SWATCHES ON A PRODUCT:
+-- variants is a JSON array string: [{"image":"path","label":"Gold"}, ...]
+-- First entry becomes the default photo shown on page load.
+--
+-- Example — 3 colors for CC-SI-001:
+-- UPDATE products SET variants = '[
+--   {"image":"images/Necklace/cc-si-001-gold.webp","label":"Gold"},
+--   {"image":"images/Necklace/cc-si-001-rose.webp","label":"Rose Gold"},
+--   {"image":"images/Necklace/cc-si-001-silver.webp","label":"Silver"}
+-- ]' WHERE sku = 'CC-SI-001';
+--
+-- Run against production:
+--   wrangler d1 execute saubhagya-db --remote --command="<one line above>"
+--
+-- Products without a variants value keep working exactly as before —
+-- product.html falls back to image + altImage (2 swatches max) if variants
+-- is NULL, and hides the swatch row entirely if there's only 1 photo.
+-- ============================================================

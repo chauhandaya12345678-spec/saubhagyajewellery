@@ -53,6 +53,14 @@ export async function onRequest(context) {
       : stmt.all()
     );
 
+    // variants is stored as a JSON string ([{image,label}]) — parse it so the
+    // client's Array.isArray(p.variants) check works for color swatches.
+    for (const row of results) {
+      if (typeof row.variants === 'string' && row.variants) {
+        try { row.variants = JSON.parse(row.variants); } catch (e) { row.variants = null; }
+      }
+    }
+
     return new Response(JSON.stringify(results), {
       headers: {
         'Content-Type': 'application/json',

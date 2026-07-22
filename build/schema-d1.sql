@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS products (
   inStock    INTEGER NOT NULL DEFAULT 1,
   stock_count INTEGER,
   weightGrams INTEGER,
+  variants   TEXT,
   created_at TEXT    NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT    NOT NULL DEFAULT (datetime('now'))
 );

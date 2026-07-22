@@ -116,6 +116,22 @@ body{padding-top:118px}
 .pill:hover{border-color:#C5A880}
 .back{margin-top:40px;border-top:1px solid #eae5d8;padding-top:22px;font-size:13px;letter-spacing:1px;color:#9a9a9a}
 .back a:hover{color:#0B291C}
+/* SEO FAQ accordion — used on about.html (moved off homepage) */
+.seo-faq{margin:24px 0 0}
+.seo-faq details{border-top:1px solid #eae5d8}
+.seo-faq details:last-child{border-bottom:1px solid #eae5d8}
+.seo-faq summary{position:relative;padding:18px 40px 18px 4px;cursor:pointer;list-style:none;font-family:'Playfair Display',serif;font-size:19px;color:#1A1A1A;user-select:none;transition:color .25s}
+.seo-faq summary::-webkit-details-marker{display:none}
+.seo-faq summary:hover{color:#0B291C}
+.seo-faq summary::after{content:'+';position:absolute;right:6px;top:50%;transform:translateY(-50%);font-family:'Montserrat',sans-serif;font-size:22px;color:#C5A880;font-weight:300;transition:transform .3s ease}
+.seo-faq details[open] summary::after{transform:translateY(-50%) rotate(45deg)}
+.seo-faq details[open] summary{color:#0B291C}
+.seo-faq details p{font-family:'Montserrat',sans-serif;font-weight:300;font-size:13.5px;line-height:1.85;color:#6a6a6a;margin:0 0 12px;padding:0 4px 6px}
+.seo-faq details p:last-child{padding-bottom:20px}
+@media(max-width:900px){
+  .seo-faq summary{padding:16px 34px 16px 4px;font-size:16.5px}
+  .seo-faq details p{font-size:13px}
+}
 /* footer */
 footer.site{background:#071B12;color:#fff;padding:60px 40px 30px}
 .fwrap{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1.7fr 1fr 1fr 1.2fr;gap:40px}
