@@ -108,15 +108,17 @@ var pendingPhone = null;
 // button should stop looking like a frozen spinner and tell the customer
 // there's something to do below.
 (function watchRecaptchaChallenge() {
-  var box = document.getElementById('recaptcha-container');
-  if (!box || !window.MutationObserver) return;
-  var mo = new MutationObserver(function () {
-    var btn = $('send-btn');
-    if (btn && btn.disabled && box.querySelector('iframe')) {
-      btn.innerHTML = 'COMPLETE VERIFICATION BELOW ↓';
-    }
+  if (!window.MutationObserver) return;
+  var boxes = [document.getElementById('recaptcha-container'), document.getElementById('ts-container')].filter(Boolean);
+  boxes.forEach(function (box) {
+    var mo = new MutationObserver(function () {
+      var btn = $('send-btn');
+      if (btn && btn.disabled && box.querySelector('iframe')) {
+        btn.innerHTML = 'COMPLETE VERIFICATION BELOW ↓';
+      }
+    });
+    mo.observe(box, { childList: true, subtree: true });
   });
-  mo.observe(box, { childList: true, subtree: true });
 })();
 
 var user = null;
