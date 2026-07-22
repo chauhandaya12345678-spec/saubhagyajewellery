@@ -16,8 +16,21 @@
     var d = document;
     if (!d.querySelector('link[rel="icon"]')) {
       var fav = d.createElement('link');
-      fav.rel = 'icon'; fav.type = 'image/svg+xml'; fav.href = 'favicon.svg';
+      fav.rel = 'icon'; fav.type = 'image/png'; fav.href = 'images/brand/favicon-mark.png?v=1';
       d.head.appendChild(fav);
+    }
+    /* Google Analytics (gtag.js) — was homepage-only before; every page needs
+       it or product/category/checkout views never reach GA at all. */
+    if (!window.__gtagLoaded) {
+      window.__gtagLoaded = true;
+      var gtagScript = d.createElement('script');
+      gtagScript.async = true;
+      gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-BFMQ8LVSF3';
+      d.head.appendChild(gtagScript);
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+      window.gtag('config', 'G-BFMQ8LVSF3');
     }
     if (!d.querySelector('meta[name="theme-color"]')) {
       var tc = d.createElement('meta');

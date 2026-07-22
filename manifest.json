@@ -12,7 +12,7 @@
   "dir": "ltr",
   "categories": ["shopping", "lifestyle"],
   "icons": [
-    { "src": "/images/brand/saubhagya-logo.svg?v=4", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+    { "src": "/images/brand/favicon-mark.png?v=1", "sizes": "256x256", "type": "image/png", "purpose": "any" }
   ],
   "shortcuts": [
     { "name": "Categories", "url": "/categories.html", "description": "Shop by category" },
