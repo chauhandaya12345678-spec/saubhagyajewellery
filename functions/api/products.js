@@ -29,13 +29,14 @@ export async function onRequest(context) {
     const region = searchParams.get('region');
     const cat = searchParams.get('cat');
 
-    let sql = 'SELECT * FROM products WHERE inStock = 1';
-    const params = [];
+    // A direct ?sku= lookup must resolve even when the product is fully
+    // delisted (inStock=0) — the product page and cart/checkout need the
+    // real row to show "Out of stock" correctly instead of silently falling
+    // back to a stale catalog.js snapshot that may still say available.
+    // Browse/category listings keep hiding delisted products as before.
+    let sql = sku ? 'SELECT * FROM products WHERE sku = ?' : 'SELECT * FROM products WHERE inStock = 1';
+    const params = sku ? [sku] : [];
 
-    if (sku) {
-      sql += ' AND sku = ?';
-      params.push(sku);
-    }
     if (region) {
       sql += ' AND region = ?';
       params.push(region);

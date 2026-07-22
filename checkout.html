@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722g">
-<script src="layout.js?v=20260722g"></script>
+<link rel="stylesheet" href="site.css?v=20260722h">
+<script src="layout.js?v=20260722h"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -188,20 +188,48 @@
     } catch(e) { cartItems = []; }
   }
 
+  function isOosProduct(p) {
+    if (!p) return false;
+    if (p.inStock === 0 || p.inStock === false) return true;
+    if (typeof p.stock_count === 'number' && p.stock_count <= 0) return true;
+    return false;
+  }
+
+  // Payable items only — out-of-stock lines are never charged or sent to
+  // Razorpay, even if they're still sitting in the saved cart (cart.html
+  // keeps them there as "saved for later"). Indices map back to the real
+  // cartItems array so qty +/- and remove still work on the right row.
+  function payableEntries() {
+    return cartItems.map(function(ci, idx) { return { ci: ci, idx: idx }; })
+      .filter(function(e) { return !isOosProduct(products[e.ci.id]); });
+  }
+
   function renderCart() {
     if (!cartItems.length) {
       $('co-content').style.display = 'none';
       $('co-empty').style.display = 'block';
       return;
     }
+    var entries = payableEntries();
+    var oosCount = cartItems.length - entries.length;
     subtotal = 0;
-    $('co-items').innerHTML = cartItems.map(function(ci, idx) {
+    $('co-items').innerHTML = entries.map(function(e) {
+      var ci = e.ci, idx = e.idx;
       var p = products[ci.id] || { name: ci.id, price: 0 };
       subtotal += (p.price || 0) * ci.qty;
       return '<div class="co-item"><div class="co-item-top"><span class="co-item-name">' + esc(p.name || ci.id) + '</span><span class="co-x" data-act="rm" data-idx="' + idx + '" title="Remove">&times;</span></div><div class="co-item-bot"><span class="co-qty"><button type="button" class="co-qbtn" data-act="dec" data-idx="' + idx + '" aria-label="Decrease">&minus;</button><span class="co-qv">' + ci.qty + '</span><button type="button" class="co-qbtn" data-act="inc" data-idx="' + idx + '" aria-label="Increase">+</button></span><span class="co-item-price">' + fmt((p.price || 0) * ci.qty) + '</span></div></div>';
     }).join('');
+    if (oosCount > 0) {
+      $('co-items').innerHTML += '<div style="font-family:Montserrat,sans-serif;font-size:12px;color:#c0392b;padding:10px 0;">' + oosCount + ' item' + (oosCount > 1 ? 's' : '') + ' in your bag ' + (oosCount > 1 ? 'are' : 'is') + ' out of stock and not included here — <a href="cart.html" style="color:#0B291C;">manage your bag</a>.</div>';
+    }
     $('co-subtotal').textContent = fmt(subtotal);
     $('co-total-amt').textContent = fmt(subtotal);
+    var submitBtn = $('co-submit');
+    if (submitBtn) submitBtn.disabled = !entries.length;
+    if (!entries.length && $('co-error')) {
+      $('co-error').textContent = 'Every item in your bag is currently out of stock. Go back to your bag to remove them or wait for restock.';
+      $('co-error').style.display = 'block';
+    }
   }
 
   function persistCart() {
@@ -462,11 +490,20 @@
 
   function doPayment(pack) {
     var addr = pack.address;
-    var cart = cartItems.slice();
+    // Out-of-stock lines never reach Razorpay or /api/orders/save, even if
+    // they're still sitting in the saved cart — see payableEntries().
+    var cart = payableEntries().map(function(e) { return e.ci; });
     var lines = cart.map(function(ci) {
       var p = products[ci.id] || {};
       return { id: ci.id, name: p.name || ci.id, price: p.price || 0, qty: ci.qty, category: p.category || '', weightGrams: p.weightGrams || undefined };
     });
+    if (!lines.length) {
+      $('co-error').textContent = 'Every item in your bag is currently out of stock. Go back to your bag to continue.';
+      $('co-error').style.display = 'block';
+      $('co-submit').disabled = false;
+      $('co-submit').textContent = 'PLACE ORDER & PAY';
+      return;
+    }
     subtotal = lines.reduce(function(s, l){ return s + l.price * l.qty; }, 0);
     if (subtotal <= 0 || lines.some(function(l){ return !(l.price > 0); })) {
       $('co-error').textContent = 'Could not load product prices. Refresh and try again.';

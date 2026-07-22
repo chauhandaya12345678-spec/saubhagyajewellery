@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722g">
-<script src="layout.js?v=20260722g"></script>
+<link rel="stylesheet" href="site.css?v=20260722h">
+<script src="layout.js?v=20260722h"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
@@ -40,6 +40,12 @@
   .cart-continue { display: block; margin-top: 12px; text-align: center; font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; letter-spacing: 1px; }
   .cart-continue a { color: #0B291C; text-decoration: none; border-bottom: 1px solid #C5A880; padding-bottom: 1px; }
   .cart-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; letter-spacing:1.5px; }
+  .cart-item.oos { opacity: .7; }
+  .cart-item-oos-tag { display: inline-block; font-family: 'Montserrat',sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #c0392b; margin-top: 8px; }
+  .cart-oos-head { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1.5px; color: #9a9a9a; text-transform: uppercase; margin: 28px 0 4px; }
+  .cart-oos-note { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; margin: 0 0 4px; }
+  .cart-checkout.disabled { background: #ddd6c6; color: #9a9a9a; cursor: not-allowed; pointer-events: none; box-shadow: none; }
+  .cart-checkout-blocked-msg { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #c0392b; text-align: center; margin-top: 10px; }
   @media (max-width: 640px) {
     .cart-wrap { padding: 10px 14px calc(96px + env(safe-area-inset-bottom)); }
     .cart-item { padding: 16px 0; gap: 12px; }
@@ -68,11 +74,17 @@
   <div id="cart-content" style="display:none">
     <h1 style="font-family:'Playfair Display',serif;font-size:24px;color:#1A1A1A;margin:0 0 20px;">Your Bag</h1>
     <div id="cart-items"></div>
+    <div id="cart-oos-section" style="display:none">
+      <div class="cart-oos-head">Saved for later — currently out of stock</div>
+      <div class="cart-oos-note">These pieces are back-ordered. They're saved here and won't be charged until you move them back once restocked.</div>
+      <div id="cart-oos-items"></div>
+    </div>
     <div class="cart-summary" id="cart-summary" style="display:none">
       <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal"></span></div>
       <div class="cart-summary-row"><span>Shipping</span><span id="cart-shipping" style="color:#0B291C;">FREE (included)</span></div>
       <div class="cart-summary-total"><span>Estimated Total</span><span id="cart-total"></span></div>
       <a class="cart-checkout" href="checkout.html" id="cart-checkout-btn">PROCEED TO CHECKOUT</a>
+      <div class="cart-checkout-blocked-msg" id="cart-checkout-blocked-msg" style="display:none">All items in your bag are currently out of stock — nothing to check out yet.</div>
     </div>
     <div class="cart-continue"><a href="index.html">← Continue Shopping</a></div>
   </div>
@@ -103,6 +115,13 @@
     if (window.MPA) { try { window.MPA.setCart(cartItems); } catch(e) {} }
   }
 
+  function isOosProduct(p) {
+    if (!p) return false;
+    if (p.inStock === 0 || p.inStock === false) return true;
+    if (typeof p.stock_count === 'number' && p.stock_count <= 0) return true;
+    return false;
+  }
+
   function render() {
     if (!cartItems.length) {
       $('cart-loading').style.display = 'none';
@@ -112,29 +131,59 @@
 
     var subtotal = 0;
     var html = '';
+    var oosHtml = '';
+    var availableCount = 0;
     cartItems.forEach(function(ci, idx) {
       var p = products[ci.id] || { name: ci.id, price: 0, image: '' };
+      var oos = isOosProduct(p);
       var lineTotal = (p.price || 0) * ci.qty;
-      subtotal += lineTotal;
-      html += '<div class="cart-item">' +
-        '<img class="cart-item-img" src="' + (p.image || '') + '" alt="' + (p.name || '') + '" onerror="this.style.display=\'none\'">' +
-        '<div class="cart-item-info">' +
-          '<div class="cart-item-name">' + (p.name || ci.id) + '</div>' +
-          '<div class="cart-item-price">' + fmt(p.price) + ' each</div>' +
-          '<div class="cart-item-qty">' +
-            '<span onclick="Cart.dec(' + idx + ')">−</span>' +
-            '<span class="cq">' + ci.qty + '</span>' +
-            '<span onclick="Cart.inc(' + idx + ')">+</span>' +
+      if (oos) {
+        oosHtml += '<div class="cart-item oos">' +
+          '<img class="cart-item-img" src="' + (p.image || '') + '" alt="' + (p.name || '') + '" onerror="this.style.display=\'none\'">' +
+          '<div class="cart-item-info">' +
+            '<div class="cart-item-name">' + (p.name || ci.id) + '</div>' +
+            '<div class="cart-item-price">' + fmt(p.price) + ' each · Qty ' + ci.qty + '</div>' +
+            '<div class="cart-item-oos-tag">OUT OF STOCK</div>' +
+            '<div class="cart-item-remove" onclick="Cart.remove(' + idx + ')">REMOVE</div>' +
           '</div>' +
-          '<div class="cart-item-remove" onclick="Cart.remove(' + idx + ')">REMOVE</div>' +
-        '</div>' +
-      '</div>';
+        '</div>';
+      } else {
+        availableCount++;
+        subtotal += lineTotal;
+        html += '<div class="cart-item">' +
+          '<img class="cart-item-img" src="' + (p.image || '') + '" alt="' + (p.name || '') + '" onerror="this.style.display=\'none\'">' +
+          '<div class="cart-item-info">' +
+            '<div class="cart-item-name">' + (p.name || ci.id) + '</div>' +
+            '<div class="cart-item-price">' + fmt(p.price) + ' each</div>' +
+            '<div class="cart-item-qty">' +
+              '<span onclick="Cart.dec(' + idx + ')">−</span>' +
+              '<span class="cq">' + ci.qty + '</span>' +
+              '<span onclick="Cart.inc(' + idx + ')">+</span>' +
+            '</div>' +
+            '<div class="cart-item-remove" onclick="Cart.remove(' + idx + ')">REMOVE</div>' +
+          '</div>' +
+        '</div>';
+      }
     });
 
     $('cart-items').innerHTML = html;
+    $('cart-oos-items').innerHTML = oosHtml;
+    $('cart-oos-section').style.display = oosHtml ? 'block' : 'none';
     $('cart-subtotal').textContent = fmt(subtotal);
     $('cart-total').textContent = fmt(subtotal);
     $('cart-summary').style.display = 'block';
+
+    var checkoutBtn = $('cart-checkout-btn');
+    if (!availableCount) {
+      checkoutBtn.classList.add('disabled');
+      checkoutBtn.removeAttribute('href');
+      $('cart-checkout-blocked-msg').style.display = 'block';
+    } else {
+      checkoutBtn.classList.remove('disabled');
+      checkoutBtn.setAttribute('href', 'checkout.html');
+      $('cart-checkout-blocked-msg').style.display = 'none';
+    }
+
     $('cart-loading').style.display = 'none';
     $('cart-content').style.display = 'block';
   }
