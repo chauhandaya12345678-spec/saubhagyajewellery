@@ -1,15 +1,16 @@
 /**
  * ShipPrime Webhook — real-time order status updates
- * POST /api/webhooks/shipprime?secret=<SHIPPRIME_WEBHOOK_SECRET>
+ * POST /api/webhooks/shipprime
  *
  * ShipPrime sends status changes (SHIPPED, OUT_FOR_DELIVERY, DELIVERED, etc.)
  * We update the D1 order status + updated_at so the track-orders page
  * always shows the latest status without polling ShipPrime API.
  *
- * Set webhook URL in ShipPrime dashboard (include the secret as a query
- * param — most webhook providers let you set the full callback URL but not
- * always custom headers, so this works everywhere):
- *   https://saubhagyajewellery.com/api/webhooks/shipprime?secret=<SHIPPRIME_WEBHOOK_SECRET>
+ * Auth: ShipPrime's dashboard has a native "Secret Token" field that it
+ * sends as `Authorization: Bearer <token>` — set that field to
+ * SHIPPRIME_WEBHOOK_SECRET's value and leave the webhook URL plain. A
+ * ?secret=... query param is also accepted as a fallback for providers
+ * that don't support a secret-token field.
  *
  * Without this, anyone who finds the URL could POST fake status updates for
  * any AWB — including a fake 'rto' to trigger the auto-restock below.
@@ -34,7 +35,9 @@ export async function onRequest(context) {
 
   const configuredSecret = env.SHIPPRIME_WEBHOOK_SECRET;
   if (!configuredSecret) return json({ error: 'SHIPPRIME_WEBHOOK_SECRET not configured' }, 501);
-  const providedSecret = new URL(request.url).searchParams.get('secret') || request.headers.get('x-shipprime-secret') || '';
+  const authHeader = request.headers.get('authorization') || '';
+  const bearerSecret = authHeader.replace(/^Bearer\s+/i, '').trim();
+  const providedSecret = bearerSecret || new URL(request.url).searchParams.get('secret') || request.headers.get('x-shipprime-secret') || '';
   if (!constantTimeEqual(providedSecret, configuredSecret)) {
     return json({ error: 'Unauthorized' }, 401);
   }
