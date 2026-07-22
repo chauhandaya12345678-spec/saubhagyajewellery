@@ -40,9 +40,12 @@ export async function hmacSha256Hex(secret, message) {
 /* Decrement stock_count for each paid line item. Only touches SKUs that
    already have a non-null stock_count (most products don't track it yet —
    see build/stock-update-examples.sql). Never throws: a missing column on
-   a pre-migration DB, or a bad SKU, must not block order confirmation. */
-export async function decrementStock(db, items) {
+   a pre-migration DB, or a bad SKU, must not block order confirmation.
+   When `env` is passed, fires a best-effort WhatsApp alert to the owner's
+   number for any SKU that drops to/below LOW_STOCK_THRESHOLD (default 3). */
+export async function decrementStock(db, items, env) {
   try {
+    const threshold = Number(env && env.LOW_STOCK_THRESHOLD) || 3;
     for (const l of (items || [])) {
       const sku = String(l.sku || l.id || '').trim();
       const qty = Number(l.qty || 1);
@@ -50,10 +53,82 @@ export async function decrementStock(db, items) {
       await db.prepare(
         "UPDATE products SET stock_count = MAX(0, stock_count - ?), updated_at = datetime('now') WHERE sku = ? AND stock_count IS NOT NULL"
       ).bind(qty, sku).run();
+
+      if (env) {
+        try {
+          const row = await db.prepare('SELECT name, stock_count FROM products WHERE sku = ? AND stock_count IS NOT NULL').bind(sku).first();
+          if (row && row.stock_count <= threshold) {
+            await alertLowStock(env, sku, row.name, row.stock_count);
+          }
+        } catch (e2) { /* alert is best-effort — never block the order */ }
+      }
     }
   } catch (e) {
     // pre-migration schema (no stock_count column yet) or transient DB error — ignore
   }
+}
+
+/* Reverse of decrementStock — used when a courier marks a shipment RTO
+   (return to origin) so the SKU goes back on sale automatically. Never throws. */
+export async function restockOrder(db, items) {
+  try {
+    for (const l of (items || [])) {
+      const sku = String(l.sku || l.id || '').trim();
+      const qty = Number(l.qty || 1);
+      if (!sku || !(qty > 0)) continue;
+      await db.prepare(
+        "UPDATE products SET stock_count = stock_count + ?, updated_at = datetime('now') WHERE sku = ? AND stock_count IS NOT NULL"
+      ).bind(qty, sku).run();
+    }
+  } catch (e) { /* ignore — same tolerance as decrementStock */ }
+}
+
+/* WhatsApp low-stock nudge to the owner's own number (already on WhatsApp
+   Business — see about.html contact number). Requires a pre-approved Meta
+   template; set WA_LOW_STOCK_TEMPLATE to override the name. No-ops silently
+   if WHATSAPP_PHONE_ID/TOKEN aren't configured or the template isn't approved yet. */
+export async function alertLowStock(env, sku, name, remaining) {
+  const ownerPhone = env.OWNER_WHATSAPP_NUMBER || '9987008435';
+  const template = env.WA_LOW_STOCK_TEMPLATE || 'low_stock_alert';
+  return sendWhatsAppMessage(env, ownerPhone, template, [name || sku, sku, String(remaining)]);
+}
+
+/* Constant-time string compare — guards the ADMIN_KEY check against
+   timing side-channels (naive !== short-circuits on first mismatched byte). */
+function timingSafeEqual(a, b) {
+  const bufA = enc.encode(String(a || ''));
+  const bufB = enc.encode(String(b || ''));
+  const len = Math.max(bufA.length, bufB.length, 1);
+  let diff = bufA.length ^ bufB.length;
+  for (let i = 0; i < len; i++) {
+    diff |= (bufA[i] || 0) ^ (bufB[i] || 0);
+  }
+  return diff === 0;
+}
+
+/* Shared admin-key gate for every /api/admin/* endpoint. Returns the
+   Unauthorized Response to send back, or null if the request is authorized. */
+export function verifyAdminKey(request, env, corsHeaders) {
+  const adminKey = env.ADMIN_KEY || '';
+  const reqKey = request.headers.get('x-admin-key') || '';
+  if (!adminKey || !timingSafeEqual(reqKey, adminKey)) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+  }
+  return null;
+}
+
+/* Admin CORS: these tools are only ever fetched same-origin from the admin
+   pages themselves, never from a browser extension or third-party origin —
+   lock it down instead of the wildcard used by public endpoints. */
+export function adminCorsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': 'https://saubhagyajewellery.com',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-admin-key',
+    'Vary': 'Origin',
+  };
 }
 
 export async function sha256Hex(message) {

@@ -3,13 +3,11 @@
  * Body: { sku, stock_count?, weightGrams?, price?, mrp?, image?, altImage? }
  * Header: x-admin-key: <ADMIN_KEY env var>
  */
+import { verifyAdminKey, adminCorsHeaders } from '../_lib.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, x-admin-key',
-  };
+  const corsHeaders = adminCorsHeaders();
 
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -21,13 +19,8 @@ export async function onRequest(context) {
     });
   }
 
-  const adminKey = env.ADMIN_KEY || '';
-  const reqKey = request.headers.get('x-admin-key') || '';
-  if (!adminKey || reqKey !== adminKey) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
-  }
+  const unauthorized = verifyAdminKey(request, env, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   let body;
   try { body = await request.json(); } catch {

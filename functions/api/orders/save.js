@@ -160,7 +160,7 @@ export async function onRequest(context) {
     // Inventory: decrement stock_count for SKUs that track it. Best-effort —
     // never blocks order confirmation (see decrementStock in _lib.js).
     const itemsArr = typeof items === 'string' ? JSON.parse(items) : items;
-    await decrementStock(db, itemsArr);
+    await decrementStock(db, itemsArr, env);
 
     // Tracking token for WhatsApp link (privacy: no phone in URL)
     const trackToken = crypto.randomUUID().slice(0, 8);

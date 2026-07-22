@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin | Saubhagya</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: #F0F5FA; font-family: 'Montserrat', sans-serif; font-size: 13px; color: #1A1A1A; }
+.ai-header { background: #0B291C; color: #fff; padding: 18px 32px; display: flex; align-items: center; gap: 20px; }
+.ai-header h1 { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: 1px; }
+.ai-tabs { display: flex; gap: 4px; margin-left: 24px; }
+.ai-tab { padding: 8px 16px; border-radius: 8px 8px 0 0; font-size: 11px; letter-spacing: 1px; color: #cfd8d3; cursor: pointer; background: transparent; border: none; font-family: inherit; }
+.ai-tab.active { background: #F0F5FA; color: #0B291C; font-weight: 600; }
+.ai-wrap { max-width: 1180px; margin: 32px auto; padding: 0 24px 80px; }
+.ai-auth { background: #fff; border: 1px solid #eae5d8; border-radius: 12px; padding: 32px; max-width: 400px; margin: 60px auto; }
+.ai-auth h2 { margin: 0 0 18px; font-size: 16px; }
+.ai-input { width: 100%; padding: 10px 12px; border: 1px solid #ddd6c6; border-radius: 6px; font-family: inherit; font-size: 13px; margin-bottom: 12px; }
+.ai-btn { padding: 10px 22px; background: #0B291C; color: #fff; border: none; border-radius: 10px; font-family: inherit; font-size: 12px; letter-spacing: 1px; cursor: pointer; }
+.ai-btn:hover { background: #071B12; }
+.ai-btn:disabled { opacity: .5; cursor: default; }
+.ai-btn.small { padding: 6px 12px; font-size: 10px; border-radius: 6px; }
+.ai-btn.ghost { background: #fff; color: #0B291C; border: 1px solid #0B291C; }
+.ai-status { font-size: 12px; color: #9a9a9a; margin-top: 8px; min-height: 16px; }
+.ai-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.ai-toolbar select, .ai-toolbar input[type="text"] { padding: 8px 10px; border: 1px solid #ddd6c6; border-radius: 6px; font-family: inherit; font-size: 12px; }
+.ai-toolbar input[type="text"] { width: 200px; }
+.ai-count { font-size: 12px; color: #9a9a9a; margin-left: auto; }
+.ai-table-wrap { background: #fff; border: 1px solid #eae5d8; border-radius: 12px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #f8f6f1; padding: 12px 14px; text-align: left; font-size: 11px; letter-spacing: 1px; color: #6a6a6a; border-bottom: 1px solid #eae5d8; font-weight: 600; white-space: nowrap; }
+td { padding: 10px 14px; border-bottom: 1px solid #f3ede1; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #faf8f3; }
+.ai-oid { font-family: monospace; font-size: 11px; color: #6a6a6a; }
+.ai-items div { margin-bottom: 2px; font-size: 12px; }
+.ai-addr { font-size: 12px; color: #4a4a4a; max-width: 200px; }
+.ai-badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 10px; letter-spacing: .6px; font-weight: 600; text-transform: uppercase; }
+.b-confirmed { background: #e8f0ea; color: #2d7a4f; }
+.b-packed { background: #f1e9fb; color: #6a3fb0; }
+.b-shipped { background: #eaf1fb; color: #2a5db0; }
+.b-out_for_delivery { background: #fef3e0; color: #b06a12; }
+.b-delivered { background: #e2f6ea; color: #1c7a3d; }
+.b-cancelled { background: #fbe7e6; color: #c0392b; }
+.b-rto, .b-rto_delivered, .b-rto_initiated, .b-rto_in_transit, .b-return_to_origin, .b-returned { background: #fbe7e6; color: #c0392b; }
+.ai-test { font-size: 9px; color: #c0392b; font-weight: 700; letter-spacing: .5px; margin-left: 6px; }
+.ai-num { width: 90px; padding: 7px 10px; border: 1px solid #ddd6c6; border-radius: 6px; font-family: inherit; font-size: 13px; }
+.ai-save { padding: 7px 14px; background: #0B291C; color: #fff; border: none; border-radius: 8px; font-family: inherit; font-size: 11px; letter-spacing: .8px; cursor: pointer; white-space: nowrap; }
+.ai-save:hover { background: #071B12; }
+.ai-save.saved { background: #2d7a4f; }
+.ai-save.err { background: #c0392b; }
+.ai-sku { font-family: monospace; font-size: 12px; color: #9a9a9a; }
+.ai-name { font-weight: 500; }
+.ai-msg { font-size: 11px; color: #9a9a9a; }
+.ai-low { color: #c0392b; font-weight: 700; }
+.ai-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="ai-header">
+  <h1>SAUBHAGYA ADMIN</h1>
+  <div class="ai-tabs" id="ai-tabs">
+    <button class="ai-tab active" data-tab="orders" type="button">ORDERS</button>
+    <button class="ai-tab" data-tab="inventory" type="button">INVENTORY</button>
+    <button class="ai-tab" data-tab="customers" type="button">CUSTOMERS</button>
+  </div>
+</div>
+
+<div id="ai-auth-screen">
+  <div class="ai-auth">
+    <h2>Admin Access</h2>
+    <input class="ai-input" type="password" id="ai-key-input" placeholder="Enter Admin Key" autocomplete="off">
+    <br>
+    <button class="ai-btn" id="ai-key-btn" type="button">ENTER</button>
+    <div class="ai-status" id="ai-auth-status"></div>
+  </div>
+</div>
+
+<div id="ai-main" style="display:none">
+  <div class="ai-wrap">
+
+    <!-- ORDERS PANEL -->
+    <div id="panel-orders">
+      <div class="ai-toolbar">
+        <select id="o-filter-status">
+          <option value="">All statuses</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="packed">Packed</option>
+          <option value="shipped">Shipped</option>
+          <option value="out_for_delivery">Out for delivery</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="rto">RTO</option>
+        </select>
+        <input type="text" id="o-filter-q" placeholder="Search order id / phone / name / email">
+        <button class="ai-btn small" id="o-reload-btn" type="button">SEARCH</button>
+        <button class="ai-btn small ghost" id="o-export-btn" type="button">EXPORT CSV</button>
+        <span class="ai-count" id="o-count"></span>
+      </div>
+      <div class="ai-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th><th>Date</th><th>Customer</th><th>Items</th><th>Address</th>
+              <th>Total</th><th>Status</th><th>AWB</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="o-tbody"></tbody>
+        </table>
+      </div>
+      <div class="ai-status" id="o-load-status"></div>
+    </div>
+
+    <!-- INVENTORY PANEL -->
+    <div id="panel-inventory" style="display:none">
+      <div class="ai-toolbar">
+        <button class="ai-btn small ghost" id="i-export-btn" type="button">EXPORT CSV</button>
+        <button class="ai-btn small" id="i-reload-btn" type="button">REFRESH</button>
+        <span class="ai-count" id="i-count"></span>
+      </div>
+      <div class="ai-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th><th>Name</th><th>Price</th><th>MRP</th><th>Stock Count</th>
+              <th>Weight (g)</th><th>Image path</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="i-tbody"></tbody>
+        </table>
+      </div>
+      <div class="ai-status" id="i-load-status"></div>
+    </div>
+
+    <!-- CUSTOMERS PANEL -->
+    <div id="panel-customers" style="display:none">
+      <div class="ai-toolbar">
+        <input type="text" id="c-filter-q" placeholder="Search name / email / phone">
+        <button class="ai-btn small" id="c-reload-btn" type="button">SEARCH</button>
+        <button class="ai-btn small ghost" id="c-export-btn" type="button">EXPORT CSV</button>
+        <span class="ai-count" id="c-count"></span>
+      </div>
+      <div class="ai-table-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Phone</th><th>Orders</th><th>Lifetime Spend</th><th>Joined</th></tr>
+          </thead>
+          <tbody id="c-tbody"></tbody>
+        </table>
+      </div>
+      <div class="ai-status" id="c-load-status"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  var adminKey = '';
+  var lastOrders = [], lastProducts = [], lastCustomers = [];
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function csvCell(v) {
+    var s = String(v == null ? '' : v);
+    if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function downloadCsv(filename, rows) {
+    var csv = rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
+    var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+  function fmtDate(s) {
+    if (!s) return '';
+    var d = new Date(s.replace(' ', 'T') + (s.indexOf('Z') === -1 ? 'Z' : ''));
+    if (isNaN(d.getTime())) return esc(s);
+    return d.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+  function apiFetch(path, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({ 'x-admin-key': adminKey }, opts.headers || {});
+    return fetch(path, opts).then(function (r) { return r.json(); });
+  }
+
+  // ---- Auth ----
+  document.getElementById('ai-key-btn').addEventListener('click', function () {
+    var k = (document.getElementById('ai-key-input').value || '').trim();
+    if (!k) { document.getElementById('ai-auth-status').textContent = 'Key required.'; return; }
+    adminKey = k;
+    document.getElementById('ai-auth-screen').style.display = 'none';
+    document.getElementById('ai-main').style.display = 'block';
+    var wantTab = new URLSearchParams(location.search).get('tab');
+    if (wantTab && wantTab !== 'orders') {
+      var btn = document.querySelector('.ai-tab[data-tab="' + wantTab + '"]');
+      if (btn) { btn.click(); return; }
+    }
+    loadOrders();
+  });
+  document.getElementById('ai-key-input').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('ai-key-btn').click();
+  });
+
+  // ---- Tabs ----
+  document.getElementById('ai-tabs').addEventListener('click', function (e) {
+    var btn = e.target.closest('.ai-tab');
+    if (!btn) return;
+    document.querySelectorAll('.ai-tab').forEach(function (t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    var tab = btn.getAttribute('data-tab');
+    document.getElementById('panel-orders').style.display = tab === 'orders' ? 'block' : 'none';
+    document.getElementById('panel-inventory').style.display = tab === 'inventory' ? 'block' : 'none';
+    document.getElementById('panel-customers').style.display = tab === 'customers' ? 'block' : 'none';
+    if (tab === 'orders' && !lastOrders.length) loadOrders();
+    if (tab === 'inventory' && !lastProducts.length) loadProducts();
+    if (tab === 'customers' && !lastCustomers.length) loadCustomers();
+  });
+
+  // ================= ORDERS =================
+  document.getElementById('o-reload-btn').addEventListener('click', loadOrders);
+  document.getElementById('o-filter-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') loadOrders(); });
+  document.getElementById('o-filter-status').addEventListener('change', loadOrders);
+  document.getElementById('o-export-btn').addEventListener('click', function () {
+    var rows = [['Order ID', 'Date', 'Name', 'Phone', 'Email', 'Items', 'Address', 'Total', 'Status', 'AWB', 'Test']];
+    lastOrders.forEach(function (o) {
+      var addr = o.address || {};
+      var addrLine = [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).join(', ');
+      var itemsLine = (o.items || []).map(function (it) { return (it.name || it.sku || '') + ' x' + (it.qty || it.quantity || 1); }).join(' | ');
+      rows.push([o.id, o.created_at || '', o.name || '', o.phone || '', o.email || '', itemsLine, addrLine, o.total, o.status || '', o.shipprime_awb || '', o.test_mode ? 'yes' : '']);
+    });
+    downloadCsv('saubhagya-orders-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
+  });
+
+  function loadOrders() {
+    var status = document.getElementById('o-load-status');
+    var tbody = document.getElementById('o-tbody');
+    var filterStatus = document.getElementById('o-filter-status').value;
+    var q = document.getElementById('o-filter-q').value.trim();
+    status.textContent = 'Loading…';
+    tbody.innerHTML = '';
+    var params = new URLSearchParams();
+    if (filterStatus) params.set('status', filterStatus);
+    if (q) params.set('q', q);
+    apiFetch('/api/admin/orders-list?' + params.toString())
+      .then(function (d) {
+        if (!d || !d.success) { status.textContent = (d && d.error) || 'Failed to load'; return; }
+        lastOrders = d.orders;
+        document.getElementById('o-count').textContent = d.count + ' orders';
+        status.textContent = '';
+        tbody.innerHTML = d.orders.map(function (o) {
+          var addr = o.address || {};
+          var addrLine = [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).map(esc).join(', ');
+          var items = (o.items || []).map(function (it) {
+            return '<div>' + esc(it.name || it.sku || '') + ' × ' + esc(it.qty || it.quantity || 1) + '</div>';
+          }).join('');
+          var badgeClass = 'b-' + String(o.status || '').toLowerCase().replace(/\s+/g, '_');
+          var actions = '<div class="ai-actions">';
+          if (o.status === 'confirmed') {
+            actions += '<button class="ai-save pack-btn" data-id="' + esc(o.id) + '" type="button">MARK PACKED</button>';
+          }
+          actions += '<button class="ai-btn small ghost slip-btn" data-id="' + esc(o.id) + '" type="button">PRINT SLIP</button></div>';
+          return '<tr>' +
+            '<td class="ai-oid">' + esc(o.id) + (o.test_mode ? '<span class="ai-test">TEST</span>' : '') + '</td>' +
+            '<td>' + fmtDate(o.created_at) + '</td>' +
+            '<td>' + esc(o.name || '') + '<br><span style="color:#9a9a9a">' + esc(o.phone || '') + '</span></td>' +
+            '<td class="ai-items">' + items + '</td>' +
+            '<td class="ai-addr">' + addrLine + '</td>' +
+            '<td>₹' + esc(o.total) + '</td>' +
+            '<td><span class="ai-badge ' + badgeClass + '">' + esc(o.status || '') + '</span></td>' +
+            '<td class="ai-oid">' + esc(o.shipprime_awb || '—') + '</td>' +
+            '<td>' + actions + '</td>' +
+            '</tr>';
+        }).join('');
+        tbody.querySelectorAll('.pack-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () { markPacked(btn.getAttribute('data-id'), btn); });
+        });
+        tbody.querySelectorAll('.slip-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () { printSlip(btn.getAttribute('data-id')); });
+        });
+      })
+      .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
+  }
+
+  function markPacked(orderId, btn) {
+    btn.disabled = true; btn.textContent = '…';
+    apiFetch('/api/admin/mark-packed', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_id: orderId }) })
+      .then(function (d) {
+        if (d && d.success) { loadOrders(); }
+        else { btn.disabled = false; btn.textContent = 'MARK PACKED'; alert((d && d.error) || 'Failed'); }
+      })
+      .catch(function (e) { btn.disabled = false; btn.textContent = 'MARK PACKED'; alert(e.message); });
+  }
+
+  function printSlip(orderId) {
+    var o = lastOrders.find(function (x) { return x.id === orderId; });
+    if (!o) return;
+    var addr = o.address || {};
+    var addrLine = [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).map(esc).join(', ');
+    var itemRows = (o.items || []).map(function (it) {
+      return '<tr><td style="padding:6px 0;border-bottom:1px solid #ddd">' + esc(it.sku || it.id || '') + '</td>' +
+        '<td style="padding:6px 0;border-bottom:1px solid #ddd">' + esc(it.name || '') + '</td>' +
+        '<td style="padding:6px 0;border-bottom:1px solid #ddd;text-align:right">' + esc(it.qty || it.quantity || 1) + '</td></tr>';
+    }).join('');
+    var html = '<!doctype html><html><head><title>Packing Slip ' + esc(o.id) + '</title>' +
+      '<style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{font-size:18px;margin:0 0 4px}' +
+      'table{width:100%;border-collapse:collapse;margin-top:16px}th{text-align:left;font-size:11px;letter-spacing:1px;color:#666;border-bottom:2px solid #111;padding-bottom:6px}' +
+      '.meta{font-size:13px;line-height:1.7;margin-top:14px}</style></head><body>' +
+      '<h1>SAUBHAGYA JEWELLERY — PACKING SLIP</h1>' +
+      '<div style="font-size:12px;color:#666">Order ' + esc(o.id) + ' · ' + esc(fmtDate(o.created_at)) + '</div>' +
+      '<div class="meta"><strong>Ship to:</strong><br>' + esc(o.name || '') + '<br>' + addrLine + '<br>' + esc(o.phone || '') + '</div>' +
+      '<table><thead><tr><th>SKU</th><th>Item</th><th style="text-align:right">Qty</th></tr></thead><tbody>' + itemRows + '</tbody></table>' +
+      '<div class="meta"><strong>Total:</strong> ₹' + esc(o.total) + ' · <strong>Payment:</strong> ' + esc(o.payment_method || '') + '</div>' +
+      '</body></html>';
+    var w = window.open('', '_blank');
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(function () { w.print(); }, 250);
+  }
+
+  // ================= INVENTORY =================
+  document.getElementById('i-reload-btn').addEventListener('click', loadProducts);
+  document.getElementById('i-export-btn').addEventListener('click', function () {
+    var rows = [['SKU', 'Name', 'Price', 'MRP', 'Stock Count', 'Weight (g)', 'Image']];
+    lastProducts.forEach(function (p) { rows.push([p.sku, p.name, p.price, p.mrp, p.stock_count, p.weightGrams, p.image || '']); });
+    downloadCsv('saubhagya-inventory-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
+  });
+
+  function loadProducts() {
+    var status = document.getElementById('i-load-status');
+    var tbody = document.getElementById('i-tbody');
+    status.textContent = 'Loading…';
+    tbody.innerHTML = '';
+    fetch('/api/products')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var list = Array.isArray(data) ? data : (data && data.products || []);
+        lastProducts = list;
+        document.getElementById('i-count').textContent = list.length + ' products';
+        status.textContent = '';
+        tbody.innerHTML = list.map(function (p) {
+          var lowClass = (p.stock_count != null && p.stock_count <= 3) ? ' ai-low' : '';
+          return '<tr data-sku="' + esc(p.sku) + '">' +
+            '<td class="ai-sku">' + esc(p.sku) + '</td>' +
+            '<td class="ai-name">' + esc(p.name) + '</td>' +
+            '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price"></td>' +
+            '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.mrp != null ? p.mrp : '') + '" data-field="mrp"></td>' +
+            '<td class="' + lowClass + '"><input class="ai-num" type="number" min="0" step="1" value="' + (p.stock_count != null ? p.stock_count : '') + '" data-field="stock_count"></td>' +
+            '<td><input class="ai-num" type="number" min="0" step="0.1" value="' + (p.weightGrams != null ? p.weightGrams : '') + '" data-field="weightGrams"></td>' +
+            '<td><input class="ai-input" style="width:180px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp"></td>' +
+            '<td><button class="ai-save" type="button">SAVE</button><div class="ai-msg"></div></td>' +
+            '</tr>';
+        }).join('');
+        tbody.querySelectorAll('.ai-save').forEach(function (btn) {
+          btn.addEventListener('click', function () { saveRow(btn.closest('tr')); });
+        });
+      })
+      .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
+  }
+
+  function saveRow(row) {
+    var sku = row.getAttribute('data-sku');
+    var scInput = row.querySelector('[data-field="stock_count"]');
+    var wgInput = row.querySelector('[data-field="weightGrams"]');
+    var priceInput = row.querySelector('[data-field="price"]');
+    var mrpInput = row.querySelector('[data-field="mrp"]');
+    var imgInput = row.querySelector('[data-field="image"]');
+    var btn = row.querySelector('.ai-save');
+    var msg = row.querySelector('.ai-msg');
+    var body = { sku: sku };
+    if (scInput.value !== '') body.stock_count = parseInt(scInput.value, 10);
+    if (wgInput.value !== '') body.weightGrams = parseFloat(wgInput.value);
+    if (priceInput.value !== '') body.price = parseInt(priceInput.value, 10);
+    if (mrpInput.value !== '') body.mrp = parseInt(mrpInput.value, 10);
+    if (imgInput.value.trim() !== '') body.image = imgInput.value.trim();
+    btn.disabled = true; btn.textContent = '…'; msg.textContent = '';
+    apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (d) {
+        btn.disabled = false;
+        if (d && d.success) {
+          btn.textContent = 'SAVED'; btn.className = 'ai-save saved';
+          setTimeout(function () { btn.textContent = 'SAVE'; btn.className = 'ai-save'; }, 2000);
+        } else {
+          btn.textContent = 'SAVE'; btn.className = 'ai-save err';
+          msg.textContent = (d && d.error) || 'Error';
+          setTimeout(function () { btn.className = 'ai-save'; }, 2000);
+        }
+      })
+      .catch(function (e) {
+        btn.disabled = false; btn.textContent = 'SAVE'; btn.className = 'ai-save err';
+        msg.textContent = e.message;
+        setTimeout(function () { btn.className = 'ai-save'; }, 2000);
+      });
+  }
+
+  // ================= CUSTOMERS =================
+  document.getElementById('c-reload-btn').addEventListener('click', loadCustomers);
+  document.getElementById('c-filter-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') loadCustomers(); });
+  document.getElementById('c-export-btn').addEventListener('click', function () {
+    var rows = [['Name', 'Email', 'Phone', 'Orders', 'Lifetime Spend', 'Joined']];
+    lastCustomers.forEach(function (c) {
+      rows.push([c.name || '', c.email || '', c.phone || '', c.order_count || 0, c.lifetime_total || 0, c.created_at || '']);
+    });
+    downloadCsv('saubhagya-customers-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
+  });
+
+  function loadCustomers() {
+    var status = document.getElementById('c-load-status');
+    var tbody = document.getElementById('c-tbody');
+    var q = document.getElementById('c-filter-q').value.trim();
+    status.textContent = 'Loading…';
+    tbody.innerHTML = '';
+    var params = new URLSearchParams();
+    if (q) params.set('q', q);
+    apiFetch('/api/admin/customers-list?' + params.toString())
+      .then(function (d) {
+        if (!d || !d.success) { status.textContent = (d && d.error) || 'Failed to load'; return; }
+        lastCustomers = d.customers;
+        document.getElementById('c-count').textContent = d.count + ' customers';
+        status.textContent = '';
+        tbody.innerHTML = d.customers.map(function (c) {
+          return '<tr>' +
+            '<td>' + esc(c.name || '') + '</td>' +
+            '<td>' + esc(c.email || '') + '</td>' +
+            '<td>' + esc(c.phone || '') + '</td>' +
+            '<td>' + esc(c.order_count || 0) + '</td>' +
+            '<td>₹' + esc(c.lifetime_total || 0) + '</td>' +
+            '<td>' + esc((c.created_at || '').slice(0, 10)) + '</td>' +
+            '</tr>';
+        }).join('');
+      })
+      .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
+  }
+})();
+</script>
+</body>
+</html>

@@ -9,7 +9,9 @@
  * Set webhook URL in ShipPrime dashboard:
  *   https://saubhagyajewellery.com/api/webhooks/shipprime
  */
-import { logOrderEvent, sendWhatsAppMessage } from '../_lib.js';
+import { logOrderEvent, sendWhatsAppMessage, restockOrder } from '../_lib.js';
+
+const RTO_STATUSES = ['rto', 'rto_delivered', 'rto_initiated', 'rto_in_transit', 'return_to_origin', 'returned'];
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -33,7 +35,7 @@ export async function onRequest(context) {
 
     // Find order by AWB
     const order = await db.prepare(
-      'SELECT id, phone, name, track_token, status, updated_at FROM orders WHERE shipprime_awb = ?'
+      'SELECT id, phone, name, items, track_token, status, updated_at FROM orders WHERE shipprime_awb = ?'
     ).bind(awb).first().catch(() => null);
 
     if (!order) {
@@ -46,16 +48,29 @@ export async function onRequest(context) {
     }
 
     // Update order status
+    const newStatusLower = newStatus.toLowerCase();
     await db.prepare(
       "UPDATE orders SET status = ?, updated_at = datetime('now') WHERE id = ?"
-    ).bind(newStatus.toLowerCase(), order.id).run();
+    ).bind(newStatusLower, order.id).run();
 
     // Log the event
     try {
       await logOrderEvent(db, order.id, 'shipprime_webhook', 1,
-        `Status: ${order.status} → ${newStatus.toLowerCase()} (AWB: ${awb})`
+        `Status: ${order.status} → ${newStatusLower} (AWB: ${awb})`
       );
     } catch (e) {}
+
+    // RTO (return to origin): courier failed delivery and sent it back —
+    // restock the SKUs so they go back on sale automatically. Guarded on the
+    // previous status so a repeat webhook for the same RTO state (couriers
+    // often fire several) never double-restocks.
+    if (RTO_STATUSES.includes(newStatusLower) && !RTO_STATUSES.includes(order.status)) {
+      try {
+        const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+        await restockOrder(db, items);
+        await logOrderEvent(db, order.id, 'rto_restock', 1, `Restocked ${items.length} line item(s) on RTO`);
+      } catch (e) { /* best-effort — never fail the webhook over this */ }
+    }
 
     // Send WhatsApp notification to customer (gracefully skip if templates not ready)
     if (order.phone && ['shipped','out_for_delivery','delivered'].includes(newStatus.toLowerCase())) {

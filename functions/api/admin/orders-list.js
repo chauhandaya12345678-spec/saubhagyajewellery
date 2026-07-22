@@ -4,13 +4,11 @@
  * Read-only order feed for admin-orders.html — status updates still flow
  * automatically via ShipPrime webhook, this is view-only.
  */
+import { verifyAdminKey, adminCorsHeaders } from '../_lib.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, x-admin-key',
-  };
+  const corsHeaders = adminCorsHeaders();
 
   if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
   if (request.method !== 'GET') {
@@ -19,13 +17,8 @@ export async function onRequest(context) {
     });
   }
 
-  const adminKey = env.ADMIN_KEY || '';
-  const reqKey = request.headers.get('x-admin-key') || '';
-  if (!adminKey || reqKey !== adminKey) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
-  }
+  const unauthorized = verifyAdminKey(request, env, corsHeaders);
+  if (unauthorized) return unauthorized;
 
   const url = new URL(request.url);
   const status = (url.searchParams.get('status') || '').trim().toLowerCase();

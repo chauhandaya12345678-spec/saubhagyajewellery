@@ -179,7 +179,7 @@ export async function onRequest(context) {
     }
 
     // Inventory: decrement stock_count (best-effort, mirrors save.js).
-    await decrementStock(db, items);
+    await decrementStock(db, items, env);
 
     let sp; // ShipPrime result
     if (!isTest) {
