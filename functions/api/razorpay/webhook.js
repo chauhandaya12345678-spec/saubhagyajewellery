@@ -13,7 +13,7 @@
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
  *   Events: payment.captured, order.paid
  */
-import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail, decrementStock, constantTimeEqual } from '../_lib.js';
+import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail, sendWhatsAppMessage, decrementStock, constantTimeEqual, logOrderEvent } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -218,6 +218,7 @@ export async function onRequest(context) {
         await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, name = ?, updated_at = datetime(\'now\') WHERE id = ?')
           .bind(sp.awb || '', sp.shipPrimeOrderId || '', notes.customer_name || 'Guest', orderId).run();
       }
+      await logOrderEvent(db, orderId, 'shipprime_push', sp && sp.pushed ? 1 : 0, sp && sp.pushed ? `awb ${sp.awb}` : (sp && sp.error) || 'unknown');
 
       const emailJob = sendOrderEmail(env, {
         id: orderId, name: notes.customer_name || 'Guest',
@@ -225,8 +226,25 @@ export async function onRequest(context) {
         phone: notes.customer_phone || p.contact || '',
         address: addressJson, items,
         totalPaise: p.amount, paymentMethod: 'razorpay',
-      });
+      }).then(r => logOrderEvent(db, orderId, 'email_sent', r && r.sent ? 1 : 0, r && r.sent ? 'sent' : (r && r.error) || 'unknown'));
       if (context.waitUntil) context.waitUntil(emailJob); else await emailJob;
+
+      // WhatsApp order-confirmation — this fallback path (browser closed/network
+      // dropped before save.js's own call completed) was pushing to ShipPrime
+      // and emailing fine, but never had this call at all, so every order that
+      // landed here (instead of via save.js) silently never got the WhatsApp
+      // confirmation. Mirrors save.js's own confirm_order send.
+      const waPhone = notes.customer_phone || p.contact || '';
+      if (waPhone) {
+        const trackToken = crypto.randomUUID().slice(0, 8);
+        try { await db.prepare('UPDATE orders SET track_token = ? WHERE id = ?').bind(trackToken, orderId).run(); } catch (e) {}
+        const waJob = sendWhatsAppMessage(env, waPhone, 'confirm_order',
+          [notes.customer_name || 'Customer', orderId, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + orderId + '&token=' + trackToken]
+        )
+          .then(r => logOrderEvent(db, orderId, 'whatsapp_sent', r && r.sent ? 1 : 0, r && r.sent ? 'msgId ' + r.msgId : (r && r.error) || 'unknown'))
+          .catch(() => {});
+        if (context.waitUntil) context.waitUntil(waJob); else await waJob;
+      }
     }
 
     return json({ ok: true, order_id: orderId, shipprime: sp || { pushed: false } });
