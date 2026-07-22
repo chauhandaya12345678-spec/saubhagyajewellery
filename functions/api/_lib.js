@@ -484,13 +484,27 @@ export async function pushToShipPrime(env, order, db) {
 
 /** Send WhatsApp order notification via Meta Cloud API.
  *  Returns { sent: bool, error? } — never throws. */
-export async function sendWhatsAppMessage(env, toPhone, templateName, params) {
+// All 4 order-status templates (confirm_order, order_shipped,
+// order_out_for_delivery, order_delivered) were built with the same IMAGE
+// header component (see wa-template-info.js output) — sending a template
+// with a HEADER: IMAGE component but no header parameter is exactly what
+// caused every send to fail with "(#132012) Parameter format does not
+// match format in the created template".
+const WA_DEFAULT_HEADER_IMAGE = 'https://saubhagyajewellery.com/images/brand/logo-mark-gold.png';
+
+export async function sendWhatsAppMessage(env, toPhone, templateName, params, headerImageUrl) {
   try {
     const phoneId = env.WHATSAPP_PHONE_ID;
     const token = env.WHATSAPP_TOKEN;
     if (!phoneId || !token) return { sent: false, error: 'WHATSAPP_PHONE_ID/TOKEN not configured' };
     const cleanPhone = String(toPhone).replace(/\D/g, '').slice(-10);
     if (cleanPhone.length !== 10 || cleanPhone === '0000000000') return { sent: false, error: 'invalid phone' };
+    const components = [
+      { type: 'header', parameters: [{ type: 'image', image: { link: headerImageUrl || WA_DEFAULT_HEADER_IMAGE } }] },
+    ];
+    if (params && params.length) {
+      components.push({ type: 'body', parameters: params.map(v => ({ type: 'text', text: String(v) })) });
+    }
     const res = await fetch(`https://graph.facebook.com/v22.0/${phoneId}/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -501,7 +515,7 @@ export async function sendWhatsAppMessage(env, toPhone, templateName, params) {
         template: {
           name: templateName,
           language: { code: 'en' },
-          components: params && params.length ? [{ type: 'body', parameters: params.map(v => ({ type: 'text', text: String(v) })) }] : undefined,
+          components,
         },
       }),
     });
