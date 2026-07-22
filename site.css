@@ -11,6 +11,7 @@ img{max-width:100%}
 [style*="border:1px"][style*="border-radius:"]{border-radius:16px !important}
 input[type="text"],input[type="tel"],input[type="email"],input[type="number"]{
   border-radius:12px !important;
+  -webkit-appearance:none;appearance:none;
 }
 /* grid tracks must be allowed to shrink below image intrinsic width, else the
    listing overflows the viewport on mobile */
