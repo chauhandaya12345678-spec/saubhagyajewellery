@@ -58,6 +58,11 @@ tr:hover td { background: #faf8f3; }
 tr.ai-attention td { background: #fdf0ef; }
 tr.ai-attention:hover td { background: #fbe4e2; }
 .ai-attention-flag { display: inline-block; margin-top: 4px; font-size: 9px; letter-spacing: .5px; color: #c0392b; font-weight: 700; text-transform: uppercase; }
+.role-staff .pack-btn, .role-staff .ai-save, .role-staff .edit-toggle, .role-staff #users-tab-btn { display: none !important; }
+.ai-toggle-link { font-size: 11px; color: #0B291C; text-decoration: underline; cursor: pointer; margin-top: 14px; display: inline-block; }
+.ai-role-badge { font-size: 9px; letter-spacing: 1px; color: #C5A880; margin-left: auto; padding: 4px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 20px; }
+.ai-form-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.ai-form-row input, .ai-form-row select { padding: 9px 12px; border: 1px solid #ddd6c6; border-radius: 6px; font-family: inherit; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -70,15 +75,26 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <button class="ai-tab active" data-tab="orders" type="button">ORDERS</button>
     <button class="ai-tab" data-tab="inventory" type="button">INVENTORY</button>
     <button class="ai-tab" data-tab="customers" type="button">CUSTOMERS</button>
+    <button class="ai-tab" data-tab="users" type="button" id="users-tab-btn">USERS</button>
   </div>
+  <span class="ai-role-badge" id="ai-role-badge" style="display:none"></span>
 </div>
 
 <div id="ai-auth-screen">
   <div class="ai-auth">
     <h2>Admin Access</h2>
-    <input class="ai-input" type="password" id="ai-key-input" placeholder="Enter Admin Key" autocomplete="off">
-    <br>
-    <button class="ai-btn" id="ai-key-btn" type="button">ENTER</button>
+    <div id="ai-owner-login">
+      <input class="ai-input" type="password" id="ai-key-input" placeholder="Enter Admin Key" autocomplete="off">
+      <br>
+      <button class="ai-btn" id="ai-key-btn" type="button">ENTER</button>
+      <div><span class="ai-toggle-link" id="ai-show-staff">Staff sign in instead</span></div>
+    </div>
+    <div id="ai-staff-login" style="display:none">
+      <input class="ai-input" type="text" id="ai-user-input" placeholder="Username" autocomplete="off">
+      <input class="ai-input" type="password" id="ai-pass-input" placeholder="Password" autocomplete="off">
+      <button class="ai-btn" id="ai-staff-btn" type="button">SIGN IN</button>
+      <div><span class="ai-toggle-link" id="ai-show-owner">Owner key instead</span></div>
+    </div>
     <div class="ai-status" id="ai-auth-status"></div>
   </div>
 </div>
@@ -158,13 +174,39 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       <div class="ai-status" id="c-load-status"></div>
     </div>
 
+    <!-- USERS PANEL (owner only) -->
+    <div id="panel-users" style="display:none">
+      <div class="ai-table-wrap" style="padding:20px;margin-bottom:20px">
+        <div style="font-size:12px;color:#9a9a9a;margin-bottom:12px">Add admin account — staff gets read-only access (view, export CSV, print packing slips; no editing).</div>
+        <div class="ai-form-row">
+          <input type="text" id="u-new-username" placeholder="Username">
+          <input type="password" id="u-new-password" placeholder="Password (min 8 chars)">
+          <select id="u-new-role">
+            <option value="staff">Staff (read-only)</option>
+            <option value="owner">Owner (full access)</option>
+          </select>
+          <button class="ai-btn small" id="u-create-btn" type="button">CREATE</button>
+        </div>
+        <div class="ai-status" id="u-create-status"></div>
+      </div>
+      <div class="ai-table-wrap">
+        <table>
+          <thead><tr><th>Username</th><th>Role</th><th>Created</th><th></th></tr></thead>
+          <tbody id="u-tbody"></tbody>
+        </table>
+      </div>
+      <div class="ai-status" id="u-load-status"></div>
+    </div>
+
   </div>
 </div>
 
 <script>
 (function () {
   var adminKey = '';
-  var lastOrders = [], lastProducts = [], lastCustomers = [];
+  var sessionToken = '';
+  var authRole = null;
+  var lastOrders = [], lastProducts = [], lastCustomers = [], lastUsers = [];
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
@@ -233,41 +275,81 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
   function apiFetch(path, opts) {
     opts = opts || {};
-    opts.headers = Object.assign({ 'x-admin-key': adminKey }, opts.headers || {});
+    var authHeader = adminKey ? { 'x-admin-key': adminKey } : { 'x-admin-session': sessionToken };
+    opts.headers = Object.assign(authHeader, opts.headers || {});
     return fetch(path, opts).then(function (r) { return r.json(); });
   }
 
   // ---- Auth ----
-  document.getElementById('ai-key-btn').addEventListener('click', function () {
-    var k = (document.getElementById('ai-key-input').value || '').trim();
-    if (!k) { document.getElementById('ai-auth-status').textContent = 'Key required.'; return; }
-    adminKey = k;
+  function enterAdmin() {
     document.getElementById('ai-auth-screen').style.display = 'none';
     document.getElementById('ai-main').style.display = 'block';
+    var badge = document.getElementById('ai-role-badge');
+    badge.textContent = authRole === 'owner' ? 'OWNER ACCESS' : 'READ-ONLY (STAFF)';
+    badge.style.display = 'inline-block';
+    if (authRole !== 'owner') document.body.classList.add('role-staff');
     var wantTab = new URLSearchParams(location.search).get('tab');
     if (wantTab && wantTab !== 'orders') {
       var btn = document.querySelector('.ai-tab[data-tab="' + wantTab + '"]');
-      if (btn) { btn.click(); return; }
+      if (btn && !(wantTab === 'users' && authRole !== 'owner')) { btn.click(); return; }
     }
     loadOrders();
+  }
+
+  document.getElementById('ai-key-btn').addEventListener('click', function () {
+    var k = (document.getElementById('ai-key-input').value || '').trim();
+    if (!k) { document.getElementById('ai-auth-status').textContent = 'Key required.'; return; }
+    adminKey = k; authRole = 'owner';
+    enterAdmin();
   });
   document.getElementById('ai-key-input').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') document.getElementById('ai-key-btn').click();
+  });
+  document.getElementById('ai-show-staff').addEventListener('click', function () {
+    document.getElementById('ai-owner-login').style.display = 'none';
+    document.getElementById('ai-staff-login').style.display = 'block';
+    document.getElementById('ai-auth-status').textContent = '';
+  });
+  document.getElementById('ai-show-owner').addEventListener('click', function () {
+    document.getElementById('ai-staff-login').style.display = 'none';
+    document.getElementById('ai-owner-login').style.display = 'block';
+    document.getElementById('ai-auth-status').textContent = '';
+  });
+  document.getElementById('ai-staff-btn').addEventListener('click', function () {
+    var status = document.getElementById('ai-auth-status');
+    var username = document.getElementById('ai-user-input').value.trim();
+    var password = document.getElementById('ai-pass-input').value;
+    if (!username || !password) { status.textContent = 'Username and password required.'; return; }
+    status.textContent = 'Signing in…';
+    fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: username, password: password }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || !d.success) { status.textContent = (d && d.error) || 'Sign in failed'; return; }
+        sessionToken = d.token; authRole = d.role;
+        enterAdmin();
+      })
+      .catch(function (e) { status.textContent = e.message; });
+  });
+  document.getElementById('ai-pass-input') && document.getElementById('ai-pass-input').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('ai-staff-btn').click();
   });
 
   // ---- Tabs ----
   document.getElementById('ai-tabs').addEventListener('click', function (e) {
     var btn = e.target.closest('.ai-tab');
     if (!btn) return;
+    var tab = btn.getAttribute('data-tab');
+    if (tab === 'users' && authRole !== 'owner') return;
     document.querySelectorAll('.ai-tab').forEach(function (t) { t.classList.remove('active'); });
     btn.classList.add('active');
-    var tab = btn.getAttribute('data-tab');
     document.getElementById('panel-orders').style.display = tab === 'orders' ? 'block' : 'none';
     document.getElementById('panel-inventory').style.display = tab === 'inventory' ? 'block' : 'none';
     document.getElementById('panel-customers').style.display = tab === 'customers' ? 'block' : 'none';
+    document.getElementById('panel-users').style.display = tab === 'users' ? 'block' : 'none';
     if (tab === 'orders' && !lastOrders.length) loadOrders();
     if (tab === 'inventory' && !lastProducts.length) loadProducts();
     if (tab === 'customers' && !lastCustomers.length) loadCustomers();
+    if (tab === 'users' && !lastUsers.length) loadUsers();
   });
 
   // ================= ORDERS =================
@@ -522,6 +604,57 @@ tr.ai-attention:hover td { background: #fbe4e2; }
             '<td>' + esc((c.created_at || '').slice(0, 10)) + '</td>' +
             '</tr>';
         }).join('');
+      })
+      .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
+  }
+
+  // ================= USERS (owner only) =================
+  document.getElementById('u-create-btn').addEventListener('click', function () {
+    var status = document.getElementById('u-create-status');
+    var username = document.getElementById('u-new-username').value.trim();
+    var password = document.getElementById('u-new-password').value;
+    var role = document.getElementById('u-new-role').value;
+    if (!username || !password) { status.textContent = 'Username and password required.'; return; }
+    status.textContent = 'Creating…';
+    apiFetch('/api/admin/create-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: username, password: password, role: role }) })
+      .then(function (d) {
+        if (d && d.success) {
+          status.textContent = 'Created ' + d.username + ' (' + d.role + ').';
+          document.getElementById('u-new-username').value = '';
+          document.getElementById('u-new-password').value = '';
+          loadUsers();
+        } else {
+          status.textContent = (d && d.error) || 'Failed';
+        }
+      })
+      .catch(function (e) { status.textContent = e.message; });
+  });
+
+  function loadUsers() {
+    var status = document.getElementById('u-load-status');
+    var tbody = document.getElementById('u-tbody');
+    status.textContent = 'Loading…';
+    apiFetch('/api/admin/list-users')
+      .then(function (d) {
+        if (!d || !d.success) { status.textContent = (d && d.error) || 'Failed to load'; return; }
+        lastUsers = d.users;
+        status.textContent = '';
+        tbody.innerHTML = d.users.map(function (u) {
+          return '<tr>' +
+            '<td>' + esc(u.username) + '</td>' +
+            '<td><span class="ai-badge ' + (u.role === 'owner' ? 'b-confirmed' : 'b-packed') + '">' + esc(u.role) + '</span></td>' +
+            '<td>' + esc((u.created_at || '').slice(0, 10)) + '</td>' +
+            '<td><button class="ai-btn small ghost del-user-btn" data-id="' + u.id + '" type="button">DELETE</button></td>' +
+            '</tr>';
+        }).join('');
+        tbody.querySelectorAll('.del-user-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            if (!confirm('Delete this admin account?')) return;
+            apiFetch('/api/admin/delete-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: parseInt(btn.getAttribute('data-id'), 10) }) })
+              .then(function (d) { if (d && d.success) loadUsers(); else alert((d && d.error) || 'Failed'); })
+              .catch(function (e) { alert(e.message); });
+          });
+        });
       })
       .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
   }

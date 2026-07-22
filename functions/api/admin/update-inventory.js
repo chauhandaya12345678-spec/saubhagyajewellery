@@ -3,7 +3,7 @@
  * Body: { sku, stock_count?, weightGrams?, price?, mrp?, image?, altImage?, name? }
  * Header: x-admin-key: <ADMIN_KEY env var>
  */
-import { verifyAdminKey, adminCorsHeaders } from '../_lib.js';
+import { verifyAdminAccess, adminCorsHeaders } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -19,8 +19,8 @@ export async function onRequest(context) {
     });
   }
 
-  const unauthorized = await verifyAdminKey(request, env, corsHeaders);
-  if (unauthorized) return unauthorized;
+  const auth = await verifyAdminAccess(request, env, corsHeaders, { requireOwner: true });
+  if (auth.response) return auth.response;
 
   let body;
   try { body = await request.json(); } catch {

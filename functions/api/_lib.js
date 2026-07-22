@@ -109,12 +109,49 @@ function timingSafeEqual(a, b) {
 const ADMIN_LOCKOUT_MAX_ATTEMPTS = 5;
 const ADMIN_LOCKOUT_MINUTES = 5;
 
-/* Shared admin-key gate for every /api/admin/* endpoint, with a per-IP
-   lockout: 5 wrong keys within the window locks that IP out for 5 minutes.
-   Tracked in D1 (admin_login_attempts) — see build/migrate-2026-07-22-admin-lockout.sql.
-   Falls back to a plain key check (no lockout) if that table isn't there yet,
-   so a pre-migration DB never breaks admin access entirely.
-   Returns the Response to send back, or null if the request is authorized. */
+/* Shared per-IP lockout, used by both the ADMIN_KEY path and the
+   username/password login path below — 5 wrong attempts of EITHER kind
+   locks that IP for 5 minutes. Tracked in D1 (admin_login_attempts);
+   degrades to "no lockout" (never throws) if that table isn't there yet. */
+async function lockoutCheck(db, ip) {
+  if (!db) return { row: undefined };
+  try {
+    const row = await db.prepare('SELECT attempts, locked_until FROM admin_login_attempts WHERE ip = ?').bind(ip).first();
+    return { row: row || null };
+  } catch (e) { return { row: undefined }; } // table missing — no lockout tracking
+}
+function lockoutActive(row) {
+  if (!row || !row.locked_until) return null;
+  const until = new Date(row.locked_until.replace(' ', 'T') + 'Z');
+  return until > new Date() ? until : null;
+}
+async function lockoutClear(db, row, ip) {
+  if (db && row !== undefined) {
+    try { await db.prepare('DELETE FROM admin_login_attempts WHERE ip = ?').bind(ip).run(); } catch (e) {}
+  }
+}
+/* Returns true if this attempt tripped the lockout (caller should reject with 429). */
+async function lockoutBumpAndCheck(db, row, ip) {
+  if (!(db && row !== undefined)) return false;
+  try {
+    const attempts = (row ? row.attempts : 0) + 1;
+    if (attempts >= ADMIN_LOCKOUT_MAX_ATTEMPTS) {
+      await db.prepare(
+        `INSERT INTO admin_login_attempts (ip, attempts, locked_until, updated_at) VALUES (?, ?, datetime('now', '+${ADMIN_LOCKOUT_MINUTES} minutes'), datetime('now'))
+         ON CONFLICT(ip) DO UPDATE SET attempts = excluded.attempts, locked_until = excluded.locked_until, updated_at = datetime('now')`
+      ).bind(ip, attempts).run();
+      return true;
+    }
+    await db.prepare(
+      `INSERT INTO admin_login_attempts (ip, attempts, updated_at) VALUES (?, ?, datetime('now'))
+       ON CONFLICT(ip) DO UPDATE SET attempts = excluded.attempts, updated_at = datetime('now')`
+    ).bind(ip, attempts).run();
+  } catch (e) {}
+  return false;
+}
+
+/* Owner-key gate (backward compatible — this is the original single-key
+   admin access). Returns the Response to send back, or null if authorized. */
 export async function verifyAdminKey(request, env, corsHeaders) {
   const adminKey = env.ADMIN_KEY || '';
   const reqKey = request.headers.get('x-admin-key') || '';
@@ -126,45 +163,96 @@ export async function verifyAdminKey(request, env, corsHeaders) {
 
   if (!adminKey) return unauthorized();
 
-  let row = null;
-  if (db) {
-    try {
-      row = await db.prepare('SELECT attempts, locked_until FROM admin_login_attempts WHERE ip = ?').bind(ip).first();
-    } catch (e) { row = undefined; } // table missing — fall through without lockout
-  }
-
-  if (row && row.locked_until) {
-    const until = new Date(row.locked_until.replace(' ', 'T') + 'Z');
-    if (until > new Date()) {
-      const waitSec = Math.ceil((until - new Date()) / 1000);
-      return unauthorized(`Too many failed attempts. Try again in ${Math.ceil(waitSec / 60)} minute(s).`, 429);
-    }
+  const { row } = await lockoutCheck(db, ip);
+  const until = lockoutActive(row);
+  if (until) {
+    const waitMin = Math.ceil((until - new Date()) / 60000);
+    return unauthorized(`Too many failed attempts. Try again in ${waitMin} minute(s).`, 429);
   }
 
   if (timingSafeEqual(reqKey, adminKey)) {
-    if (db && row !== undefined) {
-      try { await db.prepare('DELETE FROM admin_login_attempts WHERE ip = ?').bind(ip).run(); } catch (e) {}
-    }
+    await lockoutClear(db, row, ip);
     return null;
   }
 
-  if (db && row !== undefined) {
+  const tripped = await lockoutBumpAndCheck(db, row, ip);
+  if (tripped) return unauthorized(`Too many failed attempts. Locked out for ${ADMIN_LOCKOUT_MINUTES} minutes.`, 429);
+  return unauthorized();
+}
+
+/* Full admin access gate — accepts EITHER the owner ADMIN_KEY (x-admin-key,
+   always full access) OR a staff/owner session token (x-admin-session, from
+   /api/admin/login). Pass { requireOwner: true } on mutating endpoints so a
+   read-only staff session gets a 403 instead of being allowed to write.
+   Returns { role, username } on success, or { response } to send back. */
+export async function verifyAdminAccess(request, env, corsHeaders, opts) {
+  opts = opts || {};
+  const unauthorized = (msg, status) => ({
+    response: new Response(JSON.stringify({ error: msg || 'Unauthorized' }), {
+      status: status || 401, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    }),
+  });
+
+  if (request.headers.get('x-admin-key')) {
+    const res = await verifyAdminKey(request, env, corsHeaders);
+    if (res) return { response: res };
+    return { role: 'owner', username: 'owner' };
+  }
+
+  const token = request.headers.get('x-admin-session') || '';
+  if (token && env.DB) {
     try {
-      const attempts = (row ? row.attempts : 0) + 1;
-      if (attempts >= ADMIN_LOCKOUT_MAX_ATTEMPTS) {
-        await db.prepare(
-          `INSERT INTO admin_login_attempts (ip, attempts, locked_until, updated_at) VALUES (?, ?, datetime('now', '+${ADMIN_LOCKOUT_MINUTES} minutes'), datetime('now'))
-           ON CONFLICT(ip) DO UPDATE SET attempts = excluded.attempts, locked_until = excluded.locked_until, updated_at = datetime('now')`
-        ).bind(ip, attempts).run();
-        return unauthorized(`Too many failed attempts. Locked out for ${ADMIN_LOCKOUT_MINUTES} minutes.`, 429);
+      const row = await env.DB.prepare(
+        'SELECT role, username, expires_at FROM admin_sessions WHERE token = ?'
+      ).bind(token).first();
+      if (row) {
+        const expires = new Date(row.expires_at.replace(' ', 'T') + 'Z');
+        if (expires > new Date()) {
+          if (opts.requireOwner && row.role !== 'owner') {
+            return unauthorized('Forbidden — owner access required for this action', 403);
+          }
+          return { role: row.role, username: row.username };
+        }
       }
-      await db.prepare(
-        `INSERT INTO admin_login_attempts (ip, attempts, updated_at) VALUES (?, ?, datetime('now'))
-         ON CONFLICT(ip) DO UPDATE SET attempts = excluded.attempts, updated_at = datetime('now')`
-      ).bind(ip, attempts).run();
     } catch (e) {}
   }
   return unauthorized();
+}
+
+/* Username/password login for staff/owner admin accounts (admin_users table
+   — see build/migrate-2026-07-22-admin-users.sql). Shares the same per-IP
+   lockout as the ADMIN_KEY path. Issues a 24h session token in admin_sessions.
+   Returns { success, token, role, username } or { error, status }. */
+export async function adminLogin(request, env, corsHeaders) {
+  const db = env.DB;
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  let body;
+  try { body = await request.json(); } catch { return { error: 'Invalid JSON', status: 400 }; }
+  const username = String(body.username || '').trim().toLowerCase();
+  const password = String(body.password || '');
+  if (!username || !password) return { error: 'Username and password required', status: 400 };
+
+  const { row } = await lockoutCheck(db, ip);
+  const until = lockoutActive(row);
+  if (until) {
+    const waitMin = Math.ceil((until - new Date()) / 60000);
+    return { error: `Too many failed attempts. Try again in ${waitMin} minute(s).`, status: 429 };
+  }
+
+  const user = await db.prepare('SELECT id, username, password_hash, role FROM admin_users WHERE username = ?').bind(username).first().catch(() => null);
+  const ok = user && await verifyPassword(password, user.password_hash);
+  if (!ok) {
+    const tripped = await lockoutBumpAndCheck(db, row, ip);
+    return { error: tripped ? `Too many failed attempts. Locked out for ${ADMIN_LOCKOUT_MINUTES} minutes.` : 'Invalid username or password', status: tripped ? 429 : 401 };
+  }
+
+  await lockoutClear(db, row, ip);
+  const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
+  await db.prepare(
+    "INSERT INTO admin_sessions (token, user_id, role, username, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+24 hours'))"
+  ).bind(token, user.id, user.role, user.username).run();
+
+  return { success: true, token, role: user.role, username: user.username };
 }
 
 /* Admin CORS: these tools are only ever fetched same-origin from the admin

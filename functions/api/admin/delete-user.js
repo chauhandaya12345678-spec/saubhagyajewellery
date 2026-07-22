@@ -1,11 +1,10 @@
 /**
- * POST /api/admin/mark-packed
- * Body: { order_id }
- * Header: x-admin-key: <ADMIN_KEY env var>
- * Marks an order 'packed' — the warehouse-side signal that the SKU is
- * physically boxed, ahead of ShipPrime pickup. Only valid from 'confirmed'.
+ * POST /api/admin/delete-user
+ * Body: { id }
+ * Owner-only. Refuses to delete the last remaining owner account so the
+ * panel can never lock everyone out.
  */
-import { verifyAdminAccess, adminCorsHeaders, logOrderEvent } from '../_lib.js';
+import { verifyAdminAccess, adminCorsHeaders } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -27,32 +26,32 @@ export async function onRequest(context) {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
-
-  const orderId = String(body.order_id || '').trim();
-  if (!orderId) {
-    return new Response(JSON.stringify({ error: 'order_id required' }), {
+  const id = parseInt(body.id, 10);
+  if (!id) {
+    return new Response(JSON.stringify({ error: 'id required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
 
   try {
     const db = env.DB;
-    const order = await db.prepare('SELECT id, status FROM orders WHERE id = ?').bind(orderId).first();
-    if (!order) {
-      return new Response(JSON.stringify({ error: 'Order not found' }), {
+    const target = await db.prepare('SELECT role FROM admin_users WHERE id = ?').bind(id).first();
+    if (!target) {
+      return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404, headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
     }
-    if (order.status !== 'confirmed') {
-      return new Response(JSON.stringify({ error: `Cannot mark packed from status "${order.status}"` }), {
-        status: 409, headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
+    if (target.role === 'owner') {
+      const ownerCount = await db.prepare("SELECT COUNT(*) AS c FROM admin_users WHERE role = 'owner'").first();
+      if (ownerCount.c <= 1) {
+        return new Response(JSON.stringify({ error: 'Cannot delete the last owner account' }), {
+          status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        });
+      }
     }
-
-    await db.prepare("UPDATE orders SET status = 'packed', updated_at = datetime('now') WHERE id = ?").bind(orderId).run();
-    await logOrderEvent(db, orderId, 'marked_packed', 1, 'via admin panel');
-
-    return new Response(JSON.stringify({ success: true, order_id: orderId, status: 'packed' }), {
+    await db.prepare('DELETE FROM admin_users WHERE id = ?').bind(id).run();
+    await db.prepare('DELETE FROM admin_sessions WHERE user_id = ?').bind(id).run();
+    return new Response(JSON.stringify({ success: true }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   } catch (err) {

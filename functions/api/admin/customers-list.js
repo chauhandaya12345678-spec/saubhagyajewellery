@@ -3,7 +3,7 @@
  * Header: x-admin-key: <ADMIN_KEY env var>
  * Read-only customer feed for admin-customers.html.
  */
-import { verifyAdminKey, adminCorsHeaders } from '../_lib.js';
+import { verifyAdminAccess, adminCorsHeaders } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -16,8 +16,8 @@ export async function onRequest(context) {
     });
   }
 
-  const unauthorized = await verifyAdminKey(request, env, corsHeaders);
-  if (unauthorized) return unauthorized;
+  const auth = await verifyAdminAccess(request, env, corsHeaders, { requireOwner: false });
+  if (auth.response) return auth.response;
 
   const url = new URL(request.url);
   const q = (url.searchParams.get('q') || '').trim();
