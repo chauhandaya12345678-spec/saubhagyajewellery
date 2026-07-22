@@ -6,11 +6,11 @@
  * Verifies Firebase ID token via Google's tokeninfo API, then
  * finds or creates user in D1. Returns session token + user.
  */
+import { genSessionToken } from '../_lib.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
-  // Prefer env var. Fallback keeps behavior when deploy hasn't set it yet.
-  // Set in Cloudflare Pages → Settings → Environment variables → FIREBASE_API_KEY.
-  const FIREBASE_API_KEY = env.FIREBASE_API_KEY || 'AIzaSyBTOVlCY_seyeR49jEtsKBgjCNAMsA4rtw';
+  const FIREBASE_API_KEY = env.FIREBASE_API_KEY;
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -21,6 +21,7 @@ export async function onRequest(context) {
   });
   if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
   if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
+  if (!FIREBASE_API_KEY) return json({ error: 'Firebase not configured' }, 501);
 
   try {
     const body = await request.json();
@@ -38,14 +39,7 @@ export async function onRequest(context) {
     const verifyData = await verifyRes.json().catch(() => ({}));
 
     if (!verifyRes.ok || !verifyData.users || !verifyData.users.length) {
-      return json({ 
-        error: 'Invalid or expired authentication', 
-        debug: { 
-          firebase_status: verifyRes.status, 
-          firebase_error: verifyData.error?.message || 'no users returned',
-          key_used: FIREBASE_API_KEY.slice(0, 8) + '...',
-        }
-      }, 401);
+      return json({ error: 'Invalid or expired authentication' }, 401);
     }
 
     // Confirm the verified phone matches
@@ -85,8 +79,7 @@ export async function onRequest(context) {
     }
 
     // Create session token
-    const sessionToken = 'sess_' + Date.now().toString(36) + '_' +
-      Math.random().toString(36).substring(2, 10);
+    const sessionToken = genSessionToken();
     await db.prepare(
       'INSERT INTO sessions (user_id, token, email, name) VALUES (?, ?, ?, ?)'
     ).bind(user.id, sessionToken, user.email || user.phone, user.name).run();

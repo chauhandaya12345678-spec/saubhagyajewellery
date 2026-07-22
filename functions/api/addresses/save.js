@@ -14,6 +14,8 @@
  * pincode (case-insensitive, whitespace-normalized), bump its usage_count
  * + last_used_at instead of inserting a duplicate.
  */
+import { rateLimitCheck } from '../_lib.js';
+
 async function resolveSessionUser(db, token) {
   if (!token || !token.startsWith('sess_')) return null;
   try {
@@ -73,8 +75,16 @@ export async function onRequest(context) {
     const session = token ? await resolveSessionUser(db, token) : null;
     const userId = session ? session.user_id : null;
 
-    // Update path — explicit address_id + must belong to this phone / user
+    // Update path — explicit address_id + must belong to this phone / user.
+    // The phone-match branch has no session behind it (by design — guests
+    // reuse saved addresses via phone alone), so address_id + phone together
+    // is guessable in theory; rate-limit it per IP to make brute-forcing
+    // (guessing address_id against a known phone) impractical.
     if (body.address_id) {
+      const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+      const ok = await rateLimitCheck(db, `addr-update:${ip}`, 20, 10);
+      if (!ok) return json({ error: 'Too many attempts. Please try again later.' }, 429);
+
       const existing = await db.prepare('SELECT id, user_id, phone FROM addresses WHERE id = ?')
         .bind(Number(body.address_id)).first();
       if (!existing) return json({ error: 'address not found' }, 404);

@@ -13,7 +13,7 @@
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
  *   Events: payment.captured, order.paid
  */
-import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail, decrementStock } from '../_lib.js';
+import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail, decrementStock, constantTimeEqual } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -28,7 +28,7 @@ export async function onRequest(context) {
   const raw = await request.text();
   const signature = request.headers.get('x-razorpay-signature') || '';
   const expected = await hmacSha256Hex(secret, raw);
-  if (expected !== signature) return json({ error: 'Invalid signature' }, 401);
+  if (!constantTimeEqual(expected, signature)) return json({ error: 'Invalid signature' }, 401);
 
   try {
     const event = JSON.parse(raw);

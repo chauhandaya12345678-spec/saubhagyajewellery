@@ -15,7 +15,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to ShipPrime order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock, logOrderEvent } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock, logOrderEvent, computeExpectedTotalPaise, constantTimeEqual, genSessionToken } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -53,6 +53,16 @@ export async function onRequest(context) {
     }
 
     const db = env.DB;
+
+    // Never trust the client-declared total — recompute from real D1 prices.
+    // This is the ONLY integrity check a COD order gets (no payment gateway
+    // involved), and a defense-in-depth backstop for Razorpay orders in case
+    // this endpoint is ever hit directly instead of via checkout.html.
+    const itemsForVerify = typeof items === 'string' ? JSON.parse(items) : items;
+    const expectedTotal = await computeExpectedTotalPaise(db, itemsForVerify, payment_method);
+    if (expectedTotal !== Number(total)) {
+      return json({ error: 'Order total does not match current pricing. Please refresh and try again.' }, 400);
+    }
 
     // ── COD: OTP-verified only, capped, rate-limited (see COD-SECURITY.md).
     // Online payment (Razorpay) is never touched by any of this.
@@ -95,7 +105,7 @@ export async function onRequest(context) {
         return json({ error: 'Missing payment verification data (order_id and signature required)' }, 400);
       }
       const expected = await hmacSha256Hex(env.RAZORPAY_KEY_SECRET, `${razorpay_order_id}|${razorpay_payment_id}`);
-      if (expected !== razorpay_signature) {
+      if (!constantTimeEqual(expected, razorpay_signature)) {
         return json({ error: 'Payment signature verification failed' }, 400);
       }
       paymentVerified = true;
@@ -155,7 +165,7 @@ export async function onRequest(context) {
       }
 
       if (userId) {
-        sessionToken = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
+        sessionToken = genSessionToken();
         await db.prepare(
           'INSERT INTO sessions (user_id, token, email, name) VALUES (?, ?, ?, ?)'
         ).bind(userId, sessionToken, identifier, name || 'Guest').run();

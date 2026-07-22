@@ -3,6 +3,8 @@
  * Body: { token }
  * Verify magic link token → create session → return user + session_token
  */
+import { genSessionToken } from '../_lib.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
   const cors = {
@@ -32,7 +34,7 @@ export async function onRequest(context) {
     const user = await env.DB.prepare('SELECT id, name, email, phone FROM users WHERE lower(email) = ?').bind(row.email).first();
     if (!user) return json({ error: 'Account not found' }, 400);
 
-    const sessionToken = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
+    const sessionToken = genSessionToken();
     await env.DB.prepare(
       'INSERT INTO sessions (user_id, token, email, name) VALUES (?, ?, ?, ?)'
     ).bind(user.id, sessionToken, user.email || '', user.name || 'Guest').run();

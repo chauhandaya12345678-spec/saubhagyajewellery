@@ -1,15 +1,20 @@
 /**
  * ShipPrime Webhook — real-time order status updates
- * POST /api/webhooks/shipprime
+ * POST /api/webhooks/shipprime?secret=<SHIPPRIME_WEBHOOK_SECRET>
  *
  * ShipPrime sends status changes (SHIPPED, OUT_FOR_DELIVERY, DELIVERED, etc.)
  * We update the D1 order status + updated_at so the track-orders page
  * always shows the latest status without polling ShipPrime API.
  *
- * Set webhook URL in ShipPrime dashboard:
- *   https://saubhagyajewellery.com/api/webhooks/shipprime
+ * Set webhook URL in ShipPrime dashboard (include the secret as a query
+ * param — most webhook providers let you set the full callback URL but not
+ * always custom headers, so this works everywhere):
+ *   https://saubhagyajewellery.com/api/webhooks/shipprime?secret=<SHIPPRIME_WEBHOOK_SECRET>
+ *
+ * Without this, anyone who finds the URL could POST fake status updates for
+ * any AWB — including a fake 'rto' to trigger the auto-restock below.
  */
-import { logOrderEvent, sendWhatsAppMessage, restockOrder } from '../_lib.js';
+import { logOrderEvent, sendWhatsAppMessage, restockOrder, constantTimeEqual } from '../_lib.js';
 
 // Matches ShipPrime's real vocabulary (see SP_LABELS in account.html):
 // CONFIRMED, PACKED, SHIPPED, OUT_FOR_DELIVERY, DELIVERED, UNDELIVERED,
@@ -26,6 +31,13 @@ export async function onRequest(context) {
   });
 
   if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
+
+  const configuredSecret = env.SHIPPRIME_WEBHOOK_SECRET;
+  if (!configuredSecret) return json({ error: 'SHIPPRIME_WEBHOOK_SECRET not configured' }, 501);
+  const providedSecret = new URL(request.url).searchParams.get('secret') || request.headers.get('x-shipprime-secret') || '';
+  if (!constantTimeEqual(providedSecret, configuredSecret)) {
+    return json({ error: 'Unauthorized' }, 401);
+  }
 
   try {
     const body = await request.json();

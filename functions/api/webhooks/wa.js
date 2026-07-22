@@ -5,7 +5,7 @@
  * POST /api/webhooks/wa — incoming messages (we don't process yet, just ack)
  */
 export async function onRequest(context) {
-  const { request } = context;
+  const { request, env } = context;
   const json = (obj, s = 200) => new Response(JSON.stringify(obj), {
     status: s, headers: { 'Content-Type': 'application/json' },
   });
@@ -18,7 +18,8 @@ export async function onRequest(context) {
     const token = url.searchParams.get('hub.verify_token');
     const challenge = url.searchParams.get('hub.challenge');
 
-    if (mode === 'subscribe' && token === 'saubhagya-wa-2026' && challenge) {
+    const verifyToken = env.WA_WEBHOOK_VERIFY_TOKEN || 'saubhagya-wa-2026';
+    if (mode === 'subscribe' && token === verifyToken && challenge) {
       return new Response(challenge, { status: 200 });
     }
     return new Response('Verification failed', { status: 403 });

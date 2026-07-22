@@ -11,22 +11,11 @@
  *      only when the caller also presents a valid session token — anonymous
  *      broad lookups by phone alone are the leak we are closing.
  *
- * Rate limit: per-IP, 20 lookups per 10 min (in-memory Cloudflare Workers
- * global; resets on isolate recycle — good enough deterrent).
+ * Rate limit: per-IP, 20 lookups per 10 min. D1-backed (see rateLimitCheck
+ * in _lib.js) — an in-memory Map here would reset unpredictably whenever
+ * the Workers isolate recycles, so it wasn't a real guarantee.
  */
-
-const RATE_BUCKETS = new Map(); // ip -> { count, resetAt }
-
-function rateOk(ip) {
-  const now = Date.now();
-  const b = RATE_BUCKETS.get(ip);
-  if (!b || b.resetAt < now) {
-    RATE_BUCKETS.set(ip, { count: 1, resetAt: now + 10 * 60 * 1000 });
-    return true;
-  }
-  b.count++;
-  return b.count <= 20;
-}
+import { rateLimitCheck } from '../_lib.js';
 
 async function resolveSessionUser(db, token) {
   if (!token || !token.startsWith('sess_')) return null;
@@ -53,10 +42,11 @@ export async function onRequest(context) {
   if (request.method !== 'GET') return json({ error: 'Method not allowed' }, 405);
 
   const ip = request.headers.get('cf-connecting-ip') || 'unknown';
-  if (!rateOk(ip)) return json({ error: 'Too many lookups, try again later' }, 429);
+  const db = env.DB;
+  const rateOk = await rateLimitCheck(db, `track:${ip}`, 20, 10);
+  if (!rateOk) return json({ error: 'Too many lookups, try again later' }, 429);
 
   try {
-    const db = env.DB;
     const url = new URL(request.url);
     const orderId = url.searchParams.get('order_id');
     const emailQ = url.searchParams.get('email');

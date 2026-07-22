@@ -22,6 +22,8 @@
  * toggle). Until then, useMagicCheckout stays false and this file behaves
  * exactly as before.
  */
+import { computeExpectedTotalPaise } from '../_lib.js';
+
 export async function onRequest(context) {
   const { request, env } = context;
   const corsHeaders = {
@@ -38,6 +40,17 @@ export async function onRequest(context) {
   try {
     const { amount, currency, cart, name, email, phone, address, address_json, test_mode, magic } = await request.json();
     if (!amount || amount <= 0) return json({ error: 'Invalid amount' }, 400);
+
+    // Never trust the client-declared amount — recompute from real D1 prices.
+    // Without this, editing the request (devtools, curl) lets anyone pay any
+    // amount they want for a cart worth far more. Checked unconditionally —
+    // `test_mode` is a client-supplied bookkeeping flag, not a real Razorpay
+    // sandbox switch (the key used below is always rzp_live_...), so it must
+    // never be allowed to skip this check.
+    const expected = await computeExpectedTotalPaise(env.DB, cart || [], 'razorpay');
+    if (expected !== Number(amount)) {
+      return json({ error: 'Cart total does not match current pricing. Please refresh and try again.' }, 400);
+    }
 
     const keySecret = env.RAZORPAY_KEY_SECRET;
     if (!keySecret) return json({ error: 'Razorpay not configured: RAZORPAY_KEY_SECRET secret missing on Pages project' }, 500);

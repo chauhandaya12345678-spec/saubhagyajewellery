@@ -95,8 +95,60 @@ export async function alertLowStock(env, sku, name, remaining) {
   return sendWhatsAppMessage(env, ownerPhone, template, [name || sku, sku, String(remaining)]);
 }
 
-/* Constant-time string compare — guards the ADMIN_KEY check against
-   timing side-channels (naive !== short-circuits on first mismatched byte). */
+export const COD_FEE_PAISE = 4500; // ₹45 — must match checkout.html's COD_FEE
+
+/* Recomputes the real order total from D1 prices — never trust price/qty
+   the client sends. items = [{ id | sku, qty }]. Returns paise. Unknown
+   SKUs are treated as price 0 (caller's total check will then reject the
+   order, since real orders always have a matching D1 row). */
+export async function computeExpectedTotalPaise(db, items, paymentMethod) {
+  let totalPaise = 0;
+  for (const l of (items || [])) {
+    const sku = String(l.sku || l.id || '').trim();
+    const qty = Number(l.qty || 1);
+    if (!sku || !(qty > 0)) continue;
+    const row = await db.prepare('SELECT price FROM products WHERE sku = ?').bind(sku).first();
+    totalPaise += Math.round((row ? row.price : 0) * 100) * qty;
+  }
+  if (paymentMethod === 'cod') totalPaise += COD_FEE_PAISE;
+  return totalPaise;
+}
+
+/* Generic D1-backed rate limiter (fixed window), reusable across any
+   endpoint. Fails open (allows the request) if D1 is unreachable — the
+   whole app already depends on D1, so a D1 outage isn't this check's
+   problem to enforce during. See build/migrate-2026-07-22-rate-limits.sql. */
+export async function rateLimitCheck(db, key, maxAttempts, windowMinutes) {
+  if (!db) return true;
+  try {
+    const row = await db.prepare('SELECT count, window_start FROM rate_limits WHERE bucket_key = ?').bind(key).first();
+    if (!row) {
+      await db.prepare("INSERT INTO rate_limits (bucket_key, count, window_start) VALUES (?, 1, datetime('now'))").bind(key).run();
+      return true;
+    }
+    const windowStart = new Date(row.window_start.replace(' ', 'T') + 'Z');
+    const elapsedMin = (Date.now() - windowStart.getTime()) / 60000;
+    if (elapsedMin > windowMinutes) {
+      await db.prepare("UPDATE rate_limits SET count = 1, window_start = datetime('now') WHERE bucket_key = ?").bind(key).run();
+      return true;
+    }
+    if (row.count >= maxAttempts) return false;
+    await db.prepare('UPDATE rate_limits SET count = count + 1 WHERE bucket_key = ?').bind(key).run();
+    return true;
+  } catch (e) { return true; }
+}
+
+/* Crypto-random session token — replaces the old Date.now()+Math.random()
+   pattern (predictable, not a real RNG) used for customer sess_ tokens. */
+export function genSessionToken() {
+  return 'sess_' + crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '').slice(0, 12);
+}
+
+/* Constant-time string compare — guards secret/signature checks against
+   timing side-channels (naive !== short-circuits on first mismatched byte).
+   Exported as constantTimeEqual for use outside this file (e.g. webhook
+   signature checks); timingSafeEqual stays as the internal name used below. */
+export function constantTimeEqual(a, b) { return timingSafeEqual(a, b); }
 function timingSafeEqual(a, b) {
   const bufA = enc.encode(String(a || ''));
   const bufB = enc.encode(String(b || ''));
