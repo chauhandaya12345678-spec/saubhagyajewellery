@@ -1,6 +1,9 @@
 /**
  * PATCH /api/admin/update-inventory
- * Body: { sku, stock_count?, weightGrams?, price?, mrp?, image?, altImage?, name?, low_stock_threshold? }
+ * Body: { sku, stock_count?, weightGrams?, packing_weight_grams?, price?, mrp?, image?, altImage?, name?, low_stock_threshold?, new_sku? }
+ * `sku` identifies the row to update; `new_sku` (optional) renames it. Renaming
+ * does not touch past orders (they keep the SKU string as it was at purchase
+ * time) but does break any bookmarked /product?sku=<old> link.
  * Header: x-admin-key: <ADMIN_KEY env var>
  */
 import { verifyAdminAccess, adminCorsHeaders } from '../_lib.js';
@@ -29,7 +32,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { sku, stock_count, weightGrams, price, mrp, image, altImage, name, low_stock_threshold } = body || {};
+  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, low_stock_threshold, new_sku } = body || {};
   if (!sku) {
     return new Response(JSON.stringify({ error: 'sku required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -39,6 +42,7 @@ export async function onRequest(context) {
   const db = env.DB;
   const sc = stock_count !== undefined ? parseInt(stock_count, 10) : null;
   const wg = weightGrams !== undefined ? parseFloat(weightGrams) : null;
+  const pw = packing_weight_grams !== undefined ? parseInt(packing_weight_grams, 10) : null;
   const pr = price !== undefined ? parseInt(price, 10) : null;
   const mr = mrp !== undefined ? parseInt(mrp, 10) : null;
   const lt = low_stock_threshold !== undefined ? parseInt(low_stock_threshold, 10) : null;
@@ -68,6 +72,11 @@ export async function onRequest(context) {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
+  if (pw !== null && isNaN(pw)) {
+    return new Response(JSON.stringify({ error: 'packing_weight_grams must be a number' }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+  }
 
   try {
     const setClauses = ["updated_at = datetime('now')"];
@@ -77,9 +86,11 @@ export async function onRequest(context) {
     if (pr !== null) { setClauses.push('price = ?'); params.push(pr); }
     if (mr !== null) { setClauses.push('mrp = ?'); params.push(mr); }
     if (lt !== null) { setClauses.push('low_stock_threshold = ?'); params.push(lt); }
+    if (pw !== null) { setClauses.push('packing_weight_grams = ?'); params.push(pw); }
     if (typeof image === 'string' && image) { setClauses.push('image = ?'); params.push(image); }
     if (typeof altImage === 'string') { setClauses.push('altImage = ?'); params.push(altImage); }
     if (typeof name === 'string' && name.trim()) { setClauses.push('name = ?'); params.push(name.trim()); }
+    if (typeof new_sku === 'string' && new_sku.trim() && new_sku.trim() !== sku) { setClauses.push('sku = ?'); params.push(new_sku.trim()); }
     if (setClauses.length === 1) {
       return new Response(JSON.stringify({ error: 'Nothing to update' }), {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -92,8 +103,9 @@ export async function onRequest(context) {
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err.message || err) }), {
-      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    const msg = /UNIQUE/i.test(String(err.message)) ? 'That SKU is already in use by another product' : String(err.message || err);
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
 }

@@ -241,7 +241,7 @@ export async function adminLogin(request, env, corsHeaders) {
     return { error: `Too many failed attempts. Try again in ${waitMin} minute(s).`, status: 429 };
   }
 
-  const user = await db.prepare('SELECT id, username, password_hash, role FROM admin_users WHERE username = ?').bind(username).first().catch(() => null);
+  const user = await db.prepare('SELECT id, username, password_hash, role, role_expires_at FROM admin_users WHERE username = ?').bind(username).first().catch(() => null);
   const ok = user && await verifyPassword(password, user.password_hash);
   if (!ok) {
     const tripped = await lockoutBumpAndCheck(db, row, ip);
@@ -249,12 +249,22 @@ export async function adminLogin(request, env, corsHeaders) {
   }
 
   await lockoutClear(db, row, ip);
+
+  // Time-limited owner grants: if role_expires_at has passed, this login
+  // gets a staff session instead — the row still says 'owner' so the owner
+  // can re-extend it later, but access itself lapses automatically.
+  let effectiveRole = user.role;
+  if (user.role === 'owner' && user.role_expires_at) {
+    const expires = new Date(user.role_expires_at.replace(' ', 'T') + 'Z');
+    if (expires <= new Date()) effectiveRole = 'staff';
+  }
+
   const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
   await db.prepare(
     "INSERT INTO admin_sessions (token, user_id, role, username, expires_at) VALUES (?, ?, ?, ?, datetime('now', '+24 hours'))"
-  ).bind(token, user.id, user.role, user.username).run();
+  ).bind(token, user.id, effectiveRole, user.username).run();
 
-  return { success: true, token, role: user.role, username: user.username };
+  return { success: true, token, role: effectiveRole, username: user.username };
 }
 
 /* Admin CORS: these tools are only ever fetched same-origin from the admin
@@ -371,8 +381,10 @@ export async function pushToShipPrime(env, order, db) {
     const totalWeight = (order.items || []).reduce(
       (s, l) => s + guessWeight(l) * (l.qty || 1), 0
     );
-    // Add 40g packing (box + bubble + polybag). Floor 100g, ceiling 2kg.
-    const packingWeight = 40;
+    // Box + bubble + polybag — one box per shipment, so use the biggest
+    // packing_weight_grams among the items in it (catalog-configurable per
+    // SKU in the admin Inventory tab), falling back to a 40g default.
+    const packingWeight = Math.max(40, ...(order.items || []).map(l => Number(l.packing_weight_grams) || 0));
     const finalWeight = Math.max(100, Math.min(2000, totalWeight + packingWeight));
 
     const bp = {

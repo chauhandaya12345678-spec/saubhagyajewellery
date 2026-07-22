@@ -582,7 +582,7 @@
     var cart = payableEntries().map(function(e) { return e.ci; });
     var lines = cart.map(function(ci) {
       var p = products[ci.id] || {};
-      return { id: ci.id, name: p.name || ci.id, price: p.price || 0, qty: ci.qty, category: p.category || '', weightGrams: p.weightGrams || undefined };
+      return { id: ci.id, name: p.name || ci.id, price: p.price || 0, qty: ci.qty, category: p.category || '', weightGrams: p.weightGrams || undefined, packing_weight_grams: p.packing_weight_grams || undefined };
     });
     if (!lines.length) {
       $('co-error').textContent = 'Every item in your bag is currently out of stock. Go back to your bag to continue.';
@@ -699,7 +699,7 @@
     var cart = payableEntries().map(function (e) { return e.ci; });
     return cart.map(function (ci) {
       var p = products[ci.id] || {};
-      return { id: ci.id, name: p.name || ci.id, price: p.price || 0, qty: ci.qty, category: p.category || '', weightGrams: p.weightGrams || undefined };
+      return { id: ci.id, name: p.name || ci.id, price: p.price || 0, qty: ci.qty, category: p.category || '', weightGrams: p.weightGrams || undefined, packing_weight_grams: p.packing_weight_grams || undefined };
     });
   }
 

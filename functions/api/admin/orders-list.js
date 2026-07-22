@@ -23,6 +23,7 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const status = (url.searchParams.get('status') || '').trim().toLowerCase();
   const q = (url.searchParams.get('q') || '').trim();
+  const date = (url.searchParams.get('date') || '').trim().toLowerCase();
   const limit = Math.min(parseInt(url.searchParams.get('limit'), 10) || 200, 500);
 
   try {
@@ -30,7 +31,14 @@ export async function onRequest(context) {
     let sql = 'SELECT id, name, phone, email, items, total, subtotal, address, status, payment_method, shipprime_awb, test_mode, created_at, updated_at FROM orders';
     const clauses = [];
     const params = [];
-    if (status) { clauses.push('status = ?'); params.push(status); }
+    // "status" may be a single value or a comma-joined list, e.g. the
+    // Dashboard's "Pending to Ship" card links here with status=confirmed,packed.
+    if (status) {
+      const statuses = status.split(',').map(s => s.trim()).filter(Boolean);
+      clauses.push('status IN (' + statuses.map(() => '?').join(',') + ')');
+      params.push(...statuses);
+    }
+    if (date === 'today') { clauses.push("date(created_at) = date('now')"); }
     if (q) {
       clauses.push('(id LIKE ? OR phone LIKE ? OR name LIKE ? OR email LIKE ?)');
       const like = '%' + q + '%';

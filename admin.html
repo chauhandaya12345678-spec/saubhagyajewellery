@@ -69,6 +69,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 .ai-dash-num { font-size: 28px; font-weight: 600; color: #0B291C; font-family: 'Playfair Display', serif; }
 .ai-dash-warn .ai-dash-num { color: #c0392b; }
 .ai-dash-label { font-size: 11px; letter-spacing: .5px; color: #9a9a9a; margin-top: 6px; text-transform: uppercase; }
+.ai-dash-click { cursor: pointer; transition: box-shadow .2s, transform .2s; }
+.ai-dash-click:hover { box-shadow: 0 4px 14px rgba(11,41,28,.12); transform: translateY(-2px); }
 </style>
 </head>
 <body>
@@ -113,12 +115,35 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <!-- DASHBOARD PANEL -->
     <div id="panel-dashboard">
       <div class="ai-dash-grid">
-        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-today-orders">—</div><div class="ai-dash-label">Today's Orders</div></div>
-        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-today-revenue">—</div><div class="ai-dash-label">Today's Revenue</div></div>
-        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-pending">—</div><div class="ai-dash-label">Pending to Ship</div></div>
-        <div class="ai-dash-card ai-dash-warn"><div class="ai-dash-num" id="dash-attention">—</div><div class="ai-dash-label">Needs Attention</div></div>
-        <div class="ai-dash-card ai-dash-warn"><div class="ai-dash-num" id="dash-lowstock">—</div><div class="ai-dash-label">Low Stock SKUs</div></div>
-        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-customers">—</div><div class="ai-dash-label">Total Customers</div></div>
+        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="" data-date="today"><div class="ai-dash-num" id="dash-today-orders">—</div><div class="ai-dash-label">Today's Orders</div></div>
+        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="" data-date="today"><div class="ai-dash-num" id="dash-today-revenue">—</div><div class="ai-dash-label">Today's Revenue</div></div>
+        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="confirmed,packed" data-date=""><div class="ai-dash-num" id="dash-pending">—</div><div class="ai-dash-label">Pending to Ship</div></div>
+        <div class="ai-dash-card ai-dash-warn ai-dash-click" data-nav="orders" data-status="confirmed,packed" data-date=""><div class="ai-dash-num" id="dash-attention">—</div><div class="ai-dash-label">Needs Attention</div></div>
+        <div class="ai-dash-card ai-dash-warn ai-dash-click" data-nav="inventory-lowstock"><div class="ai-dash-num" id="dash-lowstock">—</div><div class="ai-dash-label">Low Stock SKUs</div></div>
+        <div class="ai-dash-card ai-dash-click" data-nav="customers"><div class="ai-dash-num" id="dash-customers">—</div><div class="ai-dash-label">Total Customers</div></div>
+      </div>
+
+      <div class="ai-table-wrap" style="padding:20px 24px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;color:#0B291C">Revenue Overview</div>
+          <div class="ai-tabs" id="dash-period-tabs" style="margin-left:0">
+            <button class="ai-tab active" data-period="today" type="button" style="color:#0B291C;background:#f8f6f1">Today</button>
+            <button class="ai-tab" data-period="week" type="button" style="color:#0B291C">This Week</button>
+            <button class="ai-tab" data-period="month" type="button" style="color:#0B291C">This Month</button>
+            <button class="ai-tab" data-period="year" type="button" style="color:#0B291C">This Year</button>
+          </div>
+        </div>
+        <div class="ai-dash-grid" style="margin-bottom:0">
+          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-revenue">—</div><div class="ai-dash-label">Revenue</div></div>
+          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-orders">—</div><div class="ai-dash-label">Orders</div></div>
+          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-aov">—</div><div class="ai-dash-label">Avg Order Value</div></div>
+        </div>
+      </div>
+
+      <div class="ai-dash-grid">
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-cod-today">—</div><div class="ai-dash-label">COD Orders Today</div></div>
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-online-today">—</div><div class="ai-dash-label">Online Orders Today</div></div>
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-rto">—</div><div class="ai-dash-label">Total RTO</div></div>
       </div>
       <div class="ai-status" id="dash-status"></div>
     </div>
@@ -160,6 +185,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       <div class="ai-toolbar">
         <button class="ai-btn small ghost" id="i-export-btn" type="button">EXPORT CSV</button>
         <button class="ai-btn small" id="i-reload-btn" type="button">REFRESH</button>
+        <label style="font-size:12px;color:#4a4a4a;display:flex;align-items:center;gap:6px;margin-left:8px"><input type="checkbox" id="i-lowstock-only"> Low stock only</label>
         <span class="ai-count" id="i-count"></span>
       </div>
       <div class="ai-table-wrap">
@@ -167,7 +193,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           <thead>
             <tr>
               <th>SKU</th><th>Name</th><th>Price</th><th>MRP</th><th>Stock Count</th><th>Alert At</th>
-              <th>Weight (g)</th><th>Image path</th><th></th>
+              <th>Weight (g)</th><th>Box Weight (g)</th><th>Image path</th><th></th>
             </tr>
           </thead>
           <tbody id="i-tbody"></tbody>
@@ -221,13 +247,14 @@ tr.ai-attention:hover td { background: #fbe4e2; }
             <option value="staff">Staff (read-only)</option>
             <option value="owner">Owner (full access)</option>
           </select>
+          <input type="date" id="u-new-expiry" style="display:none" title="Owner access expires end of this day">
           <button class="ai-btn small" id="u-create-btn" type="button">CREATE</button>
         </div>
         <div class="ai-status" id="u-create-status"></div>
       </div>
       <div class="ai-table-wrap">
         <table>
-          <thead><tr><th>Username</th><th>Role</th><th>Created</th><th></th></tr></thead>
+          <thead><tr><th>Username</th><th>Role</th><th>Owner Access Until</th><th>Created</th><th></th></tr></thead>
           <tbody id="u-tbody"></tbody>
         </table>
       </div>
@@ -243,6 +270,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   var sessionToken = '';
   var authRole = null;
   var lastOrders = [], lastProducts = [], lastCustomers = [], lastUsers = [];
+  var orderStatusOverride = null, orderDateOverride = null;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
@@ -410,12 +438,15 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   function loadOrders() {
     var status = document.getElementById('o-load-status');
     var tbody = document.getElementById('o-tbody');
-    var filterStatus = document.getElementById('o-filter-status').value;
+    var filterStatus = orderStatusOverride !== null ? orderStatusOverride : document.getElementById('o-filter-status').value;
+    var filterDate = orderDateOverride !== null ? orderDateOverride : '';
+    orderStatusOverride = null; orderDateOverride = null;
     var q = document.getElementById('o-filter-q').value.trim();
     status.textContent = 'Loading…';
     tbody.innerHTML = '';
     var params = new URLSearchParams();
     if (filterStatus) params.set('status', filterStatus);
+    if (filterDate) params.set('date', filterDate);
     if (q) params.set('q', q);
     apiFetch('/api/admin/orders-list?' + params.toString())
       .then(function (d) {
@@ -521,8 +552,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   // ================= INVENTORY =================
   document.getElementById('i-reload-btn').addEventListener('click', loadProducts);
   document.getElementById('i-export-btn').addEventListener('click', function () {
-    var rows = [['SKU', 'Name', 'Price', 'MRP', 'Stock Count', 'Alert At', 'Weight (g)', 'Image']];
-    lastProducts.forEach(function (p) { rows.push([p.sku, p.name, p.price, p.mrp, p.stock_count, p.low_stock_threshold, p.weightGrams, p.image || '']); });
+    var rows = [['SKU', 'Name', 'Price', 'MRP', 'Stock Count', 'Alert At', 'Weight (g)', 'Box Weight (g)', 'Image']];
+    lastProducts.forEach(function (p) { rows.push([p.sku, p.name, p.price, p.mrp, p.stock_count, p.low_stock_threshold, p.weightGrams, p.packing_weight_grams, p.image || '']); });
     downloadCsv('saubhagya-inventory-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
   });
 
@@ -536,68 +567,92 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       .then(function (data) {
         var list = Array.isArray(data) ? data : (data && data.products || []);
         lastProducts = list;
-        document.getElementById('i-count').textContent = list.length + ' products';
-        status.textContent = '';
-        tbody.innerHTML = list.map(function (p) {
-          var lowClass = (p.stock_count != null && p.stock_count <= 3) ? ' ai-low' : '';
-          return '<tr data-sku="' + esc(p.sku) + '">' +
-            '<td class="ai-sku">' + esc(p.sku) + '</td>' +
-            '<td style="display:flex;align-items:center;gap:6px">' +
-              '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.name) + '" data-field="name" disabled>' +
-              '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit name">✎</button>' +
-            '</td>' +
-            '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price"></td>' +
-            '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.mrp != null ? p.mrp : '') + '" data-field="mrp"></td>' +
-            '<td class="' + lowClass + '"><input class="ai-num" type="number" min="0" step="1" value="' + (p.stock_count != null ? p.stock_count : '') + '" data-field="stock_count"></td>' +
-            '<td><input class="ai-num" style="width:60px" type="number" min="0" step="1" value="' + (p.low_stock_threshold != null ? p.low_stock_threshold : 3) + '" data-field="low_stock_threshold"></td>' +
-            '<td><input class="ai-num" type="number" min="0" step="0.1" value="' + (p.weightGrams != null ? p.weightGrams : '') + '" data-field="weightGrams"></td>' +
-            '<td style="display:flex;align-items:center;gap:6px">' +
-              '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp" disabled>' +
-              '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit image path">✎</button>' +
-            '</td>' +
-            '<td><button class="ai-save" type="button">SAVE</button><div class="ai-msg"></div></td>' +
-            '</tr>';
-        }).join('');
-        tbody.querySelectorAll('.ai-save').forEach(function (btn) {
-          btn.addEventListener('click', function () { saveRow(btn.closest('tr')); });
-        });
-        tbody.querySelectorAll('.edit-toggle').forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            var input = btn.previousElementSibling;
-            input.disabled = false;
-            input.focus();
-          });
-        });
+        renderInventoryRows();
       })
       .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
   }
+
+  function renderInventoryRows() {
+    var status = document.getElementById('i-load-status');
+    var tbody = document.getElementById('i-tbody');
+    var lowOnly = document.getElementById('i-lowstock-only').checked;
+    var list = lastProducts.filter(function (p) {
+      if (!lowOnly) return true;
+      var threshold = p.low_stock_threshold != null ? p.low_stock_threshold : 3;
+      return p.stock_count != null && p.stock_count <= threshold;
+    });
+    document.getElementById('i-count').textContent = list.length + ' product' + (list.length === 1 ? '' : 's') + (lowOnly ? ' (low stock)' : '');
+    status.textContent = '';
+    tbody.innerHTML = list.map(function (p) {
+      var threshold = p.low_stock_threshold != null ? p.low_stock_threshold : 3;
+      var lowClass = (p.stock_count != null && p.stock_count <= threshold) ? ' ai-low' : '';
+      return '<tr data-sku="' + esc(p.sku) + '">' +
+        '<td style="display:flex;align-items:center;gap:6px">' +
+          '<input class="ai-input ai-sku" style="width:110px;margin:0" type="text" value="' + esc(p.sku) + '" data-field="sku" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Rename SKU">✎</button>' +
+          '<a href="product?sku=' + encodeURIComponent(p.sku) + '" target="_blank" rel="noopener" title="View live product page" style="text-decoration:none;font-size:14px">🔗</a>' +
+        '</td>' +
+        '<td style="display:flex;align-items:center;gap:6px">' +
+          '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.name) + '" data-field="name" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit name">✎</button>' +
+        '</td>' +
+        '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price"></td>' +
+        '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.mrp != null ? p.mrp : '') + '" data-field="mrp"></td>' +
+        '<td class="' + lowClass + '"><input class="ai-num" type="number" min="0" step="1" value="' + (p.stock_count != null ? p.stock_count : '') + '" data-field="stock_count"></td>' +
+        '<td><input class="ai-num" style="width:60px" type="number" min="0" step="1" value="' + threshold + '" data-field="low_stock_threshold"></td>' +
+        '<td><input class="ai-num" type="number" min="0" step="0.1" value="' + (p.weightGrams != null ? p.weightGrams : '') + '" data-field="weightGrams"></td>' +
+        '<td><input class="ai-num" type="number" min="0" step="1" value="' + (p.packing_weight_grams != null ? p.packing_weight_grams : '') + '" data-field="packing_weight_grams" placeholder="40"></td>' +
+        '<td style="display:flex;align-items:center;gap:6px">' +
+          '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit image path">✎</button>' +
+        '</td>' +
+        '<td><button class="ai-save" type="button">SAVE</button><div class="ai-msg"></div></td>' +
+        '</tr>';
+    }).join('');
+    tbody.querySelectorAll('.ai-save').forEach(function (btn) {
+      btn.addEventListener('click', function () { saveRow(btn.closest('tr')); });
+    });
+    tbody.querySelectorAll('.edit-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var input = btn.previousElementSibling;
+        input.disabled = false;
+        input.focus();
+      });
+    });
+  }
+  document.getElementById('i-lowstock-only').addEventListener('change', renderInventoryRows);
 
   function saveRow(row) {
     var sku = row.getAttribute('data-sku');
     var scInput = row.querySelector('[data-field="stock_count"]');
     var wgInput = row.querySelector('[data-field="weightGrams"]');
+    var pwInput = row.querySelector('[data-field="packing_weight_grams"]');
     var priceInput = row.querySelector('[data-field="price"]');
     var mrpInput = row.querySelector('[data-field="mrp"]');
     var ltInput = row.querySelector('[data-field="low_stock_threshold"]');
     var imgInput = row.querySelector('[data-field="image"]');
     var nameInput = row.querySelector('[data-field="name"]');
+    var skuInput = row.querySelector('[data-field="sku"]');
     var btn = row.querySelector('.ai-save');
     var msg = row.querySelector('.ai-msg');
     var body = { sku: sku };
     if (scInput.value !== '') body.stock_count = parseInt(scInput.value, 10);
     if (wgInput.value !== '') body.weightGrams = parseFloat(wgInput.value);
+    if (pwInput.value !== '') body.packing_weight_grams = parseInt(pwInput.value, 10);
     if (priceInput.value !== '') body.price = parseInt(priceInput.value, 10);
     if (mrpInput.value !== '') body.mrp = parseInt(mrpInput.value, 10);
     if (ltInput.value !== '') body.low_stock_threshold = parseInt(ltInput.value, 10);
     if (imgInput.value.trim() !== '') body.image = imgInput.value.trim();
     if (!nameInput.disabled && nameInput.value.trim() !== '') body.name = nameInput.value.trim();
+    if (!skuInput.disabled && skuInput.value.trim() !== '' && skuInput.value.trim() !== sku) body.new_sku = skuInput.value.trim();
     btn.disabled = true; btn.textContent = '…'; msg.textContent = '';
     apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (d) {
         btn.disabled = false;
         if (d && d.success) {
           btn.textContent = 'SAVED'; btn.className = 'ai-save saved';
-          nameInput.disabled = true; imgInput.disabled = true;
+          nameInput.disabled = true; imgInput.disabled = true; skuInput.disabled = true;
+          if (body.new_sku) { row.setAttribute('data-sku', body.new_sku); loadProducts(); }
           setTimeout(function () { btn.textContent = 'SAVE'; btn.className = 'ai-save'; }, 2000);
         } else {
           btn.textContent = 'SAVE'; btn.className = 'ai-save err';
@@ -652,6 +707,9 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
 
   // ================= DASHBOARD =================
+  var lastDashStats = null;
+  var dashPeriod = 'today';
+
   function loadDashboard() {
     var status = document.getElementById('dash-status');
     status.textContent = 'Loading…';
@@ -659,15 +717,62 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       .then(function (d) {
         if (!d || !d.success) { status.textContent = (d && d.error) || 'Failed to load'; return; }
         status.textContent = '';
+        lastDashStats = d;
         document.getElementById('dash-today-orders').textContent = d.today_orders;
         document.getElementById('dash-today-revenue').textContent = inr(d.today_revenue_paise);
         document.getElementById('dash-pending').textContent = d.pending_to_ship;
         document.getElementById('dash-attention').textContent = d.needs_attention;
         document.getElementById('dash-lowstock').textContent = d.low_stock_count;
         document.getElementById('dash-customers').textContent = d.total_customers;
+        document.getElementById('dash-cod-today').textContent = d.cod_orders_today;
+        document.getElementById('dash-online-today').textContent = d.online_orders_today;
+        document.getElementById('dash-rto').textContent = d.rto_count;
+        renderDashPeriod();
       })
       .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
   }
+
+  function renderDashPeriod() {
+    if (!lastDashStats) return;
+    var d = lastDashStats;
+    var revenue = d[dashPeriod + '_revenue_paise'] || 0;
+    var orders = d[dashPeriod + '_orders'] || 0;
+    document.getElementById('dash-period-revenue').textContent = inr(revenue);
+    document.getElementById('dash-period-orders').textContent = orders;
+    document.getElementById('dash-period-aov').textContent = inr(orders > 0 ? Math.round(revenue / orders) : 0);
+  }
+
+  document.getElementById('dash-period-tabs').addEventListener('click', function (e) {
+    var btn = e.target.closest('.ai-tab');
+    if (!btn) return;
+    document.querySelectorAll('#dash-period-tabs .ai-tab').forEach(function (t) { t.classList.remove('active'); t.style.background = ''; });
+    btn.classList.add('active');
+    btn.style.background = '#f8f6f1';
+    dashPeriod = btn.getAttribute('data-period');
+    renderDashPeriod();
+  });
+
+  document.querySelectorAll('.ai-dash-click').forEach(function (card) {
+    card.addEventListener('click', function () {
+      var nav = card.getAttribute('data-nav');
+      if (nav === 'inventory-lowstock') {
+        document.querySelector('.ai-tab[data-tab="inventory"]').click();
+        setTimeout(function () {
+          var toggle = document.getElementById('i-lowstock-only');
+          if (toggle) { toggle.checked = true; toggle.dispatchEvent(new Event('change')); }
+        }, 50);
+        return;
+      }
+      var tabBtn = document.querySelector('.ai-tab[data-tab="' + nav + '"]');
+      if (!tabBtn) return;
+      tabBtn.click();
+      if (nav === 'orders') {
+        orderStatusOverride = card.getAttribute('data-status') || '';
+        orderDateOverride = card.getAttribute('data-date') || '';
+        loadOrders();
+      }
+    });
+  });
 
   // ================= ACTIVITY LOG =================
   document.getElementById('a-reload-btn').addEventListener('click', loadActivity);
@@ -697,19 +802,24 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
 
   // ================= USERS (owner only) =================
+  document.getElementById('u-new-role').addEventListener('change', function () {
+    document.getElementById('u-new-expiry').style.display = this.value === 'owner' ? 'inline-block' : 'none';
+  });
   document.getElementById('u-create-btn').addEventListener('click', function () {
     var status = document.getElementById('u-create-status');
     var username = document.getElementById('u-new-username').value.trim();
     var password = document.getElementById('u-new-password').value;
     var role = document.getElementById('u-new-role').value;
+    var expiresAt = document.getElementById('u-new-expiry').value;
     if (!username || !password) { status.textContent = 'Username and password required.'; return; }
     status.textContent = 'Creating…';
-    apiFetch('/api/admin/create-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: username, password: password, role: role }) })
+    apiFetch('/api/admin/create-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: username, password: password, role: role, expires_at: role === 'owner' ? expiresAt : '' }) })
       .then(function (d) {
         if (d && d.success) {
           status.textContent = 'Created ' + d.username + ' (' + d.role + ').';
           document.getElementById('u-new-username').value = '';
           document.getElementById('u-new-password').value = '';
+          document.getElementById('u-new-expiry').value = '';
           loadUsers();
         } else {
           status.textContent = (d && d.error) || 'Failed';
@@ -728,9 +838,14 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         lastUsers = d.users;
         status.textContent = '';
         tbody.innerHTML = d.users.map(function (u) {
+          var expired = u.role_expires_at && new Date(u.role_expires_at.replace(' ', 'T') + 'Z') <= new Date();
+          var expiryText = u.role_expires_at
+            ? esc(u.role_expires_at.slice(0, 10)) + (expired ? ' <span style="color:#c0392b">(expired — logs in as staff)</span>' : '')
+            : (u.role === 'owner' ? '<span style="color:#9a9a9a">Permanent</span>' : '—');
           return '<tr>' +
             '<td>' + esc(u.username) + '</td>' +
             '<td><span class="ai-badge ' + (u.role === 'owner' ? 'b-confirmed' : 'b-packed') + '">' + esc(u.role) + '</span></td>' +
+            '<td>' + expiryText + '</td>' +
             '<td>' + esc((u.created_at || '').slice(0, 10)) + '</td>' +
             '<td><button class="ai-btn small ghost del-user-btn" data-id="' + u.id + '" type="button">DELETE</button></td>' +
             '</tr>';

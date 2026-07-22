@@ -1,7 +1,9 @@
 /**
  * POST /api/admin/create-user
- * Body: { username, password, role: 'owner'|'staff' }
+ * Body: { username, password, role: 'owner'|'staff', expires_at? }
  * Owner-only. Creates a named admin account (see build/migrate-2026-07-22-admin-users.sql).
+ * expires_at (YYYY-MM-DD, optional, owner role only) grants owner access
+ * only until end of that day — logins after that get a staff session instead.
  */
 import { verifyAdminAccess, adminCorsHeaders, hashPassword } from '../_lib.js';
 
@@ -29,6 +31,7 @@ export async function onRequest(context) {
   const username = String(body.username || '').trim().toLowerCase();
   const password = String(body.password || '');
   const role = body.role === 'owner' ? 'owner' : 'staff';
+  const expiresAtRaw = String(body.expires_at || '').trim();
 
   if (!username || username.length < 3) {
     return new Response(JSON.stringify({ error: 'Username must be at least 3 characters' }), {
@@ -40,12 +43,21 @@ export async function onRequest(context) {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
+  let roleExpiresAt = null;
+  if (role === 'owner' && expiresAtRaw) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(expiresAtRaw)) {
+      return new Response(JSON.stringify({ error: 'expires_at must be YYYY-MM-DD' }), {
+        status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+    roleExpiresAt = expiresAtRaw + ' 23:59:59';
+  }
 
   try {
     const db = env.DB;
     const hash = await hashPassword(password);
-    await db.prepare('INSERT INTO admin_users (username, password_hash, role) VALUES (?, ?, ?)').bind(username, hash, role).run();
-    return new Response(JSON.stringify({ success: true, username, role }), {
+    await db.prepare('INSERT INTO admin_users (username, password_hash, role, role_expires_at) VALUES (?, ?, ?, ?)').bind(username, hash, role, roleExpiresAt).run();
+    return new Response(JSON.stringify({ success: true, username, role, role_expires_at: roleExpiresAt }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   } catch (err) {

@@ -19,7 +19,7 @@ export async function onRequest(context) {
   if (auth.response) return auth.response;
 
   try {
-    const { results } = await env.DB.prepare('SELECT id, username, role, created_at FROM admin_users ORDER BY created_at DESC').all();
+    const { results } = await env.DB.prepare('SELECT id, username, role, role_expires_at, created_at FROM admin_users ORDER BY created_at DESC').all();
     return new Response(JSON.stringify({ success: true, users: results || [] }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
