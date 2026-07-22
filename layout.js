@@ -144,7 +144,6 @@
     }).join('');
     var drawerLinks = links +
       '<a class="navlink" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
-      '<a class="navlink" href="account.html" data-mpa-onlyauth style="display:none">My Account</a>' +
       '<a class="navlink nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>';
     var searchIcon =
       '<svg class="nav-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>';

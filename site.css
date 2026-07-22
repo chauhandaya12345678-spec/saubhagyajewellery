@@ -168,6 +168,10 @@ footer.site{background:#071B12;color:#fff;padding:60px 40px 30px}
   footer.site details.fcol .fhead::after{content:'+';position:absolute;right:6px;top:50%;transform:translateY(-50%);font:300 20px "Montserrat",sans-serif;color:#C5A880;transition:transform .3s}
   footer.site details.fcol[open] .fhead::after{transform:translateY(-50%) rotate(45deg)}
   footer.site details.fcol a{padding:0 4px 10px;margin-bottom:0}
+  /* COMPANY/POLICY link lists: 2 columns instead of one long vertical stack.
+     Support column keeps single-column flow (it's an address block, not links). */
+  footer.site details.fcol:not(.fcol-support)[open]{display:grid;grid-template-columns:repeat(2,1fr);column-gap:10px}
+  footer.site details.fcol:not(.fcol-support)[open] .fhead{grid-column:1/-1}
   footer.site details.fcol-support{padding-bottom:14px}
   footer.site details.fcol-support .fatelier{padding:6px 4px 8px;font-size:13px;line-height:1.7;text-align:left}
   footer.site .fwa{margin-left:4px}
