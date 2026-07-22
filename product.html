@@ -28,8 +28,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722e">
-<script src="layout.js?v=20260722e"></script>
+<link rel="stylesheet" href="site.css?v=20260722f">
+<script src="layout.js?v=20260722f"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
@@ -138,6 +138,8 @@
   .pdp-add:active { transform: scale(.96); transition: transform .1s; }
   .pdp-buy { width: 100%; height: 48px; border: 1px solid #0B291C; background: transparent; color: #0B291C; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; margin-bottom: 24px; border-radius: 14px; transition: all .4s cubic-bezier(.25,1,.5,1); }
   .pdp-buy:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(11,41,28,.12); background: #0B291C; color: #fff; }
+  .pdp-buy:disabled { border-color: #ddd6c6; color: #9a9a9a; background: #f3f0e9; cursor: not-allowed; }
+  .pdp-buy:disabled:hover { transform: none; box-shadow: none; background: #f3f0e9; color: #9a9a9a; }
   .pdp-desc { font-family: 'Montserrat',sans-serif; font-size: 13px; line-height: 1.8; color: #6a6a6a; max-width: 460px; }
   .pdp-desc strong { color: #1A1A1A; }
   .pdp-loading { text-align: center; padding: 80px 24px; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; letter-spacing:1.5px; }
@@ -345,12 +347,16 @@
     $('pdp-stock-txt').textContent = stockLbl;
     $('pdp-stock').className = 'pdp-stock ' + stockCls;
     $('pdp-stock').style.display = 'inline-flex';
-    // Hide buy buttons when out of stock
+    // Out of stock: Add to Bag stays live (so a signed-in customer can still
+    // queue it up and buy once it's back), Buy Now becomes a disabled
+    // "OUT OF STOCK" placeholder instead of disappearing.
     var isOos = (p.inStock === 0 || p.inStock === false || (typeof p.stock_count === 'number' && p.stock_count <= 0));
-    $('pdp-addcart').style.display = isOos ? 'none' : '';
-    $('pdp-buynow').style.display = isOos ? 'none' : '';
-    var mb = document.getElementById('pdp-mobile-bar');
-    if (mb) mb.style.display = isOos ? 'none' : '';
+    $('pdp-addcart').style.display = '';
+    var buyBtn = $('pdp-buynow');
+    buyBtn.disabled = isOos;
+    buyBtn.textContent = isOos ? 'OUT OF STOCK' : 'BUY IT NOW';
+    var mBuyBtn = document.getElementById('pdp-mobile-buy');
+    if (mBuyBtn) { mBuyBtn.disabled = isOos; mBuyBtn.textContent = isOos ? 'OUT OF STOCK' : 'BUY NOW'; }
     // Favourite toggle initial state
     paintFav();
     $('pdp-loading').style.display = 'none';
