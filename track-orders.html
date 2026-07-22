@@ -13,14 +13,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260722l">
-<script src="layout.js?v=20260722l"></script>
+<script src="layout.js?v=20260723a"></script>
 <script src="mpa.js?v=13" defer></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Track Orders"}]}</script>
 <style>
   .track-wrap { max-width: 640px; margin: 0 auto; }
-  .track-form { display:flex; flex-direction:column; gap:20px; margin:20px 0 0; }
-  .track-row { display:flex; gap:16px; flex-wrap:wrap; }
-  .track-row input { flex:1; min-width:160px; height:52px; padding:0 16px; border:1.5px solid #c9bfa4; box-shadow:0 1px 4px rgba(11,41,28,.06); font-family:'Montserrat',sans-serif; font-size:14px; outline:none; background:#fff; border-radius:12px !important; }
+  .track-form { display:flex; flex-direction:column; gap:22px; margin:22px 0 0; }
+  .track-row { display:flex; gap:18px; flex-wrap:wrap; }
+  .track-field { flex:1; min-width:180px; display:flex; flex-direction:column; }
+  .track-label { font-family:'Montserrat',sans-serif; font-size:10px; letter-spacing:1.5px; color:#6a6a6a; margin-bottom:7px; text-transform:uppercase; }
+  .track-row input { width:100%; height:52px; padding:0 16px; border:1.5px solid #c9bfa4; box-shadow:0 1px 4px rgba(11,41,28,.06); font-family:'Montserrat',sans-serif; font-size:14px; outline:none; background:#fff; border-radius:12px !important; box-sizing:border-box; }
   .track-row input:focus { border-color:#0B291C; box-shadow:0 1px 4px rgba(11,41,28,.06), 0 0 0 3px rgba(197,168,128,.18); }
   .track-btn { height:52px; padding:0 32px; background:#0B291C; color:#fff; border:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor:pointer; white-space:nowrap; align-self:flex-start; border-radius:12px; box-shadow:0 2px 8px rgba(11,41,28,.15); transition:all .4s cubic-bezier(.25,1,.5,1); }
   .track-btn:disabled { opacity:.6; cursor:not-allowed; }
@@ -69,9 +71,11 @@
 
   @media (max-width:600px) {
     .progress-label { font-size:8px; }
-    .track-row { flex-direction:column; gap:18px; }
-    .track-row input { min-width:100%; }
-    .track-btn { width:100%; height:52px; margin-top:2px; }
+    .track-row { flex-direction:column; gap:20px; }
+    .track-field { min-width:100%; }
+    .track-row input { height:54px; font-size:15px; }
+    .track-btn { width:100%; height:54px; margin-top:4px; }
+    .track-manual { padding:22px 18px !important; }
   }
 </style>
 </head>
@@ -100,13 +104,19 @@
   </div>
 
   <!-- Manual lookup (always available below orders) -->
-  <div id="track-manual" style="display:none; margin-top:24px; padding-top:24px; border-top:1px solid #eae5d8;">
-    <h3 style="font-family:'Playfair Display',serif;font-size:16px;margin:0 0 4px;">Look up another order</h3>
-    <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:#9a9a9a;margin:0 0 12px;">Enter your phone number and order ID.</p>
+  <div id="track-manual" class="track-manual" style="display:none; margin-top:28px; padding:28px 26px; background:#fff; border:1px solid #eae5d8; border-radius:14px;">
+    <h3 style="font-family:'Playfair Display',serif;font-size:16px;margin:0 0 6px;">Look up another order</h3>
+    <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:#9a9a9a;margin:0 0 4px;">Enter your phone number and order ID.</p>
     <div class="track-form">
       <div class="track-row">
-        <input id="track-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
-        <input id="track-oid" type="text" placeholder="Order ID (CC-...)" style="text-transform:uppercase;">
+        <div class="track-field">
+          <label class="track-label" for="track-phone">Mobile Number</label>
+          <input id="track-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+        </div>
+        <div class="track-field">
+          <label class="track-label" for="track-oid">Order ID</label>
+          <input id="track-oid" type="text" placeholder="Order ID (CC-...)" style="text-transform:uppercase;">
+        </div>
       </div>
       <button class="track-btn" id="track-btn">TRACK</button>
     </div>

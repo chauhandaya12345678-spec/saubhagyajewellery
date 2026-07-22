@@ -115,6 +115,7 @@
       '  .navlinks{display:none}',
       '  .nav-icons{order:2;gap:10px}',
       '  .nav-icons .ni-hide{display:none}',
+      '  .nav-icons a[data-mpa-auth]{font-size:11px;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       '  .nav-drawer{display:flex}',
       '}',
       /* footer: same brand SVG as header, sized down for the column,
@@ -171,7 +172,7 @@
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
       '<button type="button" id="nav-search-btn" aria-label="Search">' + searchIcon + '</button>' +
-      '<a class="ni-hide" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
+      '<a data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
       '<a class="ni-hide nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>' +
       '<a class="nav-bag" href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
       '</div></div>' +
