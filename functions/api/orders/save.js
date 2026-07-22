@@ -6,6 +6,7 @@
  *   items, total, subtotal, discount,           // amounts in paise
  *   name, email, phone, address (JSON string or object),
  *   payment_method: 'razorpay' | 'cod',
+ *   verification_token?  // required when payment_method is 'cod' — from /api/orders/verify-otp
  *   test_mode: bool,
  *   create_account: bool (auto-create user account for guest)
  * }
@@ -43,18 +44,53 @@ export async function onRequest(context) {
       return json({ error: 'Missing required fields: razorpay_payment_id, items, total' }, 400);
     }
 
-    // COD is disabled site-wide as of 2026-07-11. Reject any COD orders at the API
-    // boundary even if a stale client tab tries to submit one — protects ShipPrime pipeline
-    // pipeline from unverified pickups.
+    // Soft origin check — server-to-server tools (curl, Postman) send no
+    // Origin header and still pass; this only blocks a browser page on some
+    // OTHER domain trying to submit orders here directly.
+    const origin = request.headers.get('Origin') || '';
+    if (origin && origin !== 'https://saubhagyajewellery.com') {
+      return json({ error: 'Invalid request origin' }, 403);
+    }
+
+    const db = env.DB;
+
+    // ── COD: OTP-verified only, capped, rate-limited (see COD-SECURITY.md).
+    // Online payment (Razorpay) is never touched by any of this.
     if (payment_method === 'cod') {
-      return json({ error: 'Cash on Delivery is temporarily unavailable. Please pay online.' }, 400);
+      const COD_MAX_PAISE = 200000; // ₹2,000 cap
+      if (Number(total) > COD_MAX_PAISE) {
+        return json({ error: 'Cash on Delivery is available up to ₹2,000 only. Please pay online for larger orders.' }, 400);
+      }
+
+      const vToken = body.verification_token;
+      if (!vToken) {
+        return json({ error: 'Phone/email verification required for Cash on Delivery. Please verify first.' }, 400);
+      }
+      const verifyRow = await db.prepare(
+        "SELECT id, email, phone FROM cod_verifications WHERE token = ? AND used = 0 AND expires_at > datetime('now')"
+      ).bind(String(vToken)).first();
+      if (!verifyRow || verifyRow.email !== email || verifyRow.phone !== phone) {
+        return json({ error: 'Verification expired or does not match this order. Please verify again.' }, 400);
+      }
+      await db.prepare('UPDATE cod_verifications SET used = 1 WHERE id = ?').bind(verifyRow.id).run();
+
+      if (phone) {
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().replace('T', ' ').slice(0, 19);
+        const codRecent = await db.prepare(
+          "SELECT COUNT(*) AS cnt FROM orders WHERE phone = ? AND payment_method = 'cod' AND created_at > ?"
+        ).bind(phone, oneDayAgo).first();
+        if (codRecent && codRecent.cnt >= 3) {
+          return json({ error: 'Maximum 3 Cash on Delivery orders per day. Please pay online for further orders today.' }, 429);
+        }
+      }
     }
 
     // Verify the Razorpay signature whenever the payment went through an Order.
     // When RAZORPAY_KEY_SECRET is configured (always in production), we REQUIRE
     // both order_id and signature — rejecting without them prevents forged orders.
+    // COD orders never go through Razorpay, so they skip this entirely.
     let paymentVerified = false;
-    if (env.RAZORPAY_KEY_SECRET) {
+    if (payment_method !== 'cod' && env.RAZORPAY_KEY_SECRET) {
       if (!razorpay_order_id || !razorpay_signature) {
         return json({ error: 'Missing payment verification data (order_id and signature required)' }, 400);
       }
@@ -64,8 +100,6 @@ export async function onRequest(context) {
       }
       paymentVerified = true;
     }
-
-    const db = env.DB;
 
     // Idempotency: same payment id → return the already-saved order.
     const dupe = await db.prepare('SELECT id FROM orders WHERE razorpay_payment_id = ?')

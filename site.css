@@ -17,9 +17,9 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"]{
    listing overflows the viewport on mobile */
 .grid>*,.ccards>*,.rgrid>*{min-width:0}
 h1,h2,h3{font-family:'Playfair Display',serif;font-weight:600;color:#1A1A1A;margin:0}
-.kicker{font-size:13px;letter-spacing:4px;color:#C5A880;margin-bottom:14px}
+.kicker{font-size:13px;letter-spacing:4px;color:#8A6D2F;font-weight:600;margin-bottom:14px}
 .kicker.center{text-align:center}
-.kicker.gold{color:#C5A880}
+.kicker.gold{color:#8A6D2F}
 .center{text-align:center}
 .lede{font-weight:400;font-size:15px;line-height:1.85;color:#6a6a6a;max-width:640px}
 .btn{display:inline-block;font-size:12px;letter-spacing:1.5px;padding:15px 32px;background:#0B291C;color:#fff;border:1px solid #0B291C;cursor:pointer;border-radius:14px;box-shadow:0 2px 8px rgba(11,41,28,.15),0 1px 2px rgba(0,0,0,.08);transition:all .4s cubic-bezier(.25,1,.5,1)}

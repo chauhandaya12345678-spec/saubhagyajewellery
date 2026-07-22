@@ -226,7 +226,7 @@
       '<a class="fwa" href="' + WHATSAPP + '" rel="noopener" target="_blank">WhatsApp Support &rarr;</a>' +
       '<a class="fwa" href="' + MAPS + '" rel="noopener" target="_blank" style="margin-top:8px;display:inline-block">Get Directions (Google Maps) &rarr;</a>' +
       '</details></div>' +
-      '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; Manufacturer &amp; direct seller &middot; SSL secured</span>' +
+      '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; SSL secured</span>' +
       '<span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span></div>';
   }
 

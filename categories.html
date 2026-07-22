@@ -31,7 +31,7 @@
 <style>
   body { background: #F0F5FA; margin: 0; }
   .cat-hero { max-width: 1280px; margin: 0 auto; padding: 46px 40px 6px; text-align: center; }
-  .cat-kicker { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #C5A880; margin-bottom: 12px; }
+  .cat-kicker { font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 4px; color: #8A6D2F; margin-bottom: 12px; }
   .cat-title { font-family:'Playfair Display',serif; font-weight: 500; font-size: 40px; color: #1A1A1A; margin: 0 0 8px; }
   .cat-sub { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; color: #6a6a6a; margin: 0; }
   .cat-hub { max-width: 1280px; margin: 32px auto 0; padding: 0 40px; }
@@ -119,7 +119,6 @@
 <section class="cat-filterbar">
   <div>
     <h2 id="cat-title-h2">All Categories</h2>
-    <div class="count" id="cat-count">Loading…</div>
   </div>
   <a class="cat-clear" href="categories.html" id="cat-clear" style="display:none">Clear filter ×</a>
 </section>
@@ -204,7 +203,6 @@
     var sub = current.cat ? findSub(current.cat) : null;
     $('cat-title-h2').textContent = sub ? sub.label : (current.q ? 'Search: "' + current.q + '"' : 'All Categories');
     $('crumb-here').textContent = sub ? sub.label : 'Categories';
-    $('cat-count').textContent = list.length + ' piece' + (list.length === 1 ? '' : 's');
     $('cat-clear').style.display = (current.cat || current.q) ? 'inline-block' : 'none';
     $('cat-loading').style.display = 'none';
     if (!list.length) { $('cat-grid').innerHTML = ''; $('cat-empty').style.display = 'block'; return true; }
