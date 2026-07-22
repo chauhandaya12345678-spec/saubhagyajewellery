@@ -63,6 +63,12 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 .ai-role-badge { font-size: 9px; letter-spacing: 1px; color: #C5A880; margin-left: auto; padding: 4px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 20px; }
 .ai-form-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
 .ai-form-row input, .ai-form-row select { padding: 9px 12px; border: 1px solid #ddd6c6; border-radius: 6px; font-family: inherit; font-size: 12px; }
+.ai-dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.ai-dash-card { background: #fff; border: 1px solid #eae5d8; border-radius: 12px; padding: 20px; }
+.ai-dash-card.ai-dash-warn { border-color: #f3c9c5; background: #fdf6f5; }
+.ai-dash-num { font-size: 28px; font-weight: 600; color: #0B291C; font-family: 'Playfair Display', serif; }
+.ai-dash-warn .ai-dash-num { color: #c0392b; }
+.ai-dash-label { font-size: 11px; letter-spacing: .5px; color: #9a9a9a; margin-top: 6px; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -72,9 +78,11 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <h1>SAUBHAGYA <span style="font-size:9px;letter-spacing:2px;color:#C5A880;border:1px solid #C5A880;border-radius:4px;padding:3px 7px;margin-left:4px;font-weight:600">ADMIN</span></h1>
   </div>
   <div class="ai-tabs" id="ai-tabs">
-    <button class="ai-tab active" data-tab="orders" type="button">ORDERS</button>
+    <button class="ai-tab active" data-tab="dashboard" type="button">DASHBOARD</button>
+    <button class="ai-tab" data-tab="orders" type="button">ORDERS</button>
     <button class="ai-tab" data-tab="inventory" type="button">INVENTORY</button>
     <button class="ai-tab" data-tab="customers" type="button">CUSTOMERS</button>
+    <button class="ai-tab" data-tab="activity" type="button">ACTIVITY</button>
     <button class="ai-tab" data-tab="users" type="button" id="users-tab-btn">USERS</button>
   </div>
   <span class="ai-role-badge" id="ai-role-badge" style="display:none"></span>
@@ -102,8 +110,21 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 <div id="ai-main" style="display:none">
   <div class="ai-wrap">
 
+    <!-- DASHBOARD PANEL -->
+    <div id="panel-dashboard">
+      <div class="ai-dash-grid">
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-today-orders">—</div><div class="ai-dash-label">Today's Orders</div></div>
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-today-revenue">—</div><div class="ai-dash-label">Today's Revenue</div></div>
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-pending">—</div><div class="ai-dash-label">Pending to Ship</div></div>
+        <div class="ai-dash-card ai-dash-warn"><div class="ai-dash-num" id="dash-attention">—</div><div class="ai-dash-label">Needs Attention</div></div>
+        <div class="ai-dash-card ai-dash-warn"><div class="ai-dash-num" id="dash-lowstock">—</div><div class="ai-dash-label">Low Stock SKUs</div></div>
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-customers">—</div><div class="ai-dash-label">Total Customers</div></div>
+      </div>
+      <div class="ai-status" id="dash-status"></div>
+    </div>
+
     <!-- ORDERS PANEL -->
-    <div id="panel-orders">
+    <div id="panel-orders" style="display:none">
       <div class="ai-toolbar">
         <select id="o-filter-status">
           <option value="">All statuses</option>
@@ -172,6 +193,21 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         </table>
       </div>
       <div class="ai-status" id="c-load-status"></div>
+    </div>
+
+    <!-- ACTIVITY PANEL -->
+    <div id="panel-activity" style="display:none">
+      <div class="ai-toolbar">
+        <button class="ai-btn small" id="a-reload-btn" type="button">REFRESH</button>
+        <span class="ai-count" id="a-count"></span>
+      </div>
+      <div class="ai-table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Order</th><th>Customer</th><th>Event</th><th>Result</th><th>Detail</th></tr></thead>
+          <tbody id="a-tbody"></tbody>
+        </table>
+      </div>
+      <div class="ai-status" id="a-load-status"></div>
     </div>
 
     <!-- USERS PANEL (owner only) -->
@@ -289,11 +325,11 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     badge.style.display = 'inline-block';
     if (authRole !== 'owner') document.body.classList.add('role-staff');
     var wantTab = new URLSearchParams(location.search).get('tab');
-    if (wantTab && wantTab !== 'orders') {
+    if (wantTab && wantTab !== 'dashboard') {
       var btn = document.querySelector('.ai-tab[data-tab="' + wantTab + '"]');
       if (btn && !(wantTab === 'users' && authRole !== 'owner')) { btn.click(); return; }
     }
-    loadOrders();
+    loadDashboard();
   }
 
   document.getElementById('ai-key-btn').addEventListener('click', function () {
@@ -342,13 +378,17 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     if (tab === 'users' && authRole !== 'owner') return;
     document.querySelectorAll('.ai-tab').forEach(function (t) { t.classList.remove('active'); });
     btn.classList.add('active');
+    document.getElementById('panel-dashboard').style.display = tab === 'dashboard' ? 'block' : 'none';
     document.getElementById('panel-orders').style.display = tab === 'orders' ? 'block' : 'none';
     document.getElementById('panel-inventory').style.display = tab === 'inventory' ? 'block' : 'none';
     document.getElementById('panel-customers').style.display = tab === 'customers' ? 'block' : 'none';
+    document.getElementById('panel-activity').style.display = tab === 'activity' ? 'block' : 'none';
     document.getElementById('panel-users').style.display = tab === 'users' ? 'block' : 'none';
+    if (tab === 'dashboard') loadDashboard();
     if (tab === 'orders' && !lastOrders.length) loadOrders();
     if (tab === 'inventory' && !lastProducts.length) loadProducts();
     if (tab === 'customers' && !lastCustomers.length) loadCustomers();
+    if (tab === 'activity') loadActivity();
     if (tab === 'users' && !lastUsers.length) loadUsers();
   });
 
@@ -602,6 +642,51 @@ tr.ai-attention:hover td { background: #fbe4e2; }
             '<td>' + esc(c.order_count || 0) + '</td>' +
             '<td>' + inr(c.lifetime_total) + '</td>' +
             '<td>' + esc((c.created_at || '').slice(0, 10)) + '</td>' +
+            '</tr>';
+        }).join('');
+      })
+      .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
+  }
+
+  // ================= DASHBOARD =================
+  function loadDashboard() {
+    var status = document.getElementById('dash-status');
+    status.textContent = 'Loading…';
+    apiFetch('/api/admin/dashboard-stats')
+      .then(function (d) {
+        if (!d || !d.success) { status.textContent = (d && d.error) || 'Failed to load'; return; }
+        status.textContent = '';
+        document.getElementById('dash-today-orders').textContent = d.today_orders;
+        document.getElementById('dash-today-revenue').textContent = inr(d.today_revenue_paise);
+        document.getElementById('dash-pending').textContent = d.pending_to_ship;
+        document.getElementById('dash-attention').textContent = d.needs_attention;
+        document.getElementById('dash-lowstock').textContent = d.low_stock_count;
+        document.getElementById('dash-customers').textContent = d.total_customers;
+      })
+      .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
+  }
+
+  // ================= ACTIVITY LOG =================
+  document.getElementById('a-reload-btn').addEventListener('click', loadActivity);
+  function loadActivity() {
+    var status = document.getElementById('a-load-status');
+    var tbody = document.getElementById('a-tbody');
+    status.textContent = 'Loading…';
+    tbody.innerHTML = '';
+    apiFetch('/api/admin/activity-log?limit=150')
+      .then(function (d) {
+        if (!d || !d.success) { status.textContent = (d && d.error) || 'Failed to load'; return; }
+        document.getElementById('a-count').textContent = d.events.length + ' events';
+        status.textContent = '';
+        tbody.innerHTML = d.events.map(function (e) {
+          var resultBadge = e.ok ? '<span class="ai-badge b-delivered">OK</span>' : '<span class="ai-badge b-cancelled">FAILED</span>';
+          return '<tr>' +
+            '<td>' + fmtDate(e.created_at) + '</td>' +
+            '<td class="ai-oid">' + esc(e.order_id || '') + '</td>' +
+            '<td>' + esc(e.customer_name || '') + '</td>' +
+            '<td>' + esc(e.kind) + '</td>' +
+            '<td>' + resultBadge + '</td>' +
+            '<td style="max-width:320px;font-size:11px;color:#6a6a6a">' + esc((e.detail || '').slice(0, 200)) + '</td>' +
             '</tr>';
         }).join('');
       })
