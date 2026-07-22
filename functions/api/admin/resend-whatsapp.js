@@ -62,7 +62,7 @@ export async function onRequest(context) {
     await logOrderEvent(db, orderId, 'whatsapp_sent', result.sent ? 1 : 0, result.sent ? 'msgId ' + result.msgId + ' (manual resend)' : (result.error || 'unknown') + ' (manual resend)');
 
     return new Response(JSON.stringify({ success: result.sent, error: result.sent ? undefined : result.error }), {
-      status: result.sent ? 200 : 502, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err.message || err) }), {
