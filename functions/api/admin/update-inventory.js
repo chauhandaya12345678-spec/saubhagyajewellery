@@ -1,6 +1,6 @@
 /**
  * PATCH /api/admin/update-inventory
- * Body: { sku, stock_count?, weightGrams?, price?, mrp?, image?, altImage?, name? }
+ * Body: { sku, stock_count?, weightGrams?, price?, mrp?, image?, altImage?, name?, low_stock_threshold? }
  * Header: x-admin-key: <ADMIN_KEY env var>
  */
 import { verifyAdminAccess, adminCorsHeaders } from '../_lib.js';
@@ -29,7 +29,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { sku, stock_count, weightGrams, price, mrp, image, altImage, name } = body || {};
+  const { sku, stock_count, weightGrams, price, mrp, image, altImage, name, low_stock_threshold } = body || {};
   if (!sku) {
     return new Response(JSON.stringify({ error: 'sku required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -41,6 +41,7 @@ export async function onRequest(context) {
   const wg = weightGrams !== undefined ? parseFloat(weightGrams) : null;
   const pr = price !== undefined ? parseInt(price, 10) : null;
   const mr = mrp !== undefined ? parseInt(mrp, 10) : null;
+  const lt = low_stock_threshold !== undefined ? parseInt(low_stock_threshold, 10) : null;
 
   if (sc !== null && isNaN(sc)) {
     return new Response(JSON.stringify({ error: 'stock_count must be a number' }), {
@@ -62,6 +63,11 @@ export async function onRequest(context) {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
   }
+  if (lt !== null && isNaN(lt)) {
+    return new Response(JSON.stringify({ error: 'low_stock_threshold must be a number' }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
+  }
 
   try {
     const setClauses = ["updated_at = datetime('now')"];
@@ -70,6 +76,7 @@ export async function onRequest(context) {
     if (wg !== null) { setClauses.push('weightGrams = ?'); params.push(wg); }
     if (pr !== null) { setClauses.push('price = ?'); params.push(pr); }
     if (mr !== null) { setClauses.push('mrp = ?'); params.push(mr); }
+    if (lt !== null) { setClauses.push('low_stock_threshold = ?'); params.push(lt); }
     if (typeof image === 'string' && image) { setClauses.push('image = ?'); params.push(image); }
     if (typeof altImage === 'string') { setClauses.push('altImage = ?'); params.push(altImage); }
     if (typeof name === 'string' && name.trim()) { setClauses.push('name = ?'); params.push(name.trim()); }

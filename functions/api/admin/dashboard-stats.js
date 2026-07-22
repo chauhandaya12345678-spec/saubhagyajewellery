@@ -23,7 +23,7 @@ export async function onRequest(context) {
     const [todayRow, pendingRow, lowStockRow, customerRow, attentionRow] = await Promise.all([
       db.prepare("SELECT COUNT(*) AS c, COALESCE(SUM(total),0) AS revenue FROM orders WHERE date(created_at) = date('now') AND test_mode = 0").first(),
       db.prepare("SELECT COUNT(*) AS c FROM orders WHERE status IN ('confirmed','packed') AND test_mode = 0").first(),
-      db.prepare("SELECT COUNT(*) AS c FROM products WHERE stock_count IS NOT NULL AND stock_count <= 3").first(),
+      db.prepare("SELECT COUNT(*) AS c FROM products WHERE stock_count IS NOT NULL AND stock_count <= COALESCE(low_stock_threshold, 3)").first(),
       db.prepare("SELECT COUNT(*) AS c FROM users").first(),
       db.prepare(`SELECT COUNT(*) AS c FROM orders WHERE status IN ('confirmed','packed') AND test_mode = 0 AND julianday('now') - julianday(created_at) > 5`).first(),
     ]);

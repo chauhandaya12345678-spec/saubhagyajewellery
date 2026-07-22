@@ -45,7 +45,6 @@ export async function hmacSha256Hex(secret, message) {
    number for any SKU that drops to/below LOW_STOCK_THRESHOLD (default 3). */
 export async function decrementStock(db, items, env) {
   try {
-    const threshold = Number(env && env.LOW_STOCK_THRESHOLD) || 3;
     for (const l of (items || [])) {
       const sku = String(l.sku || l.id || '').trim();
       const qty = Number(l.qty || 1);
@@ -56,7 +55,10 @@ export async function decrementStock(db, items, env) {
 
       if (env) {
         try {
-          const row = await db.prepare('SELECT name, stock_count FROM products WHERE sku = ? AND stock_count IS NOT NULL').bind(sku).first();
+          const row = await db.prepare('SELECT name, stock_count, low_stock_threshold FROM products WHERE sku = ? AND stock_count IS NOT NULL').bind(sku).first();
+          // Per-SKU threshold (products.low_stock_threshold, default 3) — falls
+          // back to the old global LOW_STOCK_THRESHOLD env var pre-migration.
+          const threshold = (row && row.low_stock_threshold != null) ? row.low_stock_threshold : (Number(env.LOW_STOCK_THRESHOLD) || 3);
           if (row && row.stock_count <= threshold) {
             await alertLowStock(env, sku, row.name, row.stock_count);
           }
