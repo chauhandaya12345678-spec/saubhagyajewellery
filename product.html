@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260722l">
-<script src="layout.js?v=20260723a"></script>
-<script src="mpa.js?v=13" defer></script>
+<script src="layout.js?v=20260723b"></script>
+<script src="mpa.js?v=14" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
   * { box-sizing: border-box; }
@@ -365,6 +365,8 @@
     isOos = (p.inStock === 0 || p.inStock === false || (typeof p.stock_count === 'number' && p.stock_count <= 0));
     $('pdp-addcart').style.display = '';
     $('pdp-addcart').textContent = isOos ? 'ADD TO BAG FOR LATER' : 'ADD TO BAG';
+    var mAddBtn = $('pdp-mobile-add');
+    if (mAddBtn) mAddBtn.textContent = isOos ? 'ADD FOR LATER' : 'ADD TO BAG';
     var buyBtn = $('pdp-buynow');
     buyBtn.disabled = isOos;
     buyBtn.style.display = isOos ? 'none' : '';
@@ -534,7 +536,7 @@
     if (!product) return;
     addToBag();
     mAdd.textContent = '✓ ADDED';
-    setTimeout(function () { mAdd.textContent = 'ADD TO BAG'; }, 1400);
+    setTimeout(function () { mAdd.textContent = isOos ? 'ADD FOR LATER' : 'ADD TO BAG'; }, 1400);
   });
   if (mBuy) mBuy.addEventListener('click', function () {
     if (!product) return;

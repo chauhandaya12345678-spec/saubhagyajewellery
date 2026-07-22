@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260722l">
-<script src="layout.js?v=20260723a"></script>
-<script src="mpa.js?v=13" defer></script>
+<script src="layout.js?v=20260723b"></script>
+<script src="mpa.js?v=14" defer></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -99,6 +99,22 @@ function setLoading(btn, label) { btn.disabled = true; btn.innerHTML = '<span cl
 function clearLoading(btn, label) { btn.disabled = false; btn.textContent = label; }
 window.confirmationResult = null;
 window.recaptchaVerifier = null;
+
+// Google's "invisible" reCAPTCHA can still fall back to a visible challenge
+// when it can't silently verify the session. When that happens the send
+// button should stop looking like a frozen spinner and tell the customer
+// there's something to do below.
+(function watchRecaptchaChallenge() {
+  var box = document.getElementById('recaptcha-container');
+  if (!box || !window.MutationObserver) return;
+  var mo = new MutationObserver(function () {
+    var btn = $('send-btn');
+    if (btn && btn.disabled && box.querySelector('iframe')) {
+      btn.innerHTML = 'COMPLETE VERIFICATION BELOW ↓';
+    }
+  });
+  mo.observe(box, { childList: true, subtree: true });
+})();
 
 var user = null;
 try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}

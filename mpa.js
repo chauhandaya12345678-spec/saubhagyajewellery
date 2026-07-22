@@ -112,15 +112,18 @@
     var auths = document.querySelectorAll('[data-mpa-auth]');
     for (var j = 0; j < auths.length; j++) {
       var a = auths[j];
+      var iconOnly = a.hasAttribute('data-mpa-auth-icon');
       if (user) {
         var first = String(user.name || 'Account').split(/\s+/)[0];
-        a.textContent = 'Hi, ' + first;
+        if (!iconOnly) a.textContent = 'Hi, ' + first;
         a.setAttribute('href', a.getAttribute('data-mpa-account-href') || 'index.html');
-        a.setAttribute('title', user.email || user.phone || '');
+        a.setAttribute('title', iconOnly ? ('Hi, ' + first) : (user.email || user.phone || ''));
+        a.setAttribute('aria-label', iconOnly ? ('Account — Hi, ' + first) : (a.getAttribute('aria-label') || ''));
       } else {
-        a.textContent = 'Sign in';
+        if (!iconOnly) a.textContent = 'Sign in';
         a.setAttribute('href', a.getAttribute('data-mpa-signin-href') || 'index.html');
-        a.removeAttribute('title');
+        if (iconOnly) { a.setAttribute('title', 'Sign in'); a.setAttribute('aria-label', 'Sign in'); }
+        else a.removeAttribute('title');
       }
     }
     // Sign-out + auth-only links (Account, Sign out): shown ONLY when logged in

@@ -59,6 +59,8 @@
       '.nav-icons a,.nav-icons button{color:#1A1A1A;text-decoration:none;white-space:nowrap;transition:color .3s;background:none;border:none;padding:0;font:inherit;letter-spacing:inherit;cursor:pointer}',
       '.nav-icons a:hover,.nav-icons button:hover{color:#0B291C}',
       '.nav-search-icon{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}',
+      '.nav-profile-btn{display:none;align-items:center;justify-content:center;width:34px;height:34px;color:#1A1A1A}',
+      '.nav-profile-icon{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none}',
       '.nav-bag [data-mpa-cart-count]{align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:4px;border-radius:9px;background:#0B291C;color:#fff;font-size:10px;font-weight:600;line-height:1;vertical-align:middle}',
       '.nav-bag [data-mpa-cart-count]:not([style*="none"]){display:inline-flex}',
       '.nav-burger{order:0;display:none;flex-direction:column;justify-content:center;gap:5px;width:34px;height:34px;padding:0;background:none;border:none;cursor:pointer}',
@@ -115,7 +117,7 @@
       '  .navlinks{display:none}',
       '  .nav-icons{order:2;gap:10px}',
       '  .nav-icons .ni-hide{display:none}',
-      '  .nav-icons a[data-mpa-auth]{font-size:11px;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+      '  .nav-profile-btn{display:flex}',
       '  .nav-drawer{display:flex}',
       '}',
       /* footer: same brand SVG as header, sized down for the column,
@@ -157,10 +159,11 @@
       return '<a class="navlink' + (n.slug === active ? ' is-active' : '') + '" href="' + n.slug + '">' + n.label + '</a>';
     }).join('');
     var drawerLinks = links +
-      '<a class="navlink" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
       '<a class="navlink nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>';
     var searchIcon =
       '<svg class="nav-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>';
+    var profileIcon =
+      '<svg class="nav-profile-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6"/><path d="M5 20c0-3.9 3.4-6.2 7-6.2s7 2.3 7 6.2" stroke-linecap="round"/></svg>';
     return '<header class="site">' +
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
@@ -172,7 +175,8 @@
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
       '<button type="button" id="nav-search-btn" aria-label="Search">' + searchIcon + '</button>' +
-      '<a data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
+      '<a class="ni-hide" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
+      '<a class="nav-profile-btn" data-mpa-auth data-mpa-auth-icon data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '" aria-label="Account">' + profileIcon + '</a>' +
       '<a class="ni-hide nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>' +
       '<a class="nav-bag" href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
       '</div></div>' +
