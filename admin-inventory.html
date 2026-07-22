@@ -54,7 +54,10 @@ tr:hover td { background: #faf8f3; }
   <div class="ai-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
       <div style="font-size:12px;color:#9a9a9a" id="ai-count"></div>
-      <button class="ai-btn" id="ai-reload-btn" type="button">REFRESH</button>
+      <div>
+        <button class="ai-btn" id="ai-export-btn" type="button" style="margin-right:8px">EXPORT CSV</button>
+        <button class="ai-btn" id="ai-reload-btn" type="button">REFRESH</button>
+      </div>
     </div>
     <div class="ai-table-wrap">
       <table>
@@ -80,12 +83,39 @@ tr:hover td { background: #faf8f3; }
 <script>
 (function () {
   var adminKey = '';
+  var lastProducts = [];
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
     });
   }
+
+  function csvCell(v) {
+    var s = String(v == null ? '' : v);
+    if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function downloadCsv(filename, rows) {
+    var csv = rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
+    var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  document.getElementById('ai-export-btn').addEventListener('click', function () {
+    var rows = [['SKU', 'Name', 'Price', 'MRP', 'Stock Count', 'Weight (g)', 'Image']];
+    lastProducts.forEach(function (p) {
+      rows.push([p.sku, p.name, p.price, p.mrp, p.stock_count, p.weightGrams, p.image || '']);
+    });
+    downloadCsv('saubhagya-inventory-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
+  });
 
   document.getElementById('ai-key-btn').addEventListener('click', function () {
     var k = (document.getElementById('ai-key-input').value || '').trim();
@@ -110,6 +140,7 @@ tr:hover td { background: #faf8f3; }
       .then(function (r) { return r.json(); })
       .then(function (data) {
         var list = Array.isArray(data) ? data : (data && data.products || []);
+        lastProducts = list;
         document.getElementById('ai-count').textContent = list.length + ' products';
         status.textContent = '';
         tbody.innerHTML = list.map(function (p) {

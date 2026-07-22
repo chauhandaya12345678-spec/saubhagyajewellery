@@ -8,6 +8,10 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /admin-inventory
 Disallow: /admin-inventory.html
+Disallow: /admin-orders
+Disallow: /admin-orders.html
+Disallow: /admin-customers
+Disallow: /admin-customers.html
 Disallow: /account
 Disallow: /account.html
 Disallow: /api/
