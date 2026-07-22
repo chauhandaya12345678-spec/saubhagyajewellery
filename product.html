@@ -61,9 +61,9 @@
   .pdp-stock.low { color:#c0392b; }
   .pdp-stock .dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
   .pdp-noreturn { font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; margin-bottom: 22px; }
-  .pdp-fav-btn { display:block; width:100%; margin:22px 0 0; padding:14px; background:#fff; border:1px solid #ddd6c6; border-radius:14px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; letter-spacing:1.5px; color:#6a6a6a; cursor:pointer; transition:all .3s cubic-bezier(.25,1,.5,1); }
-  .pdp-fav-btn:hover { border-color:#C5A880; color:#0B291C; }
-  .pdp-fav-btn.on { border-color:#c0392b; color:#c0392b; background:#fdf3f2; }
+  .pdp-img-fav { position:absolute; top:12px; right:12px; z-index:3; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; color:#9a9a9a; transition:all .25s; box-shadow:0 2px 6px rgba(0,0,0,.1); border:none; line-height:1; padding:0; }
+  .pdp-img-fav:hover { color:#c0392b; background:rgba(255,255,255,1); box-shadow:0 3px 10px rgba(0,0,0,.15); }
+  .pdp-img-fav.on { color:#c0392b; }
   .pdp-pincheck { margin: 6px 0 18px; padding:14px 16px; background:#faf8f3; border:1px solid #eee5d6; border-radius:8px; }
   .pdp-pincheck-title { font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; color:#6a6a6a; margin-bottom:8px; }
   .pdp-pincheck-row { display:flex; gap:8px; }
@@ -189,6 +189,7 @@
       <div class="pdp-grid">
         <div class="pdp-img-wrap">
           <img class="pdp-img" id="pdp-image" src="" alt="">
+          <button type="button" id="pdp-fav" class="pdp-img-fav" aria-label="Save to favourites">♡</button>
           <div class="pdp-thumbs" id="pdp-thumbs"></div>
         </div>
         <div>
@@ -225,8 +226,6 @@
           <div class="pdp-desc" id="pdp-desc"></div>
         </div>
       </div>
-
-      <button class="pdp-fav-btn" id="pdp-fav" type="button">♡ SAVE TO FAVOURITES</button>
 
       <!-- REVIEWS -->
       <div class="rv-wrap">
@@ -444,7 +443,8 @@
   function paintFav() {
     var favs = getFavs();
     var on = favs.indexOf(sku) > -1;
-    $('pdp-fav').textContent = on ? '♥ SAVED TO FAVOURITES' : '♡ SAVE TO FAVOURITES';
+    $('pdp-fav').textContent = on ? '♥' : '♡';
+    $('pdp-fav').setAttribute('aria-label', on ? 'Saved to favourites' : 'Save to favourites');
     $('pdp-fav').classList.toggle('on', on);
   }
   $('pdp-fav').addEventListener('click', function() {
@@ -528,18 +528,29 @@
     window.location.href = 'checkout.html';
   });
   if (mBar) {
-    var toggleBar = function () {
-      // show once the primary desktop-side ADD button leaves the viewport
+    var _barCanShow = false, _rvVisible = false;
+    function _updateBar() {
+      var show = _barCanShow && !_rvVisible;
+      mBar.classList.toggle('on', show);
+      mBar.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }
+    var _rvWrap = document.querySelector('.rv-wrap');
+    if (_rvWrap) {
+      new IntersectionObserver(function(entries) {
+        _rvVisible = entries[0].isIntersecting;
+        _updateBar();
+      }, { threshold: 0.1 }).observe(_rvWrap);
+    }
+    var _toggleBar = function() {
       var anchor = $('pdp-addcart');
       if (!anchor) return;
       var r = anchor.getBoundingClientRect();
-      var below = r.bottom < 40;
-      mBar.classList.toggle('on', below);
-      mBar.setAttribute('aria-hidden', below ? 'false' : 'true');
+      _barCanShow = r.bottom < 40;
+      _updateBar();
     };
-    window.addEventListener('scroll', toggleBar, { passive: true });
-    window.addEventListener('resize', toggleBar);
-    setTimeout(toggleBar, 300);
+    window.addEventListener('scroll', _toggleBar, { passive: true });
+    window.addEventListener('resize', _toggleBar);
+    setTimeout(_toggleBar, 300);
   }
 
   /* ---- reviews (existing /api/reviews backend) ---- */

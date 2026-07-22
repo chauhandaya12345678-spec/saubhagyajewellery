@@ -23,6 +23,8 @@
   .auth-btn { display: block; width: 100%; padding: 16px; background: #0B291C; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; border-radius: 14px; box-shadow: 0 2px 8px rgba(11,41,28,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
   .auth-btn:hover:not(:disabled) { background: #071B12; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.25); }
   .auth-btn:disabled { opacity: .6; cursor: not-allowed; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,.35); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-right:8px; position:relative; top:-1px; }
   .auth-error { color: #c0392b; font-family: 'Montserrat',sans-serif; font-size:13px; text-align: center; margin: 12px 0; display: none; }
   .auth-success { color: #0B291C; font-family: 'Montserrat',sans-serif; font-size: 13px; text-align: center; margin: 12px 0; display: none; }
   .auth-link { text-align: center; margin-top: 18px; font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; }
@@ -93,6 +95,8 @@ const appCheck = initializeAppCheck(app, {
 const auth = getAuth(app);
 
 var $ = function(id) { return document.getElementById(id); };
+function setLoading(btn, label) { btn.disabled = true; btn.innerHTML = '<span class="btn-spinner"></span>' + label; }
+function clearLoading(btn, label) { btn.disabled = false; btn.textContent = label; }
 window.confirmationResult = null;
 window.recaptchaVerifier = null;
 
@@ -120,8 +124,7 @@ $('send-btn').addEventListener('click', function() {
   
   $('auth-error').style.display = 'none';
   $('auth-success').style.display = 'none';
-  $('send-btn').disabled = true;
-  $('send-btn').textContent = 'SENDING…';
+  setLoading($('send-btn'), 'SENDING…');
 
   if (!window.recaptchaVerifier) {
     window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
@@ -140,8 +143,7 @@ $('send-btn').addEventListener('click', function() {
       $('otp-input').focus();
     })
     .catch(function(err) {
-      $('send-btn').disabled = false;
-      $('send-btn').textContent = 'SEND OTP';
+      clearLoading($('send-btn'), 'SEND OTP');
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
         window.recaptchaVerifier = null;
@@ -155,8 +157,7 @@ $('verify-btn').addEventListener('click', function() {
   if (!code || code.length !== 6) { showError('Enter the 6-digit code.'); return; }
   if (!window.confirmationResult) { showError('Session expired. Please request a new OTP.'); return; }
   
-  $('verify-btn').disabled = true;
-  $('verify-btn').textContent = 'VERIFYING…';
+  setLoading($('verify-btn'), 'VERIFYING…');
   $('auth-error').style.display = 'none';
 
   window.confirmationResult.confirm(code)
@@ -183,13 +184,11 @@ $('verify-btn').addEventListener('click', function() {
         window.location.href = (ref && ref.indexOf('/signin') === -1) ? ref : '/index.html';
       } else {
         showError(d.error || 'Sign in failed.');
-        $('verify-btn').disabled = false;
-        $('verify-btn').textContent = 'VERIFY & SIGN IN';
+        clearLoading($('verify-btn'), 'VERIFY & SIGN IN');
       }
     })
     .catch(function(err) {
-      $('verify-btn').disabled = false;
-      $('verify-btn').textContent = 'VERIFY & SIGN IN';
+      clearLoading($('verify-btn'), 'VERIFY & SIGN IN');
       showError('Wrong code or verification expired. Please try again.');
     });
 });
