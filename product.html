@@ -334,11 +334,18 @@
     // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")
     var stockLbl = '', stockCls = '';
     if (p.inStock === 0 || p.inStock === false) { stockLbl = 'Out of stock'; stockCls = 'low'; }
+    else if (typeof p.stock_count === 'number' && p.stock_count <= 0) { stockLbl = 'Out of stock — check back soon'; stockCls = 'low'; }
     else if (typeof p.stock_count === 'number' && p.stock_count > 0 && p.stock_count <= 3) { stockLbl = 'Only ' + p.stock_count + ' left — order soon'; stockCls = 'low'; }
     else stockLbl = 'In stock · dispatches within 2–4 business days';
     $('pdp-stock-txt').textContent = stockLbl;
     $('pdp-stock').className = 'pdp-stock ' + stockCls;
     $('pdp-stock').style.display = 'inline-flex';
+    // Hide buy buttons when out of stock
+    var isOos = (p.inStock === 0 || p.inStock === false || (typeof p.stock_count === 'number' && p.stock_count <= 0));
+    $('pdp-addcart').style.display = isOos ? 'none' : '';
+    $('pdp-buynow').style.display = isOos ? 'none' : '';
+    var mb = document.getElementById('pdp-mobile-bar');
+    if (mb) mb.style.display = isOos ? 'none' : '';
     // Favourite toggle initial state
     paintFav();
     $('pdp-loading').style.display = 'none';
