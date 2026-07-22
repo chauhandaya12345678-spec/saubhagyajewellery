@@ -28,8 +28,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722j">
-<script src="layout.js?v=20260722j"></script>
+<link rel="stylesheet" href="site.css?v=20260722k">
+<script src="layout.js?v=20260722k"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
@@ -366,6 +366,14 @@
     $('pdp-content').style.display = 'block';
     // Product JSON-LD is injected server-side by functions/product.js (SSR shell
     // rewrite) so crawlers see it in the first response — no client duplicate needed.
+    try {
+      if (window.gtag) {
+        window.gtag('event', 'view_item', {
+          value: p.price || 0, currency: 'INR',
+          items: [{ item_id: p.sku || sku, item_name: p.name, price: p.price || 0, item_category: p.category || '' }]
+        });
+      }
+    } catch (e) {}
   }
 
   /* Color/finish swatches — reads p.variants([{image,label}]) or image+altImage.
@@ -476,6 +484,14 @@
 
   // Single write path — calling both MPA.addToCart AND a manual write doubled the qty
   function addToBag() {
+    try {
+      if (window.gtag && product) {
+        window.gtag('event', 'add_to_cart', {
+          value: (product.price || 0) * qty, currency: 'INR',
+          items: [{ item_id: product.sku, item_name: product.name, price: product.price || 0, quantity: qty }]
+        });
+      }
+    } catch (e) {}
     if (window.MPA) { window.MPA.addToCart(product.sku, qty); return; }
     try {
       var cart = JSON.parse(localStorage.getItem('cc_cart') || '[]');

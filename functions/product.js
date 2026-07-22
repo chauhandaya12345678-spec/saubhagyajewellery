@@ -141,9 +141,14 @@ export async function onRequest(context) {
       /<meta property="og:image" content="[^"]*">/,
       `<meta property="og:image" content="${esc(image)}">`
     )
-    // Inject Product + BreadcrumbList JSON-LD just before </head>
+    // Inject Product + BreadcrumbList JSON-LD, plus an LCP preload for the
+    // real hero image — index.html preloads its hero the same way, but
+    // product.html's image is normally only known after client-side JS
+    // fetches it, so it was never preloaded (this SSR rewrite already
+    // knows it from D1).
     .replace(
       '</head>',
+      `<link rel="preload" as="image" href="${esc(image)}" fetchpriority="high">` +
       `<meta property="og:url" content="${esc(canonical)}">` +
       `<meta property="product:price:amount" content="${p.price}">` +
       `<meta property="product:price:currency" content="INR">` +

@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722j">
-<script src="layout.js?v=20260722j"></script>
+<link rel="stylesheet" href="site.css?v=20260722k">
+<script src="layout.js?v=20260722k"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -177,6 +177,7 @@
   var cartItems = [];
   var products = {};
   var subtotal = 0;
+  var beginCheckoutFired = false;
   var savedAddresses = [];
   var selectedAddressId = null;
 
@@ -224,6 +225,20 @@
     }
     $('co-subtotal').textContent = fmt(subtotal);
     $('co-total-amt').textContent = fmt(subtotal);
+    if (!beginCheckoutFired && entries.length) {
+      beginCheckoutFired = true;
+      try {
+        if (window.gtag) {
+          window.gtag('event', 'begin_checkout', {
+            value: subtotal, currency: 'INR',
+            items: entries.map(function (e) {
+              var p = products[e.ci.id] || {};
+              return { item_id: e.ci.id, item_name: p.name || e.ci.id, price: p.price || 0, quantity: e.ci.qty };
+            })
+          });
+        }
+      } catch (e) {}
+    }
     var submitBtn = $('co-submit');
     if (submitBtn) submitBtn.disabled = !entries.length;
     if (!entries.length && $('co-error')) {
@@ -483,6 +498,18 @@
         try { localStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
         if (d.session_token) { try { localStorage.setItem('cc_token', d.session_token); } catch(e) {}}
         target += '?order_id=' + encodeURIComponent(d.order_id);
+        try {
+          if (window.gtag) {
+            window.gtag('event', 'purchase', {
+              transaction_id: d.order_id,
+              value: (saveBody.total || 0) / 100,
+              currency: 'INR',
+              items: (saveBody.items || []).map(function (l) {
+                return { item_id: l.id, item_name: l.name, price: l.price, quantity: l.qty };
+              })
+            });
+          }
+        } catch (e) {}
       }
       window.location.href = target;
     });
