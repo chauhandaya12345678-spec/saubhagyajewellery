@@ -1,6 +1,6 @@
 /**
  * PATCH /api/admin/update-inventory
- * Body: { sku, stock_count?, weightGrams?, price?, mrp?, image?, altImage? }
+ * Body: { sku, stock_count?, weightGrams?, price?, mrp?, image?, altImage?, name? }
  * Header: x-admin-key: <ADMIN_KEY env var>
  */
 import { verifyAdminKey, adminCorsHeaders } from '../_lib.js';
@@ -19,7 +19,7 @@ export async function onRequest(context) {
     });
   }
 
-  const unauthorized = verifyAdminKey(request, env, corsHeaders);
+  const unauthorized = await verifyAdminKey(request, env, corsHeaders);
   if (unauthorized) return unauthorized;
 
   let body;
@@ -29,7 +29,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { sku, stock_count, weightGrams, price, mrp, image, altImage } = body || {};
+  const { sku, stock_count, weightGrams, price, mrp, image, altImage, name } = body || {};
   if (!sku) {
     return new Response(JSON.stringify({ error: 'sku required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -72,6 +72,7 @@ export async function onRequest(context) {
     if (mr !== null) { setClauses.push('mrp = ?'); params.push(mr); }
     if (typeof image === 'string' && image) { setClauses.push('image = ?'); params.push(image); }
     if (typeof altImage === 'string') { setClauses.push('altImage = ?'); params.push(altImage); }
+    if (typeof name === 'string' && name.trim()) { setClauses.push('name = ?'); params.push(name.trim()); }
     if (setClauses.length === 1) {
       return new Response(JSON.stringify({ error: 'Nothing to update' }), {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },

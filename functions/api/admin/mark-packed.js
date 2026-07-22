@@ -18,7 +18,7 @@ export async function onRequest(context) {
     });
   }
 
-  const unauthorized = verifyAdminKey(request, env, corsHeaders);
+  const unauthorized = await verifyAdminKey(request, env, corsHeaders);
   if (unauthorized) return unauthorized;
 
   let body;

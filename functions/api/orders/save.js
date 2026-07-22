@@ -94,6 +94,15 @@ export async function onRequest(context) {
 
       if (existingUser) {
         userId = existingUser.id;
+        // Backfill the real name: instant OTP sign-in creates the account
+        // as "Guest" before any name is known (see firebase-verify.js) — the
+        // first order that comes in with a real name should fix that row.
+        if (name && name.trim() && (!existingUser.name || existingUser.name === 'Guest')) {
+          try {
+            await db.prepare('UPDATE users SET name = ?, updated_at = datetime(\'now\') WHERE id = ?')
+              .bind(name.trim(), userId).run();
+          } catch (e) {}
+        }
       } else if (create_account) {
         // is_guest=1 lets a later signup with the same email/phone claim this account
         const autoPwd = await hashPassword('guest_' + crypto.randomUUID());

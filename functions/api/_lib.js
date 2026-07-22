@@ -106,17 +106,65 @@ function timingSafeEqual(a, b) {
   return diff === 0;
 }
 
-/* Shared admin-key gate for every /api/admin/* endpoint. Returns the
-   Unauthorized Response to send back, or null if the request is authorized. */
-export function verifyAdminKey(request, env, corsHeaders) {
+const ADMIN_LOCKOUT_MAX_ATTEMPTS = 5;
+const ADMIN_LOCKOUT_MINUTES = 5;
+
+/* Shared admin-key gate for every /api/admin/* endpoint, with a per-IP
+   lockout: 5 wrong keys within the window locks that IP out for 5 minutes.
+   Tracked in D1 (admin_login_attempts) — see build/migrate-2026-07-22-admin-lockout.sql.
+   Falls back to a plain key check (no lockout) if that table isn't there yet,
+   so a pre-migration DB never breaks admin access entirely.
+   Returns the Response to send back, or null if the request is authorized. */
+export async function verifyAdminKey(request, env, corsHeaders) {
   const adminKey = env.ADMIN_KEY || '';
   const reqKey = request.headers.get('x-admin-key') || '';
-  if (!adminKey || !timingSafeEqual(reqKey, adminKey)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
+  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const db = env.DB;
+  const unauthorized = (msg, status) => new Response(JSON.stringify({ error: msg || 'Unauthorized' }), {
+    status: status || 401, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+  });
+
+  if (!adminKey) return unauthorized();
+
+  let row = null;
+  if (db) {
+    try {
+      row = await db.prepare('SELECT attempts, locked_until FROM admin_login_attempts WHERE ip = ?').bind(ip).first();
+    } catch (e) { row = undefined; } // table missing — fall through without lockout
   }
-  return null;
+
+  if (row && row.locked_until) {
+    const until = new Date(row.locked_until.replace(' ', 'T') + 'Z');
+    if (until > new Date()) {
+      const waitSec = Math.ceil((until - new Date()) / 1000);
+      return unauthorized(`Too many failed attempts. Try again in ${Math.ceil(waitSec / 60)} minute(s).`, 429);
+    }
+  }
+
+  if (timingSafeEqual(reqKey, adminKey)) {
+    if (db && row !== undefined) {
+      try { await db.prepare('DELETE FROM admin_login_attempts WHERE ip = ?').bind(ip).run(); } catch (e) {}
+    }
+    return null;
+  }
+
+  if (db && row !== undefined) {
+    try {
+      const attempts = (row ? row.attempts : 0) + 1;
+      if (attempts >= ADMIN_LOCKOUT_MAX_ATTEMPTS) {
+        await db.prepare(
+          `INSERT INTO admin_login_attempts (ip, attempts, locked_until, updated_at) VALUES (?, ?, datetime('now', '+${ADMIN_LOCKOUT_MINUTES} minutes'), datetime('now'))
+           ON CONFLICT(ip) DO UPDATE SET attempts = excluded.attempts, locked_until = excluded.locked_until, updated_at = datetime('now')`
+        ).bind(ip, attempts).run();
+        return unauthorized(`Too many failed attempts. Locked out for ${ADMIN_LOCKOUT_MINUTES} minutes.`, 429);
+      }
+      await db.prepare(
+        `INSERT INTO admin_login_attempts (ip, attempts, updated_at) VALUES (?, ?, datetime('now'))
+         ON CONFLICT(ip) DO UPDATE SET attempts = excluded.attempts, updated_at = datetime('now')`
+      ).bind(ip, attempts).run();
+    } catch (e) {}
+  }
+  return unauthorized();
 }
 
 /* Admin CORS: these tools are only ever fetched same-origin from the admin

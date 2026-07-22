@@ -43,7 +43,7 @@ tr:hover td { background: #faf8f3; }
 .b-out_for_delivery { background: #fef3e0; color: #b06a12; }
 .b-delivered { background: #e2f6ea; color: #1c7a3d; }
 .b-cancelled { background: #fbe7e6; color: #c0392b; }
-.b-rto, .b-rto_delivered, .b-rto_initiated, .b-rto_in_transit, .b-return_to_origin, .b-returned { background: #fbe7e6; color: #c0392b; }
+.b-rto, .b-rto_delivered, .b-rto_initiated, .b-rto_in_transit, .b-return_to_origin, .b-returned, .b-undelivered, .b-lost { background: #fbe7e6; color: #c0392b; }
 .ai-test { font-size: 9px; color: #c0392b; font-weight: 700; letter-spacing: .5px; margin-left: 6px; }
 .ai-num { width: 90px; padding: 7px 10px; border: 1px solid #ddd6c6; border-radius: 6px; font-family: inherit; font-size: 13px; }
 .ai-save { padding: 7px 14px; background: #0B291C; color: #fff; border: none; border-radius: 8px; font-family: inherit; font-size: 11px; letter-spacing: .8px; cursor: pointer; white-space: nowrap; }
@@ -55,11 +55,17 @@ tr:hover td { background: #faf8f3; }
 .ai-msg { font-size: 11px; color: #9a9a9a; }
 .ai-low { color: #c0392b; font-weight: 700; }
 .ai-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+tr.ai-attention td { background: #fdf0ef; }
+tr.ai-attention:hover td { background: #fbe4e2; }
+.ai-attention-flag { display: inline-block; margin-top: 4px; font-size: 9px; letter-spacing: .5px; color: #c0392b; font-weight: 700; text-transform: uppercase; }
 </style>
 </head>
 <body>
 <div class="ai-header">
-  <h1>SAUBHAGYA ADMIN</h1>
+  <div style="display:flex;align-items:center;gap:10px">
+    <img src="images/brand/logo-mark-gold.png?v=1" alt="" width="30" height="30" style="display:block">
+    <h1>SAUBHAGYA <span style="font-size:9px;letter-spacing:2px;color:#C5A880;border:1px solid #C5A880;border-radius:4px;padding:3px 7px;margin-left:4px;font-weight:600">ADMIN</span></h1>
+  </div>
   <div class="ai-tabs" id="ai-tabs">
     <button class="ai-tab active" data-tab="orders" type="button">ORDERS</button>
     <button class="ai-tab" data-tab="inventory" type="button">INVENTORY</button>
@@ -102,7 +108,7 @@ tr:hover td { background: #faf8f3; }
         <table>
           <thead>
             <tr>
-              <th>Order</th><th>Date</th><th>Customer</th><th>Items</th><th>Address</th>
+              <th>Order</th><th>Date</th><th>Customer</th><th>Email</th><th>Items</th><th>Address</th>
               <th>Total</th><th>Status</th><th>AWB</th><th>Actions</th>
             </tr>
           </thead>
@@ -187,6 +193,44 @@ tr:hover td { background: #faf8f3; }
     if (isNaN(d.getTime())) return esc(s);
     return d.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
+  // order.total is stored in paise (see functions/api/orders/save.js) — always
+  // divide by 100 before display, never print the raw integer.
+  function inr(paise) {
+    var r = (Number(paise) || 0) / 100;
+    return '₹' + r.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function rupeeNum(paise) { return ((Number(paise) || 0) / 100).toFixed(2); }
+
+  // Dispatch SLA by PIN zone — mirrors etaForPin() in functions/api/_lib.js:
+  // Mumbai 400/401 → 4 days, Maharashtra 41-44 → 5 days, rest of India → 8 days.
+  function dispatchDeadline(createdAt, pin) {
+    var p = String(pin || '').replace(/\D/g, '');
+    var maxDays = 8;
+    if (/^40[01]/.test(p)) maxDays = 4;
+    else if (/^4[1-4]/.test(p)) maxDays = 5;
+    var created = new Date(String(createdAt).replace(' ', 'T') + (String(createdAt).indexOf('Z') === -1 ? 'Z' : ''));
+    return new Date(created.getTime() + maxDays * 86400000);
+  }
+  var PRE_SHIP_STATUSES = ['confirmed', 'packed'];
+
+  // Live ShipPrime status overlay — same public endpoint account.html uses
+  // (no admin key needed), so the admin panel always shows the same truth
+  // customers see instead of the D1 cache, which only updates via webhook.
+  var SP_LABELS = {
+    CONFIRMED: 'Confirmed', PACKED: 'Packed', SHIPPED: 'Shipped',
+    OUT_FOR_DELIVERY: 'Out for Delivery', DELIVERED: 'Delivered',
+    UNDELIVERED: 'Undelivered', RTO_INITIATED: 'Return Started', RTO: 'Returned',
+    CANCELLED: 'Cancelled', LOST: 'Lost'
+  };
+  function badgeClassFor(statusUpper) {
+    return 'b-' + statusUpper.toLowerCase();
+  }
+  function fetchShipPrimeStatus(awb) {
+    if (!awb) return Promise.resolve(null);
+    return fetch('/api/orders/shipprime-track?awb=' + encodeURIComponent(awb))
+      .then(function (r) { return r.json(); })
+      .catch(function () { return null; });
+  }
   function apiFetch(path, opts) {
     opts = opts || {};
     opts.headers = Object.assign({ 'x-admin-key': adminKey }, opts.headers || {});
@@ -236,7 +280,7 @@ tr:hover td { background: #faf8f3; }
       var addr = o.address || {};
       var addrLine = [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).join(', ');
       var itemsLine = (o.items || []).map(function (it) { return (it.name || it.sku || '') + ' x' + (it.qty || it.quantity || 1); }).join(' | ');
-      rows.push([o.id, o.created_at || '', o.name || '', o.phone || '', o.email || '', itemsLine, addrLine, o.total, o.status || '', o.shipprime_awb || '', o.test_mode ? 'yes' : '']);
+      rows.push([o.id, o.created_at || '', o.name || '', o.phone || '', o.email || '', itemsLine, addrLine, rupeeNum(o.total), o.status || '', o.shipprime_awb || '', o.test_mode ? 'yes' : '']);
     });
     downloadCsv('saubhagya-orders-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
   });
@@ -269,14 +313,17 @@ tr:hover td { background: #faf8f3; }
             actions += '<button class="ai-save pack-btn" data-id="' + esc(o.id) + '" type="button">MARK PACKED</button>';
           }
           actions += '<button class="ai-btn small ghost slip-btn" data-id="' + esc(o.id) + '" type="button">PRINT SLIP</button></div>';
-          return '<tr>' +
+          var needsAttention = PRE_SHIP_STATUSES.indexOf(o.status) !== -1 && new Date() > dispatchDeadline(o.created_at, addr.pin);
+          return '<tr class="' + (needsAttention ? 'ai-attention' : '') + '" data-order-row="' + esc(o.id) + '">' +
             '<td class="ai-oid">' + esc(o.id) + (o.test_mode ? '<span class="ai-test">TEST</span>' : '') + '</td>' +
             '<td>' + fmtDate(o.created_at) + '</td>' +
             '<td>' + esc(o.name || '') + '<br><span style="color:#9a9a9a">' + esc(o.phone || '') + '</span></td>' +
+            '<td>' + esc(o.email || '') + '</td>' +
             '<td class="ai-items">' + items + '</td>' +
             '<td class="ai-addr">' + addrLine + '</td>' +
-            '<td>₹' + esc(o.total) + '</td>' +
-            '<td><span class="ai-badge ' + badgeClass + '">' + esc(o.status || '') + '</span></td>' +
+            '<td>' + inr(o.total) + '</td>' +
+            '<td class="ai-status-cell"><span class="ai-badge ' + badgeClass + '">' + esc(o.status || '') + '</span>' +
+              (needsAttention ? '<div class="ai-attention-flag">Needs attention</div>' : '') + '</td>' +
             '<td class="ai-oid">' + esc(o.shipprime_awb || '—') + '</td>' +
             '<td>' + actions + '</td>' +
             '</tr>';
@@ -287,8 +334,29 @@ tr:hover td { background: #faf8f3; }
         tbody.querySelectorAll('.slip-btn').forEach(function (btn) {
           btn.addEventListener('click', function () { printSlip(btn.getAttribute('data-id')); });
         });
+        syncLiveStatuses(d.orders);
       })
       .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
+  }
+
+  // Overlays live ShipPrime status onto each row so the panel never shows a
+  // stale D1-cached status when the webhook hasn't caught up (or isn't wired
+  // up in the ShipPrime dashboard) — same source of truth as account.html.
+  function syncLiveStatuses(orders) {
+    orders.forEach(function (o) {
+      if (!o.shipprime_awb) return;
+      fetchShipPrimeStatus(o.shipprime_awb).then(function (sp) {
+        if (!sp || !sp.currentStatus) return;
+        var row = document.querySelector('tr[data-order-row="' + CSS.escape(o.id) + '"]');
+        if (!row) return;
+        var cell = row.querySelector('.ai-status-cell');
+        if (!cell) return;
+        var label = SP_LABELS[sp.currentStatus] || sp.currentStatus;
+        cell.innerHTML = '<span class="ai-badge ' + badgeClassFor(sp.currentStatus) + '">' + esc(label) + '</span>' +
+          '<div style="font-size:9px;color:#9a9a9a;margin-top:3px">live via ShipPrime</div>';
+        row.classList.remove('ai-attention');
+      }).catch(function () {});
+    });
   }
 
   function markPacked(orderId, btn) {
@@ -319,7 +387,7 @@ tr:hover td { background: #faf8f3; }
       '<div style="font-size:12px;color:#666">Order ' + esc(o.id) + ' · ' + esc(fmtDate(o.created_at)) + '</div>' +
       '<div class="meta"><strong>Ship to:</strong><br>' + esc(o.name || '') + '<br>' + addrLine + '<br>' + esc(o.phone || '') + '</div>' +
       '<table><thead><tr><th>SKU</th><th>Item</th><th style="text-align:right">Qty</th></tr></thead><tbody>' + itemRows + '</tbody></table>' +
-      '<div class="meta"><strong>Total:</strong> ₹' + esc(o.total) + ' · <strong>Payment:</strong> ' + esc(o.payment_method || '') + '</div>' +
+      '<div class="meta"><strong>Total:</strong> ' + inr(o.total) + ' · <strong>Payment:</strong> ' + esc(o.payment_method || '') + '</div>' +
       '</body></html>';
     var w = window.open('', '_blank');
     w.document.write(html);
@@ -352,17 +420,30 @@ tr:hover td { background: #faf8f3; }
           var lowClass = (p.stock_count != null && p.stock_count <= 3) ? ' ai-low' : '';
           return '<tr data-sku="' + esc(p.sku) + '">' +
             '<td class="ai-sku">' + esc(p.sku) + '</td>' +
-            '<td class="ai-name">' + esc(p.name) + '</td>' +
+            '<td style="display:flex;align-items:center;gap:6px">' +
+              '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.name) + '" data-field="name" disabled>' +
+              '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit name">✎</button>' +
+            '</td>' +
             '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price"></td>' +
             '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.mrp != null ? p.mrp : '') + '" data-field="mrp"></td>' +
             '<td class="' + lowClass + '"><input class="ai-num" type="number" min="0" step="1" value="' + (p.stock_count != null ? p.stock_count : '') + '" data-field="stock_count"></td>' +
             '<td><input class="ai-num" type="number" min="0" step="0.1" value="' + (p.weightGrams != null ? p.weightGrams : '') + '" data-field="weightGrams"></td>' +
-            '<td><input class="ai-input" style="width:180px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp"></td>' +
+            '<td style="display:flex;align-items:center;gap:6px">' +
+              '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp" disabled>' +
+              '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit image path">✎</button>' +
+            '</td>' +
             '<td><button class="ai-save" type="button">SAVE</button><div class="ai-msg"></div></td>' +
             '</tr>';
         }).join('');
         tbody.querySelectorAll('.ai-save').forEach(function (btn) {
           btn.addEventListener('click', function () { saveRow(btn.closest('tr')); });
+        });
+        tbody.querySelectorAll('.edit-toggle').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var input = btn.previousElementSibling;
+            input.disabled = false;
+            input.focus();
+          });
         });
       })
       .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
@@ -375,6 +456,7 @@ tr:hover td { background: #faf8f3; }
     var priceInput = row.querySelector('[data-field="price"]');
     var mrpInput = row.querySelector('[data-field="mrp"]');
     var imgInput = row.querySelector('[data-field="image"]');
+    var nameInput = row.querySelector('[data-field="name"]');
     var btn = row.querySelector('.ai-save');
     var msg = row.querySelector('.ai-msg');
     var body = { sku: sku };
@@ -383,12 +465,14 @@ tr:hover td { background: #faf8f3; }
     if (priceInput.value !== '') body.price = parseInt(priceInput.value, 10);
     if (mrpInput.value !== '') body.mrp = parseInt(mrpInput.value, 10);
     if (imgInput.value.trim() !== '') body.image = imgInput.value.trim();
+    if (!nameInput.disabled && nameInput.value.trim() !== '') body.name = nameInput.value.trim();
     btn.disabled = true; btn.textContent = '…'; msg.textContent = '';
     apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       .then(function (d) {
         btn.disabled = false;
         if (d && d.success) {
           btn.textContent = 'SAVED'; btn.className = 'ai-save saved';
+          nameInput.disabled = true; imgInput.disabled = true;
           setTimeout(function () { btn.textContent = 'SAVE'; btn.className = 'ai-save'; }, 2000);
         } else {
           btn.textContent = 'SAVE'; btn.className = 'ai-save err';
@@ -409,7 +493,7 @@ tr:hover td { background: #faf8f3; }
   document.getElementById('c-export-btn').addEventListener('click', function () {
     var rows = [['Name', 'Email', 'Phone', 'Orders', 'Lifetime Spend', 'Joined']];
     lastCustomers.forEach(function (c) {
-      rows.push([c.name || '', c.email || '', c.phone || '', c.order_count || 0, c.lifetime_total || 0, c.created_at || '']);
+      rows.push([c.name || '', c.email || '', c.phone || '', c.order_count || 0, rupeeNum(c.lifetime_total), c.created_at || '']);
     });
     downloadCsv('saubhagya-customers-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
   });
@@ -434,7 +518,7 @@ tr:hover td { background: #faf8f3; }
             '<td>' + esc(c.email || '') + '</td>' +
             '<td>' + esc(c.phone || '') + '</td>' +
             '<td>' + esc(c.order_count || 0) + '</td>' +
-            '<td>₹' + esc(c.lifetime_total || 0) + '</td>' +
+            '<td>' + inr(c.lifetime_total) + '</td>' +
             '<td>' + esc((c.created_at || '').slice(0, 10)) + '</td>' +
             '</tr>';
         }).join('');

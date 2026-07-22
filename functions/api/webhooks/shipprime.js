@@ -11,7 +11,13 @@
  */
 import { logOrderEvent, sendWhatsAppMessage, restockOrder } from '../_lib.js';
 
-const RTO_STATUSES = ['rto', 'rto_delivered', 'rto_initiated', 'rto_in_transit', 'return_to_origin', 'returned'];
+// Matches ShipPrime's real vocabulary (see SP_LABELS in account.html):
+// CONFIRMED, PACKED, SHIPPED, OUT_FOR_DELIVERY, DELIVERED, UNDELIVERED,
+// RTO_INITIATED, RTO, CANCELLED, LOST. Only restock on the final 'rto' —
+// the piece is physically back with you by then. RTO_INITIATED means it's
+// still in transit back (nothing to restock yet); LOST means the courier
+// never returned it (restocking would let you oversell a piece you don't have).
+const RTO_STATUSES = ['rto'];
 
 export async function onRequest(context) {
   const { request, env } = context;
