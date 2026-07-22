@@ -12,8 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722h">
-<script src="layout.js?v=20260722h"></script>
+<link rel="stylesheet" href="site.css?v=20260722i">
+<script src="layout.js?v=20260722i"></script>
 <script src="mpa.js?v=13" defer></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Track Orders"}]}</script>
 <style>
@@ -344,16 +344,14 @@
     var lastOrderId = null;
     try { lastOrderId = localStorage.getItem('cc_lastorderid'); } catch(e) {}
 
-    if (user && user.phone) {
-      $('track-phone').value = String(user.phone || '').replace(/\D/g, '').slice(-10);
-      if (lastOrderId) {
-        // User just bought something — track that order directly
-        $('track-oid').value = lastOrderId;
-        doTrack();
-        return;
-      }
-      // User signed in but no recent order — fetch all their orders by phone
-      fetch('/api/orders/track?phone=' + encodeURIComponent(user.phone), authOpts())
+    // Signed-in users' broad "all my orders" lookup, used both as the
+    // primary path and as the fallback when a cached lastOrderId turns out
+    // to belong to a phone number that no longer matches the account (e.g.
+    // a guest checkout done with a different number before signing in) —
+    // previously that case just left the page stuck, since doTrack()'s
+    // failure state doesn't reset the "Loading your orders…" lede text.
+    function fetchAllOrders(phone) {
+      fetch('/api/orders/track?phone=' + encodeURIComponent(phone), authOpts())
         .then(function(r) { return r.json(); })
         .then(function(d) {
           if (d && d.success && d.orders && d.orders.length) {
@@ -363,6 +361,23 @@
           }
         })
         .catch(showGuest);
+    }
+
+    if (user && user.phone) {
+      $('track-phone').value = String(user.phone || '').replace(/\D/g, '').slice(-10);
+      if (lastOrderId) {
+        // Try the specific recent order first (fast, no session needed) —
+        // fall back to the broad lookup if it's not actually this account's.
+        fetch('/api/orders/track?order_id=' + encodeURIComponent(lastOrderId) + '&phone=' + encodeURIComponent(user.phone), authOpts())
+          .then(function(r) { return r.json(); })
+          .then(function(d) {
+            if (d && d.success && d.orders && d.orders.length) renderOrders(d.orders);
+            else fetchAllOrders(user.phone);
+          })
+          .catch(function() { fetchAllOrders(user.phone); });
+        return;
+      }
+      fetchAllOrders(user.phone);
       return;
     }
 
