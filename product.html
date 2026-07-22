@@ -28,8 +28,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722f">
-<script src="layout.js?v=20260722f"></script>
+<link rel="stylesheet" href="site.css?v=20260722g">
+<script src="layout.js?v=20260722g"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
@@ -288,6 +288,7 @@
 
   var product = null;
   var qty = 1;
+  var isOos = false;
 
   function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
 
@@ -350,8 +351,9 @@
     // Out of stock: Add to Bag stays live (so a signed-in customer can still
     // queue it up and buy once it's back), Buy Now becomes a disabled
     // "OUT OF STOCK" placeholder instead of disappearing.
-    var isOos = (p.inStock === 0 || p.inStock === false || (typeof p.stock_count === 'number' && p.stock_count <= 0));
+    isOos = (p.inStock === 0 || p.inStock === false || (typeof p.stock_count === 'number' && p.stock_count <= 0));
     $('pdp-addcart').style.display = '';
+    $('pdp-addcart').textContent = isOos ? 'ADD TO BAG FOR LATER' : 'ADD TO BAG';
     var buyBtn = $('pdp-buynow');
     buyBtn.disabled = isOos;
     buyBtn.textContent = isOos ? 'OUT OF STOCK' : 'BUY IT NOW';
@@ -486,7 +488,7 @@
     if (!product) return;
     addToBag();
     this.textContent = '✓ ADDED!';
-    setTimeout(function() { $('pdp-addcart').textContent = 'ADD TO BAG'; }, 1500);
+    setTimeout(function() { $('pdp-addcart').textContent = isOos ? 'ADD TO BAG FOR LATER' : 'ADD TO BAG'; }, 1500);
   });
 
   $('pdp-buynow').addEventListener('click', function() {
