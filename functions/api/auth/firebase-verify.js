@@ -6,7 +6,7 @@
  * Verifies Firebase ID token via Google's tokeninfo API, then
  * finds or creates user in D1. Returns session token + user.
  */
-import { genSessionToken } from '../_lib.js';
+import { genSessionToken, findOrCreateUserByPhone } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -50,46 +50,7 @@ export async function onRequest(context) {
     }
 
     const db = env.DB;
-
-    // Find existing user by phone
-    let user = await db.prepare('SELECT * FROM users WHERE phone = ?')
-      .bind(phone).first();
-
-    if (!user) {
-      // No users row yet — this happens when the customer's only prior order
-      // landed via the razorpay webhook fallback path, which never creates
-      // an account (save.js owns that). Their real name still lives on the
-      // orders row itself, so recover it from there instead of defaulting
-      // to "Guest" and locking in a wrong name forever.
-      let recoveredName = null, recoveredEmail = null;
-      try {
-        const lastOrder = await db.prepare(
-          'SELECT name, email FROM orders WHERE phone = ? AND name IS NOT NULL ORDER BY created_at DESC LIMIT 1'
-        ).bind(phone).first();
-        if (lastOrder) { recoveredName = lastOrder.name; recoveredEmail = lastOrder.email; }
-      } catch (e) {}
-      // Auto-create user (OTP-verified = trusted, is_guest=0)
-      const name = (body.name || recoveredName || 'Guest').trim() || 'Guest';
-      const email = recoveredEmail || null;
-      const autoPwd = 'firebase_' + crypto.randomUUID();
-      try {
-        const created = await db.prepare(
-          'INSERT INTO users (name, phone, email, password, is_guest) VALUES (?, ?, ?, ?, 0)'
-        ).bind(name, phone, email, autoPwd).run();
-        user = { id: created.meta.last_row_id, name, email, phone };
-      } catch (e) {
-        if (!/no such column/i.test(e.message)) throw e;
-        const created = await db.prepare(
-          'INSERT INTO users (name, phone, password) VALUES (?, ?, ?)'
-        ).bind(name, phone, autoPwd).run();
-        user = { id: created.meta.last_row_id, name, email: null, phone };
-      }
-    } else if (user.is_guest === 1) {
-      try {
-        await db.prepare("UPDATE users SET is_guest = 0, updated_at = datetime('now') WHERE id = ?")
-          .bind(user.id).run();
-      } catch (e) {}
-    }
+    const user = await findOrCreateUserByPhone(db, phone, { name: body.name });
 
     // Create session token
     const sessionToken = genSessionToken();

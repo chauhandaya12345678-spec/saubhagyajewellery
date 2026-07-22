@@ -144,6 +144,47 @@ export function genSessionToken() {
   return 'sess_' + crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '').slice(0, 12);
 }
 
+/* Find-or-create a users row by phone after OTP verification (phone/WhatsApp
+   auth only ever proves the number, never a name). If no row exists yet —
+   e.g. the customer's only order landed via the razorpay webhook fallback
+   path, which never creates an account — recover the real name/email from
+   their most recent orders row instead of defaulting to "Guest" and locking
+   in a wrong name permanently. Shared by every OTP-based sign-in path. */
+export async function findOrCreateUserByPhone(db, phone, opts) {
+  opts = opts || {};
+  let user = await db.prepare('SELECT * FROM users WHERE phone = ?').bind(phone).first();
+  if (user) {
+    if (user.is_guest === 1) {
+      try {
+        await db.prepare("UPDATE users SET is_guest = 0, updated_at = datetime('now') WHERE id = ?").bind(user.id).run();
+      } catch (e) {}
+    }
+    return user;
+  }
+  let recoveredName = null, recoveredEmail = null;
+  try {
+    const lastOrder = await db.prepare(
+      'SELECT name, email FROM orders WHERE phone = ? AND name IS NOT NULL ORDER BY created_at DESC LIMIT 1'
+    ).bind(phone).first();
+    if (lastOrder) { recoveredName = lastOrder.name; recoveredEmail = lastOrder.email; }
+  } catch (e) {}
+  const name = (opts.name || recoveredName || 'Guest').trim() || 'Guest';
+  const email = opts.email || recoveredEmail || null;
+  const autoPwd = 'otp_' + crypto.randomUUID();
+  try {
+    const created = await db.prepare(
+      'INSERT INTO users (name, phone, email, password, is_guest) VALUES (?, ?, ?, ?, 0)'
+    ).bind(name, phone, email, autoPwd).run();
+    return { id: created.meta.last_row_id, name, email, phone };
+  } catch (e) {
+    if (!/no such column/i.test(e.message)) throw e;
+    const created = await db.prepare(
+      'INSERT INTO users (name, phone, password) VALUES (?, ?, ?)'
+    ).bind(name, phone, autoPwd).run();
+    return { id: created.meta.last_row_id, name, email: null, phone };
+  }
+}
+
 /* Constant-time string compare — guards secret/signature checks against
    timing side-channels (naive !== short-circuits on first mismatched byte).
    Exported as constantTimeEqual for use outside this file (e.g. webhook
