@@ -150,14 +150,30 @@ export async function onRequest(context) {
     const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
     const orderId = `CC-${dateStr}-${rand}`;
 
+    // Best-effort user_id lookup (never creates an account — save.js owns
+    // that). Without this, every order that lands via this webhook path
+    // instead of save.js gets user_id = NULL even when the phone/email
+    // already has an account, which used to make it invisible to the
+    // admin Customers view (that view has since been fixed to key off
+    // orders.phone directly, but linking it here keeps the data correct too).
+    const webhookPhone = notes.customer_phone || p.contact || null;
+    const webhookEmail = notes.customer_email || p.email || null;
+    let webhookUserId = null;
+    try {
+      let existing = null;
+      if (webhookEmail) existing = await db.prepare('SELECT id FROM users WHERE lower(email) = ?').bind(String(webhookEmail).toLowerCase()).first();
+      if (!existing && webhookPhone) existing = await db.prepare('SELECT id FROM users WHERE phone = ?').bind(String(webhookPhone).replace(/\D/g, '').slice(-10)).first();
+      if (existing) webhookUserId = existing.id;
+    } catch (e) { /* best-effort */ }
+
     let webhookInsertRes;
     try {
       webhookInsertRes = await db.prepare(
         `INSERT OR IGNORE INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address,
                              razorpay_payment_id, razorpay_order_id, payment_method, test_mode, status)
-         VALUES (?, NULL, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, 'razorpay', ?, 'confirmed')`
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, 'razorpay', ?, 'confirmed')`
       ).bind(
-        orderId, notes.customer_email || p.email || null, notes.customer_phone || p.contact || null,
+        orderId, webhookUserId, webhookEmail, webhookPhone,
         notes.customer_name || 'Guest', JSON.stringify(items), p.amount, p.amount,
         addressJson, p.id, p.order_id || null, isTest
       ).run();
@@ -165,9 +181,9 @@ export async function onRequest(context) {
       if (!/no such column/i.test(e.message)) throw e;
       webhookInsertRes = await db.prepare(
         `INSERT OR IGNORE INTO orders (id, user_id, email, phone, name, items, total, subtotal, discount, address, razorpay_payment_id, status)
-         VALUES (?, NULL, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'confirmed')`
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 'confirmed')`
       ).bind(
-        orderId, notes.customer_email || p.email || null, notes.customer_phone || p.contact || null,
+        orderId, webhookUserId, webhookEmail, webhookPhone,
         notes.customer_name || 'Guest', JSON.stringify(items), p.amount, p.amount, addressJson, p.id
       ).run();
     }

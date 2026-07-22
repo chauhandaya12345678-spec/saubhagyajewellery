@@ -63,6 +63,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 .ai-role-badge { font-size: 9px; letter-spacing: 1px; color: #C5A880; margin-left: auto; padding: 4px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 20px; }
 .ai-form-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
 .ai-form-row input, .ai-form-row select { padding: 9px 12px; border: 1px solid #ddd6c6; border-radius: 6px; font-family: inherit; font-size: 12px; }
+.ai-cell-flex { display: flex; align-items: center; gap: 6px; }
 .ai-dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
 .ai-dash-card { background: #fff; border: 1px solid #eae5d8; border-radius: 12px; padding: 20px; }
 .ai-dash-card.ai-dash-warn { border-color: #f3c9c5; background: #fdf6f5; }
@@ -587,25 +588,25 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       var threshold = p.low_stock_threshold != null ? p.low_stock_threshold : 3;
       var lowClass = (p.stock_count != null && p.stock_count <= threshold) ? ' ai-low' : '';
       return '<tr data-sku="' + esc(p.sku) + '">' +
-        '<td style="display:flex;align-items:center;gap:6px">' +
+        '<td><div class="ai-cell-flex">' +
           '<input class="ai-input ai-sku" style="width:110px;margin:0" type="text" value="' + esc(p.sku) + '" data-field="sku" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Rename SKU">✎</button>' +
           '<a href="product?sku=' + encodeURIComponent(p.sku) + '" target="_blank" rel="noopener" title="View live product page" style="text-decoration:none;font-size:14px">🔗</a>' +
-        '</td>' +
-        '<td style="display:flex;align-items:center;gap:6px">' +
+        '</div></td>' +
+        '<td><div class="ai-cell-flex">' +
           '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.name) + '" data-field="name" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit name">✎</button>' +
-        '</td>' +
+        '</div></td>' +
         '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price"></td>' +
         '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.mrp != null ? p.mrp : '') + '" data-field="mrp"></td>' +
         '<td class="' + lowClass + '"><input class="ai-num" type="number" min="0" step="1" value="' + (p.stock_count != null ? p.stock_count : '') + '" data-field="stock_count"></td>' +
         '<td><input class="ai-num" style="width:60px" type="number" min="0" step="1" value="' + threshold + '" data-field="low_stock_threshold"></td>' +
         '<td><input class="ai-num" type="number" min="0" step="0.1" value="' + (p.weightGrams != null ? p.weightGrams : '') + '" data-field="weightGrams"></td>' +
         '<td><input class="ai-num" type="number" min="0" step="1" value="' + (p.packing_weight_grams != null ? p.packing_weight_grams : '') + '" data-field="packing_weight_grams" placeholder="40"></td>' +
-        '<td style="display:flex;align-items:center;gap:6px">' +
+        '<td><div class="ai-cell-flex">' +
           '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit image path">✎</button>' +
-        '</td>' +
+        '</div></td>' +
         '<td><button class="ai-save" type="button">SAVE</button><div class="ai-msg"></div></td>' +
         '</tr>';
     }).join('');

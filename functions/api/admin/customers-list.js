@@ -2,6 +2,12 @@
  * GET /api/admin/customers-list?q=&limit=
  * Header: x-admin-key: <ADMIN_KEY env var>
  * Read-only customer feed for admin-customers.html.
+ *
+ * Built from orders.phone, not users.id — orders created via the Razorpay
+ * webhook race-condition path (functions/api/razorpay/webhook.js) always
+ * insert user_id = NULL, even when a matching users row exists by phone.
+ * Joining on user_id there silently hides every real customer. Phone is
+ * the reliable identity across both tables, so aggregate on that instead.
  */
 import { verifyAdminAccess, adminCorsHeaders } from '../_lib.js';
 
@@ -25,18 +31,33 @@ export async function onRequest(context) {
 
   try {
     const db = env.DB;
-    let sql = `SELECT u.id, u.name, u.email, u.phone, u.created_at,
-                      COUNT(o.id) AS order_count,
-                      COALESCE(SUM(o.total), 0) AS lifetime_total
-               FROM users u
-               LEFT JOIN orders o ON o.user_id = u.id`;
+    let sql = `
+      SELECT * FROM (
+        SELECT
+          o.phone AS phone,
+          COALESCE(
+            (SELECT o2.name FROM orders o2 WHERE o2.phone = o.phone AND o2.name IS NOT NULL AND o2.name != 'Guest' ORDER BY o2.created_at DESC LIMIT 1),
+            'Guest'
+          ) AS name,
+          (SELECT u.email FROM users u WHERE u.phone = o.phone AND u.email IS NOT NULL LIMIT 1) AS email,
+          COUNT(*) AS order_count,
+          COALESCE(SUM(o.total), 0) AS lifetime_total,
+          MIN(o.created_at) AS created_at
+        FROM orders o
+        WHERE o.phone IS NOT NULL
+        GROUP BY o.phone
+        UNION ALL
+        SELECT u.phone, u.name, u.email, 0, 0, u.created_at
+        FROM users u
+        WHERE u.phone IS NOT NULL AND u.phone NOT IN (SELECT phone FROM orders WHERE phone IS NOT NULL)
+      )`;
     const params = [];
     if (q) {
-      sql += ' WHERE (u.name LIKE ? OR u.email LIKE ? OR u.phone LIKE ?)';
+      sql += ' WHERE (name LIKE ? OR email LIKE ? OR phone LIKE ?)';
       const like = '%' + q + '%';
       params.push(like, like, like);
     }
-    sql += ' GROUP BY u.id ORDER BY u.created_at DESC LIMIT ?';
+    sql += ' ORDER BY created_at DESC LIMIT ?';
     params.push(limit);
 
     const { results } = await db.prepare(sql).bind(...params).all();
