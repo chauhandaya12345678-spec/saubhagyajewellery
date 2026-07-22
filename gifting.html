@@ -41,7 +41,7 @@
   .gf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
   .p-card { text-decoration: none; color: inherit; display: block; position: relative; }
   .p-img { position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden; border-radius: 8px; background: #eae5d8; }
-  .p-img .im { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.25,1,.5,1); }
+  .p-img .im { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform .6s cubic-bezier(.25,1,.5,1); }
   @media(hover:hover) { .p-card:hover .p-img .im { transform: scale(1.05); } }
   .p-name { font-family:'Playfair Display',serif; font-size: 17px; color: #1A1A1A; margin-top: 10px; }
   .p-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B291C; font-weight: 500; margin-top: 3px; }
@@ -124,7 +124,7 @@
       var img = p.image || '';
       return '<a class="p-card" href="product?sku=' + encodeURIComponent(p.sku || p.id) + '">' +
         '<div class="p-img">' +
-          '<div class="im" style="background-image:url(\'' + esc(img) + '\')"></div>' +
+          '<img class="im" src="' + esc(img) + '" alt="' + esc(p.name || '') + ' — Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500">' +
         '</div>' +
         '<div class="p-name">' + esc(p.name) + '</div>' +
         '<div class="p-price">' + fmt(p.price) +
