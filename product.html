@@ -28,8 +28,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722b">
-<script src="layout.js?v=20260722b"></script>
+<link rel="stylesheet" href="site.css?v=20260722c">
+<script src="layout.js?v=20260722c"></script>
 <script src="mpa.js?v=13" defer></script>
 <script src="catalog.js?v=13"></script>
 <style>
@@ -73,28 +73,25 @@
   .pdp-pincheck-result { margin-top:8px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B291C; min-height:16px; }
   .pdp-pincheck-result.err { color:#c0392b; }
   .pdp-noreturn a { color: #0B291C; }
-  /* reviews — compact 2-column split: rating summary + form on the left, review list on the right.
-     max-height caps at 6+ reviews only (JS adds .rv-scroll) so 1-2 reviews don't leave a tall empty box. */
+  /* reviews — single column: horizontal-scrolling review strip on top (never
+     reserves empty vertical space, however many/few reviews exist), compact
+     "write a review" form below it. */
   .rv-wrap { max-width: 760px; margin: 20px auto 0; padding: 22px 0 0; border-top: 1px solid #eae5d8; }
-  .rv-grid { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 32px; align-items: start; }
   .rv-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
   .rv-title { font-family:'Playfair Display',serif; font-size: 22px; color: #1A1A1A; margin: 0; }
   .rv-avg { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #C5A880; }
-  .rv-right.rv-scroll { max-height: 420px; overflow-y: auto; padding-right: 6px; }
-  .rv-item { padding: 12px 14px; border: 1px solid #f3ede1; border-radius: 12px; margin-bottom: 10px; background: #fff; }
-  .rv-item:last-child { margin-bottom: 0; }
+  .rv-right { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 20px; scroll-snap-type: x proximity; }
+  .rv-item { flex: 0 0 240px; scroll-snap-align: start; padding: 12px 14px; border: 1px solid #f3ede1; border-radius: 12px; background: #fff; }
   .rv-stars { color: #C5A880; font-size: 13px; letter-spacing:1.5px; }
   .rv-name { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #1A1A1A; font-weight: 500; margin-top: 4px; }
-  .rv-text { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6a6a6a; line-height: 1.7; margin-top: 6px; }
-  .rv-empty { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; padding: 10px 0 4px; }
-  .rv-form { margin-top: 14px; max-width: 100%; }
+  .rv-text { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #6a6a6a; line-height: 1.6; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .rv-empty { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; padding: 4px 0 4px; }
+  .rv-form { margin-top: 0; max-width: 100%; padding-top: 16px; border-top: 1px solid #f3ede1; }
   .rv-form h3 { font-family:'Playfair Display',serif; font-size: 17px; color: #1A1A1A; margin: 0 0 10px; }
-  @media (max-width: 900px) {
-    .rv-grid { grid-template-columns: 1fr; gap: 20px; }
-    .rv-right.rv-scroll { max-height: none; overflow-y: visible; padding-right: 0; }
-  }
+  .rv-form-row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 8px; }
+  .rv-form-row > div { flex: 1; min-width: 160px; }
   .rv-input, .rv-textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd6c6; font-family: 'Montserrat',sans-serif; font-size: 13px; outline: none; background: #fff; margin-bottom: 8px; box-sizing: border-box; }
-  .rv-textarea { min-height: 64px; resize: vertical; }
+  .rv-textarea { min-height: 56px; resize: vertical; }
   .rv-starpick { display: flex; gap: 6px; margin-bottom: 12px; cursor: pointer; font-size: 22px; color: #ddd6c6; user-select: none; }
   .rv-starpick span.on { color: #C5A880; }
   .rv-submit { padding: 13px 26px; background: #0B291C; color: #fff; border: none; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; border-radius: 14px; box-shadow: 0 2px 8px rgba(11,41,28,.15); transition: all .4s cubic-bezier(.25,1,.5,1); }
@@ -213,30 +210,32 @@
 
       <!-- REVIEWS -->
       <div class="rv-wrap">
-        <div class="rv-grid">
-          <div class="rv-left">
-            <div class="rv-head">
-              <h2 class="rv-title">Reviews</h2>
-              <span class="rv-avg" id="rv-avg"></span>
-            </div>
-            <div class="rv-form">
-              <h3>Write a review</h3>
+        <div class="rv-head">
+          <h2 class="rv-title">Reviews</h2>
+          <span class="rv-avg" id="rv-avg"></span>
+        </div>
+        <div class="rv-right" id="rv-right">
+          <div id="rv-list"><div class="rv-empty-nice">Be the first to review —<br>your feedback helps others find their perfect piece.</div></div>
+        </div>
+        <div class="rv-form">
+          <h3>Write a review</h3>
+          <div class="rv-form-row">
+            <div>
               <label class="rv-label">Your rating</label>
               <div class="rv-starpick" id="rv-starpick" title="Tap to rate">
                 <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
               </div>
+            </div>
+            <div>
               <label class="rv-label" for="rv-name">Your name</label>
-              <input class="rv-input" id="rv-name" placeholder="e.g. Priya M." maxlength="60">
-              <label class="rv-label" for="rv-text">Your review</label>
-              <textarea class="rv-textarea" id="rv-text" placeholder="How was the piece? Fit, finish, occasion…" maxlength="600"></textarea>
-              <div class="rv-char-count" id="rv-char-count">0 / 600</div>
-              <button class="rv-submit" id="rv-submit">SUBMIT REVIEW</button>
-              <div class="rv-msg" id="rv-msg"></div>
+              <input class="rv-input" id="rv-name" placeholder="e.g. Priya M." maxlength="60" style="margin-bottom:0">
             </div>
           </div>
-          <div class="rv-right" id="rv-right">
-            <div id="rv-list"><div class="rv-empty-nice">Be the first to review —<br>your feedback helps others find their perfect piece.</div></div>
-          </div>
+          <label class="rv-label" for="rv-text">Your review</label>
+          <textarea class="rv-textarea" id="rv-text" placeholder="How was the piece? Fit, finish, occasion…" maxlength="600"></textarea>
+          <div class="rv-char-count" id="rv-char-count">0 / 600</div>
+          <button class="rv-submit" id="rv-submit">SUBMIT REVIEW</button>
+          <div class="rv-msg" id="rv-msg"></div>
         </div>
       </div>
     </div>
@@ -511,9 +510,6 @@
       .then(function(d) {
         if (!d || !d.success) return;
         if (d.count > 0) $('rv-avg').textContent = '★ ' + d.average + ' · ' + d.count + ' review' + (d.count > 1 ? 's' : '');
-        // Only cap height + scroll once there are enough reviews to need it —
-        // otherwise a 1-2 review list would sit inside a tall near-empty box.
-        $('rv-right').classList.toggle('rv-scroll', (d.count || 0) > 5);
         if (d.reviews && d.reviews.length) {
           $('rv-list').innerHTML = d.reviews.map(function(r) {
             var stars = '★'.repeat(Math.max(1, Math.min(5, r.rating))) + '☆'.repeat(Math.max(0, 5 - Math.min(5, r.rating)));
