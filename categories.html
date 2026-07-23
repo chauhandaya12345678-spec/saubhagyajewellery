@@ -142,26 +142,16 @@
      `image` = a representative photo we already have.
      `match(p)` gets the product; returns true if it belongs.        */
   var SUBS = [
-    { slug: 'necklaces',   label: 'Necklaces',           image: 'images/necklace/20260602_163137.webp',
-      match: function (p) { return /Necklace|Haaram|Kasu Mala|Rani Haar/i.test(p.category + ' ' + p.name) && !/Set/i.test(p.category); } },
-    { slug: 'premium-chokers', label: 'Premium Chokers', image: 'images/choker/202606051334.webp',
-      match: function (p) { return /Choker/i.test(p.category + ' ' + p.name) && (p.price >= 1000); } },
-    { slug: 'waist-chains', label: 'Waist Chains',       image: 'images/waist-chain/20260528_132320.webp',
-      match: function (p) { return /Vanki|Waist/i.test(p.category + ' ' + p.name); } },
-    { slug: 'jhumkas',     label: 'Jhumkas',             image: 'images/Earrings/20260528_121549.webp',
-      match: function (p) { return /Jhumka|Drop/i.test(p.category + ' ' + p.name) && !/Solitaire|Studs/i.test(p.category + ' ' + p.name); } },
-    { slug: 'earrings',    label: 'Earrings',            image: 'images/Earrings/20260528_120749.webp',
-      match: function (p) { return /Earring|Drop|Studs|Jhumka|Passa|Nath|Maang Tikka/i.test(p.category + ' ' + p.name); } },
-    { slug: 'pendants',    label: 'Pendants',            image: 'images/pendant/pendant-01.webp',
-      match: function (p) { return /Pendant/i.test(p.category + ' ' + p.name); } },
-    { slug: 'necklace-set', label: 'Necklace Sets',      image: 'images/necklace/necklace-05.webp',
-      match: function (p) { return /Set/i.test(p.category) && !/Bridal/i.test(p.category); } },
-    { slug: 'fashion-earrings', label: 'Fashion Earrings', image: 'images/Earrings/20260528_123742.webp',
-      match: function (p) { return /Drop|Studs|Earring/i.test(p.category + ' ' + p.name) && p.price < 1500; } },
-    { slug: 'bridal-set',  label: 'Bridal Sets',         image: 'images/necklace/20260605_111058.webp',
-      match: function (p) { return /Bridal Set/i.test(p.category + ' ' + p.name); } },
-    { slug: 'south-temple-necklace', label: 'South Temple Necklaces', image: 'images/necklace/20260605_110931.webp',
-      match: function (p) { return /Temple/i.test(p.category + ' ' + p.name); } }
+    { slug: 'bridal-set',  label: 'Bridal Sets',  image: 'images/necklace/neck-20260723_202837.webp',
+      match: function (p) { return p.category === 'Bridal Set'; } },
+    { slug: 'necklaces',   label: 'Necklaces',    image: 'images/necklace/neck-20260723_195253.webp',
+      match: function (p) { return p.category === 'Necklace'; } },
+    { slug: 'jhumkas',     label: 'Jhumkas',      image: 'images/Earrings/ear-20260528_125028.webp',
+      match: function (p) { return p.category === 'Jhumkas'; } },
+    { slug: 'earrings',    label: 'Earrings',     image: 'images/Earrings/ear-20260528_115256.webp',
+      match: function (p) { return p.category === 'Earring'; } },
+    { slug: 'pendants',    label: 'Pendants',     image: 'images/Earrings/ear-20260528_121549.webp',
+      match: function (p) { return p.category === 'Pendant'; } }
   ];
 
   function getParam(name) { return new URLSearchParams(location.search).get(name) || ''; }
