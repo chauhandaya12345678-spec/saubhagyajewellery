@@ -312,7 +312,7 @@
   function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
 
   function renderTrending() {
-    var cat = window.CHAUHAN_CATALOG || [];
+    var cat = window.SAUBHAGYA_CATALOG || [];
     if (!cat.length) return false;
     var picks = cat.filter(function (p) { return p.inStock !== 0 && p.inStock !== false; }).slice(0, 8);
     var grid = document.getElementById('tr-grid');

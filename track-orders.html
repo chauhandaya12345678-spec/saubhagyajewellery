@@ -147,7 +147,7 @@
 
   var CATALOG = {};
   function hydrateCatalog() {
-    (window.CHAUHAN_CATALOG || []).forEach(function(p) { CATALOG[p.id || p.sku] = p; });
+    (window.SAUBHAGYA_CATALOG || []).forEach(function(p) { CATALOG[p.id || p.sku] = p; });
   }
 
   // ── ShipPrime status mapping ──
@@ -428,7 +428,7 @@
   // ── Init ──
   function boot() {
     hydrateCatalog();
-    if (!window.CHAUHAN_CATALOG || !window.CHAUHAN_CATALOG.length) {
+    if (!window.SAUBHAGYA_CATALOG || !window.SAUBHAGYA_CATALOG.length) {
       window.addEventListener('catalog-ready', function once() { window.removeEventListener('catalog-ready', once); hydrateCatalog(); });
     }
     autoDetect();

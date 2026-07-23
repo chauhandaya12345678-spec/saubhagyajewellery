@@ -666,7 +666,7 @@
 
   // Fetch product (catalog.js static fallback if the API is unreachable)
   function fromCatalog() {
-    var hit = (window.CHAUHAN_CATALOG || []).find(function(p) { return p.id === sku || p.sku === sku; });
+    var hit = (window.SAUBHAGYA_CATALOG || []).find(function(p) { return p.id === sku || p.sku === sku; });
     if (hit) { product = hit; render(); return true; }
     return false;
   }

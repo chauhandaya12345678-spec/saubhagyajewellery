@@ -94,7 +94,7 @@
   var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
   var CATALOG = {};
 
-  function hydrate() { (window.CHAUHAN_CATALOG || []).forEach(function(p) { CATALOG[p.id || p.sku] = p; }); }
+  function hydrate() { (window.SAUBHAGYA_CATALOG || []).forEach(function(p) { CATALOG[p.id || p.sku] = p; }); }
 
   function fmtDate(d) { if (!d) return ''; return new Date(String(d).replace(' ','T')+'Z').toLocaleDateString('en-IN', { month:'short', day:'numeric', year:'numeric' }); }
 
@@ -200,7 +200,7 @@
     $('ac-contact').textContent = user.email || ('+91 ' + (user.phone || ''));
     loadOrders(user);
     favsUI();
-    if (!(window.CHAUHAN_CATALOG || []).length) {
+    if (!(window.SAUBHAGYA_CATALOG || []).length) {
       window.addEventListener('catalog-ready', function once() { window.removeEventListener('catalog-ready', once); hydrate(); favsUI(); });
     }
   }

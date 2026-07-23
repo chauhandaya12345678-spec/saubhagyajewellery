@@ -305,7 +305,7 @@
         function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
 
         function renderHits(q) {
-          var cat = window.CHAUHAN_CATALOG || [];
+          var cat = window.SAUBHAGYA_CATALOG || [];
           if (!cat.length || !q) { sHits.classList.remove('on'); sHits.innerHTML = ''; return; }
           var lc = q.toLowerCase();
           var hits = cat.filter(function (p) {
