@@ -401,6 +401,7 @@ export async function verifyPassword(plain, stored) {
  * Returns { pushed, awb?, courier?, orderId?, labelUrl?, error? } — never throws.
  */
 export async function pushToShipPrime(env, order, db) {
+  if (env.UAT_MODE === 'true') return { pushed: false, skipped: true, reason: 'UAT sandbox — no real ShipPrime push' };
   try {
     const token = env.SHIPPRIME_TOKEN;
     if (!token) return { pushed: false, error: 'SHIPPRIME_TOKEN not configured' };
@@ -534,6 +535,7 @@ export async function pushToShipPrime(env, order, db) {
 const WA_DEFAULT_HEADER_IMAGE = 'https://saubhagyajewellery.com/images/brand/logo-mark-gold.png';
 
 export async function sendWhatsAppMessage(env, toPhone, templateName, params, headerImageUrl) {
+  if (env.UAT_MODE === 'true') return { sent: false, skipped: true, reason: 'UAT sandbox — no real WhatsApp send' };
   try {
     const phoneId = env.WHATSAPP_PHONE_ID;
     const token = env.WHATSAPP_TOKEN;
@@ -656,6 +658,7 @@ export function etaForPin(pin, from) {
  * Returns { sent, id?, error? } — never throws.
  */
 export async function sendOrderEmail(env, order) {
+  if (env.UAT_MODE === 'true') return { sent: false, skipped: true, reason: 'UAT sandbox — no real email send' };
   try {
     const key = env.RESEND_API_KEY;
     if (!key) return { sent: false, error: 'RESEND_API_KEY not configured' };
