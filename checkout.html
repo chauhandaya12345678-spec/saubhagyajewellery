@@ -15,7 +15,7 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   window.CC_PAYMENTS = {
-    razorpayKeyId: 'rzp_live_T6EhbHB5QhrM5W',
+    razorpayKeyId: (window.SAUBHAGYA_ENV && window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID) || 'rzp_live_T6EhbHB5QhrM5W',
     createOrderUrl: '/api/orders/create-razorpay-order',
     useMagicCheckout: false
   };
