@@ -11,23 +11,6 @@
   var CART = 'cart.html';
   var WHATSAPP = 'https://wa.me/919987008435';
 
-  /* ── UAT / TEST MODE BANNER ── wait for DOM ready ── */
-  document.addEventListener('DOMContentLoaded', function () {
-    var banner = document.createElement('div');
-    banner.id = 'uat-banner';
-    banner.innerHTML = '⚠️ UAT — TEST MODE — NOT LIVE ⚠️';
-    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#ff5722;color:#fff;text-align:center;padding:6px 10px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;box-shadow:0 2px 12px rgba(255,87,34,.5)';
-    document.body.insertBefore(banner, document.body.firstChild);
-    document.body.style.paddingTop = (parseInt(getComputedStyle(document.body).paddingTop) || 0) + 36 + 'px';
-  });
-
-  /* ── UAT: inject test Razorpay key so checkout uses test mode ── */
-  window.SAUBHAGYA_ENV = { RAZORPAY_KEY_ID: 'rzp_test_placeholder123' };
-  /* Override with real Cloudflare env var if available (injected by CF Pages) */
-  if (window.CF_ENV && window.CF_ENV.RAZORPAY_KEY_ID) {
-    window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID = window.CF_ENV.RAZORPAY_KEY_ID;
-  }
-
   /* Head extras every page gets: favicon, theme color, brand/fx styles */
   (function injectHead() {
     var d = document;
@@ -497,4 +480,24 @@
     });
     window.addEventListener('scroll', function () { if (!FINE) clearAll(); }, { passive: true });
   })();
+})();
+
+/* ─────────────────────────────────────────────────
+ * UAT BANNER — appended after main IIFE, cannot break layout
+ * ───────────────────────────────────────────────── */
+(function () {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', showBanner);
+  } else {
+    showBanner();
+  }
+  function showBanner() {
+    var b = document.createElement('div');
+    b.id = 'uat-banner';
+    b.textContent = '⚠️ UAT — TEST MODE — NOT LIVE ⚠️';
+    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#ff5722;color:#fff;text-align:center;padding:6px 10px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;box-shadow:0 2px 12px rgba(255,87,34,.5)';
+    document.body.insertBefore(b, document.body.firstChild);
+  }
+  window.SAUBHAGYA_ENV = window.SAUBHAGYA_ENV || {};
+  window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID = window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID || 'rzp_test_placeholder123';
 })();
