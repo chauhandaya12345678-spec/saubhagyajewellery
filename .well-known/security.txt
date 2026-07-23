@@ -1,0 +1,6 @@
+Contact: mailto:care@saubhagyajewellery.com
+Contact: https://wa.me/919987008435
+Expires: 2027-07-12T00:00:00.000Z
+Preferred-Languages: en, hi
+Canonical: https://saubhagyajewellery.com/.well-known/security.txt
+Policy: https://saubhagyajewellery.com/privacy-policy.html
