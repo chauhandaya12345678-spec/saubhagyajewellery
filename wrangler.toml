@@ -16,8 +16,8 @@ compatibility_flags = ["nodejs_compat"]
 # Seed:   wrangler d1 execute saubhagya-db --file=build/seed-d1.sql
 [[d1_databases]]
 binding = "DB"
-database_name = "saubhagya-db"
-database_id = "e0b5e020-eb86-445d-baae-09a949dd4c0e"
+database_name = "saubhagya-db-uat"
+database_id = "9bbaaa5c-79cc-4a49-bddc-8a00bacd2d3b"
 
 # ── R2 Bucket (Product Images) ──────────────────────────────
 # Enable R2 in Cloudflare Dashboard first, then uncomment:
