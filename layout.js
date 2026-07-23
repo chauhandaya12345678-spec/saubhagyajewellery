@@ -176,6 +176,7 @@
       '<a class="logo logo-real" href="index.html" title="Saubhagya Jewellery — Home">' +
       '<img class="brand-logo" src="images/brand/logo-mark-gold.png?v=1" alt="" width="45" height="45">' +
       '<span class="logo-stack"><span class="logo-name">SAUBHAGYA</span><span class="logo-sub">JEWELLERY</span></span>' +
+      '<span class="uat-tag" style="color:#ff3b30;font-family:Montserrat,sans-serif;font-size:9px;font-weight:800;letter-spacing:1.5px;margin-left:8px;background:#fff3f3;padding:2px 7px;border-radius:3px;border:1px solid #ff3b30;white-space:nowrap;">UAT — TEST MODE</span>' +
       '<span class="sr-only">Saubhagya Jewellery — handcrafted imitation jewellery, Mumbai. Home.</span>' +
       '</a>' +
       '<nav class="navlinks">' + links + '</nav>' +
@@ -482,22 +483,8 @@
   })();
 })();
 
-/* ─────────────────────────────────────────────────
- * UAT BANNER — appended after main IIFE, cannot break layout
- * ───────────────────────────────────────────────── */
+/* ── UAT: inject test Razorpay key for checkout ── */
 (function () {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', showBanner);
-  } else {
-    showBanner();
-  }
-  function showBanner() {
-    var b = document.createElement('div');
-    b.id = 'uat-banner';
-    b.textContent = '⚠️ UAT — TEST MODE — NOT LIVE ⚠️';
-    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#ff5722;color:#fff;text-align:center;padding:6px 10px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;box-shadow:0 2px 12px rgba(255,87,34,.5)';
-    document.body.insertBefore(b, document.body.firstChild);
-  }
   window.SAUBHAGYA_ENV = window.SAUBHAGYA_ENV || {};
   window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID = window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID || 'rzp_test_placeholder123';
 })();
