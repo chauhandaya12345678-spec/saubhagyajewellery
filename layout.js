@@ -11,6 +11,17 @@
   var CART = 'cart.html';
   var WHATSAPP = 'https://wa.me/919987008435';
 
+  /* ── UAT / TEST MODE BANNER ── every page, impossible to miss ── */
+  (function injectUatBanner() {
+    var banner = document.createElement('div');
+    banner.id = 'uat-banner';
+    banner.innerHTML = '⚠️ UAT — TEST MODE — NOT LIVE ⚠️';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#ff5722;color:#fff;text-align:center;padding:6px 10px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;box-shadow:0 2px 12px rgba(255,87,34,.5)';
+    document.body.insertBefore(banner, document.body.firstChild);
+    /* push page content down so banner doesn't overlap */
+    document.body.style.paddingTop = (parseInt(getComputedStyle(document.body).paddingTop) || 0) + 36 + 'px';
+  })();
+
   /* Head extras every page gets: favicon, theme color, brand/fx styles */
   (function injectHead() {
     var d = document;
