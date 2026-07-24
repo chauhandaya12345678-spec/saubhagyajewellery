@@ -1,702 +1,482 @@
 [
   {
-    "sku": "BS-001",
-    "name": "Lakshmi Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Chennai",
-    "badge": "BESTSELLER",
-    "image": "images/necklace/neck-20260723_184547-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-002",
-    "name": "Peacock Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Madurai",
-    "badge": "",
-    "image": "images/necklace/neck-20260723_185050-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-003",
-    "name": "Lotus Temple Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Coimbatore",
-    "badge": "",
-    "image": "images/necklace/neck-20260723_190613-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-004",
-    "name": "Antique Lakshmi Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Bengaluru",
+    "sku": "SJ-SN01-GL",
+    "name": "Royal Short Necklace (Gold)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "NEW",
-    "image": "images/necklace/neck-20260723_191610-o2.webp",
+    "image": "images/products/SJ-SN01-GL.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN01-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN01-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN01-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN01-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN01-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN01-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-005",
-    "name": "Royal Temple Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Hyderabad",
+    "sku": "SJ-SN01-GR",
+    "name": "Royal Short Necklace (Green)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_192149-o2.webp",
+    "image": "images/products/SJ-SN01-GR.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN01-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN01-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN01-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN01-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN01-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN01-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-006",
-    "name": "Divine Nakshi Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Chennai",
-    "badge": "TRENDING",
-    "image": "images/necklace/neck-20260723_193319-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-007",
-    "name": "Gajalakshmi Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Madurai",
+    "sku": "SJ-SN01-WH",
+    "name": "Royal Short Necklace (White)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_193931-o2.webp",
+    "image": "images/products/SJ-SN01-WH.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN01-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN01-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN01-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN01-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN01-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN01-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-008",
-    "name": "Grand Temple Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Coimbatore",
+    "sku": "SJ-SN02-GL",
+    "name": "Heritage Short Necklace (Gold)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_194111-o2.webp",
+    "image": "images/products/SJ-SN02-GL.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN02-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN02-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN02-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN02-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN02-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN02-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-009",
-    "name": "Regal Kasu Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Bengaluru",
-    "badge": "BESTSELLER",
-    "image": "images/necklace/neck-20260723_195253-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-010",
-    "name": "Imperial Lakshmi Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Hyderabad",
+    "sku": "SJ-SN02-GR",
+    "name": "Heritage Short Necklace (Green)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_195617-o2.webp",
+    "image": "images/products/SJ-SN02-GR.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN02-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN02-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN02-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN02-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN02-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN02-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-011",
-    "name": "Heritage Temple Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Chennai",
-    "badge": "NEW",
-    "image": "images/necklace/neck-20260723_195741-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-012",
-    "name": "Padmini Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Madurai",
+    "sku": "SJ-SN02-WH",
+    "name": "Heritage Short Necklace (White)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_200742-o2.webp",
+    "image": "images/products/SJ-SN02-WH.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN02-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN02-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN02-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN02-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN02-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN02-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-013",
-    "name": "Mayuri Peacock Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Coimbatore",
-    "badge": "BESTSELLER",
-    "image": "images/necklace/neck-20260723_201223-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-014",
-    "name": "Anantha Lakshmi Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Bengaluru",
+    "sku": "SJ-SN03-GL",
+    "name": "Peacock Short Necklace (Gold)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_201340-o2.webp",
+    "image": "images/products/SJ-SN03-GL.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN03-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN03-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN03-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN03-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN03-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN03-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-015",
-    "name": "Kanaka Temple Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Hyderabad",
+    "sku": "SJ-SN03-GR",
+    "name": "Peacock Short Necklace (Green)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_201732-o2.webp",
+    "image": "images/products/SJ-SN03-GR.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN03-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN03-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN03-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN03-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN03-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN03-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-016",
-    "name": "Swarna Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Chennai",
-    "badge": "NEW",
-    "image": "images/necklace/neck-20260723_201831-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-017",
-    "name": "Rajwada Temple Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Madurai",
+    "sku": "SJ-SN03-WH",
+    "name": "Peacock Short Necklace (White)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_201917-o2.webp",
+    "image": "images/products/SJ-SN03-WH.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN03-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN03-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN03-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN03-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN03-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN03-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-018",
-    "name": "Nakshi Lakshmi Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Coimbatore",
-    "badge": "TRENDING",
-    "image": "images/necklace/neck-20260723_202110-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-019",
-    "name": "Meenakari Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Bengaluru",
+    "sku": "SJ-SN04-GL",
+    "name": "Lotus Short Necklace (Gold)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_202338-o2.webp",
+    "image": "images/products/SJ-SN04-GL.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN04-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN04-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN04-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN04-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN04-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN04-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-020",
-    "name": "Kalyani Temple Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Hyderabad",
+    "sku": "SJ-SN04-GR",
+    "name": "Lotus Short Necklace (Green)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_202437-o2.webp",
+    "image": "images/products/SJ-SN04-GR.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN04-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN04-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN04-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN04-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN04-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN04-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-021",
-    "name": "Sridevi Lakshmi Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Chennai",
-    "badge": "BESTSELLER",
-    "image": "images/necklace/neck-20260723_202837-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-022",
-    "name": "Bhavya Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Madurai",
+    "sku": "SJ-SN04-WH",
+    "name": "Lotus Short Necklace (White)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_202931-o2.webp",
+    "image": "images/products/SJ-SN04-WH.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN04-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN04-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN04-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN04-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN04-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN04-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "BS-023",
-    "name": "Maharani Temple Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Coimbatore",
-    "badge": "NEW",
-    "image": "images/necklace/neck-20260723_203031-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "BS-024",
-    "name": "Aishwarya Bridal Set",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Bridal Set",
-    "price": 280,
-    "mrp": 399,
-    "city": "Bengaluru",
+    "sku": "SJ-SN05-GL",
+    "name": "Divine Short Necklace (Gold)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/necklace/neck-20260723_203218-o2.webp",
+    "image": "images/products/SJ-SN05-GL.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN05-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN05-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN05-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN05-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN05-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN05-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "ER-001",
-    "name": "Emerald Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Jaipur",
-    "badge": "BESTSELLER",
-    "image": "images/Earrings/ear-20260528_115256-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-002",
-    "name": "Sapphire Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Delhi",
+    "sku": "SJ-SN05-GR",
+    "name": "Divine Short Necklace (Green)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/Earrings/ear-20260528_121252-o2.webp",
+    "image": "images/products/SJ-SN05-GR.jpeg",
     "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN05-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN05-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN05-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN05-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN05-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN05-WH.jpeg"
+      }
+    ]
   },
   {
-    "sku": "ER-003",
-    "name": "Kundan Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Lucknow",
+    "sku": "SJ-SN05-WH",
+    "name": "Divine Short Necklace (White)",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 549,
+    "mrp": 740,
+    "city": "Mumbai",
     "badge": "",
-    "image": "images/Earrings/ear-20260528_121549-o2.webp",
+    "image": "images/products/SJ-SN05-WH.jpeg",
     "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-004",
-    "name": "Emerald Kundan Chandbali",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Amritsar",
-    "badge": "NEW",
-    "image": "images/Earrings/ear-20260528_121823-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-005",
-    "name": "Ruby Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Chandigarh",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_122236-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-006",
-    "name": "Rose Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Jaipur",
-    "badge": "TRENDING",
-    "image": "images/Earrings/ear-20260528_122517-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-007",
-    "name": "Sheesha Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Delhi",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_122811-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-008",
-    "name": "Polki Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Lucknow",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_123207-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-009",
-    "name": "Mirror Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Amritsar",
-    "badge": "BESTSELLER",
-    "image": "images/Earrings/ear-20260528_123439-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-010",
-    "name": "Noor Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Chandigarh",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_123742-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-011",
-    "name": "Gulnaar Chandbali Earrings",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Jaipur",
-    "badge": "NEW",
-    "image": "images/Earrings/ear-20260528_123856-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "ER-012",
-    "name": "Chand Kundan Chandbali",
-    "region": "bridal",
-    "regionLabel": "North Indian Bridal",
-    "category": "Earring",
-    "price": 225,
-    "mrp": 320,
-    "city": "Delhi",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_123959-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-001",
-    "name": "Sheesha Kundan Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Chennai",
-    "badge": "BESTSELLER",
-    "image": "images/Earrings/ear-20260528_124512-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-002",
-    "name": "Mirror Polki Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Madurai",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_124810-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-003",
-    "name": "Polki Dome Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Coimbatore",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_125028-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-004",
-    "name": "Kundan Temple Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Bengaluru",
-    "badge": "NEW",
-    "image": "images/Earrings/ear-20260528_125422-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-005",
-    "name": "Chandni Kundan Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Hyderabad",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_125720-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-006",
-    "name": "Mayuri Gold Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Chennai",
-    "badge": "TRENDING",
-    "image": "images/Earrings/ear-20260528_130137-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-007",
-    "name": "Lotus Temple Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Madurai",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_130305-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-008",
-    "name": "Moti Gold Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Coimbatore",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_130740-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-009",
-    "name": "Pearl Drop Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Bengaluru",
-    "badge": "BESTSELLER",
-    "image": "images/Earrings/ear-20260528_130918-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-010",
-    "name": "Temple Antique Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Hyderabad",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_131103-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-011",
-    "name": "Antique Gold Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Chennai",
-    "badge": "NEW",
-    "image": "images/Earrings/ear-20260528_131303-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-012",
-    "name": "Royal Nakshi Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Madurai",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_131400-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-013",
-    "name": "Heritage Gold Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Coimbatore",
-    "badge": "BESTSELLER",
-    "image": "images/Earrings/ear-20260528_131500-o2.webp",
-    "altImage": "",
-    "inStock": 1
-  },
-  {
-    "sku": "JH-014",
-    "name": "Nakshi Temple Jhumkas",
-    "region": "south",
-    "regionLabel": "South Indian Traditional",
-    "category": "Jhumkas",
-    "price": 225,
-    "mrp": 320,
-    "city": "Bengaluru",
-    "badge": "",
-    "image": "images/Earrings/ear-20260528_131603-o2.webp",
-    "altImage": "",
-    "inStock": 1
+    "inStock": 1,
+    "stock_count": 4,
+    "variants": [
+      {
+        "sku": "SJ-SN05-GL",
+        "label": "Gold",
+        "image": "images/products/SJ-SN05-GL.jpeg"
+      },
+      {
+        "sku": "SJ-SN05-GR",
+        "label": "Green",
+        "image": "images/products/SJ-SN05-GR.jpeg"
+      },
+      {
+        "sku": "SJ-SN05-WH",
+        "label": "White",
+        "image": "images/products/SJ-SN05-WH.jpeg"
+      }
+    ]
   }
 ]

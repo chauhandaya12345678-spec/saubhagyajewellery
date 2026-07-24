@@ -36,6 +36,14 @@
       var q = {};
       for (var k in p) q[k] = p[k];
       q.id = p.sku || p.id;
+      // colour variants arrive as a JSON string from the static fallback
+      if (typeof q.variants === 'string' && q.variants) {
+        try { q.variants = JSON.parse(q.variants); } catch (e) { q.variants = null; }
+      }
+      // listing pages show ONE card per design — siblings beyond the first
+      // colour are flagged so grids can skip them (cart/PDP still see all)
+      q.isVariantDup = !!(Array.isArray(q.variants) && q.variants.length &&
+        q.variants[0].sku && q.variants[0].sku !== q.id);
       return q;
     });
     window.SAUBHAGYA_CATALOG = catalog;

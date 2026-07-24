@@ -63,7 +63,10 @@
     <div class="auth-error" id="auth-error"></div>
     <div class="auth-success" id="auth-success"></div>
 
-    <div id="ts-container" class="cf-turnstile" data-sitekey="0x4AAAAAAD7dybSbH-6hyTGP" data-execution="execute" data-callback="__tsToken" data-error-callback="__tsError" data-timeout-callback="__tsError" style="display:none"></div>
+    <!-- Turnstile widget must stay in layout (not display:none): when Cloudflare
+         escalates to an interactive challenge it renders here — hiding the
+         container left the SEND button spinning forever. -->
+    <div id="ts-container" class="cf-turnstile" data-sitekey="0x4AAAAAAD7dybSbH-6hyTGP" data-execution="execute" data-callback="__tsToken" data-error-callback="__tsError" data-timeout-callback="__tsError" style="margin:10px auto;text-align:center"></div>
     <div id="recaptcha-container"></div>
 
     <div class="auth-link">New here? Sign in with your phone — your account will be created automatically.</div>
@@ -89,10 +92,17 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaEnterpriseProvider('6LeLr1ItAAAAAEIeh4d-4FUit9chB11D8SjyNPhw'),
-  isTokenAutoRefreshEnabled: true
-});
+// App Check is best-effort: if the reCAPTCHA Enterprise key/script is broken
+// or blocked, a thrown error here used to kill this whole module — every
+// button on the page went dead. Sign-in must survive App Check failure.
+try {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider('6LeLr1ItAAAAAEIeh4d-4FUit9chB11D8SjyNPhw'),
+    isTokenAutoRefreshEnabled: true
+  });
+} catch (e) {
+  console.warn('App Check init failed (continuing without):', e && e.message);
+}
 
 const auth = getAuth(app);
 
@@ -152,6 +162,7 @@ function startFirebaseOtp(phone) {
   }
   signInWithPhoneNumber(auth, '+91' + phone, window.recaptchaVerifier)
     .then(function(result) {
+      clearTimeout(sendWatchdog);
       window.confirmationResult = result;
       $('send-btn').textContent = 'OTP SENT';
       $('phone-section').style.display = 'none';
@@ -160,6 +171,7 @@ function startFirebaseOtp(phone) {
       $('otp-input').focus();
     })
     .catch(function(err) {
+      clearTimeout(sendWatchdog);
       clearLoading($('send-btn'), 'SEND OTP');
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
@@ -188,6 +200,22 @@ window.__tsError = function() {
   startFirebaseOtp(pendingPhone);
 };
 
+// Watchdog: whatever silently stalls (Turnstile, reCAPTCHA, App Check,
+// network), never leave the customer on an infinite spinner — reset the
+// button and say so.
+var sendWatchdog = null;
+function armWatchdog() {
+  clearTimeout(sendWatchdog);
+  sendWatchdog = setTimeout(function () {
+    var btn = $('send-btn');
+    if (btn.disabled && !window.confirmationResult) {
+      clearLoading(btn, 'SEND OTP');
+      if (window.recaptchaVerifier) { try { window.recaptchaVerifier.clear(); } catch (e) {} window.recaptchaVerifier = null; }
+      showError('Taking too long — please tap SEND OTP again. If it repeats, check your connection or try another browser.');
+    }
+  }, 25000);
+}
+
 $('send-btn').addEventListener('click', function() {
   var phone = ($('phone-input').value || '').replace(/\D/g, '');
   if (phone.length !== 10) { showError('Enter a valid 10-digit mobile number.'); return; }
@@ -196,10 +224,16 @@ $('send-btn').addEventListener('click', function() {
   $('auth-success').style.display = 'none';
   setLoading($('send-btn'), 'SENDING…');
   pendingPhone = phone;
+  armWatchdog();
 
   if (window.turnstile) {
-    try { turnstile.reset('#ts-container'); } catch (e) {}
-    turnstile.execute('#ts-container');
+    try {
+      try { turnstile.reset('#ts-container'); } catch (e) {}
+      turnstile.execute('#ts-container');
+    } catch (e) {
+      // Turnstile present but broken (bad render/sitekey) — don't block sign-in
+      startFirebaseOtp(phone);
+    }
   } else {
     startFirebaseOtp(phone);
   }

@@ -1,166 +1,119 @@
 #!/usr/bin/env python3
 """
-Saubhagya Jewellery – D1 Migration Script
-======================================
-Reproduces the exact same 150-product catalog as catalog.js / build/site.js,
-merges in products.json overrides, and outputs:
-  1. seed.sql       – INSERT statements for D1
-  2. complete.json  – full merged catalog as JSON (for reference / R2 fallback)
+Saubhagya Jewellery - D1 Catalog Generator
+==========================================
+Single source of truth for the storefront catalog.
+5 short-necklace designs x 3 colours (GL=Gold, GR=Green, WH=White) = 15 SKUs.
+Each colour is its own D1 row (own stock count, own orderable SKU); the
+`variants` JSON on every row links the 3 sibling colours so the product
+page can render colour swatches and swap SKU in place.
+
+Outputs:
+  1. build/seed-d1.sql          - DELETE + INSERT for D1
+  2. build/complete-catalog.json - static/localhost fallback for catalog.js
 
 Usage:
-  cd /c/Users/Daya/Documents/GitHub/saubhagyajewellery
   python build/migrate-d1.py
+Then seed (live):
+  wrangler d1 execute saubhagya-db --remote --file=build/seed-d1.sql
+UAT:
+  wrangler d1 execute saubhagya-db-uat --remote --file=build/seed-d1.sql
 """
 
-import json, math, os
+import json, os
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# ── Reproduce the deterministic algorithm from catalog.js ──────────
+# ── Pricing (ALL-INCLUSIVE: listed price is final, checkout adds nothing) ──
+# Cost build-up per short necklace: product 315 + avg courier 90 + packaging 25
+# + 3% GST (inclusive) + ~2.4% gateway  =>  break-even ~456.
+# Sell 549 leaves ~Rs 90/unit (~16%) after all costs. MRP = ceil(549/0.75).
+PRICE = 549
+MRP = 740
 
-REGIONS = {
-    'south': {
-        'label': 'South Indian Traditional',
-        'cities': ['Chennai', 'Madurai', 'Coimbatore', 'Bengaluru', 'Hyderabad'],
-        'cats': ['Temple Necklace', 'Lakshmi Haaram', 'Matte Jhumkas', 'Vanki', 'Maang Tikka', 'Kasu Mala', 'Bridal Set']
-    },
-    'modern': {
-        'label': 'Mumbai Modern',
-        'cities': ['Mumbai', 'Pune', 'Ahmedabad', 'Surat'],
-        'cats': ['AD Necklace', 'Bridal Pendant', 'Solitaire Studs', 'Designer Drop', 'Pendant Set', 'Statement Choker']
-    },
-    'bridal': {
-        'label': 'North Indian Bridal',
-        'cities': ['Delhi', 'Jaipur', 'Lucknow', 'Chandigarh', 'Amritsar'],
-        'cats': ['Kundan Set', 'Polki Choker', 'Rani Haar', 'Nath', 'Passa', 'Bridal Set', 'Meenakari Set']
-    }
-}
-ADJ = ['Royal', 'Heritage', 'Regal', 'Antique', 'Imperial', 'Maharani', 'Grand', 'Celestial',
-       'Noble', 'Vintage', 'Lotus', 'Peacock', 'Divine', 'Padmini', 'Aurelia', 'Mughal']
-PREFIX = {'south': 'SI', 'modern': 'MM', 'bridal': 'NB'}
-BADGES = ['', '', '', '', 'BESTSELLER', 'NEW', 'TRENDING']
-BLOCKED_SKUS = ['CC-NB-002']
-BLOCKED_NAMES = ['Regal Lakshmi Haaram', 'Regal Bridal Set', 'Antique Rani Haar']
+COLORS = {'GL': 'Gold', 'GR': 'Green', 'WH': 'White'}
+COLOR_ORDER = ['GL', 'GR', 'WH']
 
-# ── Real retail pricing (₹), derived from wholesale + all costs ─────
-# Sell price per category. Honest "Compare at" anchor = ~25% above sell
-# (NOT an inflated MRP). Keep in sync with build/site.js CATEGORY_PRICES.
-CATEGORY_PRICES = {
-    # South Indian
-    'Temple Necklace': 799, 'Lakshmi Haaram': 999, 'Matte Jhumkas': 399,
-    'Vanki': 599, 'Maang Tikka': 299, 'Kasu Mala': 899, 'Bridal Set': 1599,
-    # Mumbai Modern
-    'AD Necklace': 849, 'Bridal Pendant': 249, 'Solitaire Studs': 299,
-    'Designer Drop': 349, 'Pendant Set': 1299, 'Statement Choker': 449,
-    # North Indian Bridal
-    'Kundan Set': 1599, 'Polki Choker': 499, 'Rani Haar': 999,
-    'Nath': 299, 'Passa': 349, 'Meenakari Set': 1499,
+# design code -> display name (colour appended per row)
+DESIGNS = {
+    'SJ-SN01': 'Royal Short Necklace',
+    'SJ-SN02': 'Heritage Short Necklace',
+    'SJ-SN03': 'Peacock Short Necklace',
+    'SJ-SN04': 'Lotus Short Necklace',
+    'SJ-SN05': 'Divine Short Necklace',
 }
 
-def compare_at(price):
-    """Honest 'Compare at' anchor: ~25% above the real selling price."""
-    return int(math.ceil(price / 0.75 / 10) * 10)
+STOCK_PER_COLOR = 4          # 12 pcs per design / 3 colours
+CATEGORY = 'Necklace'
+IMG_DIR = 'images/products'  # new dir; unique filenames = no CDN cache clash
 
-def rng(seed):
-    x = math.sin(seed) * 10000
-    return x - math.floor(x)
 
-def build_base():
-    """Generate 150 base products, same algorithm as catalog.js."""
+def build_catalog():
     catalog = []
-    for ri, (reg_key, R) in enumerate(REGIONS.items()):
-        for i in range(1, 51):
-            seed = ri * 1000 + i
-            cat = R['cats'][int(math.floor(rng(seed) * len(R['cats'])))]
-            adj = ADJ[int(math.floor(rng(seed * 1.7) * len(ADJ)))]
-            price = CATEGORY_PRICES.get(cat, 799)
-            mrp = compare_at(price)
-            sku = 'CC-' + PREFIX[reg_key] + '-' + str(i).zfill(3)
-            city = R['cities'][int(math.floor(rng(seed * 4.2) * len(R['cities'])))]
-            badge = BADGES[int(math.floor(rng(seed * 5.5) * len(BADGES)))]
+    for design, base_name in DESIGNS.items():
+        variants = [
+            {'sku': f'{design}-{c}', 'label': COLORS[c],
+             'image': f'{IMG_DIR}/{design}-{c}.jpeg'}
+            for c in COLOR_ORDER
+        ]
+        for ci, c in enumerate(COLOR_ORDER):
+            sku = f'{design}-{c}'
+            img = f'{IMG_DIR}/{sku}.jpeg'
+            if not os.path.exists(os.path.join(BASE, IMG_DIR, f'{sku}.jpeg')):
+                raise SystemExit(f'MISSING IMAGE: {IMG_DIR}/{sku}.jpeg')
             catalog.append({
-                'sku': sku, 'name': adj + ' ' + cat,
-                'region': reg_key, 'regionLabel': R['label'], 'category': cat,
-                'price': price, 'mrp': mrp, 'city': city, 'badge': badge,
-                'image': '', 'altImage': '', 'inStock': 1
+                'sku': sku,
+                'name': f'{base_name} ({COLORS[c]})',
+                'region': 'modern', 'regionLabel': 'Mumbai Modern',
+                'category': CATEGORY,
+                'price': PRICE, 'mrp': MRP,
+                'city': 'Mumbai',
+                'badge': 'NEW' if (design == 'SJ-SN01' and c == 'GL') else '',
+                'image': img, 'altImage': '',
+                'inStock': 1,
+                'stock_count': STOCK_PER_COLOR,
+                'variants': variants,
             })
     return catalog
 
-def load_overrides():
-    """Load products.json overrides, same as build/site.js."""
-    path = os.path.join(BASE, 'products.json')
-    if not os.path.exists(path):
-        return {}
-    with open(path, 'r') as f:
-        raw = json.load(f)
-    if isinstance(raw, dict) and 'products' in raw and isinstance(raw['products'], dict):
-        return raw['products']
-    return raw if isinstance(raw, dict) else {}
 
-def apply_overrides(base, overrides):
-    """Merge overrides onto base, same as catalog.js applyOverrides()."""
-    result = []
-    for p in base:
-        if p['sku'] in BLOCKED_SKUS or p['name'] in BLOCKED_NAMES:
-            continue
-        o = overrides.get(p['sku'])
-        if o and isinstance(o, dict):
-            if o.get('name'): p['name'] = o['name']
-            if isinstance(o.get('price'), (int, float)): p['price'] = int(o['price'])
-            if isinstance(o.get('mrp'), (int, float)): p['mrp'] = int(o['mrp'])
-            if o.get('image'): p['image'] = o['image']
-            if o.get('altImage'): p['altImage'] = o['altImage']
-            if 'badge' in o: p['badge'] = o['badge'] if o['badge'] else ''
-        result.append(p)
-    return result
-
-def escape_sql(val):
-    """Escape a string value for SQLite."""
+def esc(val):
     if val is None:
         return 'NULL'
     if isinstance(val, (int, float)):
         return str(int(val))
-    s = str(val).replace("'", "''")
-    return f"'{s}'"
+    return "'" + str(val).replace("'", "''") + "'"
+
 
 def generate_sql(products):
-    """Generate D1 INSERT statements."""
     lines = [
-        "DELETE FROM products;",
-        "INSERT INTO products (sku, name, region, regionLabel, category, price, mrp, city, badge, image, altImage, inStock) VALUES"
+        'DELETE FROM products;',
+        'INSERT INTO products (sku, name, region, regionLabel, category, price, mrp, city, badge, image, altImage, inStock, stock_count, variants) VALUES',
     ]
-    values = []
+    rows = []
     for p in products:
-        row = f"  ({escape_sql(p['sku'])}, {escape_sql(p['name'])}, {escape_sql(p['region'])}, {escape_sql(p['regionLabel'])}, {escape_sql(p['category'])}, {p['price']}, {p['mrp']}, {escape_sql(p['city'])}, {escape_sql(p['badge'])}, {escape_sql(p['image'])}, {escape_sql(p['altImage'])}, {p['inStock']})"
-        values.append(row)
-    lines.append(",\n".join(values) + ";")
-    return "\n".join(lines)
+        rows.append(
+            f"  ({esc(p['sku'])}, {esc(p['name'])}, {esc(p['region'])}, {esc(p['regionLabel'])}, "
+            f"{esc(p['category'])}, {p['price']}, {p['mrp']}, {esc(p['city'])}, {esc(p['badge'])}, "
+            f"{esc(p['image'])}, {esc(p['altImage'])}, {p['inStock']}, {p['stock_count']}, "
+            f"{esc(json.dumps(p['variants']))})"
+        )
+    lines.append(',\n'.join(rows) + ';')
+    return '\n'.join(lines)
+
 
 def main():
-    base = build_base()
-    overrides = load_overrides()
-    merged = apply_overrides(base, overrides)
-    
-    print(f"Base products:  {len(base)}")
-    print(f"Overrides:      {len(overrides)}")
-    print(f"Merged (active): {len(merged)}")
-    
-    # Output 1: complete JSON (for reference)
+    catalog = build_catalog()
     out_json = os.path.join(BASE, 'build', 'complete-catalog.json')
     with open(out_json, 'w') as f:
-        json.dump(merged, f, indent=2)
-    print(f"\nOK JSON written: {out_json}")
-    
-    # Output 2: SQL seed file
+        json.dump(catalog, f, indent=2)
     out_sql = os.path.join(BASE, 'build', 'seed-d1.sql')
-    sql = generate_sql(merged)
     with open(out_sql, 'w') as f:
-        f.write(sql)
-        f.write("\n")
-    print(f"OK SQL written:  {out_sql}")
-    
-    with_img = sum(1 for p in merged if p['image'])
-    print(f"\nSummary: {len(merged)} products, {with_img} with images")
+        f.write(generate_sql(catalog) + '\n')
+    print(f'{len(catalog)} SKUs ({len(DESIGNS)} designs x {len(COLORS)} colours)')
+    print(f'OK JSON: {out_json}')
+    print(f'OK SQL:  {out_sql}')
+
 
 if __name__ == '__main__':
     main()
