@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="site.css?v=20260722l">
 <script src="layout.js?v=20260724a"></script>
 <script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=15"></script>
+<script src="catalog.js?v=16"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -470,7 +470,8 @@
     var box = $('pdp-swatches');
     var lbl = $('pdp-color-lbl');
     var opts = getImageOpts(p);
-    if (!opts.length) { box.style.display = 'none'; box.innerHTML = ''; lbl.style.display = 'none'; return; }
+    // A lone swatch is meaningless — only show swatches for a real choice (2+)
+    if (opts.length < 2) { box.style.display = 'none'; box.innerHTML = ''; lbl.style.display = 'none'; return; }
     var act = activeOptIndex(p, opts);
     if (opts[act] && opts[act].label) {
       lbl.innerHTML = 'Colour: <strong>' + opts[act].label + '</strong>';

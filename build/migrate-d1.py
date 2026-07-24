@@ -3,80 +3,104 @@
 Saubhagya Jewellery - D1 Catalog Generator
 ==========================================
 Single source of truth for the storefront catalog.
-5 short-necklace designs x 3 colours (GL=Gold, GR=Green, WH=White) = 15 SKUs.
-Each colour is its own D1 row (own stock count, own orderable SKU); the
-`variants` JSON on every row links the 3 sibling colours so the product
-page can render colour swatches and swap SKU in place.
+
+  * Necklaces (SJ-SN01..05) x 3 colours (GL/GR/WH) = 15 SKUs, MULTI-COLOUR:
+    each colour is its own D1 row; the `variants` JSON links the siblings so
+    the product page shows colour swatches and swaps SKU in place.
+  * Earrings (SJ-ER01..06 -MH) = 6 SKUs, SINGLE (no variants).
+  * Jhumkas  (14 files) = 14 SKUs, SINGLE independent products (no switcher,
+    no colour label). GL=Gold; the "S" in SGL is just a random tag, not a
+    colour — so each file is its own Jhumka design with its own name.
+
+Images are the owner's originals, copied byte-for-byte to images/products/
+(filename == SKU). Never edited/resized.
 
 Outputs:
-  1. build/seed-d1.sql          - DELETE + INSERT for D1
+  1. build/seed-d1.sql           - DELETE + INSERT for D1
   2. build/complete-catalog.json - static/localhost fallback for catalog.js
 
 Usage:
   python build/migrate-d1.py
-Then seed (live):
-  wrangler d1 execute saubhagya-db --remote --file=build/seed-d1.sql
-UAT:
-  wrangler d1 execute saubhagya-db-uat --remote --file=build/seed-d1.sql
+Then seed:  wrangler d1 execute saubhagya-db     --remote --file=build/seed-d1.sql
+UAT:        wrangler d1 execute saubhagya-db-uat --remote --file=build/seed-d1.sql
 """
 
 import json, os
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMG_DIR = 'images/products'   # unique filenames = no CDN immutable-cache clash
 
 # ── Pricing (ALL-INCLUSIVE: listed price is final, checkout adds nothing) ──
-# Cost build-up per short necklace: product 315 + avg courier 90 + packaging 25
-# + 3% GST (inclusive) + ~2.4% gateway  =>  break-even ~456.
-# Sell 549 leaves ~Rs 90/unit (~16%) after all costs. MRP = ceil(549/0.75).
+# Necklace cost build-up: product 315 + courier 90 + packaging 25 + 3% GST
+# + ~2.4% gateway => break-even ~456; sell 549 leaves ~Rs 90/unit.
+# Earrings/jhumkas reuse the same band FOR NOW (owner to confirm real cost).
 PRICE = 549
 MRP = 740
+STOCK_DEFAULT = 5
 
-COLORS = {'GL': 'Gold', 'GR': 'Green', 'WH': 'White'}
-COLOR_ORDER = ['GL', 'GR', 'WH']
+ADJ = ['Royal', 'Heritage', 'Peacock', 'Lotus', 'Divine', 'Regal', 'Grand', 'Antique']
 
-# design code -> display name (colour appended per row)
-DESIGNS = {
-    'SJ-SN01': 'Royal Short Necklace',
-    'SJ-SN02': 'Heritage Short Necklace',
-    'SJ-SN03': 'Peacock Short Necklace',
-    'SJ-SN04': 'Lotus Short Necklace',
-    'SJ-SN05': 'Divine Short Necklace',
-}
+# Multi-colour necklaces ------------------------------------------------------
+NECK_COLORS = {'GL': 'Gold', 'GR': 'Green', 'WH': 'White'}
+NECK_ORDER = ['GL', 'GR', 'WH']
+NECK_DESIGNS = ['SJ-SN01', 'SJ-SN02', 'SJ-SN03', 'SJ-SN04', 'SJ-SN05']
 
-STOCK_PER_COLOR = 4          # 12 pcs per design / 3 colours
-CATEGORY = 'Necklace'
-IMG_DIR = 'images/products'  # new dir; unique filenames = no CDN cache clash
+# Jhumkas — every file is its own single product (no colour switcher, no
+# colour label). Order preserves the folder order; each gets a distinct name.
+JHUMKAS = ['SJ-JH01-GL', 'SJ-JH01-SGL', 'SJ-JH02-GL', 'SJ-JH02-SGL',
+           'SJ-JH03-GL', 'SJ-JH03-SGL', 'SJ-JH04-GL', 'SJ-JH04-SGL',
+           'SJ-JH05-GL', 'SJ-JH05-SGL', 'SJ-JH06-GL', 'SJ-JH06-SGL',
+           'SJ-JH07-GL', 'SJ-JH08-GL']
+JHUMKA_NAMES = ['Royal', 'Heritage', 'Peacock', 'Lotus', 'Divine', 'Regal',
+                'Grand', 'Antique', 'Celestial', 'Imperial', 'Kundan',
+                'Meenakari', 'Temple', 'Nakshi']
+
+# Single earrings (all -MH) --------------------------------------------------
+EARRINGS = ['SJ-ER01-MH', 'SJ-ER02-MH', 'SJ-ER03-MH', 'SJ-ER04-MH', 'SJ-ER05-MH', 'SJ-ER06-MH']
+
+
+def _img(sku):
+    path = os.path.join(BASE, IMG_DIR, f'{sku}.jpeg')
+    if not os.path.exists(path):
+        raise SystemExit(f'MISSING IMAGE: {IMG_DIR}/{sku}.jpeg')
+    return f'{IMG_DIR}/{sku}.jpeg'
+
+
+def _row(sku, name, category, badge='', variants=None):
+    return {
+        'sku': sku, 'name': name,
+        'region': 'modern', 'regionLabel': 'Mumbai Modern',
+        'category': category, 'price': PRICE, 'mrp': MRP, 'city': 'Mumbai',
+        'badge': badge, 'image': _img(sku), 'altImage': '',
+        'inStock': 1, 'stock_count': STOCK_DEFAULT, 'variants': variants,
+    }
 
 
 def build_catalog():
-    catalog = []
-    for design, base_name in DESIGNS.items():
-        variants = [
-            {'sku': f'{design}-{c}', 'label': COLORS[c],
-             'image': f'{IMG_DIR}/{design}-{c}.jpeg'}
-            for c in COLOR_ORDER
-        ]
-        for ci, c in enumerate(COLOR_ORDER):
+    cat = []
+
+    # necklaces (multi-colour)
+    for i, design in enumerate(NECK_DESIGNS):
+        name = f'{ADJ[i]} Short Necklace'
+        variants = [{'sku': f'{design}-{c}', 'label': NECK_COLORS[c],
+                     'image': _img(f'{design}-{c}')} for c in NECK_ORDER]
+        for c in NECK_ORDER:
             sku = f'{design}-{c}'
-            img = f'{IMG_DIR}/{sku}.jpeg'
-            if not os.path.exists(os.path.join(BASE, IMG_DIR, f'{sku}.jpeg')):
-                raise SystemExit(f'MISSING IMAGE: {IMG_DIR}/{sku}.jpeg')
-            # colour lives in the SKU + variants label, NOT the name — cards
-            # show one design; PDP/cart derive the colour from variants
-            catalog.append({
-                'sku': sku,
-                'name': base_name,
-                'region': 'modern', 'regionLabel': 'Mumbai Modern',
-                'category': CATEGORY,
-                'price': PRICE, 'mrp': MRP,
-                'city': 'Mumbai',
-                'badge': 'NEW' if (design == 'SJ-SN01' and c == 'GL') else '',
-                'image': img, 'altImage': '',
-                'inStock': 1,
-                'stock_count': STOCK_PER_COLOR,
-                'variants': variants,
-            })
-    return catalog
+            cat.append(_row(sku, name, 'Necklace',
+                            badge='NEW' if (design == 'SJ-SN01' and c == 'GL') else '',
+                            variants=variants))
+
+    # jhumkas (each file = its own single product, unique name, no colour)
+    for i, sku in enumerate(JHUMKAS):
+        cat.append(_row(sku, f'{JHUMKA_NAMES[i]} Jhumkas', 'Jhumkas',
+                        badge='NEW' if i == 0 else ''))
+
+    # earrings (single)
+    for i, sku in enumerate(EARRINGS):
+        cat.append(_row(sku, f'{ADJ[i]} Earrings', 'Earring',
+                        badge='NEW' if i == 0 else ''))
+
+    return cat
 
 
 def esc(val):
@@ -85,6 +109,10 @@ def esc(val):
     if isinstance(val, (int, float)):
         return str(int(val))
     return "'" + str(val).replace("'", "''") + "'"
+
+
+def variants_sql(v):
+    return 'NULL' if not v else esc(json.dumps(v))
 
 
 def generate_sql(products):
@@ -98,7 +126,7 @@ def generate_sql(products):
             f"  ({esc(p['sku'])}, {esc(p['name'])}, {esc(p['region'])}, {esc(p['regionLabel'])}, "
             f"{esc(p['category'])}, {p['price']}, {p['mrp']}, {esc(p['city'])}, {esc(p['badge'])}, "
             f"{esc(p['image'])}, {esc(p['altImage'])}, {p['inStock']}, {p['stock_count']}, "
-            f"{esc(json.dumps(p['variants']))})"
+            f"{variants_sql(p['variants'])})"
         )
     lines.append(',\n'.join(rows) + ';')
     return '\n'.join(lines)
@@ -106,15 +134,14 @@ def generate_sql(products):
 
 def main():
     catalog = build_catalog()
-    out_json = os.path.join(BASE, 'build', 'complete-catalog.json')
-    with open(out_json, 'w') as f:
+    by_cat = {}
+    for p in catalog:
+        by_cat[p['category']] = by_cat.get(p['category'], 0) + 1
+    with open(os.path.join(BASE, 'build', 'complete-catalog.json'), 'w') as f:
         json.dump(catalog, f, indent=2)
-    out_sql = os.path.join(BASE, 'build', 'seed-d1.sql')
-    with open(out_sql, 'w') as f:
+    with open(os.path.join(BASE, 'build', 'seed-d1.sql'), 'w') as f:
         f.write(generate_sql(catalog) + '\n')
-    print(f'{len(catalog)} SKUs ({len(DESIGNS)} designs x {len(COLORS)} colours)')
-    print(f'OK JSON: {out_json}')
-    print(f'OK SQL:  {out_sql}')
+    print(f'{len(catalog)} SKUs: ' + ', '.join(f'{k}={v}' for k, v in by_cat.items()))
 
 
 if __name__ == '__main__':
