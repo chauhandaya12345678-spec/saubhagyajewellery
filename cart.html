@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260722l">
-<script src="layout.js?v=20260723c"></script>
+<script src="layout.js?v=20260724a"></script>
 <script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=14"></script>
+<script src="catalog.js?v=15"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -141,7 +141,7 @@
         oosHtml += '<div class="cart-item oos">' +
           '<img class="cart-item-img" src="' + (p.image || '') + '" alt="' + (p.name || '') + '" onerror="this.style.display=\'none\'">' +
           '<div class="cart-item-info">' +
-            '<div class="cart-item-name">' + (p.name || ci.id) + '</div>' +
+            '<div class="cart-item-name">' + ((window.SJ_NAME ? SJ_NAME(p) : p.name) || ci.id) + '</div>' +
             '<div class="cart-item-price">' + fmt(p.price) + ' each · Qty ' + ci.qty + '</div>' +
             '<div class="cart-item-oos-tag">OUT OF STOCK</div>' +
             '<div class="cart-item-remove" onclick="Cart.remove(' + idx + ')">REMOVE</div>' +
@@ -153,7 +153,7 @@
         html += '<div class="cart-item">' +
           '<img class="cart-item-img" src="' + (p.image || '') + '" alt="' + (p.name || '') + '" onerror="this.style.display=\'none\'">' +
           '<div class="cart-item-info">' +
-            '<div class="cart-item-name">' + (p.name || ci.id) + '</div>' +
+            '<div class="cart-item-name">' + ((window.SJ_NAME ? SJ_NAME(p) : p.name) || ci.id) + '</div>' +
             '<div class="cart-item-price">' + fmt(p.price) + ' each</div>' +
             '<div class="cart-item-qty">' +
               '<span onclick="Cart.dec(' + idx + ')">−</span>' +

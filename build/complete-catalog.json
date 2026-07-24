@@ -1,7 +1,7 @@
 [
   {
     "sku": "SJ-SN01-GL",
-    "name": "Royal Short Necklace (Gold)",
+    "name": "Royal Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -33,7 +33,7 @@
   },
   {
     "sku": "SJ-SN01-GR",
-    "name": "Royal Short Necklace (Green)",
+    "name": "Royal Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -65,7 +65,7 @@
   },
   {
     "sku": "SJ-SN01-WH",
-    "name": "Royal Short Necklace (White)",
+    "name": "Royal Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -97,7 +97,7 @@
   },
   {
     "sku": "SJ-SN02-GL",
-    "name": "Heritage Short Necklace (Gold)",
+    "name": "Heritage Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -129,7 +129,7 @@
   },
   {
     "sku": "SJ-SN02-GR",
-    "name": "Heritage Short Necklace (Green)",
+    "name": "Heritage Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -161,7 +161,7 @@
   },
   {
     "sku": "SJ-SN02-WH",
-    "name": "Heritage Short Necklace (White)",
+    "name": "Heritage Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -193,7 +193,7 @@
   },
   {
     "sku": "SJ-SN03-GL",
-    "name": "Peacock Short Necklace (Gold)",
+    "name": "Peacock Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -225,7 +225,7 @@
   },
   {
     "sku": "SJ-SN03-GR",
-    "name": "Peacock Short Necklace (Green)",
+    "name": "Peacock Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -257,7 +257,7 @@
   },
   {
     "sku": "SJ-SN03-WH",
-    "name": "Peacock Short Necklace (White)",
+    "name": "Peacock Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -289,7 +289,7 @@
   },
   {
     "sku": "SJ-SN04-GL",
-    "name": "Lotus Short Necklace (Gold)",
+    "name": "Lotus Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -321,7 +321,7 @@
   },
   {
     "sku": "SJ-SN04-GR",
-    "name": "Lotus Short Necklace (Green)",
+    "name": "Lotus Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -353,7 +353,7 @@
   },
   {
     "sku": "SJ-SN04-WH",
-    "name": "Lotus Short Necklace (White)",
+    "name": "Lotus Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -385,7 +385,7 @@
   },
   {
     "sku": "SJ-SN05-GL",
-    "name": "Divine Short Necklace (Gold)",
+    "name": "Divine Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -417,7 +417,7 @@
   },
   {
     "sku": "SJ-SN05-GR",
-    "name": "Divine Short Necklace (Green)",
+    "name": "Divine Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
@@ -449,7 +449,7 @@
   },
   {
     "sku": "SJ-SN05-WH",
-    "name": "Divine Short Necklace (White)",
+    "name": "Divine Short Necklace",
     "region": "modern",
     "regionLabel": "Mumbai Modern",
     "category": "Necklace",
