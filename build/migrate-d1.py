@@ -31,26 +31,28 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IMG_DIR = 'images/products'   # unique filenames = no CDN immutable-cache clash
 
 # ── Pricing (ALL-INCLUSIVE: listed price is final, checkout adds nothing) ──
-# Same build-up the owner decided for necklaces:
+# Same build-up the owner decided for necklaces, EXCEPT earrings/jhumkas are
+# sold at BREAK-EVEN (no profit margin) per owner instruction — only real
+# costs are recovered:
 #   fixed  = product cost + courier(90) + packaging(25)
 #   %costs = 3% GST inclusive (= 2.913% of price) + 2.36% payment gateway
-#   sell   = fixed / (1 - %costs) + ~90 profit/unit, rounded up to a clean ₹5
+#   sell   = fixed / (1 - %costs) + margin, rounded up to a clean ₹5
 #   MRP    = ceil(sell / 0.75) to ₹10  (~25% honest "compare at", not inflated)
 COURIER = 90
 PACKAGING = 25
 PCT_COSTS = 0.02913 + 0.0236    # GST-inclusive share + gateway = 5.273%
-MARGIN = 90
-STOCK_DEFAULT = 5
 
-def price_from_cost(cost):
+def price_from_cost(cost, margin=0):
     fixed = cost + COURIER + PACKAGING
     break_even = fixed / (1 - PCT_COSTS)
-    sell = int(math.ceil((break_even + MARGIN) / 5.0) * 5)       # → clean ₹5
+    sell = int(math.ceil((break_even + margin) / 5.0) * 5)       # → clean ₹5
     mrp = int(math.ceil((sell / 0.75) / 10.0) * 10)              # → ₹10
     return sell, mrp
 
-# Necklaces were set earlier at a flat 549/740 (product cost 315) — keep as-is.
+# Necklaces stay at the flat 549/740 the owner already approved (keeps profit).
 NECK_PRICE, NECK_MRP = 549, 740
+NECK_STOCK = 4                  # 12 pcs per design / 3 colours
+SINGLE_STOCK = 12               # earrings + jhumkas: 12 pcs each SKU
 
 ADJ = ['Royal', 'Heritage', 'Peacock', 'Lotus', 'Divine', 'Regal', 'Grand', 'Antique']
 
@@ -89,40 +91,40 @@ def _img(sku):
     return f'{IMG_DIR}/{sku}.jpeg'
 
 
-def _row(sku, name, category, price, mrp, badge='', variants=None):
+def _row(sku, name, category, price, mrp, stock, badge='', variants=None):
     return {
         'sku': sku, 'name': name,
         'region': 'modern', 'regionLabel': 'Mumbai Modern',
         'category': category, 'price': price, 'mrp': mrp, 'city': 'Mumbai',
         'badge': badge, 'image': _img(sku), 'altImage': '',
-        'inStock': 1, 'stock_count': STOCK_DEFAULT, 'variants': variants,
+        'inStock': 1, 'stock_count': stock, 'variants': variants,
     }
 
 
 def build_catalog():
     cat = []
 
-    # necklaces (multi-colour) — flat 549/740
+    # necklaces (multi-colour) — flat 549/740, keeps profit, 4/colour
     for i, design in enumerate(NECK_DESIGNS):
         name = f'{ADJ[i]} Short Necklace'
         variants = [{'sku': f'{design}-{c}', 'label': NECK_COLORS[c],
                      'image': _img(f'{design}-{c}')} for c in NECK_ORDER]
         for c in NECK_ORDER:
             sku = f'{design}-{c}'
-            cat.append(_row(sku, name, 'Necklace', NECK_PRICE, NECK_MRP,
+            cat.append(_row(sku, name, 'Necklace', NECK_PRICE, NECK_MRP, NECK_STOCK,
                             badge='NEW' if (design == 'SJ-SN01' and c == 'GL') else '',
                             variants=variants))
 
-    # jhumkas (single; price from owner per-SKU cost)
+    # jhumkas (single; BREAK-EVEN price, no profit; 12 pcs each)
     for i, sku in enumerate(JHUMKAS):
-        price, mrp = price_from_cost(JHUMKA_COST[sku])
-        cat.append(_row(sku, f'{JHUMKA_NAMES[i]} Jhumkas', 'Jhumkas', price, mrp,
+        price, mrp = price_from_cost(JHUMKA_COST[sku])   # margin=0
+        cat.append(_row(sku, f'{JHUMKA_NAMES[i]} Jhumkas', 'Jhumkas', price, mrp, SINGLE_STOCK,
                         badge='NEW' if i == 0 else ''))
 
-    # earrings (single; cost 115)
-    price, mrp = price_from_cost(EARRING_COST)
+    # earrings (single; BREAK-EVEN price, no profit; 12 pcs each)
+    price, mrp = price_from_cost(EARRING_COST)            # margin=0
     for i, sku in enumerate(EARRINGS):
-        cat.append(_row(sku, f'{ADJ[i]} Earrings', 'Earring', price, mrp,
+        cat.append(_row(sku, f'{ADJ[i]} Earrings', 'Earring', price, mrp, SINGLE_STOCK,
                         badge='NEW' if i == 0 else ''))
 
     return cat
