@@ -28,6 +28,23 @@
     }
   };
 
+  // Display name incl. colour ("Royal Short Necklace · White") for cart /
+  // checkout / order lines. Works on raw API rows too (variants may be a
+  // JSON string there).
+  window.SJ_NAME = function (p) {
+    if (!p) return '';
+    var n = p.name || p.id || '';
+    var vs = p.variants;
+    if (typeof vs === 'string' && vs) { try { vs = JSON.parse(vs); } catch (e) { vs = null; } }
+    if (Array.isArray(vs)) {
+      for (var i = 0; i < vs.length; i++) {
+        var v = vs[i];
+        if (v && v.sku === (p.sku || p.id) && v.label && n.indexOf(v.label) === -1) return n + ' · ' + v.label;
+      }
+    }
+    return n;
+  };
+
   function publish(catalog) {
     // Canonical product id = sku. D1 rows carry a numeric id while the static
     // fallback JSON has none, and SEO deep links (?product=CC-SI-001) use the

@@ -94,10 +94,14 @@ export async function onRequest(context) {
     }
 
     // Send WhatsApp notification to customer (gracefully skip if templates not ready)
-    if (order.phone && ['shipped','out_for_delivery','delivered'].includes(newStatus.toLowerCase())) {
-      const templateName = newStatus.toLowerCase() === 'shipped' ? 'order_shipped'
-        : newStatus.toLowerCase() === 'out_for_delivery' ? 'order_out_for_delivery'
-        : 'order_delivered';
+    const WA_STATUS_TEMPLATES = {
+      shipped: 'order_shipped',
+      out_for_delivery: 'order_out_for_delivery',
+      delivered: 'order_delivered',
+      cancelled: 'order_cancelled_update',
+    };
+    if (order.phone && WA_STATUS_TEMPLATES[newStatusLower]) {
+      const templateName = WA_STATUS_TEMPLATES[newStatusLower];
       try {
         const token = order.track_token || order.phone || '';
         const wa = await sendWhatsAppMessage(env, order.phone, templateName,

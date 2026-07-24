@@ -61,9 +61,11 @@ def build_catalog():
             img = f'{IMG_DIR}/{sku}.jpeg'
             if not os.path.exists(os.path.join(BASE, IMG_DIR, f'{sku}.jpeg')):
                 raise SystemExit(f'MISSING IMAGE: {IMG_DIR}/{sku}.jpeg')
+            # colour lives in the SKU + variants label, NOT the name — cards
+            # show one design; PDP/cart derive the colour from variants
             catalog.append({
                 'sku': sku,
-                'name': f'{base_name} ({COLORS[c]})',
+                'name': base_name,
                 'region': 'modern', 'regionLabel': 'Mumbai Modern',
                 'category': CATEGORY,
                 'price': PRICE, 'mrp': MRP,

@@ -216,15 +216,13 @@
       return '<details class="fcol"><summary class="fhead">' + title + '</summary>' +
         items.map(function (i) { return '<a href="' + i[1] + '">' + i[0] + '</a>'; }).join('') + '</details>';
     };
-    var MAPS = 'https://maps.google.com/?q=Saubhagya+Jewellery+Kandivali+East+Mumbai';
-    var INSTA = 'https://www.instagram.com/saubhagyajewellery';
-    var FB = 'https://www.facebook.com/saubhagyajewellery';
+    var INSTA = 'https://www.instagram.com/saubhagyajewellery_';
+    var FB = 'https://www.facebook.com/profile.php?id=61591767526538';
     var social =
       '<div class="fsocial">' +
       '<a href="' + INSTA + '" rel="noopener" target="_blank" aria-label="Saubhagya Jewellery on Instagram">Instagram</a>' +
       '<a href="' + FB + '" rel="noopener" target="_blank" aria-label="Saubhagya Jewellery on Facebook">Facebook</a>' +
       '<a href="' + WHATSAPP + '" rel="noopener" target="_blank" aria-label="WhatsApp Saubhagya Jewellery">WhatsApp</a>' +
-      '<a href="' + MAPS + '" rel="noopener" target="_blank" aria-label="Saubhagya Jewellery on Google Maps">Google Maps</a>' +
       '</div>';
     return '<div class="fwrap">' +
       '<div class="fbrand">' +
@@ -235,7 +233,6 @@
       '<details class="fcol fcol-support"><summary class="fhead">SELLER &amp; SUPPORT</summary>' +
       '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A880">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
       '<a class="fwa" href="' + WHATSAPP + '" rel="noopener" target="_blank">WhatsApp Support &rarr;</a>' +
-      '<a class="fwa" href="' + MAPS + '" rel="noopener" target="_blank" style="margin-top:8px;display:inline-block">Get Directions (Google Maps) &rarr;</a>' +
       '</details></div>' +
       '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; SSL secured</span>' +
       '<span class="fpay"><i>UPI</i><i>VISA</i><i>RuPay</i><i>EMI</i></span></div>';
@@ -310,6 +307,7 @@
           var lc = q.toLowerCase();
           var hits = cat.filter(function (p) {
             if (p.inStock === 0 || p.inStock === false) return false;
+            if (p.isVariantDup) return false;
             var hay = ((p.name || '') + ' ' + (p.category || '') + ' ' + (p.regionLabel || '')).toLowerCase();
             return hay.indexOf(lc) !== -1;
           }).slice(0, 6);
