@@ -25,15 +25,18 @@
 <link rel="stylesheet" href="site.css?v=20260722l">
 <script src="layout.js?v=20260724a"></script>
 <script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=17"></script>
+<script src="catalog.js?v=18"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://saubhagyajewellery.com/categories"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Shop by Category | Saubhagya Jewellery","url":"https://saubhagyajewellery.com/categories","description":"Shop Saubhagya jewellery by category: necklaces, chokers, waist chains, jhumkas, earrings, pendants, bridal sets and South temple necklaces.","isPartOf":{"@type":"WebSite","name":"Saubhagya Jewellery","url":"https://saubhagyajewellery.com/"}}</script>
 <style>
   body { background: #F0F5FA; margin: 0; }
-  .cat-hero { max-width: 1280px; margin: 0 auto; padding: 46px 40px 6px; text-align: center; }
-  .cat-kicker { font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 4px; color: #8A6D2F; margin-bottom: 12px; }
-  .cat-title { font-family:'Playfair Display',serif; font-weight: 500; font-size: 40px; color: #1A1A1A; margin: 0 0 8px; }
-  .cat-sub { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; color: #6a6a6a; margin: 0; }
+  /* Hero band over a real model photo — dark overlay keeps text legible */
+  .cat-hero { position: relative; max-width: 1280px; margin: 14px auto 0; padding: 96px 40px 88px; text-align: center; border-radius: 18px; overflow: hidden;
+    background-image: linear-gradient(rgba(11,41,28,.58), rgba(11,41,28,.72)), url('images/models/hero-wide.webp');
+    background-size: cover; background-position: center 28%; box-shadow: 0 30px 60px -34px rgba(11,41,28,.5); }
+  .cat-kicker { font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 4px; color: #E7CFA0; margin-bottom: 12px; }
+  .cat-title { font-family:'Playfair Display',serif; font-weight: 500; font-size: 42px; color: #fff; margin: 0 0 10px; text-shadow: 0 2px 14px rgba(0,0,0,.35); }
+  .cat-sub { font-family: 'Montserrat',sans-serif; font-weight: 300; font-size: 14px; color: rgba(255,255,255,.85); margin: 0 auto; max-width: 560px; }
   .cat-hub { max-width: 1280px; margin: 32px auto 0; padding: 0 40px; }
   .cat-hub-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
   .cat-card { position: relative; display: block; border-radius: 10px; overflow: hidden; text-decoration: none; aspect-ratio: 1/1; background: #eae5d8; }
@@ -81,8 +84,8 @@
   .crumb a { color: #0B291C; text-decoration: none; }
   .crumb i { margin: 0 8px; color: #C5A880; font-style: normal; }
   @media (max-width: 900px) {
-    .cat-hero { padding: 24px 16px 4px; }
-    .cat-title { font-size: 26px; }
+    .cat-hero { padding: 60px 18px 54px; margin: 10px 16px 0; border-radius: 14px; }
+    .cat-title { font-size: 27px; }
     .cat-sub { font-size: 13px; }
     .cat-hub, .cat-filterbar, .cat-search, .cat-list-wrap, .crumb { padding-left: 16px; padding-right: 16px; }
     .cat-hub { margin-top: 22px; }
@@ -145,16 +148,16 @@
   /* Subcategory definitions — each maps to a name/category matcher.
      `image` = a representative photo we already have.
      `match(p)` gets the product; returns true if it belongs.        */
-  /* Category tiles are intentionally imageless (brand gradients) until each
-     category gets its own approved photography. */
+  /* Tiles with model photography use `img`; categories still awaiting their
+     own shoot (bridal, pendant) fall back to a brand gradient. */
   var SUBS = [
     { slug: 'bridal-set',  label: 'Bridal Sets',  grad: 'linear-gradient(135deg,#0B291C 0%,#1E4D34 70%,#3A6B4D 100%)',
       match: function (p) { return p.category === 'Bridal Set'; } },
-    { slug: 'necklaces',   label: 'Necklaces',    grad: 'linear-gradient(135deg,#1A4630 0%,#0B291C 100%)',
+    { slug: 'necklaces',   label: 'Necklaces',    img: 'images/models/cat-necklace.webp',
       match: function (p) { return p.category === 'Necklace'; } },
-    { slug: 'jhumkas',     label: 'Jhumkas',      grad: 'linear-gradient(135deg,#0B291C 0%,#26543A 100%)',
+    { slug: 'jhumkas',     label: 'Jhumkas',      img: 'images/models/cat-jhumka.webp',
       match: function (p) { return p.category === 'Jhumkas'; } },
-    { slug: 'earrings',    label: 'Earrings',     grad: 'linear-gradient(135deg,#1E4D34 0%,#0B291C 100%)',
+    { slug: 'earrings',    label: 'Earrings',     img: 'images/models/cat-earrings.webp',
       match: function (p) { return p.category === 'Earring'; } },
     { slug: 'pendants',    label: 'Pendants',     grad: 'linear-gradient(135deg,#0F3323 0%,#2B5C40 100%)',
       match: function (p) { return p.category === 'Pendant'; } }
@@ -168,8 +171,9 @@
     var active = current.cat;
     $('cat-hub-grid').innerHTML = SUBS.map(function (s) {
       var cls = 'cat-card' + (s.slug === active ? ' is-active' : '');
+      var bg = s.img ? "background-image:url('" + s.img + "');background-color:#0B291C" : 'background:' + s.grad;
       return '<a class="' + cls + '" href="categories.html?cat=' + s.slug + '">' +
-        '<div class="bg" style="background:' + s.grad + '"></div>' +
+        '<div class="bg" style="' + bg + '"></div>' +
         '<div class="shade"></div>' +
         '<div class="lbl">' + esc(s.label) + '<span class="arr">SHOP →</span></div>' +
         '</a>';
