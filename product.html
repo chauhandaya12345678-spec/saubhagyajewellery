@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="site.css?v=20260722l">
 <script src="layout.js?v=20260723c"></script>
 <script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=13"></script>
+<script src="catalog.js?v=14"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -50,7 +50,10 @@
   .pdp-price { font-family:'Playfair Display',serif; font-size: 28px; font-weight: 600; color: #0B291C; }
   .pdp-mrp { font-family: 'Montserrat',sans-serif; font-size: 15px; color: #9a9a9a; text-decoration: line-through; }
   .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B291C; font-weight: 500; }
-  .pdp-swatches { display: flex; gap: 8px; margin: 10px 0 16px; flex-wrap: wrap; }
+  .pdp-color-lbl { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1.5px; color: #6a6a6a; text-transform: uppercase; margin: 10px 0 6px; }
+  .pdp-color-lbl strong { color: #1A1A1A; }
+  .pdp-swatches { display: flex; gap: 8px; margin: 0 0 16px; flex-wrap: wrap; }
+  .pdp-img { transition: opacity .28s ease; }
   .pdp-swatch { width: 36px; height: 36px; border-radius: 50%; padding: 2px; border: 2px solid transparent; background: #f0ede5; cursor: pointer; transition: border-color .25s cubic-bezier(.25,1,.5,1), transform .25s cubic-bezier(.25,1,.5,1); }
   .pdp-swatch img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
   .pdp-swatch:hover { transform: translateY(-2px); }
@@ -206,6 +209,7 @@
         <div>
           <div class="pdp-cat" id="pdp-cat"></div>
           <h1 class="pdp-name" id="pdp-name"></h1>
+          <div class="pdp-color-lbl" id="pdp-color-lbl" style="display:none"></div>
           <div class="pdp-swatches" id="pdp-swatches" style="display:none"></div>
           <div class="pdp-region" id="pdp-region"></div>
           <div class="pdp-price-row">
@@ -392,8 +396,11 @@
     } catch (e) {}
   }
 
-  /* Color/finish swatches — reads p.variants([{image,label}]) or image+altImage.
-     Always shown when at least one image exists (gate removed). */
+  /* Colour variants — each colour is its own SKU row in D1; p.variants
+     ([{sku,label,image}]) links the siblings. Clicking a swatch/thumb swaps
+     the WHOLE product (sku, image, stock, name) with a crossfade, so the
+     cart receives the exact colour SKU. Legacy rows without variants fall
+     back to image+altImage gallery behaviour. */
   function getImageOpts(p) {
     var opts = Array.isArray(p.variants) && p.variants.length
       ? p.variants.filter(function (v) { return v && v.image; }).slice(0, 6)
@@ -402,28 +409,79 @@
     return opts.filter(function (o) { if (seen[o.image]) return false; seen[o.image] = 1; return true; });
   }
 
+  function activeOptIndex(p, opts) {
+    var cur = p.sku || sku;
+    for (var i = 0; i < opts.length; i++) {
+      if (opts[i].sku ? opts[i].sku === cur : opts[i].image === p.image) return i;
+    }
+    return 0;
+  }
+
   function switchMainImage(src) {
     $('pdp-image').src = src;
-    // sync swatch active state
     $('pdp-swatches').querySelectorAll('.pdp-swatch').forEach(function (b) {
       b.classList.toggle('on', b.getAttribute('data-img') === src);
     });
-    // sync thumb active state
     $('pdp-thumbs').querySelectorAll('.pdp-thumb').forEach(function (b) {
       b.classList.toggle('on', b.getAttribute('data-img') === src);
     });
   }
 
+  var switching = false;
+  function selectVariant(vsku) {
+    if (switching || !vsku || vsku === (product.sku || sku)) return;
+    switching = true;
+    var img = $('pdp-image');
+    img.style.opacity = '0';
+    function apply(row) {
+      product = row; sku = row.sku || vsku;
+      try { history.replaceState(null, '', 'product?sku=' + encodeURIComponent(sku)); } catch (e) {}
+      setTimeout(function () {
+        render();
+        var im = $('pdp-image');
+        var reveal = function () { im.style.opacity = '1'; switching = false; };
+        if (im.complete && im.naturalWidth) reveal();
+        else {
+          im.addEventListener('load', function once() { im.removeEventListener('load', once); reveal(); });
+          im.addEventListener('error', function once2() { im.removeEventListener('error', once2); reveal(); });
+        }
+      }, 180);
+    }
+    function bail() { img.style.opacity = '1'; switching = false; }
+    var hit = (window.SAUBHAGYA_CATALOG || []).find(function (p) { return p.id === vsku || p.sku === vsku; });
+    if (hit) { apply(hit); return; }
+    fetch('/api/products?sku=' + encodeURIComponent(vsku))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var list = Array.isArray(data) ? data : (data && data.products || []);
+        if (list && list.length) apply(list[0]); else bail();
+      })
+      .catch(bail);
+  }
+
+  function optHandler(o) {
+    return function () {
+      if (o.sku) selectVariant(o.sku);
+      else switchMainImage(o.image);
+    };
+  }
+
   function renderSwatches(p) {
     var box = $('pdp-swatches');
+    var lbl = $('pdp-color-lbl');
     var opts = getImageOpts(p);
-    if (!opts.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+    if (!opts.length) { box.style.display = 'none'; box.innerHTML = ''; lbl.style.display = 'none'; return; }
+    var act = activeOptIndex(p, opts);
+    if (opts[act] && opts[act].label) {
+      lbl.innerHTML = 'Colour: <strong>' + opts[act].label + '</strong>';
+      lbl.style.display = 'block';
+    } else lbl.style.display = 'none';
     box.innerHTML = opts.map(function (o, i) {
-      return '<button type="button" class="pdp-swatch' + (i === 0 ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" aria-label="' + (o.label || ('View ' + (i + 1))) + '"><img src="' + o.image + '" alt="' + (o.label || '') + '" loading="lazy"></button>';
+      return '<button type="button" class="pdp-swatch' + (i === act ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" title="' + (o.label || '') + '" aria-label="' + (o.label || ('View ' + (i + 1))) + '"><img src="' + o.image + '" alt="' + (o.label || '') + '" loading="lazy"></button>';
     }).join('');
     box.style.display = 'flex';
-    box.querySelectorAll('.pdp-swatch').forEach(function (btn) {
-      btn.addEventListener('click', function () { switchMainImage(btn.getAttribute('data-img')); });
+    box.querySelectorAll('.pdp-swatch').forEach(function (btn, i) {
+      btn.addEventListener('click', optHandler(opts[i]));
     });
   }
 
@@ -431,12 +489,13 @@
     var box = $('pdp-thumbs');
     var opts = getImageOpts(p);
     if (opts.length < 2) { box.innerHTML = ''; return; }
+    var act = activeOptIndex(p, opts);
     box.innerHTML = opts.map(function (o, i) {
-      return '<div class="pdp-thumb' + (i === 0 ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" role="button" tabindex="0" aria-label="' + (o.label || ('Image ' + (i + 1))) + '"><img src="' + o.image + '" alt="' + (o.label || '') + '" loading="lazy"></div>';
+      return '<div class="pdp-thumb' + (i === act ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" role="button" tabindex="0" aria-label="' + (o.label || ('Image ' + (i + 1))) + '"><img src="' + o.image + '" alt="' + (o.label || '') + '" loading="lazy"></div>';
     }).join('');
-    box.querySelectorAll('.pdp-thumb').forEach(function (btn) {
-      btn.addEventListener('click', function () { switchMainImage(btn.getAttribute('data-img')); });
-      btn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') switchMainImage(btn.getAttribute('data-img')); });
+    box.querySelectorAll('.pdp-thumb').forEach(function (btn, i) {
+      btn.addEventListener('click', optHandler(opts[i]));
+      btn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') optHandler(opts[i])(); });
     });
   }
 

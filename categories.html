@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="site.css?v=20260722l">
 <script src="layout.js?v=20260723c"></script>
 <script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=13"></script>
+<script src="catalog.js?v=14"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://saubhagyajewellery.com/categories"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Shop by Category | Saubhagya Jewellery","url":"https://saubhagyajewellery.com/categories","description":"Shop Saubhagya jewellery by category: necklaces, chokers, waist chains, jhumkas, earrings, pendants, bridal sets and South temple necklaces.","isPartOf":{"@type":"WebSite","name":"Saubhagya Jewellery","url":"https://saubhagyajewellery.com/"}}</script>
 <style>
@@ -141,16 +141,18 @@
   /* Subcategory definitions — each maps to a name/category matcher.
      `image` = a representative photo we already have.
      `match(p)` gets the product; returns true if it belongs.        */
+  /* Category tiles are intentionally imageless (brand gradients) until each
+     category gets its own approved photography. */
   var SUBS = [
-    { slug: 'bridal-set',  label: 'Bridal Sets',  image: 'images/necklace/neck-20260723_202837-o2.webp',
+    { slug: 'bridal-set',  label: 'Bridal Sets',  grad: 'linear-gradient(135deg,#0B291C 0%,#1E4D34 70%,#3A6B4D 100%)',
       match: function (p) { return p.category === 'Bridal Set'; } },
-    { slug: 'necklaces',   label: 'Necklaces',    image: 'images/necklace/neck-20260723_195253-o2.webp',
+    { slug: 'necklaces',   label: 'Necklaces',    grad: 'linear-gradient(135deg,#1A4630 0%,#0B291C 100%)',
       match: function (p) { return p.category === 'Necklace'; } },
-    { slug: 'jhumkas',     label: 'Jhumkas',      image: 'images/Earrings/ear-20260528_125028.webp',
+    { slug: 'jhumkas',     label: 'Jhumkas',      grad: 'linear-gradient(135deg,#0B291C 0%,#26543A 100%)',
       match: function (p) { return p.category === 'Jhumkas'; } },
-    { slug: 'earrings',    label: 'Earrings',     image: 'images/Earrings/ear-20260528_115256-o2.webp',
+    { slug: 'earrings',    label: 'Earrings',     grad: 'linear-gradient(135deg,#1E4D34 0%,#0B291C 100%)',
       match: function (p) { return p.category === 'Earring'; } },
-    { slug: 'pendants',    label: 'Pendants',     image: 'images/Earrings/ear-20260528_121549-o2.webp',
+    { slug: 'pendants',    label: 'Pendants',     grad: 'linear-gradient(135deg,#0F3323 0%,#2B5C40 100%)',
       match: function (p) { return p.category === 'Pendant'; } }
   ];
 
@@ -163,7 +165,7 @@
     $('cat-hub-grid').innerHTML = SUBS.map(function (s) {
       var cls = 'cat-card' + (s.slug === active ? ' is-active' : '');
       return '<a class="' + cls + '" href="categories.html?cat=' + s.slug + '">' +
-        '<div class="bg" style="background-image:url(\'' + esc(s.image) + '\')"></div>' +
+        '<div class="bg" style="background:' + s.grad + '"></div>' +
         '<div class="shade"></div>' +
         '<div class="lbl">' + esc(s.label) + '<span class="arr">SHOP →</span></div>' +
         '</a>';
@@ -177,6 +179,7 @@
     var sub = current.cat ? findSub(current.cat) : null;
     return all.filter(function (p) {
       if (p.inStock === 0 || p.inStock === false) return false;
+      if (p.isVariantDup) return false;
       if (sub && !sub.match(p)) return false;
       if (q) {
         var hay = (p.name + ' ' + p.category + ' ' + (p.regionLabel || '')).toLowerCase();
