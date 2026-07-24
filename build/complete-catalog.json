@@ -9,25 +9,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "NEW",
-    "image": "images/products/SJ-SN01-GL.jpeg",
+    "image": "images/products/SJ-SN01-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN01-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN01-GL.jpeg"
+        "image": "images/products/SJ-SN01-GL.webp"
       },
       {
         "sku": "SJ-SN01-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN01-GR.jpeg"
+        "image": "images/products/SJ-SN01-GR.webp"
       },
       {
         "sku": "SJ-SN01-WH",
         "label": "White",
-        "image": "images/products/SJ-SN01-WH.jpeg"
+        "image": "images/products/SJ-SN01-WH.webp"
       }
     ]
   },
@@ -41,25 +42,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN01-GR.jpeg",
+    "image": "images/products/SJ-SN01-GR.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN01-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN01-GL.jpeg"
+        "image": "images/products/SJ-SN01-GL.webp"
       },
       {
         "sku": "SJ-SN01-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN01-GR.jpeg"
+        "image": "images/products/SJ-SN01-GR.webp"
       },
       {
         "sku": "SJ-SN01-WH",
         "label": "White",
-        "image": "images/products/SJ-SN01-WH.jpeg"
+        "image": "images/products/SJ-SN01-WH.webp"
       }
     ]
   },
@@ -73,25 +75,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN01-WH.jpeg",
+    "image": "images/products/SJ-SN01-WH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN01-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN01-GL.jpeg"
+        "image": "images/products/SJ-SN01-GL.webp"
       },
       {
         "sku": "SJ-SN01-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN01-GR.jpeg"
+        "image": "images/products/SJ-SN01-GR.webp"
       },
       {
         "sku": "SJ-SN01-WH",
         "label": "White",
-        "image": "images/products/SJ-SN01-WH.jpeg"
+        "image": "images/products/SJ-SN01-WH.webp"
       }
     ]
   },
@@ -105,25 +108,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN02-GL.jpeg",
+    "image": "images/products/SJ-SN02-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN02-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN02-GL.jpeg"
+        "image": "images/products/SJ-SN02-GL.webp"
       },
       {
         "sku": "SJ-SN02-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN02-GR.jpeg"
+        "image": "images/products/SJ-SN02-GR.webp"
       },
       {
         "sku": "SJ-SN02-WH",
         "label": "White",
-        "image": "images/products/SJ-SN02-WH.jpeg"
+        "image": "images/products/SJ-SN02-WH.webp"
       }
     ]
   },
@@ -137,25 +141,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN02-GR.jpeg",
+    "image": "images/products/SJ-SN02-GR.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN02-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN02-GL.jpeg"
+        "image": "images/products/SJ-SN02-GL.webp"
       },
       {
         "sku": "SJ-SN02-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN02-GR.jpeg"
+        "image": "images/products/SJ-SN02-GR.webp"
       },
       {
         "sku": "SJ-SN02-WH",
         "label": "White",
-        "image": "images/products/SJ-SN02-WH.jpeg"
+        "image": "images/products/SJ-SN02-WH.webp"
       }
     ]
   },
@@ -169,25 +174,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN02-WH.jpeg",
+    "image": "images/products/SJ-SN02-WH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN02-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN02-GL.jpeg"
+        "image": "images/products/SJ-SN02-GL.webp"
       },
       {
         "sku": "SJ-SN02-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN02-GR.jpeg"
+        "image": "images/products/SJ-SN02-GR.webp"
       },
       {
         "sku": "SJ-SN02-WH",
         "label": "White",
-        "image": "images/products/SJ-SN02-WH.jpeg"
+        "image": "images/products/SJ-SN02-WH.webp"
       }
     ]
   },
@@ -201,25 +207,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN03-GL.jpeg",
+    "image": "images/products/SJ-SN03-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN03-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN03-GL.jpeg"
+        "image": "images/products/SJ-SN03-GL.webp"
       },
       {
         "sku": "SJ-SN03-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN03-GR.jpeg"
+        "image": "images/products/SJ-SN03-GR.webp"
       },
       {
         "sku": "SJ-SN03-WH",
         "label": "White",
-        "image": "images/products/SJ-SN03-WH.jpeg"
+        "image": "images/products/SJ-SN03-WH.webp"
       }
     ]
   },
@@ -233,25 +240,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN03-GR.jpeg",
+    "image": "images/products/SJ-SN03-GR.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN03-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN03-GL.jpeg"
+        "image": "images/products/SJ-SN03-GL.webp"
       },
       {
         "sku": "SJ-SN03-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN03-GR.jpeg"
+        "image": "images/products/SJ-SN03-GR.webp"
       },
       {
         "sku": "SJ-SN03-WH",
         "label": "White",
-        "image": "images/products/SJ-SN03-WH.jpeg"
+        "image": "images/products/SJ-SN03-WH.webp"
       }
     ]
   },
@@ -265,25 +273,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN03-WH.jpeg",
+    "image": "images/products/SJ-SN03-WH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN03-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN03-GL.jpeg"
+        "image": "images/products/SJ-SN03-GL.webp"
       },
       {
         "sku": "SJ-SN03-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN03-GR.jpeg"
+        "image": "images/products/SJ-SN03-GR.webp"
       },
       {
         "sku": "SJ-SN03-WH",
         "label": "White",
-        "image": "images/products/SJ-SN03-WH.jpeg"
+        "image": "images/products/SJ-SN03-WH.webp"
       }
     ]
   },
@@ -297,25 +306,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN04-GL.jpeg",
+    "image": "images/products/SJ-SN04-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN04-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN04-GL.jpeg"
+        "image": "images/products/SJ-SN04-GL.webp"
       },
       {
         "sku": "SJ-SN04-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN04-GR.jpeg"
+        "image": "images/products/SJ-SN04-GR.webp"
       },
       {
         "sku": "SJ-SN04-WH",
         "label": "White",
-        "image": "images/products/SJ-SN04-WH.jpeg"
+        "image": "images/products/SJ-SN04-WH.webp"
       }
     ]
   },
@@ -329,25 +339,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN04-GR.jpeg",
+    "image": "images/products/SJ-SN04-GR.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN04-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN04-GL.jpeg"
+        "image": "images/products/SJ-SN04-GL.webp"
       },
       {
         "sku": "SJ-SN04-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN04-GR.jpeg"
+        "image": "images/products/SJ-SN04-GR.webp"
       },
       {
         "sku": "SJ-SN04-WH",
         "label": "White",
-        "image": "images/products/SJ-SN04-WH.jpeg"
+        "image": "images/products/SJ-SN04-WH.webp"
       }
     ]
   },
@@ -361,25 +372,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN04-WH.jpeg",
+    "image": "images/products/SJ-SN04-WH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN04-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN04-GL.jpeg"
+        "image": "images/products/SJ-SN04-GL.webp"
       },
       {
         "sku": "SJ-SN04-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN04-GR.jpeg"
+        "image": "images/products/SJ-SN04-GR.webp"
       },
       {
         "sku": "SJ-SN04-WH",
         "label": "White",
-        "image": "images/products/SJ-SN04-WH.jpeg"
+        "image": "images/products/SJ-SN04-WH.webp"
       }
     ]
   },
@@ -393,25 +405,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN05-GL.jpeg",
+    "image": "images/products/SJ-SN05-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN05-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN05-GL.jpeg"
+        "image": "images/products/SJ-SN05-GL.webp"
       },
       {
         "sku": "SJ-SN05-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN05-GR.jpeg"
+        "image": "images/products/SJ-SN05-GR.webp"
       },
       {
         "sku": "SJ-SN05-WH",
         "label": "White",
-        "image": "images/products/SJ-SN05-WH.jpeg"
+        "image": "images/products/SJ-SN05-WH.webp"
       }
     ]
   },
@@ -425,25 +438,26 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN05-GR.jpeg",
+    "image": "images/products/SJ-SN05-GR.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN05-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN05-GL.jpeg"
+        "image": "images/products/SJ-SN05-GL.webp"
       },
       {
         "sku": "SJ-SN05-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN05-GR.jpeg"
+        "image": "images/products/SJ-SN05-GR.webp"
       },
       {
         "sku": "SJ-SN05-WH",
         "label": "White",
-        "image": "images/products/SJ-SN05-WH.jpeg"
+        "image": "images/products/SJ-SN05-WH.webp"
       }
     ]
   },
@@ -457,27 +471,247 @@
     "mrp": 740,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-SN05-WH.jpeg",
+    "image": "images/products/SJ-SN05-WH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 4,
+    "weightGrams": null,
     "variants": [
       {
         "sku": "SJ-SN05-GL",
         "label": "Gold",
-        "image": "images/products/SJ-SN05-GL.jpeg"
+        "image": "images/products/SJ-SN05-GL.webp"
       },
       {
         "sku": "SJ-SN05-GR",
         "label": "Green",
-        "image": "images/products/SJ-SN05-GR.jpeg"
+        "image": "images/products/SJ-SN05-GR.webp"
       },
       {
         "sku": "SJ-SN05-WH",
         "label": "White",
-        "image": "images/products/SJ-SN05-WH.jpeg"
+        "image": "images/products/SJ-SN05-WH.webp"
       }
     ]
+  },
+  {
+    "sku": "SJ-CY01-MR",
+    "name": "Royal Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY01-MR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": null
+  },
+  {
+    "sku": "SJ-CY02-MR",
+    "name": "Heritage Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY02-MR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": [
+      {
+        "sku": "SJ-CY02-MR",
+        "label": "Maroon",
+        "image": "images/products/SJ-CY02-MR.webp"
+      },
+      {
+        "sku": "SJ-CY02-GR",
+        "label": "Green",
+        "image": "images/products/SJ-CY02-GR.webp"
+      }
+    ]
+  },
+  {
+    "sku": "SJ-CY02-GR",
+    "name": "Heritage Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY02-GR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": [
+      {
+        "sku": "SJ-CY02-MR",
+        "label": "Maroon",
+        "image": "images/products/SJ-CY02-MR.webp"
+      },
+      {
+        "sku": "SJ-CY02-GR",
+        "label": "Green",
+        "image": "images/products/SJ-CY02-GR.webp"
+      }
+    ]
+  },
+  {
+    "sku": "SJ-CY03-MR",
+    "name": "Peacock Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY03-MR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": [
+      {
+        "sku": "SJ-CY03-MR",
+        "label": "Maroon",
+        "image": "images/products/SJ-CY03-MR.webp"
+      },
+      {
+        "sku": "SJ-CY03-GR",
+        "label": "Green",
+        "image": "images/products/SJ-CY03-GR.webp"
+      }
+    ]
+  },
+  {
+    "sku": "SJ-CY03-GR",
+    "name": "Peacock Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY03-GR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": [
+      {
+        "sku": "SJ-CY03-MR",
+        "label": "Maroon",
+        "image": "images/products/SJ-CY03-MR.webp"
+      },
+      {
+        "sku": "SJ-CY03-GR",
+        "label": "Green",
+        "image": "images/products/SJ-CY03-GR.webp"
+      }
+    ]
+  },
+  {
+    "sku": "SJ-CY04-MR",
+    "name": "Lotus Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY04-MR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": [
+      {
+        "sku": "SJ-CY04-MR",
+        "label": "Maroon",
+        "image": "images/products/SJ-CY04-MR.webp"
+      },
+      {
+        "sku": "SJ-CY04-GR",
+        "label": "Green",
+        "image": "images/products/SJ-CY04-GR.webp"
+      }
+    ]
+  },
+  {
+    "sku": "SJ-CY04-GR",
+    "name": "Lotus Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY04-GR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": [
+      {
+        "sku": "SJ-CY04-MR",
+        "label": "Maroon",
+        "image": "images/products/SJ-CY04-MR.webp"
+      },
+      {
+        "sku": "SJ-CY04-GR",
+        "label": "Green",
+        "image": "images/products/SJ-CY04-GR.webp"
+      }
+    ]
+  },
+  {
+    "sku": "SJ-CY05-MR",
+    "name": "Divine Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY05-MR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": null
+  },
+  {
+    "sku": "SJ-CY06-MR",
+    "name": "Regal Crystal Necklace",
+    "region": "modern",
+    "regionLabel": "Mumbai Modern",
+    "category": "Necklace",
+    "price": 510,
+    "mrp": 680,
+    "city": "Mumbai",
+    "badge": "",
+    "image": "images/products/SJ-CY06-MR.webp",
+    "altImage": "",
+    "inStock": 1,
+    "stock_count": 4,
+    "weightGrams": 85,
+    "variants": null
   },
   {
     "sku": "SJ-JH01-GL",
@@ -489,10 +723,11 @@
     "mrp": 320,
     "city": "Mumbai",
     "badge": "NEW",
-    "image": "images/products/SJ-JH01-GL.jpeg",
+    "image": "images/products/SJ-JH01-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -505,10 +740,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH01-SGL.jpeg",
+    "image": "images/products/SJ-JH01-SGL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -521,10 +757,11 @@
     "mrp": 320,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH02-GL.jpeg",
+    "image": "images/products/SJ-JH02-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -537,10 +774,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH02-SGL.jpeg",
+    "image": "images/products/SJ-JH02-SGL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -553,10 +791,11 @@
     "mrp": 320,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH03-GL.jpeg",
+    "image": "images/products/SJ-JH03-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -569,10 +808,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH03-SGL.jpeg",
+    "image": "images/products/SJ-JH03-SGL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -585,10 +825,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH04-GL.jpeg",
+    "image": "images/products/SJ-JH04-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -601,10 +842,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH04-SGL.jpeg",
+    "image": "images/products/SJ-JH04-SGL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -617,10 +859,11 @@
     "mrp": 300,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH05-GL.jpeg",
+    "image": "images/products/SJ-JH05-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -633,10 +876,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH05-SGL.jpeg",
+    "image": "images/products/SJ-JH05-SGL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -649,10 +893,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH06-GL.jpeg",
+    "image": "images/products/SJ-JH06-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -665,10 +910,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH06-SGL.jpeg",
+    "image": "images/products/SJ-JH06-SGL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -681,10 +927,11 @@
     "mrp": 300,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH07-GL.jpeg",
+    "image": "images/products/SJ-JH07-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -697,10 +944,11 @@
     "mrp": 310,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-JH08-GL.jpeg",
+    "image": "images/products/SJ-JH08-GL.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -713,10 +961,11 @@
     "mrp": 330,
     "city": "Mumbai",
     "badge": "NEW",
-    "image": "images/products/SJ-ER01-MH.jpeg",
+    "image": "images/products/SJ-ER01-MH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -729,10 +978,11 @@
     "mrp": 330,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-ER02-MH.jpeg",
+    "image": "images/products/SJ-ER02-MH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -745,10 +995,11 @@
     "mrp": 330,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-ER03-MH.jpeg",
+    "image": "images/products/SJ-ER03-MH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -761,10 +1012,11 @@
     "mrp": 330,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-ER04-MH.jpeg",
+    "image": "images/products/SJ-ER04-MH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -777,10 +1029,11 @@
     "mrp": 330,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-ER05-MH.jpeg",
+    "image": "images/products/SJ-ER05-MH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   },
   {
@@ -793,10 +1046,11 @@
     "mrp": 330,
     "city": "Mumbai",
     "badge": "",
-    "image": "images/products/SJ-ER06-MH.jpeg",
+    "image": "images/products/SJ-ER06-MH.webp",
     "altImage": "",
     "inStock": 1,
     "stock_count": 12,
+    "weightGrams": null,
     "variants": null
   }
 ]

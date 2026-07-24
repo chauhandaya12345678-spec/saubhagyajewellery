@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="site.css?v=20260722l">
 <script src="layout.js?v=20260724a"></script>
 <script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=16"></script>
+<script src="catalog.js?v=17"></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -150,6 +150,15 @@
   .pdp-buy:disabled:hover { transform: none; box-shadow: none; background: #f3f0e9; color: #9a9a9a; }
   .pdp-desc { font-family: 'Montserrat',sans-serif; font-size: 13px; line-height: 1.8; color: #6a6a6a; max-width: 460px; }
   .pdp-desc strong { color: #1A1A1A; }
+  .pdp-spec { max-width: 460px; margin-top: 22px; }
+  .pdp-spec h4 { font-family:'Montserrat',sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #8A6D2F; margin: 0 0 10px; font-weight: 600; }
+  .pdp-spec-row { display: flex; gap: 10px; font-family:'Montserrat',sans-serif; font-size: 13px; line-height: 1.7; color: #4a4a4a; padding: 5px 0; border-bottom: 1px solid #f0ebe0; }
+  .pdp-spec-row .k { flex: 0 0 96px; color: #9a9a9a; }
+  .pdp-spec-row .v { flex: 1; color: #1A1A1A; }
+  .pdp-care { margin-top: 18px; padding: 14px 16px; background: #faf8f3; border: 1px solid #eee5d6; border-radius: 8px; }
+  .pdp-care h4 { color: #0B291C; }
+  .pdp-care ul { margin: 0; padding-left: 18px; font-family:'Montserrat',sans-serif; font-size: 12.5px; line-height: 1.85; color: #6a6a6a; }
+  .pdp-care li strong { color: #1A1A1A; }
   .pdp-loading { text-align: center; padding: 80px 24px; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; letter-spacing:1.5px; }
   .pdp-error { text-align: center; padding: 80px 24px; }
   .pdp-error-title { font-family:'Playfair Display',serif; font-weight: 600; font-size: 28px; color: #1A1A1A; margin: 0 0 14px; }
@@ -239,6 +248,7 @@
           </div>
           <button class="pdp-buy" id="pdp-buynow">BUY IT NOW</button>
           <div class="pdp-desc" id="pdp-desc"></div>
+          <div class="pdp-spec" id="pdp-spec"></div>
         </div>
       </div>
 
@@ -354,6 +364,7 @@
     $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> — premium handcrafted imitation jewellery, manufactured in our Mumbai warehouse. ' +
       (p.category ? 'Part of our ' + p.category + ' collection. ' : '') +
       'Each piece is individually inspected and dispatched insured across India.';
+    renderSpec(p);
     // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")
     var stockLbl = '', stockCls = '';
     if (p.inStock === 0 || p.inStock === false) { stockLbl = 'Out of stock'; stockCls = 'low'; }
@@ -394,6 +405,34 @@
         });
       }
     } catch (e) {}
+  }
+
+  /* Specs + care. Material is Zamak alloy across the range; weight comes from
+     D1 (admin fills it in — shown as "updating" until then). Care list tells
+     the buyer what to avoid so the plating lasts. */
+  function renderSpec(p) {
+    var box = $('pdp-spec');
+    if (!box) return;
+    var wt = (typeof p.weightGrams === 'number' && p.weightGrams > 0)
+      ? p.weightGrams + ' g (approx.)'
+      : 'Updating soon';
+    var specRows =
+      row('Material', 'Zamak alloy (lead &amp; nickel-safe base metal)') +
+      row('Finish', 'Hand-set stones with colour / gold-tone plating') +
+      row('Weight', wt) +
+      row('Origin', 'Handcrafted in Mumbai, India');
+    box.innerHTML =
+      '<h4>Product Details</h4>' + specRows +
+      '<div class="pdp-care"><h4>Care &amp; What to Avoid</h4><ul>' +
+        '<li><strong>Avoid water, sweat &amp; humidity</strong> — remove before bathing, swimming or workouts.</li>' +
+        '<li><strong>Keep away from perfume, deodorant &amp; hairspray</strong> — spray first, wear jewellery last.</li>' +
+        '<li><strong>No harsh chemicals</strong> — soap, sanitiser, lotion and cleaning agents dull the plating.</li>' +
+        '<li><strong>Store dry &amp; separate</strong> — keep in the pouch/box, away from other metal, in a moisture-free spot.</li>' +
+        '<li><strong>Wipe after use</strong> — a soft dry cloth only; never rub with tissue or water.</li>' +
+      '</ul></div>';
+    function row(k, v) {
+      return '<div class="pdp-spec-row"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
+    }
   }
 
   /* Colour variants — each colour is its own SKU row in D1; p.variants
