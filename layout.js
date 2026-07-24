@@ -479,3 +479,23 @@
     window.addEventListener('scroll', function () { if (!FINE) clearAll(); }, { passive: true });
   })();
 })();
+
+/* ─────────────────────────────────────────────────
+ * UAT BANNER — appended after main IIFE, cannot break layout
+ * ───────────────────────────────────────────────── */
+(function () {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', showBanner);
+  } else {
+    showBanner();
+  }
+  function showBanner() {
+    var b = document.createElement('div');
+    b.id = 'uat-banner';
+    b.textContent = '⚠️ UAT — TEST MODE — NOT LIVE ⚠️';
+    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#ff5722;color:#fff;text-align:center;padding:6px 10px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;box-shadow:0 2px 12px rgba(255,87,34,.5)';
+    document.body.insertBefore(b, document.body.firstChild);
+  }
+  window.SAUBHAGYA_ENV = window.SAUBHAGYA_ENV || {};
+  window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID = window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID || 'rzp_test_placeholder123';
+})();
