@@ -146,11 +146,16 @@ def esc(val):
 
 
 def generate_sql(products):
-    """UPSERT, not DELETE+INSERT. Authority split:
-       - SCRIPT owns: name, category, price, mrp, badge, image, variants, inStock
-       - ADMIN owns (preserved on reseed once set in D1): stock_count,
-         weightGrams, packing_weight_grams, low_stock_threshold
-       Retired SKUs (no longer in this script) are deleted at the end."""
+    """D1 IS THE LIVE SOURCE OF TRUTH (owner rule, 2026-07-24).
+       Reseeding NEVER overwrites an existing row — no price/name/image/
+       inStock/stock/weight resets. The seed only:
+         1. INSERTs brand-new SKUs (script values are onboarding defaults),
+         2. refreshes `variants` (internal colour-switcher wiring, not owner
+            data — stale JSON would break the switcher when colours change),
+         3. DELETEs SKUs retired from this script.
+       To change price/name/image on a LIVE product: update D1 directly
+       (admin panel / agent / wrangler) — and optionally sync the value here
+       so future fresh seeds start from the right number."""
     rows = []
     for p in products:
         variants_sql = 'NULL' if not p['variants'] else esc(json.dumps(p['variants']))
@@ -166,12 +171,7 @@ def generate_sql(products):
         'INSERT INTO products (sku, name, region, regionLabel, category, price, mrp, city, badge, image, altImage, inStock, stock_count, weightGrams, variants) VALUES\n'
         + ',\n'.join(rows) + '\n'
         'ON CONFLICT(sku) DO UPDATE SET\n'
-        "  name=excluded.name, region=excluded.region, regionLabel=excluded.regionLabel,\n"
-        "  category=excluded.category, price=excluded.price, mrp=excluded.mrp,\n"
-        "  city=excluded.city, badge=excluded.badge, image=excluded.image,\n"
-        "  altImage=excluded.altImage, inStock=excluded.inStock, variants=excluded.variants,\n"
-        "  stock_count=COALESCE(products.stock_count, excluded.stock_count),\n"
-        "  weightGrams=COALESCE(products.weightGrams, excluded.weightGrams),\n"
+        "  variants=excluded.variants,\n"
         "  updated_at=datetime('now');\n"
         f'DELETE FROM products WHERE sku NOT IN ({all_skus});'
     )

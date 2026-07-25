@@ -44,11 +44,6 @@ INSERT INTO products (sku, name, region, regionLabel, category, price, mrp, city
   ('SJ-ER05-MH', 'Divine Earrings', 'modern', 'Mumbai Modern', 'Earring', 245, 330, 'Mumbai', '', 'images/products/SJ-ER05-MH.webp', '', 1, 12, NULL, NULL),
   ('SJ-ER06-MH', 'Regal Earrings', 'modern', 'Mumbai Modern', 'Earring', 245, 330, 'Mumbai', '', 'images/products/SJ-ER06-MH.webp', '', 1, 12, NULL, NULL)
 ON CONFLICT(sku) DO UPDATE SET
-  name=excluded.name, region=excluded.region, regionLabel=excluded.regionLabel,
-  category=excluded.category, price=excluded.price, mrp=excluded.mrp,
-  city=excluded.city, badge=excluded.badge, image=excluded.image,
-  altImage=excluded.altImage, inStock=excluded.inStock, variants=excluded.variants,
-  stock_count=COALESCE(products.stock_count, excluded.stock_count),
-  weightGrams=COALESCE(products.weightGrams, excluded.weightGrams),
+  variants=excluded.variants,
   updated_at=datetime('now');
 DELETE FROM products WHERE sku NOT IN ('SJ-SN01-GL', 'SJ-SN01-GR', 'SJ-SN01-WH', 'SJ-SN02-GL', 'SJ-SN02-GR', 'SJ-SN02-WH', 'SJ-SN03-GL', 'SJ-SN03-GR', 'SJ-SN03-WH', 'SJ-SN04-GL', 'SJ-SN04-GR', 'SJ-SN04-WH', 'SJ-SN05-GL', 'SJ-SN05-GR', 'SJ-SN05-WH', 'SJ-CY01-MR', 'SJ-CY02-MR', 'SJ-CY02-GR', 'SJ-CY03-MR', 'SJ-CY03-GR', 'SJ-CY04-MR', 'SJ-CY04-GR', 'SJ-CY05-MR', 'SJ-CY06-MR', 'SJ-JH01-GL', 'SJ-JH01-SGL', 'SJ-JH02-GL', 'SJ-JH02-SGL', 'SJ-JH03-GL', 'SJ-JH03-SGL', 'SJ-JH04-GL', 'SJ-JH04-SGL', 'SJ-JH05-GL', 'SJ-JH05-SGL', 'SJ-JH06-GL', 'SJ-JH06-SGL', 'SJ-JH07-GL', 'SJ-JH08-GL', 'SJ-ER01-MH', 'SJ-ER02-MH', 'SJ-ER03-MH', 'SJ-ER04-MH', 'SJ-ER05-MH', 'SJ-ER06-MH');
