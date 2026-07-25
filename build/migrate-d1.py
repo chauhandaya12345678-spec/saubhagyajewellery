@@ -124,7 +124,9 @@ def build_catalog():
 
     for i, sku in enumerate(JHUMKAS):
         price, mrp = price_from_cost(JHUMKA_COST[sku])          # break-even
-        cat.append(_row(sku, f'{JHUMKA_NAMES[i]} Jhumkas', 'Jhumkas', price, mrp,
+        # "Jhumka Earrings" = clearest for customers + best SEO (jhumka is a
+        # type of earring; that's the searched term)
+        cat.append(_row(sku, f'{JHUMKA_NAMES[i]} Jhumka Earrings', 'Jhumkas', price, mrp,
                         SINGLE_STOCK, None, badge='NEW' if i == 0 else ''))
 
     price, mrp = price_from_cost(EARRING_COST)                  # break-even
