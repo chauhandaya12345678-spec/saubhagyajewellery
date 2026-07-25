@@ -46,6 +46,18 @@
   .pdp-cat { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #C5A880; margin-bottom: 8px; text-transform: uppercase; }
   .pdp-name { font-family:'Playfair Display',serif; font-size: 36px; font-weight: 500; color: #1A1A1A; line-height: 1.15; margin: 0 0 6px; }
   .pdp-sub-seo { font-family: 'Montserrat',sans-serif; font-size: 14px; font-weight: 400; color: #6a6a6a; line-height: 1.4; margin: 0 0 14px; }
+  .ctl-wrap { max-width: 1080px; margin: 30px auto 0; padding: 26px 0 0; border-top: 1px solid #eae5d8; }
+  .ctl-title { font-family:'Playfair Display',serif; font-size: 24px; color: #1A1A1A; margin: 0 0 4px; }
+  .ctl-sub { font-family:'Montserrat',sans-serif; font-size: 13px; color: #9a9a9a; margin: 0 0 18px; }
+  .ctl-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .ctl-card { text-decoration: none; color: inherit; display: block; }
+  .ctl-img { position: relative; width: 100%; aspect-ratio: 4/5; overflow: hidden; border-radius: 10px; background: #f0ede5; }
+  .ctl-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s cubic-bezier(.25,1,.5,1); }
+  @media(hover:hover){ .ctl-card:hover .ctl-img img { transform: scale(1.05); } }
+  .ctl-name { font-family:'Playfair Display',serif; font-size: 15px; color: #1A1A1A; margin-top: 9px; line-height: 1.25; }
+  .ctl-price { font-family:'Montserrat',sans-serif; font-size: 13px; color: #0B291C; font-weight: 500; margin-top: 3px; }
+  .ctl-price .mrp { color:#9a9a9a; text-decoration: line-through; margin-left: 6px; font-weight: 300; font-size: 12px; }
+  @media (max-width: 700px) { .ctl-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
   .pdp-region { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; margin-bottom: 20px; }
   .pdp-price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
   .pdp-price { font-family:'Playfair Display',serif; font-size: 28px; font-weight: 600; color: #0B291C; }
@@ -254,6 +266,13 @@
         </div>
       </div>
 
+      <!-- COMPLETE THE LOOK (cross-sell / bundle) -->
+      <section class="ctl-wrap" id="ctl-wrap" style="display:none">
+        <h2 class="ctl-title">Complete the Look</h2>
+        <p class="ctl-sub">Pair it with a matching piece — free insured shipping on the whole order.</p>
+        <div class="ctl-grid" id="ctl-grid"></div>
+      </section>
+
       <!-- REVIEWS -->
       <div class="rv-wrap">
         <div class="rv-head">
@@ -375,6 +394,7 @@
       'Buy this ' + (p.category === 'Earring' ? 'pair of ' + (/jhumka/i.test(p.name) ? 'jhumka earrings' : 'earrings') : (/crystal/i.test(p.name) ? 'crystal necklace' : 'gold-plated necklace')) +
       ' online with free insured shipping across India.';
     renderSpec(p);
+    renderCompleteTheLook(p);
     // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")
     var stockLbl = '', stockCls = '';
     if (p.inStock === 0 || p.inStock === false) { stockLbl = 'Out of stock'; stockCls = 'low'; }
@@ -415,6 +435,46 @@
         });
       }
     } catch (e) {}
+  }
+
+  /* "Complete the Look" cross-sell — suggests pieces from the COMPLEMENTARY
+     category (necklace PDP -> earrings, and vice-versa) to lift order value.
+     One card per design (skips colour-variant duplicates), current item and
+     out-of-stock excluded. Falls back to same-category picks if needed. */
+  function renderCompleteTheLook(p) {
+    var wrap = $('ctl-wrap'), grid = $('ctl-grid');
+    if (!wrap || !grid) return;
+    function build() {
+      var all = window.SAUBHAGYA_CATALOG || [];
+      if (!all.length) return false;
+      var other = p.category === 'Earring' ? 'Necklace' : 'Earring';
+      var pool = all.filter(function (x) {
+        return x.category === other && (x.sku || x.id) !== (p.sku || sku) &&
+          !x.isVariantDup && x.inStock !== 0 && x.inStock !== false;
+      });
+      // fallback: same category if the other one is empty
+      if (pool.length < 2) {
+        pool = all.filter(function (x) {
+          return (x.sku || x.id) !== (p.sku || sku) && !x.isVariantDup &&
+            x.inStock !== 0 && x.inStock !== false && x.category === p.category;
+        });
+      }
+      if (!pool.length) return true; // nothing to show — leave hidden
+      // light shuffle so it's not always the same 4
+      for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+      var picks = pool.slice(0, 4);
+      grid.innerHTML = picks.map(function (x) {
+        var id = x.sku || x.id;
+        var mrp = (x.mrp && x.mrp > x.price) ? '<span class="mrp">' + fmt(x.mrp) + '</span>' : '';
+        return '<a class="ctl-card" href="product?sku=' + encodeURIComponent(id) + '">' +
+          '<div class="ctl-img"><img src="' + esc(x.image || '') + '" alt="' + esc(x.name) + '" loading="lazy" width="400" height="500"></div>' +
+          '<div class="ctl-name">' + esc(x.name) + '</div>' +
+          '<div class="ctl-price">' + fmt(x.price) + mrp + '</div></a>';
+      }).join('');
+      wrap.style.display = 'block';
+      return true;
+    }
+    if (!build()) window.addEventListener('catalog-ready', function once() { window.removeEventListener('catalog-ready', once); build(); });
   }
 
   /* Keyword-rich H2 line: Material + Style + Use-case. Drives long-tail
