@@ -65,8 +65,20 @@ export async function onRequest(context) {
     });
   }
 
-  const title = `${p.name} | Saubhagya Jewellery`;
-  const desc = `${p.name} — handcrafted ${p.category || 'imitation jewellery'} at ₹${p.price}. Made in Mumbai, free insured shipping across India.`;
+  // Keyword-rich SEO line (Material + Style + Use-case) — mirrors the client
+  // H2 in product.html so crawlers see the same long-tail intent up front.
+  const seoSubtitle = (() => {
+    const n = p.name || '';
+    if (/jhumka/i.test(n)) return 'Traditional Gold-Plated Jhumka Earrings for Weddings & Festive Wear';
+    if (p.category === 'Earring') return 'Handcrafted Gold-Plated Earrings for Everyday & Festive Wear';
+    if (/crystal/i.test(n)) return 'Crystal-Studded High Gold-Plated Necklace for Weddings & Party Wear';
+    if (/short/i.test(n)) return 'High Gold-Plated Short Necklace for Festive & Party Wear';
+    if (p.category === 'Necklace') return 'Handcrafted High Gold-Plated Necklace for Weddings & Festive Wear';
+    return 'Handcrafted Gold-Plated Imitation Jewellery, Made in India';
+  })();
+
+  const title = `${p.name} — ${seoSubtitle} | Saubhagya Jewellery`;
+  const desc = `Buy ${p.name} online at ₹${p.price}. ${seoSubtitle}, handcrafted in Mumbai from skin-friendly Zamak alloy. Free insured shipping across India.`;
   const canonical = `${SITE_URL}/product?sku=${encodeURIComponent(p.sku)}`;
   const image = abs(p.image);
   const inStock = (p.inStock === 0 || p.inStock === false) ? false : true;

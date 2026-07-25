@@ -45,6 +45,7 @@
   .pdp-badge { display: inline-block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; padding: 5px 12px; background: #C5A880; color: #fff; margin-bottom: 14px; }
   .pdp-cat { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 4px; color: #C5A880; margin-bottom: 8px; text-transform: uppercase; }
   .pdp-name { font-family:'Playfair Display',serif; font-size: 36px; font-weight: 500; color: #1A1A1A; line-height: 1.15; margin: 0 0 6px; }
+  .pdp-sub-seo { font-family: 'Montserrat',sans-serif; font-size: 14px; font-weight: 400; color: #6a6a6a; line-height: 1.4; margin: 0 0 14px; }
   .pdp-region { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #9a9a9a; margin-bottom: 20px; }
   .pdp-price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
   .pdp-price { font-family:'Playfair Display',serif; font-size: 28px; font-weight: 600; color: #0B291C; }
@@ -218,6 +219,7 @@
         <div>
           <div class="pdp-cat" id="pdp-cat"></div>
           <h1 class="pdp-name" id="pdp-name"></h1>
+          <h2 class="pdp-sub-seo" id="pdp-sub-seo"></h2>
           <div class="pdp-color-lbl" id="pdp-color-lbl" style="display:none"></div>
           <div class="pdp-swatches" id="pdp-swatches" style="display:none"></div>
           <div class="pdp-region" id="pdp-region"></div>
@@ -341,6 +343,10 @@
     $('pdp-crumb').innerHTML = '<a href="index.html">Home</a><i>/</i><a href="categories.html">Categories</a><i>/</i><span>' + p.name + '</span>';
     $('pdp-cat').textContent = p.category || '';
     $('pdp-name').textContent = p.name;
+    // H1 = brand/design name; H2 = keyword-rich SEO line (material + style +
+    // use-case). Mirrors the strategy top jewellery sites use.
+    var seo = seoSubtitle(p);
+    $('pdp-sub-seo').textContent = seo;
     $('pdp-region').textContent = '';
     $('pdp-region').style.display = 'none';
     $('pdp-image').src = p.image || '';
@@ -361,9 +367,13 @@
       $('pdp-save').textContent = '';
     }
     var mp = $('pdp-mobile-price'); if (mp) mp.textContent = fmt(p.price);
-    $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> — premium handcrafted imitation jewellery, manufactured in our Mumbai warehouse. ' +
-      (p.category ? 'Part of our ' + p.category + ' collection. ' : '') +
-      'Each piece is individually inspected and dispatched insured across India.';
+    $('pdp-image').alt = p.name + ' — ' + seo;
+    $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> is a ' + seo.toLowerCase() +
+      '. Handcrafted in our Mumbai workshop from skin-friendly <strong>Zamak alloy</strong> with a rich, long-lasting gold-tone plating' +
+      (/crystal/i.test(p.name) ? ' and hand-set crystal stones' : '') + '. ' +
+      'Lightweight, comfortable for all-day wear, and individually quality-checked before dispatch. ' +
+      'Buy this ' + (p.category === 'Earring' ? 'pair of ' + (/jhumka/i.test(p.name) ? 'jhumka earrings' : 'earrings') : (/crystal/i.test(p.name) ? 'crystal necklace' : 'gold-plated necklace')) +
+      ' online with free insured shipping across India.';
     renderSpec(p);
     // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")
     var stockLbl = '', stockCls = '';
@@ -405,6 +415,18 @@
         });
       }
     } catch (e) {}
+  }
+
+  /* Keyword-rich H2 line: Material + Style + Use-case. Drives long-tail
+     search intent ("gold plated jhumka earrings for weddings" etc.). */
+  function seoSubtitle(p) {
+    var n = p.name || '';
+    if (/jhumka/i.test(n)) return 'Traditional Gold-Plated Jhumka Earrings for Weddings & Festive Wear';
+    if (p.category === 'Earring') return 'Handcrafted Gold-Plated Earrings for Everyday & Festive Wear';
+    if (/crystal/i.test(n)) return 'Crystal-Studded High Gold-Plated Necklace for Weddings & Party Wear';
+    if (/short/i.test(n)) return 'High Gold-Plated Short Necklace for Festive & Party Wear';
+    if (p.category === 'Necklace') return 'Handcrafted High Gold-Plated Necklace for Weddings & Festive Wear';
+    return 'Handcrafted Gold-Plated Imitation Jewellery, Made in India';
   }
 
   /* Specs + care. Material is Zamak alloy across the range; weight comes from
