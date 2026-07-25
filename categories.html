@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="site.css?v=20260722l">
 <script src="layout.js?v=20260724a"></script>
 <script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=18"></script>
+<script src="catalog.js?v=19"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://saubhagyajewellery.com/categories"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Shop by Category | Saubhagya Jewellery","url":"https://saubhagyajewellery.com/categories","description":"Shop Saubhagya jewellery by category: necklaces, chokers, waist chains, jhumkas, earrings, pendants, bridal sets and South temple necklaces.","isPartOf":{"@type":"WebSite","name":"Saubhagya Jewellery","url":"https://saubhagyajewellery.com/"}}</script>
 <style>
@@ -155,8 +155,6 @@
       match: function (p) { return p.category === 'Bridal Set'; } },
     { slug: 'necklaces',   label: 'Necklaces',    img: 'images/models/cat-necklace.webp',
       match: function (p) { return p.category === 'Necklace'; } },
-    { slug: 'jhumkas',     label: 'Jhumkas',      img: 'images/models/cat-jhumka.webp',
-      match: function (p) { return p.category === 'Jhumkas'; } },
     { slug: 'earrings',    label: 'Earrings',     img: 'images/models/cat-earrings.webp',
       match: function (p) { return p.category === 'Earring'; } },
     { slug: 'pendants',    label: 'Pendants',     grad: 'linear-gradient(135deg,#0F3323 0%,#2B5C40 100%)',
@@ -165,7 +163,10 @@
 
   function getParam(name) { return new URLSearchParams(location.search).get(name) || ''; }
 
-  var current = { cat: getParam('cat'), q: getParam('q') };
+  // Jhumka is now part of Earrings — remap any old ?cat=jhumkas deep link.
+  var _cat = getParam('cat');
+  if (_cat === 'jhumkas') { _cat = 'earrings'; try { var u = new URL(location.href); u.searchParams.set('cat', 'earrings'); history.replaceState(null, '', u.toString()); } catch (e) {} }
+  var current = { cat: _cat, q: getParam('q') };
 
   function renderHub() {
     var active = current.cat;
