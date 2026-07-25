@@ -63,14 +63,15 @@
   .pdp-price { font-family:'Playfair Display',serif; font-size: 28px; font-weight: 600; color: #0B291C; }
   .pdp-mrp { font-family: 'Montserrat',sans-serif; font-size: 15px; color: #9a9a9a; text-decoration: line-through; }
   .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B291C; font-weight: 500; }
-  .pdp-color-lbl { font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: 1.5px; color: #6a6a6a; text-transform: uppercase; margin: 10px 0 6px; }
-  .pdp-color-lbl strong { color: #1A1A1A; }
-  .pdp-swatches { display: flex; gap: 8px; margin: 0 0 16px; flex-wrap: wrap; }
+  .pdp-color-lbl { font-family: 'Montserrat',sans-serif; font-size: 13px; letter-spacing: .3px; color: #8a8a8a; text-transform: none; margin: 18px 0 10px; }
+  .pdp-color-lbl strong { color: #1A1A1A; font-size: 15.5px; font-weight: 600; }
+  .pdp-color-count { color: #8A6D2F; font-size: 12px; margin-left: 8px; letter-spacing: .5px; }
+  .pdp-swatches { display: flex; gap: 10px; margin: 0 0 20px; flex-wrap: wrap; }
   .pdp-img { transition: opacity .28s ease; }
-  .pdp-swatch { width: 36px; height: 36px; border-radius: 50%; padding: 2px; border: 2px solid transparent; background: #f0ede5; cursor: pointer; transition: border-color .25s cubic-bezier(.25,1,.5,1), transform .25s cubic-bezier(.25,1,.5,1); }
+  .pdp-swatch { width: 48px; height: 48px; border-radius: 50%; padding: 2px; border: 2px solid #e4ddcd; background: #f0ede5; cursor: pointer; transition: border-color .25s cubic-bezier(.25,1,.5,1), transform .25s cubic-bezier(.25,1,.5,1), box-shadow .25s; }
   .pdp-swatch img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
-  .pdp-swatch:hover { transform: translateY(-2px); }
-  .pdp-swatch.on { border-color: #C5A880; box-shadow: 0 0 0 2px rgba(90,136,0,.25); }
+  .pdp-swatch:hover { transform: translateY(-2px); border-color: #C5A880; }
+  .pdp-swatch.on { border-color: #0B291C; box-shadow: 0 0 0 3px rgba(197,168,128,.4); }
   .pdp-tax { font-family: 'Montserrat',sans-serif; font-size:13px; color: #9a9a9a; margin-bottom: 6px; }
   .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #6a6a6a; margin-bottom: 4px; }
   .pdp-ship .free { color: #1B7A3D; font-weight: 600; }
@@ -642,7 +643,8 @@
     if (opts.length < 2) { box.style.display = 'none'; box.innerHTML = ''; lbl.style.display = 'none'; return; }
     var act = activeOptIndex(p, opts);
     if (opts[act] && opts[act].label) {
-      lbl.innerHTML = 'Colour: <strong>' + opts[act].label + '</strong>';
+      lbl.innerHTML = 'Colour: <strong>' + opts[act].label + '</strong>' +
+        '<span class="pdp-color-count">' + opts.length + ' shades available</span>';
       lbl.style.display = 'block';
     } else lbl.style.display = 'none';
     box.innerHTML = opts.map(function (o, i) {
