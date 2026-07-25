@@ -597,12 +597,20 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.name) + '" data-field="name" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit name">✎</button>' +
         '</div></td>' +
-        '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price"></td>' +
-        '<td><input class="ai-num" style="width:70px" type="number" min="0" step="1" value="' + (p.mrp != null ? p.mrp : '') + '" data-field="mrp"></td>' +
-        '<td class="' + lowClass + '"><input class="ai-num" type="number" min="0" step="1" value="' + (p.stock_count != null ? p.stock_count : '') + '" data-field="stock_count"></td>' +
-        '<td><input class="ai-num" style="width:60px" type="number" min="0" step="1" value="' + threshold + '" data-field="low_stock_threshold"></td>' +
-        '<td><input class="ai-num" type="number" min="0" step="0.1" value="' + (p.weightGrams != null ? p.weightGrams : '') + '" data-field="weightGrams"></td>' +
-        '<td><input class="ai-num" type="number" min="0" step="1" value="' + (p.packing_weight_grams != null ? p.packing_weight_grams : '') + '" data-field="packing_weight_grams" placeholder="40"></td>' +
+        /* numeric fields locked by default — ✎ unlocks (prevents accidental
+           price/stock edits while scrolling the table) */
+        '<td><div class="ai-cell-flex"><input class="ai-num" style="width:70px;margin:0" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit price">✎</button></div></td>' +
+        '<td><div class="ai-cell-flex"><input class="ai-num" style="width:70px;margin:0" type="number" min="0" step="1" value="' + (p.mrp != null ? p.mrp : '') + '" data-field="mrp" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit MRP">✎</button></div></td>' +
+        '<td class="' + lowClass + '"><div class="ai-cell-flex"><input class="ai-num" style="margin:0" type="number" min="0" step="1" value="' + (p.stock_count != null ? p.stock_count : '') + '" data-field="stock_count" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit stock">✎</button></div></td>' +
+        '<td><div class="ai-cell-flex"><input class="ai-num" style="width:60px;margin:0" type="number" min="0" step="1" value="' + threshold + '" data-field="low_stock_threshold" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit alert threshold">✎</button></div></td>' +
+        '<td><div class="ai-cell-flex"><input class="ai-num" style="margin:0" type="number" min="0" step="0.1" value="' + (p.weightGrams != null ? p.weightGrams : '') + '" data-field="weightGrams" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit weight">✎</button></div></td>' +
+        '<td><div class="ai-cell-flex"><input class="ai-num" style="margin:0" type="number" min="0" step="1" value="' + (p.packing_weight_grams != null ? p.packing_weight_grams : '') + '" data-field="packing_weight_grams" placeholder="40" disabled>' +
+          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit box weight">✎</button></div></td>' +
         '<td><div class="ai-cell-flex">' +
           '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit image path">✎</button>' +
@@ -637,13 +645,14 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var btn = row.querySelector('.ai-save');
     var msg = row.querySelector('.ai-msg');
     var body = { sku: sku };
-    if (scInput.value !== '') body.stock_count = parseInt(scInput.value, 10);
-    if (wgInput.value !== '') body.weightGrams = parseFloat(wgInput.value);
-    if (pwInput.value !== '') body.packing_weight_grams = parseInt(pwInput.value, 10);
-    if (priceInput.value !== '') body.price = parseInt(priceInput.value, 10);
-    if (mrpInput.value !== '') body.mrp = parseInt(mrpInput.value, 10);
-    if (ltInput.value !== '') body.low_stock_threshold = parseInt(ltInput.value, 10);
-    if (imgInput.value.trim() !== '') body.image = imgInput.value.trim();
+    // only unlocked (✎-toggled) fields are sent — locked ones can't change
+    if (!scInput.disabled && scInput.value !== '') body.stock_count = parseInt(scInput.value, 10);
+    if (!wgInput.disabled && wgInput.value !== '') body.weightGrams = parseFloat(wgInput.value);
+    if (!pwInput.disabled && pwInput.value !== '') body.packing_weight_grams = parseInt(pwInput.value, 10);
+    if (!priceInput.disabled && priceInput.value !== '') body.price = parseInt(priceInput.value, 10);
+    if (!mrpInput.disabled && mrpInput.value !== '') body.mrp = parseInt(mrpInput.value, 10);
+    if (!ltInput.disabled && ltInput.value !== '') body.low_stock_threshold = parseInt(ltInput.value, 10);
+    if (!imgInput.disabled && imgInput.value.trim() !== '') body.image = imgInput.value.trim();
     if (!nameInput.disabled && nameInput.value.trim() !== '') body.name = nameInput.value.trim();
     if (!skuInput.disabled && skuInput.value.trim() !== '' && skuInput.value.trim() !== sku) body.new_sku = skuInput.value.trim();
     btn.disabled = true; btn.textContent = '…'; msg.textContent = '';

@@ -146,10 +146,11 @@ def esc(val):
 
 
 def generate_sql(products):
-    lines = [
-        'DELETE FROM products;',
-        'INSERT INTO products (sku, name, region, regionLabel, category, price, mrp, city, badge, image, altImage, inStock, stock_count, weightGrams, variants) VALUES',
-    ]
+    """UPSERT, not DELETE+INSERT. Authority split:
+       - SCRIPT owns: name, category, price, mrp, badge, image, variants, inStock
+       - ADMIN owns (preserved on reseed once set in D1): stock_count,
+         weightGrams, packing_weight_grams, low_stock_threshold
+       Retired SKUs (no longer in this script) are deleted at the end."""
     rows = []
     for p in products:
         variants_sql = 'NULL' if not p['variants'] else esc(json.dumps(p['variants']))
@@ -160,8 +161,20 @@ def generate_sql(products):
             f"{esc(p['image'])}, {esc(p['altImage'])}, {p['inStock']}, {p['stock_count']}, "
             f"{weight_sql}, {variants_sql})"
         )
-    lines.append(',\n'.join(rows) + ';')
-    return '\n'.join(lines)
+    all_skus = ', '.join(esc(p['sku']) for p in products)
+    return (
+        'INSERT INTO products (sku, name, region, regionLabel, category, price, mrp, city, badge, image, altImage, inStock, stock_count, weightGrams, variants) VALUES\n'
+        + ',\n'.join(rows) + '\n'
+        'ON CONFLICT(sku) DO UPDATE SET\n'
+        "  name=excluded.name, region=excluded.region, regionLabel=excluded.regionLabel,\n"
+        "  category=excluded.category, price=excluded.price, mrp=excluded.mrp,\n"
+        "  city=excluded.city, badge=excluded.badge, image=excluded.image,\n"
+        "  altImage=excluded.altImage, inStock=excluded.inStock, variants=excluded.variants,\n"
+        "  stock_count=COALESCE(products.stock_count, excluded.stock_count),\n"
+        "  weightGrams=COALESCE(products.weightGrams, excluded.weightGrams),\n"
+        "  updated_at=datetime('now');\n"
+        f'DELETE FROM products WHERE sku NOT IN ({all_skus});'
+    )
 
 
 def main():
