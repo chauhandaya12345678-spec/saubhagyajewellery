@@ -151,13 +151,13 @@
   /* Tiles with model photography use `img`; categories still awaiting their
      own shoot (bridal, pendant) fall back to a brand gradient. */
   var SUBS = [
-    { slug: 'bridal-set',  label: 'Bridal Sets',  grad: 'linear-gradient(135deg,#0B291C 0%,#1E4D34 70%,#3A6B4D 100%)',
+    { slug: 'bridal-set',  label: 'Bridal Sets',  img: 'images/models/cat-bridal.webp', pos: 'center 42%',
       match: function (p) { return p.category === 'Bridal Set'; } },
-    { slug: 'necklaces',   label: 'Necklaces',    img: 'images/models/cat-necklace.webp',
+    { slug: 'necklaces',   label: 'Necklaces',    img: 'images/models/cat-necklace.webp', pos: 'center 65%',
       match: function (p) { return p.category === 'Necklace'; } },
     { slug: 'earrings',    label: 'Earrings',     img: 'images/models/cat-earrings.webp',
       match: function (p) { return p.category === 'Earring'; } },
-    { slug: 'pendants',    label: 'Pendants',     grad: 'linear-gradient(135deg,#0F3323 0%,#2B5C40 100%)',
+    { slug: 'pendants',    label: 'Pendants',     img: 'images/models/cat-pendant.webp',
       match: function (p) { return p.category === 'Pendant'; } }
   ];
 
@@ -172,7 +172,7 @@
     var active = current.cat;
     $('cat-hub-grid').innerHTML = SUBS.map(function (s) {
       var cls = 'cat-card' + (s.slug === active ? ' is-active' : '');
-      var bg = s.img ? "background-image:url('" + s.img + "');background-color:#0B291C" : 'background:' + s.grad;
+      var bg = s.img ? "background-image:url('" + s.img + "');background-color:#0B291C" + (s.pos ? ';background-position:' + s.pos : '') : 'background:' + s.grad;
       return '<a class="' + cls + '" href="categories.html?cat=' + s.slug + '">' +
         '<div class="bg" style="' + bg + '"></div>' +
         '<div class="shade"></div>' +

@@ -184,6 +184,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <!-- INVENTORY PANEL -->
     <div id="panel-inventory" style="display:none">
       <div class="ai-toolbar">
+        <button class="ai-btn small" id="i-saveall-btn" type="button">SAVE EDITED</button>
         <button class="ai-btn small ghost" id="i-export-btn" type="button">EXPORT CSV</button>
         <button class="ai-btn small" id="i-reload-btn" type="button">REFRESH</button>
         <label style="font-size:12px;color:#4a4a4a;display:flex;align-items:center;gap:6px;margin-left:8px"><input type="checkbox" id="i-lowstock-only"> Low stock only</label>
@@ -194,7 +195,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           <thead>
             <tr>
               <th>SKU</th><th>Name</th><th>Price</th><th>MRP</th><th>Stock Count</th><th>Alert At</th>
-              <th>Weight (g)</th><th>Box Weight (g)</th><th>Image path</th><th></th>
+              <th>Weight (g)</th><th>Box Weight (g)</th>
             </tr>
           </thead>
           <tbody id="i-tbody"></tbody>
@@ -611,16 +612,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit weight">✎</button></div></td>' +
         '<td><div class="ai-cell-flex"><input class="ai-num" style="margin:0" type="number" min="0" step="1" value="' + (p.packing_weight_grams != null ? p.packing_weight_grams : '') + '" data-field="packing_weight_grams" placeholder="40" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit box weight">✎</button></div></td>' +
-        '<td><div class="ai-cell-flex">' +
-          '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.image || '') + '" data-field="image" placeholder="images/category/file.webp" disabled>' +
-          '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit image path">✎</button>' +
-        '</div></td>' +
-        '<td><button class="ai-save" type="button">SAVE</button><div class="ai-msg"></div></td>' +
         '</tr>';
     }).join('');
-    tbody.querySelectorAll('.ai-save').forEach(function (btn) {
-      btn.addEventListener('click', function () { saveRow(btn.closest('tr')); });
-    });
     tbody.querySelectorAll('.edit-toggle').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var input = btn.previousElementSibling;
@@ -631,51 +624,48 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
   document.getElementById('i-lowstock-only').addEventListener('change', renderInventoryRows);
 
-  function saveRow(row) {
+  // Build the update payload for one row from its ✎-unlocked, non-empty fields.
+  // Locked (disabled) inputs are skipped, so untouched rows produce {sku} only.
+  function collectRowBody(row) {
     var sku = row.getAttribute('data-sku');
-    var scInput = row.querySelector('[data-field="stock_count"]');
-    var wgInput = row.querySelector('[data-field="weightGrams"]');
-    var pwInput = row.querySelector('[data-field="packing_weight_grams"]');
-    var priceInput = row.querySelector('[data-field="price"]');
-    var mrpInput = row.querySelector('[data-field="mrp"]');
-    var ltInput = row.querySelector('[data-field="low_stock_threshold"]');
-    var imgInput = row.querySelector('[data-field="image"]');
-    var nameInput = row.querySelector('[data-field="name"]');
-    var skuInput = row.querySelector('[data-field="sku"]');
-    var btn = row.querySelector('.ai-save');
-    var msg = row.querySelector('.ai-msg');
+    var f = function (name) { return row.querySelector('[data-field="' + name + '"]'); };
     var body = { sku: sku };
-    // only unlocked (✎-toggled) fields are sent — locked ones can't change
-    if (!scInput.disabled && scInput.value !== '') body.stock_count = parseInt(scInput.value, 10);
-    if (!wgInput.disabled && wgInput.value !== '') body.weightGrams = parseFloat(wgInput.value);
-    if (!pwInput.disabled && pwInput.value !== '') body.packing_weight_grams = parseInt(pwInput.value, 10);
-    if (!priceInput.disabled && priceInput.value !== '') body.price = parseInt(priceInput.value, 10);
-    if (!mrpInput.disabled && mrpInput.value !== '') body.mrp = parseInt(mrpInput.value, 10);
-    if (!ltInput.disabled && ltInput.value !== '') body.low_stock_threshold = parseInt(ltInput.value, 10);
-    if (!imgInput.disabled && imgInput.value.trim() !== '') body.image = imgInput.value.trim();
-    if (!nameInput.disabled && nameInput.value.trim() !== '') body.name = nameInput.value.trim();
-    if (!skuInput.disabled && skuInput.value.trim() !== '' && skuInput.value.trim() !== sku) body.new_sku = skuInput.value.trim();
-    btn.disabled = true; btn.textContent = '…'; msg.textContent = '';
-    apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      .then(function (d) {
-        btn.disabled = false;
-        if (d && d.success) {
-          btn.textContent = 'SAVED'; btn.className = 'ai-save saved';
-          nameInput.disabled = true; imgInput.disabled = true; skuInput.disabled = true;
-          if (body.new_sku) { row.setAttribute('data-sku', body.new_sku); loadProducts(); }
-          setTimeout(function () { btn.textContent = 'SAVE'; btn.className = 'ai-save'; }, 2000);
-        } else {
-          btn.textContent = 'SAVE'; btn.className = 'ai-save err';
-          msg.textContent = (d && d.error) || 'Error';
-          setTimeout(function () { btn.className = 'ai-save'; }, 2000);
-        }
-      })
-      .catch(function (e) {
-        btn.disabled = false; btn.textContent = 'SAVE'; btn.className = 'ai-save err';
-        msg.textContent = e.message;
-        setTimeout(function () { btn.className = 'ai-save'; }, 2000);
-      });
+    var sc = f('stock_count'), wg = f('weightGrams'), pw = f('packing_weight_grams');
+    var pr = f('price'), mr = f('mrp'), lt = f('low_stock_threshold');
+    var nm = f('name'), sk = f('sku');
+    if (sc && !sc.disabled && sc.value !== '') body.stock_count = parseInt(sc.value, 10);
+    if (wg && !wg.disabled && wg.value !== '') body.weightGrams = parseFloat(wg.value);
+    if (pw && !pw.disabled && pw.value !== '') body.packing_weight_grams = parseInt(pw.value, 10);
+    if (pr && !pr.disabled && pr.value !== '') body.price = parseInt(pr.value, 10);
+    if (mr && !mr.disabled && mr.value !== '') body.mrp = parseInt(mr.value, 10);
+    if (lt && !lt.disabled && lt.value !== '') body.low_stock_threshold = parseInt(lt.value, 10);
+    if (nm && !nm.disabled && nm.value.trim() !== '') body.name = nm.value.trim();
+    if (sk && !sk.disabled && sk.value.trim() !== '' && sk.value.trim() !== sku) body.new_sku = sk.value.trim();
+    return body;
   }
+
+  // One-click save of every edited row. Reloads afterwards so all fields
+  // re-lock — fixes fields staying editable (and auto-committing) after a save.
+  function saveAllEdited() {
+    var btn = document.getElementById('i-saveall-btn');
+    var status = document.getElementById('i-load-status');
+    var rows = Array.prototype.slice.call(document.querySelectorAll('#i-tbody tr'));
+    var edits = rows.map(collectRowBody).filter(function (b) { return Object.keys(b).length > 1; });
+    if (!edits.length) { status.textContent = 'Nothing to save — click ✎ to edit a field first.'; return; }
+    btn.disabled = true; btn.textContent = 'SAVING…'; status.textContent = 'Saving ' + edits.length + '…';
+    var ok = 0, errs = [];
+    Promise.all(edits.map(function (body) {
+      return apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+        .then(function (d) { if (d && d.success) ok++; else errs.push(body.sku + ': ' + ((d && d.error) || 'error')); })
+        .catch(function (e) { errs.push(body.sku + ': ' + e.message); });
+    })).then(function () {
+      btn.disabled = false; btn.textContent = 'SAVE EDITED';
+      status.textContent = 'Saved ' + ok + ' product' + (ok === 1 ? '' : 's') +
+        (errs.length ? ' · ' + errs.length + ' failed: ' + errs.join('; ') : '') + '.';
+      loadProducts();
+    });
+  }
+  document.getElementById('i-saveall-btn').addEventListener('click', saveAllEdited);
 
   // ================= CUSTOMERS =================
   document.getElementById('c-reload-btn').addEventListener('click', loadCustomers);
