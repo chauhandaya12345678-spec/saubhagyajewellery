@@ -438,10 +438,12 @@
     var wt = (typeof p.weightGrams === 'number' && p.weightGrams > 0)
       ? p.weightGrams + ' g (approx.)'
       : 'Updating soon';
+    var esc2 = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
     var specRows =
-      row('Material', 'Zamak alloy (lead &amp; nickel-safe base metal)') +
-      row('Finish', 'Hand-set stones with colour / gold-tone plating') +
+      row('Material', 'Skin-friendly Zamak alloy (lead &amp; nickel-free base metal)') +
+      row('Finish', 'High gold-plated, 1 gram gold look with hand-set stones') +
       row('Weight', wt) +
+      row('Product Code', esc2(p.sku || sku)) +
       row('Origin', 'Handcrafted in Mumbai, India');
     box.innerHTML =
       '<h4>Product Details</h4>' + specRows +
