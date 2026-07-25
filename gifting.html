@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gifting under ₹2,999 | Saubhagya Jewellery</title>
-<meta name="description" content="Curated jewellery gifts under ₹400, ₹1,000 and ₹2,999. Handcrafted earrings, pendants, chokers and more — insured shipping across India.">
+<title>Jewellery Gifts Under ₹1000 — Gifts for Her | Saubhagya Jewellery</title>
+<meta name="description" content="Buy jewellery gifts for her under ₹1000 online. Handcrafted gold-plated necklaces and earrings for birthdays, anniversaries and festivals. Free insured shipping across India.">
 <link rel="canonical" href="https://saubhagyajewellery.com/gifting">
 <meta name="author" content="Saubhagya Jewellery">
 <meta name="publisher" content="Saubhagya Jewellery">
@@ -13,8 +13,8 @@
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Saubhagya">
-<meta property="og:title" content="Gifting under ₹2,999 | Saubhagya Jewellery">
-<meta property="og:description" content="Thoughtful jewellery gifts starting under ₹400. Handcrafted and shipped insured across India.">
+<meta property="og:title" content="Jewellery Gifts Under ₹1000 — Gifts for Her | Saubhagya Jewellery">
+<meta property="og:description" content="Affordable handcrafted jewellery gifts for her under ₹1000. Free insured shipping across India.">
 <meta property="og:url" content="https://saubhagyajewellery.com/gifting">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,20 +65,19 @@
 <main>
 <nav class="crumb"><a href="index.html">Home</a><i>/</i><span>Gifting</span></nav>
 <section class="gf-hero">
-  <div class="gf-kicker">THOUGHTFUL GIFTING</div>
-  <h1 class="gf-title">Gifts under <em>₹2,999</em></h1>
-  <p class="gf-sub">Handpicked pieces across three price bands. Free insured shipping across India.</p>
+  <div class="gf-kicker">GIFTS FOR HER</div>
+  <h1 class="gf-title">Jewellery Gifts under <em>₹1,000</em></h1>
+  <p class="gf-sub">Handcrafted gold-plated necklaces and earrings — thoughtful, affordable gifts for birthdays, anniversaries and festive occasions. Free insured shipping across India.</p>
 </section>
 
 <div class="gf-tabs" id="gf-tabs">
-  <button class="gf-tab" data-lo="400" data-hi="999">Under ₹1,000</button>
-  <button class="gf-tab" data-lo="1000" data-hi="1999">₹1,000 – ₹1,999</button>
-  <button class="gf-tab" data-lo="2000" data-hi="2999">₹2,000 – ₹2,999</button>
-  <button class="gf-tab on" data-lo="400" data-hi="2999">All Gifts (₹400 – ₹2,999)</button>
+  <button class="gf-tab" data-lo="0" data-hi="300">Under ₹300</button>
+  <button class="gf-tab" data-lo="300" data-hi="1000">₹300 – ₹1,000</button>
+  <button class="gf-tab on" data-lo="0" data-hi="1000">All Gifts under ₹1,000</button>
 </div>
 
 <section class="gf-heads">
-  <h2 id="gf-title-h2">All Gifts (₹400 – ₹2,999)</h2>
+  <h2 id="gf-title-h2">Gifts under ₹1,000</h2>
   <div class="count" id="gf-count">Loading…</div>
 </section>
 
@@ -97,13 +96,12 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
 
-  var current = { lo: 400, hi: 2999 };
+  var current = { lo: 0, hi: 1000 };
 
   function bandLabel(lo, hi) {
-    if (lo === 400 && hi === 999) return 'Under ₹1,000';
-    if (lo === 1000 && hi === 1999) return '₹1,000 – ₹1,999';
-    if (lo === 2000 && hi === 2999) return '₹2,000 – ₹2,999';
-    return 'All Gifts (₹400 – ₹2,999)';
+    if (hi === 300) return 'Gifts under ₹300';
+    if (lo === 300) return 'Gifts ₹300 – ₹1,000';
+    return 'All Gifts under ₹1,000';
   }
 
   function render() {
