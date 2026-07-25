@@ -1,0 +1,45 @@
+Handle,Title,Vendor,Product Category,Type,Published,Variant SKU,Variant Price,Variant Compare At Price,Variant Inventory Qty,Variant Grams,Image Src,Status
+sj-cy01-mr,Royal Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY01-MR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY01-MR.webp,active
+sj-cy02-gr,Heritage Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY02-GR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY02-GR.webp,active
+sj-cy02-mr,Heritage Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY02-MR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY02-MR.webp,active
+sj-cy03-gr,Peacock Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY03-GR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY03-GR.webp,active
+sj-cy03-mr,Peacock Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY03-MR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY03-MR.webp,active
+sj-cy04-gr,Lotus Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY04-GR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY04-GR.webp,active
+sj-cy04-mr,Lotus Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY04-MR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY04-MR.webp,active
+sj-cy05-mr,Divine Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY05-MR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY05-MR.webp,active
+sj-cy06-mr,Regal Crystal Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-CY06-MR,510,680,4,85,https://saubhagyajewellery.com/images/products/SJ-CY06-MR.webp,active
+sj-er01-mh,Royal Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-ER01-MH,245,330,12,,https://saubhagyajewellery.com/images/products/SJ-ER01-MH.webp,active
+sj-er02-mh,Heritage Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-ER02-MH,245,330,12,,https://saubhagyajewellery.com/images/products/SJ-ER02-MH.webp,active
+sj-er03-mh,Peacock Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-ER03-MH,245,330,12,,https://saubhagyajewellery.com/images/products/SJ-ER03-MH.webp,active
+sj-er04-mh,Lotus Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-ER04-MH,245,330,12,,https://saubhagyajewellery.com/images/products/SJ-ER04-MH.webp,active
+sj-er05-mh,Divine Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-ER05-MH,245,330,12,,https://saubhagyajewellery.com/images/products/SJ-ER05-MH.webp,active
+sj-er06-mh,Regal Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-ER06-MH,245,330,12,,https://saubhagyajewellery.com/images/products/SJ-ER06-MH.webp,active
+sj-jh01-gl,Royal Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH01-GL,240,320,12,,https://saubhagyajewellery.com/images/products/SJ-JH01-GL.webp,active
+sj-jh01-sgl,Heritage Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH01-SGL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH01-SGL.webp,active
+sj-jh02-gl,Peacock Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH02-GL,240,320,12,,https://saubhagyajewellery.com/images/products/SJ-JH02-GL.webp,active
+sj-jh02-sgl,Lotus Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH02-SGL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH02-SGL.webp,active
+sj-jh03-gl,Divine Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH03-GL,240,320,12,,https://saubhagyajewellery.com/images/products/SJ-JH03-GL.webp,active
+sj-jh03-sgl,Regal Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH03-SGL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH03-SGL.webp,active
+sj-jh04-gl,Grand Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH04-GL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH04-GL.webp,active
+sj-jh04-sgl,Antique Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH04-SGL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH04-SGL.webp,active
+sj-jh05-gl,Celestial Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH05-GL,225,300,12,,https://saubhagyajewellery.com/images/products/SJ-JH05-GL.webp,active
+sj-jh05-sgl,Imperial Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH05-SGL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH05-SGL.webp,active
+sj-jh06-gl,Kundan Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH06-GL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH06-GL.webp,active
+sj-jh06-sgl,Meenakari Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH06-SGL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH06-SGL.webp,active
+sj-jh07-gl,Temple Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH07-GL,225,300,12,,https://saubhagyajewellery.com/images/products/SJ-JH07-GL.webp,active
+sj-jh08-gl,Nakshi Jhumka Earrings,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Earring,TRUE,SJ-JH08-GL,230,310,12,,https://saubhagyajewellery.com/images/products/SJ-JH08-GL.webp,active
+sj-sn01-gl,Royal Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN01-GL,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN01-GL.webp,active
+sj-sn01-gr,Royal Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN01-GR,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN01-GR.webp,active
+sj-sn01-wh,Royal Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN01-WH,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN01-WH.webp,active
+sj-sn02-gl,Heritage Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN02-GL,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN02-GL.webp,active
+sj-sn02-gr,Heritage Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN02-GR,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN02-GR.webp,active
+sj-sn02-wh,Heritage Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN02-WH,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN02-WH.webp,active
+sj-sn03-gl,Peacock Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN03-GL,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN03-GL.webp,active
+sj-sn03-gr,Peacock Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN03-GR,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN03-GR.webp,active
+sj-sn03-wh,Peacock Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN03-WH,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN03-WH.webp,active
+sj-sn04-gl,Lotus Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN04-GL,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN04-GL.webp,active
+sj-sn04-gr,Lotus Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN04-GR,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN04-GR.webp,active
+sj-sn04-wh,Lotus Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN04-WH,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN04-WH.webp,active
+sj-sn05-gl,Divine Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN05-GL,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN05-GL.webp,active
+sj-sn05-gr,Divine Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN05-GR,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN05-GR.webp,active
+sj-sn05-wh,Divine Short Necklace,Saubhagya Jewellery,Apparel & Accessories > Jewelry,Necklace,TRUE,SJ-SN05-WH,549,740,4,,https://saubhagyajewellery.com/images/products/SJ-SN05-WH.webp,active

@@ -10,6 +10,7 @@ This document explains everything you need to take over this site — whether yo
 
 ## Table of Contents
 
+0. [DATA OWNERSHIP — READ FIRST](#0-data-ownership--read-this-first)
 1. [Business Overview](#1-business-overview)
 2. [Current Architecture](#2-current-architecture)
 3. [Services & Logins](#3-services--logins)
@@ -23,15 +24,36 @@ This document explains everything you need to take over this site — whether yo
 
 ---
 
+## 0. DATA OWNERSHIP — READ THIS FIRST
+
+**The D1 database is the single source of truth for all live product data.** Everything else (scripts, JSON files) is tooling around it.
+
+- **All business data lives in Cloudflare D1** (`saubhagya-db`): products, orders, users, addresses, sessions, reviews, order events. Standard SQLite. You own it; export it any time:
+  ```bash
+  # FULL database backup (everything):
+  npx wrangler d1 export saubhagya-db --remote --output=backup.sql
+  # Products as JSON:
+  npx wrangler d1 execute saubhagya-db --remote --json     --command "SELECT * FROM products" > products.json
+  ```
+  A ready Shopify-importable CSV generator produced `build/export/products-shopify.csv` — regenerate with the same SELECT + the column mapping in that file.
+
+- **`build/migrate-d1.py` is OPTIONAL — a bulk-onboarding convenience, not a dependency.** It exists only to (a) type 15 similar rows once instead of by hand, (b) compute sell price from cost (cost + ₹90 courier + ₹25 packaging + 3% GST + 2.36% gateway + margin, rounded to ₹5; MRP = ceil(price/0.75) to ₹10), (c) regenerate the localhost fallback JSON. **Its generated seed NEVER overwrites existing D1 rows** (`ON CONFLICT` updates only the internal `variants` colour-switcher JSON). You can ignore the script entirely and add products with plain SQL — see §5.
+
+- **Zero-deploy edits:** any direct D1 UPDATE (admin panel at `/admin.html?tab=inventory`, an agent, or wrangler) is live on the website within ~1-5 minutes (API cache). No git push needed. Reseeds/deploys will never revert those edits.
+
+- **Images** are plain WebP files in `images/products/` (filename = SKU). No proprietary storage.
+
+---
+
 ## 1. Business Overview
 
 Saubhagya is a designer imitation jewellery brand based in Mumbai. We sell online across India.
 
 | Detail | Value |
 |--------|-------|
-| Product Categories | South Indian Traditional, Mumbai Modern (AD), North Indian Bridal |
-| Product Count | ~150 SKUs |
-| Price Range | ₹100 - ₹10,000 |
+| Product Categories | Necklace (short + crystal), Earring (incl. jhumka); Bridal Set & Pendant reserved |
+| Product Count | 44 SKUs (live in D1 — always check there, not this doc) |
+| Price Range | ₹225 - ₹549 (all-inclusive: free shipping, GST included) |
 | Average Order | ₹800-2,000 |
 | Current Volume | Launch phase (0-50 orders/day expected) |
 | Shipping | Pan-India, free insured delivery |
@@ -79,9 +101,10 @@ CUSTOMER BROWSER
        │     • Standard Checkout (popup)
        │     • Webhook → /api/razorpay/webhook
        │
-       ├──→ Shiprocket (Shipping + Tracking)
-       │     • API: Create ad-hoc orders
-       │     • Manual: AWB generation, pickup
+       ├──→ ShipPrime (Shipping + Tracking)
+       │     • API push on order save
+       │     • Status webhook → /api/webhooks/shipprime
+       │     • WhatsApp status templates to customer
        │
        └──→ Resend (Transactional Email)
              • Order confirmation
@@ -128,16 +151,30 @@ CUSTOMER BROWSER
 
 **How to get access:** Daya adds you as team member (Settings → Team → Add Member)
 
-### 3.4 Shiprocket (Shipping)
+### 3.4 ShipPrime (Shipping)
 
 | What | Where |
 |------|-------|
-| Dashboard | https://app.shiprocket.in |
-| Email + Password | In Cloudflare env vars |
-| Pickup Location | "Primary" (Mumbai) |
-| Box Dimensions | 12x12x6 cm, 0.3 kg default |
+| Credentials | In Cloudflare env vars (SHIPPRIME_*) |
+| Push | Automatic on paid order (functions/api/_lib.js) |
+| Status webhook | /api/webhooks/shipprime (Bearer secret) |
+| Retry cron | /api/orders/retry-shipprime (x-admin-key, external cron) |
 
-**How to get access:** Daya adds you as sub-user (Settings → API → Add Sub-user)
+### 3.4b WhatsApp Business (Customer Notifications)
+
+| What | Where |
+|------|-------|
+| Sender | Meta WhatsApp Business API (WHATSAPP_PHONE_ID / WHATSAPP_TOKEN env) |
+| Templates | confirm_order, order_shipped, order_out_for_delivery, order_delivered, order_cancelled_update (3 body vars: name, order id, track link + image header) |
+| Guard | UAT never sends (UAT_MODE env) |
+
+### 3.4c Firebase (Phone OTP Sign-in)
+
+| What | Where |
+|------|-------|
+| Project | saubhagya-jewellery (console.firebase.google.com) |
+| Used by | signin.html (phone OTP) + /api/auth/firebase-verify |
+| Key | FIREBASE_API_KEY env (referrer-restricted) |
 
 ### 3.5 Resend (Email)
 
@@ -161,7 +198,7 @@ saubhagyajewellery/
 │                           Edit this for: nav links, brand logo,
 │                           header CSS, footer content
 ├── mpa.js                  Shopping cart, auth state, multi-page glue
-├── catalog.js              Product catalog + search index (150 SKUs)
+├── catalog.js              Loads catalog from D1 API (fallback: build/complete-catalog.json)
 ├── site.css                Global styles (static pages)
 │
 ├── product.html            Product detail page
@@ -194,7 +231,7 @@ saubhagyajewellery/
 ├── package.json            Node build config
 │
 ├── functions/api/           🔑 BACKEND API (Cloudflare Workers)
-│   ├── _lib.js             Shared helpers (hash, email, Shiprocket)
+│   ├── _lib.js             Shared helpers (hash, email, ShipPrime, WhatsApp)
 │   ├── auth/signin.js      POST - email+password login
 │   ├── auth/signup.js      POST - create account
 │   ├── orders/create-razorpay-order.js  POST - create Razorpay order
@@ -205,24 +242,22 @@ saubhagyajewellery/
 │   ├── reviews.js          Product reviews CRUD
 │   └── wishlist.js         Wishlist CRUD
 │
-├── images/                 Product images
-│   ├── banners/            Hero banners
-│   ├── brand/              Logo (SVG + JPG)
-│   ├── Earrings/           Product photos by category
-│   ├── necklace/
-│   ├── choker/
-│   ├── pendant/
-│   └── waist-chain/
+├── images/                 All WebP q95
+│   ├── products/           Product photos, filename = SKU
+│   ├── models/             Model shots for hero/category tiles
+│   ├── banners/            Hero banner art
+│   └── brand/              Logos
 │
-└── build/                  Build scripts & DB schema
-    ├── site.js             Generates static SEO pages
-    ├── seed-products.js    Auto-assign images to SKUs
-    ├── audit-images.js     Image inventory checker
-    ├── inject-tracking.js  Tracking widget builder
-    ├── schema-d1.sql       Product catalog table
+└── build/                  Catalog tooling (OPTIONAL — see §0)
+    ├── migrate-d1.py       Bulk product onboarding + price calculator.
+    │                       Generates seed-d1.sql + complete-catalog.json.
+    │                       NEVER overwrites existing D1 rows on reseed.
+    ├── seed-d1.sql         Generated seed (new-SKU inserts only)
+    ├── complete-catalog.json  Localhost/API-down fallback for catalog.js
+    ├── schema-d1.sql       Product table schema
     ├── schema-auth-orders.sql  Users + Orders + Sessions tables
-    ├── seed-d1.sql         Initial product data (144 SKUs)
-    └── complete-catalog.json  Full catalog export
+    └── export/             Ready data exports (full-backup.sql,
+                            products-shopify.csv)
 ```
 
 ---
@@ -232,24 +267,32 @@ saubhagyajewellery/
 ### Add/Edit Product Price
 ```
 1. D1 database → products table → UPDATE price
-2. No deploy needed (instant, zero-deploy via D1 API)
-3. Static pages need rebuild if price shown on collection pages:
-   Edit products.json → git push → auto-deploy (~30 seconds)
+2. No deploy needed (instant, zero-deploy via D1 API).
+   All pages read prices live from D1 — nothing else to update.
 ```
 
-### Add New Product
+### Add New Product (NO script required)
 ```
-1. Upload image to images/<category>/
-2. Insert row into D1 products table:
-   SKU format: CC-<region>-<number> (e.g., CC-SI-051)
-   Region codes: SI (South Indian), MM (Mumbai Modern), NB (North Indian)
-3. Add to products.json for SEO page rendering
-4. Git push → auto-deploy
+1. Convert photo to WebP q95, name it <SKU>.webp, drop in images/products/,
+   git push (images deploy with the site).
+   SKU format: SJ-<TYPE><NN>-<COLOR>  e.g. SJ-SN06-GL
+   Colours: GL Gold, GR Green, WH White, MR Maroon, MH Mehndi
+2. Insert the row (zero-deploy, live in ~1 min):
+   npx wrangler d1 execute saubhagya-db --remote --command "
+   INSERT INTO products (sku,name,region,regionLabel,category,price,mrp,city,
+     badge,image,altImage,inStock,stock_count,weightGrams)
+   VALUES ('SJ-SN06-GL','New Necklace','modern','Mumbai Modern','Necklace',
+     549,740,'Mumbai','','images/products/SJ-SN06-GL.webp','',1,12,NULL)"
+3. Multi-colour design? Also set the variants JSON on each sibling row:
+   [{"sku":"...-GL","label":"Gold","image":"images/products/...-GL.webp"}, ...]
+4. Sitemap, Google Shopping feed, SEO meta all update automatically from D1.
+
+(For BULK batches, build/migrate-d1.py does steps 2-3 for you — optional.)
 ```
 
 ### Process Orders (Daily)
 ```
-1. Open Shiprocket dashboard → New Orders tab
+1. Open ShipPrime dashboard → New Orders tab
 2. Pack item → Generate AWB (auto-assigns courier)
 3. Print label → Stick on package → Hand to pickup agent
 4. Customer gets auto SMS/WhatsApp/email with tracking link
@@ -260,7 +303,7 @@ saubhagyajewellery/
 ```
 1. Customer contacts via WhatsApp (+91 99870 08435) or email
 2. Razorpay dashboard → Transactions → find payment → Refund
-3. Shiprocket → Reverse Pickup (if item returning)
+3. ShipPrime → Reverse Pickup (if item returning)
 ```
 
 ---
@@ -278,9 +321,8 @@ Deploys to global CDN (~30 seconds)
 Live at saubhagyajewellery.com
 ```
 
-**Build command:** `npm run build` (runs `node build/site.js && node build/inject-tracking.js`)  
-**Output directory:** `/` (repo root)  
-**Node version:** 18+
+**Build command:** none — static files + Pages Functions deploy as-is.  
+**Output directory:** `/` (repo root)
 
 ### Deploy manually (without git push)
 ```bash
@@ -311,12 +353,12 @@ python -m http.server 5000
 5. Razorpay checkout popup opens (customer enters card/UPI)
 6. Payment succeeds → Razorpay calls browser callback
 7. Browser calls POST /api/orders/save
-   → Saves order to D1 → Pushes to Shiprocket → Sends email
+   → Saves order to D1 → Pushes to ShipPrime → WhatsApp + email confirm
 8. Customer sees success page with order ID
 
 BACKSTOP: If browser fails (tab closed, network drop):
   Razorpay webhook → POST /api/razorpay/webhook
-  → Verifies signature → Saves order → Pushes Shiprocket → Sends email
+  → Verifies signature → Saves order → Pushes ShipPrime → notifies
 ```
 
 ---
@@ -330,9 +372,13 @@ All sensitive values are stored in **Cloudflare Dashboard → Pages → saubhagy
 | `RAZORPAY_KEY_ID` | Checkout page | Public key (also in code: rzp_live_T6EhbHB5QhrM5W) |
 | `RAZORPAY_KEY_SECRET` | Orders API | Secret key for payment verification |
 | `RAZORPAY_WEBHOOK_SECRET` | Webhook | Verifies webhook came from Razorpay |
-| `SHIPROCKET_EMAIL` | Orders API | Shiprocket login email |
-| `SHIPROCKET_PASSWORD` | Orders API | Shiprocket login password |
-| `SHIPROCKET_PICKUP_LOCATION` | Orders API | Pickup address name (default: "Primary") |
+| `SHIPPRIME_TOKEN` | Orders API | ShipPrime API token |
+| `SHIPPRIME_PICKUP_*` | Orders API | Pickup name/phone/address/city/state/pin |
+| `SHIPPRIME_WEBHOOK_SECRET` | Status webhook | Verifies webhook came from ShipPrime |
+| `WHATSAPP_PHONE_ID` / `WHATSAPP_TOKEN` | Notifications | Meta WhatsApp Business API |
+| `FIREBASE_API_KEY` | Sign-in | Phone OTP verify |
+| `ADMIN_KEY` | Retry cron | x-admin-key header for /api/orders/retry-shipprime |
+| `UAT_MODE` | UAT only | 'true' on UAT = no real ShipPrime/WhatsApp/email |
 | `RESEND_API_KEY` | Email | Resend API key for transactional emails |
 | `ORDER_EMAIL_FROM` | Email | Sender address for order emails |
 | `ORDER_EMAIL_BCC` | Email | BCC copy for store records |
@@ -350,7 +396,7 @@ If you decide to move to Shopify, here's what you need to migrate:
 ### What Migrates
 | Item | How |
 |------|-----|
-| Products (~150 SKUs) | Export D1 → CSV → Import to Shopify |
+| Products (44 SKUs) | Ready file: build/export/products-shopify.csv (regenerate any time — see §0) |
 | Product Images | Already on R2, re-upload or use URLs |
 | Domain | Point DNS to Shopify |
 | Customer List | Export D1 users table → CSV → Import |
@@ -366,7 +412,7 @@ If you decide to move to Shopify, here's what you need to migrate:
 | D1 Database | Shopify admin (built-in) |
 | Custom auth (D1) | Shopify customer accounts (built-in) |
 | Razorpay | Shopify Payments India (Razorpay integrated) |
-| Shiprocket | Shopify Shipping or Shyplite/Pickrr app |
+| ShipPrime | Shopify Shipping or courier app |
 | Resend | Shopify Email (built-in) |
 | Custom checkout | Shopify Checkout (optimized, secure) |
 | Custom cart | Shopify Cart (built-in) |
@@ -375,7 +421,7 @@ If you decide to move to Shopify, here's what you need to migrate:
 | Service | Notes |
 |---------|-------|
 | Razorpay | Can still use separately if needed |
-| Shiprocket/Shyplite | Connect via Shopify app |
+| ShipPrime | Reconnect via Shopify app or keep API |
 | WhatsApp | Business number, independent |
 | Google Search Console | Re-submit Shopify sitemap |
 | Google Analytics | Re-add tracking code |
@@ -404,10 +450,10 @@ If you decide to move to Shopify, here's what you need to migrate:
 | Task | Where |
 |------|-------|
 | Change a price | D1 database → UPDATE products SET price=... WHERE sku='...' |
-| Add product photo | Drop in images/<category>/ → Update D1 + products.json → git push |
+| Add product photo | WebP q95 → images/products/<SKU>.webp → git push → update D1 image path |
 | See if payment received | Razorpay dashboard → Transactions |
-| Ship an order | Shiprocket dashboard → New Orders → Generate AWB |
-| Check order status | Shiprocket dashboard → Orders → Search by order ID |
+| Ship an order | ShipPrime dashboard → New Orders → Generate AWB |
+| Check order status | ShipPrime dashboard → Orders → Search by order ID |
 | Send marketing email | Resend dashboard (or setup Mailchimp later) |
 | Check website traffic | Cloudflare Web Analytics (free, enable in dashboard) |
 | Fix a broken page | Check Cloudflare Pages → Deployments → see build log |
@@ -416,7 +462,7 @@ If you decide to move to Shopify, here's what you need to migrate:
 | Add new collection | Create new HTML (copy existing collection) → add to layout.js nav → git push |
 | Change brand logo | Replace images/brand/saubhagya-logo.svg → git push |
 | Add discount code | Edit checkout.html discount logic (or use Razorpay dashboard) |
-| Process return/refund | Razorpay → Refund + Shiprocket → Reverse Pickup |
+| Process return/refund | Razorpay → Refund + ShipPrime → Reverse Pickup |
 
 ---
 
