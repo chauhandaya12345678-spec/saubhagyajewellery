@@ -189,6 +189,11 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         <button class="ai-btn small" id="i-reload-btn" type="button">REFRESH</button>
         <label style="font-size:12px;color:#4a4a4a;display:flex;align-items:center;gap:6px;margin-left:8px"><input type="checkbox" id="i-lowstock-only"> Low stock only</label>
         <span class="ai-count" id="i-count"></span>
+        <span style="display:inline-flex;gap:6px;align-items:center;border-left:1px solid #ddd6c6;padding-left:10px;margin-left:4px">
+          <input type="text" id="i-up-sku" placeholder="SKU (e.g. SJ-SN06-GL)" style="width:150px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+          <input type="file" id="i-up-file" accept="image/webp,image/jpeg,image/png" style="font-size:11px;max-width:150px">
+          <button class="ai-btn small" id="i-up-btn" type="button" title="Upload a photo to R2 and set it on this SKU — no deploy needed">UPLOAD IMG</button>
+        </span>
       </div>
       <div class="ai-table-wrap">
         <table>
@@ -666,6 +671,40 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     });
   }
   document.getElementById('i-saveall-btn').addEventListener('click', saveAllEdited);
+
+  // Upload a product photo straight to R2 and set it on the SKU — zero deploy.
+  document.getElementById('i-up-btn').addEventListener('click', function () {
+    var status = document.getElementById('i-load-status');
+    var fileEl = document.getElementById('i-up-file');
+    var sku = (document.getElementById('i-up-sku').value || '').trim();
+    var file = fileEl.files && fileEl.files[0];
+    if (!file) { status.textContent = 'Choose an image file first.'; return; }
+    var btn = document.getElementById('i-up-btn');
+    btn.disabled = true; btn.textContent = 'UPLOADING…'; status.textContent = 'Uploading ' + file.name + '…';
+    var fd = new FormData();
+    fd.append('file', file);
+    if (sku) fd.append('sku', sku);
+    apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
+      .then(function (d) {
+        if (!d || !d.success) { btn.disabled = false; btn.textContent = 'UPLOAD IMG'; status.textContent = 'Upload failed: ' + ((d && d.error) || 'error'); return; }
+        if (sku) {
+          // Point the product row at the new R2 URL (live, no deploy).
+          apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: sku, image: d.url }) })
+            .then(function (u) {
+              btn.disabled = false; btn.textContent = 'UPLOAD IMG';
+              status.textContent = (u && u.success)
+                ? ('✓ Uploaded and set on ' + sku + ' → ' + d.url)
+                : ('Uploaded (' + d.url + ') but could not set on ' + sku + ': ' + ((u && u.error) || 'error'));
+              fileEl.value = '';
+              if (u && u.success) loadProducts();
+            });
+        } else {
+          btn.disabled = false; btn.textContent = 'UPLOAD IMG'; fileEl.value = '';
+          status.textContent = '✓ Uploaded → ' + d.url + '  (copy this URL into a product’s image field)';
+        }
+      })
+      .catch(function (e) { btn.disabled = false; btn.textContent = 'UPLOAD IMG'; status.textContent = 'Upload error: ' + e.message; });
+  });
 
   // ================= CUSTOMERS =================
   document.getElementById('c-reload-btn').addEventListener('click', loadCustomers);
