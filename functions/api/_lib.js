@@ -567,6 +567,132 @@ export async function sendWhatsAppMessage(env, toPhone, templateName, params, he
   }
 }
 
+// ── Order status → customer WhatsApp (shared by the ShipPrime webhook AND
+//    the cron status poller, so both behave identically) ────────────────────
+export const WA_STATUS_TEMPLATES = {
+  shipped: 'order_shipped',
+  out_for_delivery: 'order_out_for_delivery',
+  delivered: 'order_delivered',
+  cancelled: 'order_cancelled_update',
+};
+// Shipment-ending statuses — the poller stops tracking these.
+export const TERMINAL_STATUSES = ['delivered', 'rto', 'cancelled', 'lost'];
+const RTO_RESTOCK_STATUSES = ['rto'];
+
+/**
+ * Apply a courier status change to one order: update D1, log it, restock on
+ * RTO, and fire the customer WhatsApp template — logging every WA attempt
+ * (sent OR failed) to order_events so a silent failure is never invisible
+ * again. Idempotent: no-op when the status hasn't changed. `source` is just a
+ * tag for the log ('shipprime-webhook' | 'cron-track').
+ */
+export async function applyOrderStatus(db, env, order, newStatusRaw, source, options = {}) {
+  const notify = options.notify !== false; // default: send WhatsApp
+  const newStatus = String(newStatusRaw || '').trim().toLowerCase();
+  if (!newStatus) return { changed: false, reason: 'empty status' };
+  const prev = String(order.status || '').toLowerCase();
+  if (prev === newStatus) return { changed: false, reason: 'unchanged' };
+
+  await db.prepare("UPDATE orders SET status = ?, updated_at = datetime('now') WHERE id = ?")
+    .bind(newStatus, order.id).run();
+  try { await logOrderEvent(db, order.id, 'status_update', 1, `${prev || '(none)'} → ${newStatus} [${source}]`); } catch (e) {}
+
+  // RTO restock, guarded so repeat webhooks/polls never double-restock.
+  if (RTO_RESTOCK_STATUSES.includes(newStatus) && !RTO_RESTOCK_STATUSES.includes(prev)) {
+    try {
+      const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
+      await restockOrder(db, items);
+      await logOrderEvent(db, order.id, 'rto_restock', 1, `Restocked ${items.length} line item(s) on RTO`);
+    } catch (e) {}
+  }
+
+  // Milestone customer WhatsApp. `notify` lets the poller skip stale
+  // back-notifications (e.g. an order delivered days ago that D1 only now
+  // catches up on) — it still records the status, just doesn't message.
+  let wa = null;
+  const templateName = WA_STATUS_TEMPLATES[newStatus];
+  if (notify && order.phone && templateName) {
+    const token = order.track_token || order.phone || '';
+    const link = 'https://saubhagyajewellery.com/track-orders.html?order_id=' + order.id + '&token=' + token;
+    wa = await sendWhatsAppMessage(env, order.phone, templateName, [order.name || 'Customer', order.id, link]);
+    try {
+      await logOrderEvent(db, order.id,
+        wa.sent ? 'whatsapp_status_sent' : 'whatsapp_status_failed', wa.sent ? 1 : 0,
+        templateName + ' — ' + (wa.sent ? (wa.msgId || 'ok') : (wa.error || 'error')));
+    } catch (e) {}
+  }
+  return { changed: true, status: newStatus, wa };
+}
+
+/**
+ * Poll ShipPrime tracking for every in-transit order and apply status changes
+ * (→ D1 + customer WhatsApp). This is the self-driven fallback that makes
+ * status notifications work even when ShipPrime never calls our webhook.
+ * Batches all AWBs into one tracking call. Returns a summary. Never throws.
+ */
+export async function syncActiveOrderStatuses(env, db, limit = 25, options = {}) {
+  const dryRun = !!options.dryRun;
+  const summary = { dryRun, scanned: 0, changed: 0, wa_sent: 0, wa_failed: 0, errors: 0, details: [] };
+  const token = env.SHIPPRIME_TOKEN;
+  if (!token) return { success: false, error: 'SHIPPRIME_TOKEN not configured', ...summary };
+
+  const placeholders = TERMINAL_STATUSES.map(() => '?').join(',');
+  const rows = await db.prepare(
+    `SELECT id, phone, name, items, track_token, status, shipprime_awb
+       FROM orders
+      WHERE shipprime_awb IS NOT NULL AND shipprime_awb != ''
+        AND COALESCE(test_mode, 0) = 0
+        AND LOWER(COALESCE(status, '')) NOT IN (${placeholders})
+        AND datetime(created_at) > datetime('now', '-30 days')
+      ORDER BY updated_at ASC
+      LIMIT ?`
+  ).bind(...TERMINAL_STATUSES, limit).all().catch(() => ({ results: [] }));
+
+  const orders = rows.results || [];
+  summary.scanned = orders.length;
+  if (!orders.length) return { success: true, ...summary };
+
+  const byAwb = {};
+  orders.forEach(o => { byAwb[String(o.shipprime_awb)] = o; });
+  let results = [];
+  try {
+    const res = await fetch(`https://api.shipprime.live/v1/forward/track?awbs=${Object.keys(byAwb).join(',')}`,
+      { headers: { 'Authorization': `Bearer ${token}` } });
+    const data = await res.json().catch(() => ({}));
+    if (data.status === 'SUCCESS' && Array.isArray(data.results)) results = data.results;
+    else return { success: false, error: 'track API: ' + (data.message || data.status || res.status), ...summary };
+  } catch (e) {
+    return { success: false, error: e.message, ...summary };
+  }
+
+  for (const r of results) {
+    const o = byAwb[String(r.awb)];
+    if (!o || !r.currentStatus) continue;
+    // Only WhatsApp when the courier's status change is recent (≤3 days). Stops
+    // the first sync from blasting stale "delivered" messages for old orders
+    // whose D1 status was simply never advanced.
+    const t = Date.parse(r.statusDate || '');
+    const fresh = isNaN(t) ? true : (Date.now() - t < 3 * 86400 * 1000);
+    const newStatus = String(r.currentStatus).trim().toLowerCase();
+    if (dryRun) {
+      if (newStatus && newStatus !== String(o.status || '').toLowerCase()) {
+        summary.changed++;
+        summary.details.push({ id: o.id, from: o.status, to: newStatus, wouldWhatsApp: !!(fresh && o.phone && WA_STATUS_TEMPLATES[newStatus]), statusDate: r.statusDate });
+      }
+      continue;
+    }
+    try {
+      const out = await applyOrderStatus(db, env, o, r.currentStatus, 'cron-track', { notify: fresh });
+      if (out.changed) {
+        summary.changed++;
+        if (out.wa) { out.wa.sent ? summary.wa_sent++ : summary.wa_failed++; }
+        summary.details.push({ id: o.id, status: out.status, wa: out.wa ? out.wa.sent : null });
+      }
+    } catch (e) { summary.errors++; }
+  }
+  return { success: true, ...summary };
+}
+
 /** Record Shipprime result on the order row + append an event log entry so
  *  a missing order in the Shipprime panel is always diagnosable from D1. */
 export async function recordShipprimeResult(db, orderId, sp) {

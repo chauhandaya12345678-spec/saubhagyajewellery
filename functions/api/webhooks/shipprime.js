@@ -15,15 +15,7 @@
  * Without this, anyone who finds the URL could POST fake status updates for
  * any AWB — including a fake 'rto' to trigger the auto-restock below.
  */
-import { logOrderEvent, sendWhatsAppMessage, restockOrder, constantTimeEqual } from '../_lib.js';
-
-// Matches ShipPrime's real vocabulary (see SP_LABELS in account.html):
-// CONFIRMED, PACKED, SHIPPED, OUT_FOR_DELIVERY, DELIVERED, UNDELIVERED,
-// RTO_INITIATED, RTO, CANCELLED, LOST. Only restock on the final 'rto' —
-// the piece is physically back with you by then. RTO_INITIATED means it's
-// still in transit back (nothing to restock yet); LOST means the courier
-// never returned it (restocking would let you oversell a piece you don't have).
-const RTO_STATUSES = ['rto'];
+import { applyOrderStatus, constantTimeEqual } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -63,55 +55,10 @@ export async function onRequest(context) {
       return json({ ok: true, note: 'no matching order for AWB ' + awb });
     }
 
-    // Don't update if status hasn't changed
-    if (order.status === newStatus.toLowerCase()) {
-      return json({ ok: true, note: 'status unchanged', order_id: order.id });
-    }
-
-    // Update order status
-    const newStatusLower = newStatus.toLowerCase();
-    await db.prepare(
-      "UPDATE orders SET status = ?, updated_at = datetime('now') WHERE id = ?"
-    ).bind(newStatusLower, order.id).run();
-
-    // Log the event
-    try {
-      await logOrderEvent(db, order.id, 'shipprime_webhook', 1,
-        `Status: ${order.status} → ${newStatusLower} (AWB: ${awb})`
-      );
-    } catch (e) {}
-
-    // RTO (return to origin): courier failed delivery and sent it back —
-    // restock the SKUs so they go back on sale automatically. Guarded on the
-    // previous status so a repeat webhook for the same RTO state (couriers
-    // often fire several) never double-restocks.
-    if (RTO_STATUSES.includes(newStatusLower) && !RTO_STATUSES.includes(order.status)) {
-      try {
-        const items = typeof order.items === 'string' ? JSON.parse(order.items) : (order.items || []);
-        await restockOrder(db, items);
-        await logOrderEvent(db, order.id, 'rto_restock', 1, `Restocked ${items.length} line item(s) on RTO`);
-      } catch (e) { /* best-effort — never fail the webhook over this */ }
-    }
-
-    // Send WhatsApp notification to customer (gracefully skip if templates not ready)
-    const WA_STATUS_TEMPLATES = {
-      shipped: 'order_shipped',
-      out_for_delivery: 'order_out_for_delivery',
-      delivered: 'order_delivered',
-      cancelled: 'order_cancelled_update',
-    };
-    if (order.phone && WA_STATUS_TEMPLATES[newStatusLower]) {
-      const templateName = WA_STATUS_TEMPLATES[newStatusLower];
-      try {
-        const token = order.track_token || order.phone || '';
-        const wa = await sendWhatsAppMessage(env, order.phone, templateName,
-          [order.name || 'Customer', order.id, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + order.id + '&token=' + token]
-        );
-        if (!wa.sent) {
-          console.log('WA_DEBUG: template', templateName, 'not sent —', wa.error, '(create templates in Meta dashboard)');
-        }
-      } catch (e) { console.log('WA_DEBUG: error', e.message); }
-    }
+    // Single source of truth: update D1 + restock-on-RTO + customer WhatsApp,
+    // all with event logging, shared with the cron status poller. No-ops if
+    // the status is unchanged.
+    const out = await applyOrderStatus(db, env, order, newStatus, 'shipprime-webhook');
 
     return json({
       ok: true,
@@ -119,6 +66,8 @@ export async function onRequest(context) {
       awb,
       previous: order.status,
       current: newStatus.toLowerCase(),
+      changed: out.changed,
+      whatsapp: out.wa ? out.wa.sent : null,
       updated_at: new Date().toISOString(),
     });
   } catch (err) {

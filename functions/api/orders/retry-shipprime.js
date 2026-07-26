@@ -16,7 +16,7 @@
  * Cloudflare Pages Functions do not support native scheduled triggers on
  * the free tier — this endpoint bridges to any external cron.
  */
-import { pushToShipPrime, recordShipprimeResult, logOrderEvent } from '../_lib.js';
+import { pushToShipPrime, recordShipprimeResult, logOrderEvent, syncActiveOrderStatuses } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -73,7 +73,13 @@ export async function onRequest(context) {
       summary.details.push({ id: row.id, pushed: sp.pushed, error: sp.error || null, awb: sp.awb || null });
     }
 
-    return json({ success: true, ...summary });
+    // Same cron run also polls ShipPrime for status changes on already-shipped
+    // orders and sends the customer WhatsApp — so one cron hit covers both
+    // "push failed orders" and "notify status updates".
+    let statusSync = null;
+    try { statusSync = await syncActiveOrderStatuses(env, db, 25); } catch (e) { statusSync = { error: e.message }; }
+
+    return json({ success: true, ...summary, statusSync });
   } catch (err) {
     return json({ error: err.message }, 500);
   }
