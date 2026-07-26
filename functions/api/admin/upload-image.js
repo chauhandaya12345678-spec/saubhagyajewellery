@@ -46,9 +46,10 @@ export async function onRequest(context) {
   const buf = await file.arrayBuffer();
   if (buf.byteLength > 8 * 1024 * 1024) return json({ error: 'File too large (max 8 MB)' }, 413);
 
-  // Resolve the R2 key.
+  // Resolve the R2 key. `key` may contain slashes (a path); sku/filename may not.
   const clean = (s) => String(s || '').replace(/[^A-Za-z0-9._-]/g, '');
-  let key = clean(form.get('key'));
+  const cleanKey = (s) => String(s || '').replace(/[^A-Za-z0-9._/-]/g, '');
+  let key = cleanKey(form.get('key'));
   if (!key) {
     const sku = clean(form.get('sku'));
     if (sku) key = 'products/' + sku + ext;
