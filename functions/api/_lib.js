@@ -569,11 +569,18 @@ export async function sendWhatsAppMessage(env, toPhone, templateName, params, he
 
 // ── Order status → customer WhatsApp (shared by the ShipPrime webhook AND
 //    the cron status poller, so both behave identically) ────────────────────
+// Each approved template has its OWN body-variable count (verified against
+// Meta via wa-template-info) — sending the wrong number is (#132000). So each
+// entry carries a params(order, link) builder, not just a name.
+//   order_shipped           : {{1}} name, {{2}} order#, {{3}} track link
+//   order_out_for_delivery  : {{1}} name, {{2}} order#
+//   order_delivered         : {{1}} name, {{2}} order#
+//   order_cancelled_update  : {{1}} name, {{2}} order#
 export const WA_STATUS_TEMPLATES = {
-  shipped: 'order_shipped',
-  out_for_delivery: 'order_out_for_delivery',
-  delivered: 'order_delivered',
-  cancelled: 'order_cancelled_update',
+  shipped:          { name: 'order_shipped',          params: (o, link) => [o.name || 'Customer', o.id, link] },
+  out_for_delivery: { name: 'order_out_for_delivery', params: (o) => [o.name || 'Customer', o.id] },
+  delivered:        { name: 'order_delivered',        params: (o) => [o.name || 'Customer', o.id] },
+  cancelled:        { name: 'order_cancelled_update', params: (o) => [o.name || 'Customer', o.id] },
 };
 // Shipment-ending statuses — the poller stops tracking these.
 export const TERMINAL_STATUSES = ['delivered', 'rto', 'cancelled', 'lost'];
@@ -610,15 +617,15 @@ export async function applyOrderStatus(db, env, order, newStatusRaw, source, opt
   // back-notifications (e.g. an order delivered days ago that D1 only now
   // catches up on) — it still records the status, just doesn't message.
   let wa = null;
-  const templateName = WA_STATUS_TEMPLATES[newStatus];
-  if (notify && order.phone && templateName) {
+  const tpl = WA_STATUS_TEMPLATES[newStatus];
+  if (notify && order.phone && tpl) {
     const token = order.track_token || order.phone || '';
     const link = 'https://saubhagyajewellery.com/track-orders.html?order_id=' + order.id + '&token=' + token;
-    wa = await sendWhatsAppMessage(env, order.phone, templateName, [order.name || 'Customer', order.id, link]);
+    wa = await sendWhatsAppMessage(env, order.phone, tpl.name, tpl.params(order, link));
     try {
       await logOrderEvent(db, order.id,
         wa.sent ? 'whatsapp_status_sent' : 'whatsapp_status_failed', wa.sent ? 1 : 0,
-        templateName + ' — ' + (wa.sent ? (wa.msgId || 'ok') : (wa.error || 'error')));
+        tpl.name + ' — ' + (wa.sent ? (wa.msgId || 'ok') : (wa.error || 'error')));
     } catch (e) {}
   }
   return { changed: true, status: newStatus, wa };
