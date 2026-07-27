@@ -28,6 +28,12 @@ export async function onRequest(context) {
   try {
     const dryRun = ['1', 'true', 'yes'].includes((new URL(request.url).searchParams.get('dry') || '').toLowerCase());
     const out = await syncActiveOrderStatuses(env, env.DB, 25, { dryRun });
+    // Dead-man's-switch: ping Healthchecks.io on a real (non-dry) success so
+    // you're alerted if this cron ever silently stops. No-ops if unset. Never
+    // throws — a failed ping must not fail the sync.
+    if (!dryRun && env.HEALTHCHECK_URL) {
+      try { await fetch(env.HEALTHCHECK_URL); } catch { /* ignore */ }
+    }
     return json(out);
   } catch (err) {
     return json({ error: err.message }, 500);
