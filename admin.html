@@ -80,7 +80,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <img src="images/brand/logo-mark-gold.png?v=1" alt="" width="30" height="30" style="display:block">
     <h1>SAUBHAGYA <span style="font-size:9px;letter-spacing:2px;color:#C5A880;border:1px solid #C5A880;border-radius:4px;padding:3px 7px;margin-left:4px;font-weight:600">ADMIN</span></h1>
   </div>
-  <div class="ai-tabs" id="ai-tabs">
+  <div class="ai-tabs" id="ai-tabs" style="display:none">
     <button class="ai-tab active" data-tab="dashboard" type="button">DASHBOARD</button>
     <button class="ai-tab" data-tab="orders" type="button">ORDERS</button>
     <button class="ai-tab" data-tab="inventory" type="button">INVENTORY</button>
@@ -89,6 +89,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <button class="ai-tab" data-tab="users" type="button" id="users-tab-btn">USERS</button>
   </div>
   <span class="ai-role-badge" id="ai-role-badge" style="display:none"></span>
+  <button class="ai-tab" id="ai-logout-btn" type="button" style="display:none">LOGOUT</button>
 </div>
 
 <div id="ai-auth-screen">
@@ -355,6 +356,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   function enterAdmin() {
     document.getElementById('ai-auth-screen').style.display = 'none';
     document.getElementById('ai-main').style.display = 'block';
+    document.getElementById('ai-tabs').style.display = '';
+    document.getElementById('ai-logout-btn').style.display = 'inline-block';
     var badge = document.getElementById('ai-role-badge');
     badge.textContent = authRole === 'owner' ? 'OWNER ACCESS' : 'READ-ONLY (STAFF)';
     badge.style.display = 'inline-block';
@@ -369,9 +372,24 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 
   document.getElementById('ai-key-btn').addEventListener('click', function () {
     var k = (document.getElementById('ai-key-input').value || '').trim();
-    if (!k) { document.getElementById('ai-auth-status').textContent = 'Key required.'; return; }
-    adminKey = k; authRole = 'owner';
-    enterAdmin();
+    var status = document.getElementById('ai-auth-status');
+    if (!k) { status.textContent = 'Key required.'; return; }
+    // Validate the key against a protected endpoint BEFORE showing the panel,
+    // so a wrong key is rejected here instead of fake-entering + failing later.
+    status.textContent = 'Verifying…';
+    fetch('/api/admin/dashboard-stats', { headers: { 'x-admin-key': k } })
+      .then(function (r) {
+        if (r.status === 401 || r.status === 403) { status.textContent = 'Wrong admin key.'; return; }
+        if (!r.ok) { status.textContent = 'Server error (' + r.status + '). Try again.'; return; }
+        adminKey = k; authRole = 'owner'; status.textContent = '';
+        document.getElementById('ai-key-input').value = '';
+        enterAdmin();
+      })
+      .catch(function (e) { status.textContent = e.message; });
+  });
+  document.getElementById('ai-logout-btn').addEventListener('click', function () {
+    adminKey = ''; sessionToken = ''; authRole = '';
+    location.reload();
   });
   document.getElementById('ai-key-input').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') document.getElementById('ai-key-btn').click();
