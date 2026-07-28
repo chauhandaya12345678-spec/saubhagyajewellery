@@ -48,8 +48,18 @@ export async function onRequest(context) {
     // Origin header and still pass; this only blocks a browser page on some
     // OTHER domain trying to submit orders here directly.
     const origin = request.headers.get('Origin') || '';
-    if (origin && origin !== 'https://saubhagyajewellery.com') {
-      return json({ error: 'Invalid request origin' }, 403);
+    if (origin) {
+      const allowed = [
+        'https://saubhagyajewellery.com',
+        'https://www.saubhagyajewellery.com',
+        'https://saubhagyajewellery.pages.dev',
+        'https://uat.saubhagyajewellery.com',
+      ];
+      // Also allow any Cloudflare Pages preview URL (hash.saubhagyajewellery.pages.dev)
+      const isPreviewUrl = /^https:\/\/[^.]+\.saubhagyajewellery\.pages\.dev$/.test(origin);
+      if (!isPreviewUrl && !allowed.includes(origin)) {
+        return json({ error: 'Invalid request origin' }, 403);
+      }
     }
 
     const db = env.DB;
