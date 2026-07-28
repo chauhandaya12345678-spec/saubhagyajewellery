@@ -24,6 +24,17 @@ export async function onRequest(context) {
     const { phone, turnstileToken } = await request.json();
     const phoneN = String(phone || '').replace(/\D/g, '').slice(-10);
     if (phoneN.length !== 10) return json({ error: 'Enter a valid 10-digit mobile number.' }, 400);
+
+    // UAT sandbox: no Firebase, no Turnstile, no real WhatsApp. Generate a test
+    // OTP, store it, and RETURN it so the tester sees it on screen. Gated on
+    // env.UAT_MODE (only set in the Preview environment) so live never leaks it.
+    if (env.UAT_MODE === 'true') {
+      const otp = String(Math.floor(100000 + Math.random() * 900000));
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+      await env.DB.prepare('INSERT INTO login_otps (phone, otp, expires_at) VALUES (?, ?, ?)').bind(phoneN, otp, expiresAt).run();
+      return json({ success: true, uat: true, otp, message: 'UAT sandbox - OTP not sent to any real number.' });
+    }
+
     if (!turnstileToken) return json({ error: 'Verification failed. Please try again.' }, 400);
 
     const secret = env.TURNSTILE_SECRET_KEY;

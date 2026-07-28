@@ -26,6 +26,16 @@ export async function onRequest(context) {
     const phoneN = normPhone(phone);
     if (!emailN || !phoneN) return json({ error: 'Valid email and phone required' }, 400);
 
+    // UAT sandbox: no real email — generate the COD OTP, store it, and RETURN
+    // it so the tester sees it in the verify dialog. Gated on env.UAT_MODE
+    // (Preview only) so the live COD flow is unchanged.
+    if (env.UAT_MODE === 'true') {
+      const otpU = String(Math.floor(100000 + Math.random() * 900000));
+      const expU = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+      await env.DB.prepare('INSERT INTO order_otps (email, phone, otp, expires_at) VALUES (?, ?, ?, ?)').bind(emailN, phoneN, otpU, expU).run();
+      return json({ success: true, uat: true, otp: otpU, message: 'UAT sandbox - COD code not emailed.', expires_in: 600 });
+    }
+
     const db = env.DB;
     const fifteenMinAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString().replace('T', ' ').slice(0, 19);
     const recent = await db.prepare(

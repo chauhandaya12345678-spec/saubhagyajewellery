@@ -49,7 +49,7 @@ export async function onRequest(context) {
         ).bind(session.user_id, sPhone, sPhone).all();
       } else if (phoneQ && phoneQ.length === 10) {
         rows = await db.prepare(
-          `SELECT id, full_name, address1, address2, landmark, city, state, pincode, is_default, label, last_used_at, usage_count
+          `SELECT id, full_name, phone, email, address1, address2, landmark, city, state, pincode, is_default, label, last_used_at, usage_count
              FROM addresses
             WHERE phone = ?
             ORDER BY last_used_at DESC LIMIT 5`

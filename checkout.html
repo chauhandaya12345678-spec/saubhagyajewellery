@@ -15,7 +15,7 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   window.CC_PAYMENTS = {
-    razorpayKeyId: 'rzp_live_T6EhbHB5QhrM5W',
+    razorpayKeyId: (window.SAUBHAGYA_ENV && window.SAUBHAGYA_ENV.RAZORPAY_KEY_ID) || 'rzp_live_T6EhbHB5QhrM5W',
     createOrderUrl: '/api/orders/create-razorpay-order',
     useMagicCheckout: false
   };
@@ -443,7 +443,7 @@
     if (user.email && !$('f-email').value) $('f-email').value = user.email;
   }
 
-  function loadSavedAddresses() {
+  function loadSavedAddresses(autoSelect) {
     var phone = ($('f-phone').value || '').replace(/\D/g, '').slice(-10);
     var user = null;
     try { user = JSON.parse(localStorage.getItem('cc_user') || 'null'); } catch(e) {}
@@ -454,9 +454,16 @@
       .then(function(d) {
         if (d && d.success && d.addresses && d.addresses.length) {
           savedAddresses = d.addresses;
-          var def = savedAddresses.find(function(a){ return a.is_default; });
-          selectedAddressId = def ? def.id : savedAddresses[0].id;
-          selectSaved(selectedAddressId);
+          // Only auto-fill the form on the INITIAL page load. While the user is
+          // typing a new address, just show saved ones as pickable suggestions —
+          // never overwrite what they're entering or hide the form.
+          if (autoSelect) {
+            var def = savedAddresses.find(function(a){ return a.is_default; });
+            selectedAddressId = def ? def.id : savedAddresses[0].id;
+            selectSaved(selectedAddressId);
+          } else {
+            renderSavedAddresses();
+          }
         }
       }).catch(function(){});
   }
@@ -466,7 +473,7 @@
     var ph = ($('f-phone').value || '').replace(/\D/g, '').slice(0, 10);
     $('f-phone').value = ph;
     clearTimeout(phoneTimer);
-    if (ph.length === 10) phoneTimer = setTimeout(loadSavedAddresses, 400);
+    if (ph.length === 10) phoneTimer = setTimeout(function(){ loadSavedAddresses(false); }, 400);
   });
 
   function collectAddress() {
@@ -518,7 +525,15 @@
     }
     var save = $('f-save').checked;
     var body = Object.assign({}, payload, { is_default: save && !savedAddresses.length });
-    if (selectedAddressId) body.address_id = selectedAddressId;
+    if (selectedAddressId) {
+      // If the user changed the phone while editing a saved address, this is
+      // effectively a NEW address — don't send address_id, or the backend
+      // rejects the phone that doesn't match the saved row (403 forbidden).
+      var selAddr = savedAddresses.find(function(a){ return a.id === selectedAddressId; });
+      var samePhone = selAddr && String(selAddr.phone || '').replace(/\D/g,'').slice(-10) === payload.phone;
+      if (samePhone) body.address_id = selectedAddressId;
+      else selectedAddressId = null;
+    }
     var headers = { 'Content-Type': 'application/json' };
     var a = authOpts();
     if (a.headers) Object.assign(headers, a.headers);
@@ -545,6 +560,9 @@
       }));
     } catch(e) {}
     try { localStorage.setItem('cc_cart', '[]'); } catch(e) {}
+    // Stash item names so the success page can show what was ordered (names,
+    // not SKUs — the customer never sees SKUs; admin does).
+    try { localStorage.setItem('cc_lastorder_items', JSON.stringify((saveBody.items || []).map(function(l){ return { name: l.name, qty: l.qty }; }))); } catch(e) {}
     cartItems = [];
     showOverlay();
     var save = fetch('/api/orders/save', {
@@ -768,7 +786,14 @@
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: pendingCod.addr.email, phone: pendingCod.addr.phone, name: pendingCod.addr.full_name }),
     }).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.success) { msg.textContent = 'Code sent — check your email.'; msg.style.color = '#0B291C'; }
+      if (d && d.success) {
+        if (d.uat && d.otp) {
+          // UAT sandbox: no real email — show + prefill the code for testing.
+          $('co-otp-input').value = d.otp;
+          msg.textContent = 'UAT sandbox — test code is ' + d.otp + ' (prefilled).';
+        } else { msg.textContent = 'Code sent — check your email.'; }
+        msg.style.color = '#0B291C';
+      }
       else { msg.textContent = (d && d.error) || 'Failed to send code'; msg.style.color = '#c0392b'; }
     }).catch(function () { msg.textContent = 'Network error sending code.'; msg.style.color = '#c0392b'; });
   }
@@ -836,7 +861,7 @@
       renderCart();
     });
   var currentPhone = ($('f-phone').value || '').replace(/\D/g, '').slice(-10);
-  if (currentPhone.length === 10) loadSavedAddresses();
+  if (currentPhone.length === 10) loadSavedAddresses(true);
 })();
 </script>
 </body>

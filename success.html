@@ -37,6 +37,7 @@
       </div>
       <h1 class="sx-h1">Order Confirmed</h1>
       <p class="sx-sub">Thank you! Your order <strong id="sx-oid"></strong> is confirmed. Redirecting to tracking page…</p>
+      <div id="sx-items" style="font-family:'Montserrat',sans-serif;font-size:14px;color:#1A1A1A;margin-top:10px;line-height:1.7"></div>
     </div>
     <div class="sx-loading" id="sx-loading">LOADING TRACKING…</div>
     <div class="sx-btns">
@@ -55,10 +56,19 @@
   var phone = '';
   try { var u = JSON.parse(localStorage.getItem('cc_user') || 'null'); phone = u && u.phone ? u.phone : ''; } catch(e) {}
   $('sx-oid').textContent = orderId || (localStorage.getItem('cc_lastorderid') || '');
+  // Show the product names the customer just ordered (stashed by checkout).
+  try {
+    var items = JSON.parse(localStorage.getItem('cc_lastorder_items') || '[]');
+    if (items.length && $('sx-items')) {
+      $('sx-items').innerHTML = items.map(function (l) {
+        return '<div>' + (l.name || 'Item') + ' &times; ' + (l.qty || 1) + '</div>';
+      }).join('');
+    }
+  } catch (e) {}
   var trackUrl = '/track-orders.html?order_id=' + encodeURIComponent(orderId);
   if (phone) trackUrl += '&phone=' + encodeURIComponent(phone);
   $('sx-track-link').href = trackUrl;
-  if (orderId) { setTimeout(function() { window.location.href = trackUrl; }, 2000); }
+  if (orderId) { setTimeout(function() { window.location.href = trackUrl; }, 3500); }
 })();
 </script>
 </body>
