@@ -6,7 +6,7 @@
  * Defaults to 'confirm_order'; pass template: 'order_shipped' etc to resend
  * a status message instead.
  */
-import { verifyAdminAccess, adminCorsHeaders, sendWhatsAppMessage, logOrderEvent } from '../_lib.js';
+import { verifyAdminAccess, adminCorsHeaders, sendWhatsAppMessage, logOrderEvent, orderProductLabel } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -57,7 +57,7 @@ export async function onRequest(context) {
     }
 
     const result = await sendWhatsAppMessage(env, order.phone, template,
-      [order.name || 'Customer', orderId, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + orderId + '&token=' + trackToken]
+      [order.name || 'Customer', orderProductLabel(order), orderId]
     );
     await logOrderEvent(db, orderId, 'whatsapp_sent', result.sent ? 1 : 0, result.sent ? 'msgId ' + result.msgId + ' (manual resend)' : (result.error || 'unknown') + ' (manual resend)');
 

@@ -15,7 +15,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to ShipPrime order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock, logOrderEvent, computeExpectedTotalPaise, constantTimeEqual, genSessionToken } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock, logOrderEvent, computeExpectedTotalPaise, constantTimeEqual, genSessionToken, orderProductLabel } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -290,7 +290,7 @@ export async function onRequest(context) {
 
       // WhatsApp: order confirmed notification
       const waJob = sendWhatsAppMessage(env, orderForJobs.phone, 'confirm_order',
-        [orderForJobs.name || 'Customer', orderId, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + orderId + '&token=' + trackToken]
+        [orderForJobs.name || 'Customer', orderProductLabel(orderForJobs), orderId]
       )
         .then(r => logOrderEvent(db, orderId, 'whatsapp_sent', r && r.sent ? 1 : 0, r && r.sent ? 'msgId ' + r.msgId : (r && r.error) || 'unknown'))
         .catch(() => {});

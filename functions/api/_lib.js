@@ -569,20 +569,28 @@ export async function sendWhatsAppMessage(env, toPhone, templateName, params, he
   }
 }
 
+// Short product label for WhatsApp {{2}} — customer sees the product NAME,
+// never the SKU. "Royal Crystal Necklace" or "…Necklace + 1 more" for multi-item.
+export function orderProductLabel(order) {
+  let items = order && order.items;
+  try { if (typeof items === 'string') items = JSON.parse(items); } catch (e) { items = null; }
+  items = Array.isArray(items) ? items : [];
+  if (!items.length) return 'your order';
+  const first = String(items[0].name || '').slice(0, 60);
+  if (!first) return 'your order'; // never leak a SKU to the customer
+  return items.length > 1 ? `${first} + ${items.length - 1} more` : first;
+}
+
 // ── Order status → customer WhatsApp (shared by the ShipPrime webhook AND
 //    the cron status poller, so both behave identically) ────────────────────
-// Each approved template has its OWN body-variable count (verified against
-// Meta via wa-template-info) — sending the wrong number is (#132000). So each
-// entry carries a params(order, link) builder, not just a name.
-//   order_shipped           : {{1}} name, {{2}} order#, {{3}} track link
-//   order_out_for_delivery  : {{1}} name, {{2}} order#
-//   order_delivered         : {{1}} name, {{2}} order#
-//   order_cancelled_update  : {{1}} name, {{2}} order#
+// All 5 approved templates (confirm_order + these 4) now share ONE structure —
+// 3 body vars: {{1}} name, {{2}} product name, {{3}} order#. The track link is a
+// static button on each template, not a variable. Wrong count = Meta (#132000).
 export const WA_STATUS_TEMPLATES = {
-  shipped:          { name: 'order_shipped',          params: (o, link) => [o.name || 'Customer', o.id, link] },
-  out_for_delivery: { name: 'order_out_for_delivery', params: (o) => [o.name || 'Customer', o.id] },
-  delivered:        { name: 'order_delivered',        params: (o) => [o.name || 'Customer', o.id] },
-  cancelled:        { name: 'order_cancelled_update', params: (o) => [o.name || 'Customer', o.id] },
+  shipped:          { name: 'order_shipped',          params: (o) => [o.name || 'Customer', orderProductLabel(o), o.id] },
+  out_for_delivery: { name: 'order_out_for_delivery', params: (o) => [o.name || 'Customer', orderProductLabel(o), o.id] },
+  delivered:        { name: 'order_delivered',        params: (o) => [o.name || 'Customer', orderProductLabel(o), o.id] },
+  cancelled:        { name: 'order_cancelled_update', params: (o) => [o.name || 'Customer', orderProductLabel(o), o.id] },
 };
 // Shipment-ending statuses — the poller stops tracking these.
 export const TERMINAL_STATUSES = ['delivered', 'rto', 'cancelled', 'lost'];

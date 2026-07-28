@@ -13,7 +13,7 @@
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
  *   Events: payment.captured, order.paid
  */
-import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail, sendWhatsAppMessage, decrementStock, constantTimeEqual, logOrderEvent } from '../_lib.js';
+import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail, sendWhatsAppMessage, decrementStock, constantTimeEqual, logOrderEvent, orderProductLabel } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -239,7 +239,7 @@ export async function onRequest(context) {
         const trackToken = crypto.randomUUID().slice(0, 8);
         try { await db.prepare('UPDATE orders SET track_token = ? WHERE id = ?').bind(trackToken, orderId).run(); } catch (e) {}
         const waJob = sendWhatsAppMessage(env, waPhone, 'confirm_order',
-          [notes.customer_name || 'Customer', orderId, 'https://saubhagyajewellery.com/track-orders.html?order_id=' + orderId + '&token=' + trackToken]
+          [notes.customer_name || 'Customer', orderProductLabel({ items: notes.cart }), orderId]
         )
           .then(r => logOrderEvent(db, orderId, 'whatsapp_sent', r && r.sent ? 1 : 0, r && r.sent ? 'msgId ' + r.msgId : (r && r.error) || 'unknown'))
           .catch(() => {});
