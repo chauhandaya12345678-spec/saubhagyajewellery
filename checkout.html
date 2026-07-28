@@ -510,6 +510,10 @@
     d.innerHTML = '<div class="co-spinner"></div><div class="co-overlay-text">CONFIRMING YOUR ORDER…</div>';
     document.body.appendChild(d);
   }
+  function removeOverlay() {
+    var o = document.querySelector('.co-overlay');
+    if (o) o.remove();
+  }
 
   function saveAddressFirst() {
     var payload = collectAddress();
@@ -559,18 +563,13 @@
         email: saveBody.email || '', phone: saveBody.phone || ''
       }));
     } catch(e) {}
-    try { localStorage.setItem('cc_cart', '[]'); } catch(e) {}
     // Stash item names so the success page can show what was ordered (names,
     // not SKUs — the customer never sees SKUs; admin does).
     try { localStorage.setItem('cc_lastorder_items', JSON.stringify((saveBody.items || []).map(function(l){ return { name: l.name, qty: l.qty }; }))); } catch(e) {}
-    cartItems = [];
+    var isCod = saveBody.payment_method === 'cod';
     showOverlay();
-    var save = fetch('/api/orders/save', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      keepalive: true, body: JSON.stringify(saveBody)
-    }).then(function(r){ return r.json(); }).catch(function(){ return null; });
-    var timeout = new Promise(function(res){ setTimeout(function(){ res(null); }, 8000); });
-    Promise.race([save, timeout]).then(function(d) {
+
+    function goSuccess(d) {
       var target = '/success';
       if (d && d.success && d.order_id) {
         try { localStorage.setItem('cc_lastorderid', d.order_id); } catch(e) {}
@@ -579,18 +578,41 @@
         try {
           if (window.gtag) {
             window.gtag('event', 'purchase', {
-              transaction_id: d.order_id,
-              value: (saveBody.total || 0) / 100,
-              currency: 'INR',
-              items: (saveBody.items || []).map(function (l) {
-                return { item_id: l.id, item_name: l.name, price: l.price, quantity: l.qty };
-              })
+              transaction_id: d.order_id, value: (saveBody.total || 0) / 100, currency: 'INR',
+              items: (saveBody.items || []).map(function (l) { return { item_id: l.id, item_name: l.name, price: l.price, quantity: l.qty }; })
             });
           }
         } catch (e) {}
       }
+      try { localStorage.setItem('cc_cart', '[]'); } catch(e) {}
+      cartItems = [];
       window.location.href = target;
-    });
+    }
+
+    var save = fetch('/api/orders/save', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      keepalive: !isCod, body: JSON.stringify(saveBody)
+    }).then(function(r){ return r.json(); }).catch(function(){ return null; });
+
+    if (isCod) {
+      // COD has NO payment-gateway webhook backstop — the save IS the order.
+      // Wait for it and confirm only on real success; never fake-confirm.
+      save.then(function(d) {
+        if (d && d.success && d.order_id) { goSuccess(d); }
+        else {
+          removeOverlay();
+          $('co-error').textContent = (d && d.error) || 'Could not place your order. Please try again.';
+          $('co-error').style.display = 'block';
+          $('co-submit').disabled = false;
+          $('co-submit').textContent = 'VERIFY & PLACE ORDER';
+        }
+      });
+    } else {
+      // Razorpay: payment already captured; confirm optimistically even if the
+      // save is slow — the razorpay webhook backstop persists it regardless.
+      var timeout = new Promise(function(res){ setTimeout(function(){ res(null); }, 8000); });
+      Promise.race([save, timeout]).then(goSuccess);
+    }
   }
 
   function doPayment(pack) {
@@ -751,7 +773,7 @@
       street: addr.address1, apt: addr.address2, landmark: addr.landmark,
       city: addr.city, state: addr.state, pin: addr.pincode
     });
-    var codOrderId = 'COD' + Date.now().toString(36).toUpperCase();
+    var codOrderId = Date.now().toString(36).toUpperCase();
     var saveBody = {
       razorpay_payment_id: 'COD-' + codOrderId,
       items: lines, total: (grandTotal) * 100, subtotal: itemsTotal * 100, discount: 0,
