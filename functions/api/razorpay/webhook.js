@@ -13,7 +13,7 @@
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
  *   Events: payment.captured, order.paid
  */
-import { hmacSha256Hex, pushToShipPrime, recordShipprimeResult, sendOrderEmail, sendWhatsAppMessage, decrementStock, constantTimeEqual, logOrderEvent, orderProductLabel } from '../_lib.js';
+import { hmacSha256Hex, recordShipprimeResult, sendOrderEmail, sendWhatsAppMessage, decrementStock, constantTimeEqual, logOrderEvent, orderProductLabel } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -168,7 +168,7 @@ export async function onRequest(context) {
     // Inventory: decrement stock_count (best-effort, mirrors save.js).
     await decrementStock(db, items, env);
 
-    let sp; // ShipPrime result
+    let sp = { pushed: false, note: 'shipprime push is manual (Mark as Packed)' };
     if (!isTest) {
       const orderForPush = {
         id: orderId,
@@ -180,16 +180,7 @@ export async function onRequest(context) {
         totalPaise: p.amount,
         paymentMethod: 'razorpay',
       };
-      sp = await Promise.race([
-        pushToShipPrime(env, orderForPush, db),
-        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (ShipPrime >22s)' }), 22000)),
-      ]).catch(e => ({ pushed: false, error: 'push exception: ' + e.message }));
-
-      if (sp && sp.pushed) {
-        await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, name = ?, updated_at = datetime(\'now\') WHERE id = ?')
-          .bind(sp.awb || '', sp.shipPrimeOrderId || '', notes.customer_name || 'Guest', orderId).run();
-      }
-      await logOrderEvent(db, orderId, 'shipprime_push', sp && sp.pushed ? 1 : 0, sp && sp.pushed ? `awb ${sp.awb}` : (sp && sp.error) || 'unknown');
+      await logOrderEvent(db, orderId, 'shipprime_push', 0, 'manual (Mark as Packed)');
 
       const emailJob = sendOrderEmail(env, {
         id: orderId, name: notes.customer_name || 'Guest',
