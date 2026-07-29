@@ -488,7 +488,10 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           var badgeClass = 'b-' + String(o.status || '').toLowerCase().replace(/\s+/g, '_');
           var actions = '<div class="ai-actions">';
           if (o.status === 'confirmed') {
-            actions += '<button class="ai-save pack-btn" data-id="' + esc(o.id) + '" type="button">MARK PACKED</button>';
+            actions += '<button class="ai-save pack-btn" data-id="' + esc(o.id) + '" type="button">PACK</button>';
+            actions += '<button class="ai-btn small ghost cancel-btn" data-id="' + esc(o.id) + '" type="button" style="color:#c0392b;border-color:#c0392b;">CANCEL</button>';
+          } else if (o.status === 'packed') {
+            actions += '<button class="ai-btn small ghost cancel-btn" data-id="' + esc(o.id) + '" type="button" style="color:#c0392b;border-color:#c0392b;">CANCEL</button>';
           }
           actions += '<button class="ai-btn small ghost slip-btn" data-id="' + esc(o.id) + '" type="button">PRINT SLIP</button></div>';
           var needsAttention = PRE_SHIP_STATUSES.indexOf(o.status) !== -1 && new Date() > dispatchDeadline(o.created_at, addr.pin);
@@ -508,6 +511,9 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         }).join('');
         tbody.querySelectorAll('.pack-btn').forEach(function (btn) {
           btn.addEventListener('click', function () { markPacked(btn.getAttribute('data-id'), btn); });
+        });
+        tbody.querySelectorAll('.cancel-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () { cancelOrder(btn.getAttribute('data-id'), btn); });
         });
         tbody.querySelectorAll('.slip-btn').forEach(function (btn) {
           btn.addEventListener('click', function () { printSlip(btn.getAttribute('data-id')); });
@@ -542,9 +548,21 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     apiFetch('/api/admin/mark-packed', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_id: orderId }) })
       .then(function (d) {
         if (d && d.success) { loadOrders(); }
-        else { btn.disabled = false; btn.textContent = 'MARK PACKED'; alert((d && d.error) || 'Failed'); }
+        else { btn.disabled = false; btn.textContent = 'PACK'; alert((d && d.error) || 'Failed'); }
       })
-      .catch(function (e) { btn.disabled = false; btn.textContent = 'MARK PACKED'; alert(e.message); });
+      .catch(function (e) { btn.disabled = false; btn.textContent = 'PACK'; alert(e.message); });
+  }
+
+  function cancelOrder(orderId, btn) {
+    var reason = prompt('Reason for cancellation:', '');
+    if (!reason || !reason.trim()) { alert('Cancellation reason is required.'); return; }
+    btn.disabled = true; btn.textContent = '…';
+    apiFetch('/api/admin/cancel-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_id: orderId, reason: reason.trim() }) })
+      .then(function (d) {
+        if (d && d.success) { loadOrders(); }
+        else { btn.disabled = false; btn.textContent = 'CANCEL'; alert((d && d.error) || 'Failed'); }
+      })
+      .catch(function (e) { btn.disabled = false; btn.textContent = 'CANCEL'; alert(e.message); });
   }
 
   function printSlip(orderId) {
