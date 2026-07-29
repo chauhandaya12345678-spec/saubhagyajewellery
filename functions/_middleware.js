@@ -24,8 +24,9 @@ export async function onRequest(context) {
       if (path.startsWith('/api/')) return next();      // API → Pages Functions
       if (path.startsWith('/_admin/')) return next();   // real SPA asset
       // SPA route (/, /orders, /logs, …) → serve the app shell.
+      // Use the trailing-slash form: Pages clean-URLs 308 /_admin/index.html → /_admin/.
       const idxUrl = new URL(url);
-      idxUrl.pathname = '/_admin/index.html';
+      idxUrl.pathname = '/_admin/';
       return env.ASSETS.fetch(new Request(idxUrl.toString(), request));
     }
 
