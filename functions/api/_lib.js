@@ -714,6 +714,9 @@ export async function syncActiveOrderStatuses(env, db, limit = 25, options = {})
  *  a missing order in the Shipprime panel is always diagnosable from D1. */
 export async function recordShipprimeResult(db, orderId, sp) {
   const ok = !!(sp && sp.pushed);
+  // When ShipPrime push is intentionally skipped (e.g. "will push when admin marks packed"),
+  // it's not a failure — log as informational so events don't show misleading "FAILED".
+  const isIntentionalSkip = !ok && sp && sp.note && !sp.error;
   const detail = ok
     ? JSON.stringify({ shipprime_awb: sp.awb, shipprime_order_id: sp.shipPrimeOrderId || sp.shipment_id })
     : String((sp && (sp.note || sp.error)) || 'unknown').slice(0, 500);
@@ -753,7 +756,7 @@ export async function recordShipprimeResult(db, orderId, sp) {
   try {
     await db.prepare(
       'INSERT INTO order_events (order_id, kind, ok, detail) VALUES (?, ?, ?, ?)'
-    ).bind(orderId, 'shipprime_push', ok ? 1 : 0, detail).run();
+    ).bind(orderId, 'shipprime_push', isIntentionalSkip ? 1 : (ok ? 1 : 0), detail).run();
   } catch (e) {}
 }
 
