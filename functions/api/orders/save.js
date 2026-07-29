@@ -294,7 +294,6 @@ export async function onRequest(context) {
       if (context.waitUntil) context.waitUntil(waJob);
 
       }  // end if (!isTest)
-    }
 
     return json({
       success: true,
