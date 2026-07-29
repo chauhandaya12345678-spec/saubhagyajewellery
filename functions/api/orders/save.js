@@ -262,10 +262,8 @@ export async function onRequest(context) {
         paymentMethod: method,
       };
 
-      // ── Validate shipping address before pushing to ShipPrime ──
-      // Empty street/city/pin previously fell through _lib.js fallbacks
-      // ("Address, Mumbai, 400001") producing undeliverable labels.
-      // Now: skip push entirely; order.paid webhook or admin retry fills it.
+      // ── Validate shipping address ──
+      // ShipPrime push is done when admin marks "Packed", not here.
       let addrCheck = addressJson;
       if (typeof addrCheck === 'string') { try { addrCheck = JSON.parse(addrCheck); } catch (e) { addrCheck = {}; } }
       addrCheck = addrCheck || {};
@@ -273,21 +271,10 @@ export async function onRequest(context) {
       const street = String(addrCheck.street || addrCheck.address1 || '').trim();
       const city = String(addrCheck.city || '').trim();
       if (pin.length !== 6 || street.length < 5 || city.length < 2) {
-        shipprimeResult = { pushed: false, error: 'skipped — incomplete address (pin="' + (addrCheck.pin || '') + '", street="' + street + '", city="' + city + '") — will retry when order.paid webhook fires' };
-        try { await recordShipprimeResult(db, orderId, shipprimeResult); } catch (e) {}
+        shipprimeResult = { pushed: false, note: 'incomplete address — will push when admin marks packed' };
       } else {
-        const srPromise = pushToShipPrime(env, orderForJobs, db);
-      const capped = Promise.race([
-        srPromise,
-        new Promise(res => setTimeout(() => res({ pushed: false, error: 'timeout (ShipPrime >22s)' }), 22000)),
-      ]);
-      try {
-        shipprimeResult = await capped;
-      } catch (e) {
-        shipprimeResult = { pushed: false, error: 'push exception: ' + e.message };
+        shipprimeResult = { pushed: false, note: 'will push when admin marks packed' };
       }
-      // Always record — success writes SR ids, failure writes reason for
-      // manual/scheduled retry. Never throws.
       try { await recordShipprimeResult(db, orderId, shipprimeResult); } catch (e) {}
 
       // Order-confirmation email: try waitUntil first, but await inline as a
@@ -306,7 +293,7 @@ export async function onRequest(context) {
         .catch(() => {});
       if (context.waitUntil) context.waitUntil(waJob);
 
-      }  // end else (valid pincode — push to ShipPrime)
+      }  // end if (!isTest)
     }
 
     return json({
