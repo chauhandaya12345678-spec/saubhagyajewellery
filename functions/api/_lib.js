@@ -360,21 +360,12 @@ export async function adminLogin(request, env, corsHeaders) {
   return { success: true, token, role: effectiveRole, username: user.username };
 }
 
-/* Admin CORS: tools are fetched from either saubhagyajewellery.com (LIVE) or
-   uat.saubhagyajewellery.com (UAT). Dynamically echo the request origin so
-   admin pages work on both without wildcarding. Falls back to saubhagyajewellery.com
-   when no Origin header is present (server-to-server calls). */
-export function adminCorsHeaders(request) {
-  const reqOrigin = request && request.headers && request.headers.get('Origin');
-  const allowed = ['https://saubhagyajewellery.com', 'https://uat.saubhagyajewellery.com',
-    'https://www.saubhagyajewellery.com', 'https://saubhagyajewellery.pages.dev'];
-  // Also allow any *.pages.dev preview URL
-  if (reqOrigin && /^https:\/\/[^.]+\.saubhagyajewellery\.pages\.dev$/.test(reqOrigin)) {
-    allowed.push(reqOrigin);
-  }
-  const origin = reqOrigin && allowed.indexOf(reqOrigin) !== -1 ? reqOrigin : 'https://saubhagyajewellery.com';
+/* Admin CORS: these tools are only ever fetched same-origin from the admin
+   pages themselves, never from a browser extension or third-party origin —
+   lock it down instead of the wildcard used by public endpoints. */
+export function adminCorsHeaders() {
   return {
-    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Origin': 'https://saubhagyajewellery.com',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, x-admin-key',
     'Vary': 'Origin',

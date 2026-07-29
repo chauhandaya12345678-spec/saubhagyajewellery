@@ -10,7 +10,7 @@ import { verifyAdminAccess, adminCorsHeaders, sendWhatsAppMessage, logOrderEvent
 
 export async function onRequest(context) {
   const { request, env } = context;
-  const corsHeaders = adminCorsHeaders(request);
+  const corsHeaders = adminCorsHeaders();
 
   if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
   if (request.method !== 'POST') {

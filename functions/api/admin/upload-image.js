@@ -19,7 +19,7 @@ const ALLOWED = { 'image/webp': '.webp', 'image/jpeg': '.jpg', 'image/png': '.pn
 
 export async function onRequest(context) {
   const { request, env } = context;
-  const cors = adminCorsHeaders(request);
+  const cors = adminCorsHeaders();
   const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
     status, headers: { 'Content-Type': 'application/json', ...cors },
   });

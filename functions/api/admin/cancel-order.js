@@ -10,7 +10,7 @@ import { verifyAdminAccess, adminCorsHeaders, logOrderEvent, restockOrder, sendW
 
 export async function onRequest(context) {
   const { request, env } = context;
-  const corsHeaders = adminCorsHeaders(request);
+  const corsHeaders = adminCorsHeaders();
   const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
     status, headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
