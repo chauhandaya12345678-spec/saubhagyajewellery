@@ -373,6 +373,8 @@ export function adminCorsHeaders(request) {
     // Capacitor native app origins (Android https://localhost, iOS capacitor://localhost)
     'https://localhost', 'capacitor://localhost', 'http://localhost'];
   if (reqOrigin && /^https:\/\/[^.]+\.saubhagyajewellery\.pages\.dev$/.test(reqOrigin)) allowed.push(reqOrigin);
+  // Local dev of the admin app (vite dev server, Capacitor live-reload) — any localhost port.
+  if (reqOrigin && /^https?:\/\/localhost(:\d+)?$/.test(reqOrigin)) allowed.push(reqOrigin);
   const origin = reqOrigin && allowed.indexOf(reqOrigin) !== -1 ? reqOrigin : 'https://saubhagyajewellery.com';
   return {
     'Access-Control-Allow-Origin': origin,
