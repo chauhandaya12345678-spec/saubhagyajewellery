@@ -483,7 +483,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           var addr = o.address || {};
           var addrLine = [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).map(esc).join(', ');
           var items = (o.items || []).map(function (it) {
-            return '<div>' + esc(it.name || it.sku || '') + ' × ' + esc(it.qty || it.quantity || 1) + '<br><span style="font-size:10px;color:#9a9a9a">SKU: ' + esc(it.sku || it.id || '—') + '</span></div>';
+            return '<div>' + esc(it.name || it.sku || '') + ' × ' + esc(it.qty || it.quantity || 1) + '<br><span style="font-size:11px;font-weight:600;color:#c0392b">SKU: ' + esc(it.sku || it.id || '—') + '</span></div>';
           }).join('');
           var badgeClass = 'b-' + String(o.status || '').toLowerCase().replace(/\s+/g, '_');
           var actions = '<div class="ai-actions">';
@@ -498,7 +498,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           return '<tr class="' + (needsAttention ? 'ai-attention' : '') + '" data-order-row="' + esc(o.id) + '">' +
             '<td class="ai-oid">' + esc(o.id) + (o.test_mode ? '<span class="ai-test">TEST</span>' : '') + '</td>' +
             '<td>' + fmtDate(o.created_at) + '</td>' +
-            '<td>' + esc(o.name || '') + '<br><span style="color:#9a9a9a">' + esc(o.phone || '') + '</span></td>' +
+            '<td>' + esc(o.name || '') + '<br><span style="font-weight:600;color:#1a1a1a">' + esc(o.phone || '') + '</span></td>' +
             '<td>' + esc(o.email || '') + '</td>' +
             '<td class="ai-items">' + items + '</td>' +
             '<td class="ai-addr">' + addrLine + '</td>' +
