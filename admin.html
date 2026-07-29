@@ -237,7 +237,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       </div>
       <div class="ai-table-wrap">
         <table>
-          <thead><tr><th>Time</th><th>Order</th><th>Customer</th><th>Event</th><th>Result</th><th>Detail</th></tr></thead>
+          <thead><tr><th>Time</th><th>Order</th><th>SKU</th><th>Customer</th><th>Event</th><th>Result</th><th>Detail</th></tr></thead>
           <tbody id="a-tbody"></tbody>
         </table>
       </div>
@@ -863,9 +863,12 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         status.textContent = '';
         tbody.innerHTML = d.events.map(function (e) {
           var resultBadge = e.ok ? '<span class="ai-badge b-delivered">OK</span>' : '<span class="ai-badge b-cancelled">FAILED</span>';
+          var sku = '';
+          try { var it = JSON.parse(e.order_items || '[]'); sku = (it[0] && (it[0].sku || it[0].id)) || ''; } catch (x) {}
           return '<tr>' +
             '<td>' + fmtDate(e.created_at) + '</td>' +
             '<td class="ai-oid">' + esc(e.order_id || '') + '</td>' +
+            '<td class="ai-oid">' + esc(sku) + '</td>' +
             '<td>' + esc(e.customer_name || '') + '</td>' +
             '<td>' + esc(e.kind) + '</td>' +
             '<td>' + resultBadge + '</td>' +

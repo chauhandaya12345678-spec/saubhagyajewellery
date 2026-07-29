@@ -56,9 +56,14 @@ export async function onRequest(context) {
   if (before)  { where.push('ts < ?'); args.push(before); }
   if (q)       { where.push('(message LIKE ? OR meta LIKE ?)'); args.push('%' + q + '%', '%' + q + '%'); }
 
-  const sql = `SELECT * FROM (${base}) t
+  // Enrich with order context (customer name, items→sku, current status) so the
+  // log viewer shows who/what each event is about — easier error hunting.
+  const sql = `SELECT t.uid, t.ts, t.level, t.source, t.order_id, t.message, t.meta,
+      o.name AS customer_name, o.items AS order_items, o.status AS order_status
+    FROM (${base}) t
+    LEFT JOIN orders o ON o.id = t.order_id
     ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
-    ORDER BY ts DESC, uid DESC
+    ORDER BY t.ts DESC, t.uid DESC
     LIMIT ?`;
   args.push(limit);
 

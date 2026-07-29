@@ -25,7 +25,8 @@ export async function onRequest(context) {
 
   try {
     const { results } = await env.DB.prepare(
-      `SELECT e.id, e.order_id, e.kind, e.ok, e.detail, e.created_at, o.name AS customer_name
+      `SELECT e.id, e.order_id, e.kind, e.ok, e.detail, e.created_at,
+              o.name AS customer_name, o.items AS order_items, o.status AS order_status
        FROM order_events e LEFT JOIN orders o ON o.id = e.order_id
        ORDER BY e.id DESC LIMIT ?`
     ).bind(limit).all();
