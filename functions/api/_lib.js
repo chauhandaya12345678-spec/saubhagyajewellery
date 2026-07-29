@@ -716,7 +716,7 @@ export async function recordShipprimeResult(db, orderId, sp) {
   const ok = !!(sp && sp.pushed);
   const detail = ok
     ? JSON.stringify({ shipprime_awb: sp.awb, shipprime_order_id: sp.shipPrimeOrderId || sp.shipment_id })
-    : String((sp && sp.error) || 'unknown').slice(0, 500);
+    : String((sp && (sp.note || sp.error)) || 'unknown').slice(0, 500);
 
   // Bump attempt counter + save error text on the order row. Tolerate rows
   // that haven't been migrated yet.
