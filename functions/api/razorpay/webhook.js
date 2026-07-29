@@ -76,38 +76,9 @@ export async function onRequest(context) {
       await db.prepare('UPDATE orders SET address = ?, updated_at = datetime(\'now\') WHERE id = ?')
         .bind(addressJson, existing.id).run();
 
-      // Push to ShipPrime now that we have the address
-      if (!existing.shipprime_awb) {
-        // Validate address before pushing (mirror save.js + _lib.js checks)
-        const pin = String(address.pin || '').replace(/\D/g, '');
-        const streetOk = String(address.street || '').trim().length >= 5;
-        const cityOk = String(address.city || '').trim().length >= 2;
-        if (pin.length !== 6 || !streetOk || !cityOk) {
-          return json({ ok: true, event: 'order.paid', order_id: existing.id,
-            address_updated: true, shipprime: { pushed: false, error: 'incomplete address after order.paid — street="' + address.street + '", city="' + address.city + '", pin="' + address.pin + '"' } });
-        }
-        // Parse items from existing order
-        let orderItems = [];
-        if (existing.items) {
-          try { orderItems = typeof existing.items === 'string' ? JSON.parse(existing.items) : existing.items; } catch (e) {}
-        }
-        const orderForPush = {
-          id: existing.id,
-          name: cd.name || notes.customer_name || 'Guest',
-          email: cd.email || notes.customer_email || '',
-          phone: cd.contact || notes.customer_phone || '',
-          address: addressJson,
-          items: orderItems,
-          totalPaise: o.amount || existing.total || 0,
-          paymentMethod: 'razorpay',
-        };
-        const sp = await pushToShipPrime(env, orderForPush, db);
-        if (sp.pushed) {
-          await db.prepare('UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?, name = ?, updated_at = datetime(\'now\') WHERE id = ?')
-            .bind(sp.awb || '', sp.shipPrimeOrderId || '', cd.name || notes.customer_name || 'Guest', existing.id).run();
-        }
-        return json({ ok: true, event: 'order.paid', order_id: existing.id, address_updated: true, shipprime: sp });
-      }
+      // ShipPrime push is done when admin marks "Packed", not here.
+      return json({ ok: true, event: 'order.paid', order_id: existing.id,
+        address_updated: true, shipprime: { pushed: false, note: 'will push when admin marks packed' } });
 
       return json({ ok: true, event: 'order.paid', order_id: existing.id, address_updated: true });
     }

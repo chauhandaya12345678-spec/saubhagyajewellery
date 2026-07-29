@@ -16,7 +16,7 @@
  * Cloudflare Pages Functions do not support native scheduled triggers on
  * the free tier — this endpoint bridges to any external cron.
  */
-import { pushToShipPrime, recordShipprimeResult, logOrderEvent, syncActiveOrderStatuses } from '../_lib.js';
+import { recordShipprimeResult, logOrderEvent, syncActiveOrderStatuses } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -46,32 +46,13 @@ export async function onRequest(context) {
     ).all().catch(() => ({ results: [] }));
 
     const candidates = rows.results || [];
-    const summary = { scanned: candidates.length, pushed: 0, skipped: 0, failed: 0, details: [] };
+    const summary = { scanned: candidates.length, pushed: 0, skipped: candidates.length, failed: 0, details: [] };
 
-    for (const row of candidates) {
-      const items = typeof row.items === 'string' ? (() => { try { return JSON.parse(row.items); } catch { return []; } })() : (row.items || []);
-      const orderForPush = {
-        id: row.id,
-        name: row.name || 'Customer',
-        email: row.email || '',
-        phone: row.phone || '',
-        address: row.address,
-        items,
-        totalPaise: row.total || 0,
-        paymentMethod: row.payment_method || 'razorpay',
-      };
-      const sp = await pushToShipPrime(env, orderForPush, db);
-      try { await recordShipprimeResult(db, row.id, sp); } catch (e) {}
-      if (sp.pushed) {
-        try { await logOrderEvent(db, row.id, 'shipprime_retry_ok', 1, 'AWB ' + sp.awb); } catch (e) {}
-        summary.pushed++;
-      } else if (/incomplete address/i.test(sp.error || '')) {
-        summary.skipped++;
-      } else {
-        summary.failed++;
-      }
-      summary.details.push({ id: row.id, pushed: sp.pushed, error: sp.error || null, awb: sp.awb || null });
-    }
+    // ShipPrime auto-push disabled — only triggered manually via "Mark as Packed".
+    // This retry endpoint is kept to sync active order statuses.
+    candidates.forEach(function (row) {
+      summary.details.push({ id: row.id, note: 'shipprime push is manual (Mark as Packed)' });
+    });
 
     // Same cron run also polls ShipPrime for status changes on already-shipped
     // orders and sends the customer WhatsApp — so one cron hit covers both
