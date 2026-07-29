@@ -9,7 +9,7 @@ import { verifyAdminAccess, adminCorsHeaders, hashPassword } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
-  const corsHeaders = adminCorsHeaders();
+  const corsHeaders = adminCorsHeaders(request);
 
   if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
   if (request.method !== 'POST') {
