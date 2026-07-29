@@ -360,14 +360,24 @@ export async function adminLogin(request, env, corsHeaders) {
   return { success: true, token, role: effectiveRole, username: user.username };
 }
 
-/* Admin CORS: these tools are only ever fetched same-origin from the admin
-   pages themselves, never from a browser extension or third-party origin —
-   lock it down instead of the wildcard used by public endpoints. */
-export function adminCorsHeaders() {
+/* Admin CORS: admin tools are served from the website (same-origin) AND from
+   the Saubhagya Manager app (admin subdomain + Capacitor native origins).
+   Echo the request Origin only when it's on the allowlist; otherwise fall back
+   to the main site. Backward compatible: callers that pass no request get the
+   default origin. */
+export function adminCorsHeaders(request) {
+  const reqOrigin = request && request.headers && request.headers.get('Origin');
+  const allowed = ['https://saubhagyajewellery.com', 'https://www.saubhagyajewellery.com',
+    'https://uat.saubhagyajewellery.com', 'https://saubhagyajewellery.pages.dev',
+    'https://admin.saubhagyajewellery.com',
+    // Capacitor native app origins (Android https://localhost, iOS capacitor://localhost)
+    'https://localhost', 'capacitor://localhost', 'http://localhost'];
+  if (reqOrigin && /^https:\/\/[^.]+\.saubhagyajewellery\.pages\.dev$/.test(reqOrigin)) allowed.push(reqOrigin);
+  const origin = reqOrigin && allowed.indexOf(reqOrigin) !== -1 ? reqOrigin : 'https://saubhagyajewellery.com';
   return {
-    'Access-Control-Allow-Origin': 'https://saubhagyajewellery.com',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, x-admin-key',
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-admin-key, x-admin-session',
     'Vary': 'Origin',
   };
 }
@@ -984,5 +994,133 @@ export async function sendPasswordResetEmail(env, email, name, token) {
     return { sent: true, id: data.id };
   } catch (err) {
     return { sent: false, error: 'Reset email error: ' + err.message };
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Structured application log — powers the admin "Logs" viewer (Kibana-lite).
+   Append-only rows in app_logs (see build/schema-app-logs.sql). Never throws.
+   levels: debug | info | warn | error
+   ───────────────────────────────────────────────────────────────────────── */
+export async function logEvent(db, { level = 'info', source = 'app', message = '', orderId = null, requestId = null, meta = null } = {}) {
+  try {
+    if (!db) return;
+    const metaStr = meta == null ? null : (typeof meta === 'string' ? meta : safeJson(meta));
+    await db.prepare(
+      `INSERT INTO app_logs (level, source, order_id, request_id, message, meta)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    ).bind(
+      String(level).slice(0, 10),
+      String(source).slice(0, 80),
+      orderId == null ? null : String(orderId),
+      requestId == null ? null : String(requestId).slice(0, 64),
+      String(message || '').slice(0, 2000),
+      metaStr == null ? null : metaStr.slice(0, 4000)
+    ).run();
+  } catch (e) { /* logging must never break the request */ }
+}
+
+function safeJson(o) { try { return JSON.stringify(o); } catch { return String(o); } }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   FCM HTTP v1 push to admin devices (new-order alerts → Pack/Cancel).
+   Service account JSON stored in env.FCM_SERVICE_ACCOUNT (Cloudflare secret).
+   Device tokens live in admin_devices (see register-device.js).
+   UAT_MODE short-circuits to a mock so sandbox never sends real pushes.
+   ───────────────────────────────────────────────────────────────────────── */
+let _fcmTokenCache = { token: null, exp: 0 };
+
+function b64urlFromBytes(bytes) {
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64urlFromStr(str) { return b64urlFromBytes(new Uint8Array(enc.encode(str))); }
+
+function pemToPkcs8Bytes(pem) {
+  const body = pem.replace(/-----BEGIN PRIVATE KEY-----/, '')
+    .replace(/-----END PRIVATE KEY-----/, '').replace(/\s+/g, '');
+  const raw = atob(body);
+  const bytes = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+  return bytes.buffer;
+}
+
+async function getFcmAccessToken(sa) {
+  const now = Math.floor(Date.now() / 1000);
+  if (_fcmTokenCache.token && _fcmTokenCache.exp - 60 > now) return _fcmTokenCache.token;
+
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const claim = {
+    iss: sa.client_email,
+    scope: 'https://www.googleapis.com/auth/firebase.messaging',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now, exp: now + 3600,
+  };
+  const signingInput = b64urlFromStr(JSON.stringify(header)) + '.' + b64urlFromStr(JSON.stringify(claim));
+  const key = await crypto.subtle.importKey(
+    'pkcs8', pemToPkcs8Bytes(sa.private_key),
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']
+  );
+  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, enc.encode(signingInput));
+  const jwt = signingInput + '.' + b64urlFromBytes(new Uint8Array(sig));
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=' + encodeURIComponent(jwt),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.access_token) throw new Error('FCM token: ' + JSON.stringify(data).slice(0, 200));
+  _fcmTokenCache = { token: data.access_token, exp: now + (data.expires_in || 3600) };
+  return data.access_token;
+}
+
+/* Send to every registered admin device. `notif`={title,body}, `data`=string map.
+   Prunes tokens FCM reports as UNREGISTERED. Returns {sent, failed, mock?}. */
+export async function sendFcmToAdmins(env, notif, data) {
+  try {
+    if (String(env.UAT_MODE) === 'true') return { sent: 0, mock: true, note: 'UAT_MODE — push suppressed' };
+    if (!env.FCM_SERVICE_ACCOUNT) return { sent: 0, error: 'FCM_SERVICE_ACCOUNT not set' };
+    const sa = typeof env.FCM_SERVICE_ACCOUNT === 'string' ? JSON.parse(env.FCM_SERVICE_ACCOUNT) : env.FCM_SERVICE_ACCOUNT;
+
+    const { results } = await env.DB.prepare('SELECT token FROM admin_devices').all();
+    const tokens = (results || []).map(r => r.token).filter(Boolean);
+    if (!tokens.length) return { sent: 0, note: 'no registered devices' };
+
+    const accessToken = await getFcmAccessToken(sa);
+    const dataStr = {};
+    for (const k in (data || {})) dataStr[k] = String(data[k]);
+
+    let sent = 0, failed = 0; const dead = [];
+    for (const token of tokens) {
+      const msg = {
+        message: {
+          token,
+          notification: { title: notif.title, body: notif.body },
+          data: dataStr,
+          android: { priority: 'high', notification: { channel_id: 'orders', click_action: 'OPEN_ORDER' } },
+        },
+      };
+      const r = await fetch(`https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(msg),
+      });
+      if (r.ok) { sent++; }
+      else {
+        failed++;
+        const err = await r.json().catch(() => ({}));
+        const code = err && err.error && (err.error.status || '');
+        if (code === 'NOT_FOUND' || code === 'UNREGISTERED' || r.status === 404) dead.push(token);
+      }
+    }
+    if (dead.length) {
+      const ph = dead.map(() => '?').join(',');
+      try { await env.DB.prepare(`DELETE FROM admin_devices WHERE token IN (${ph})`).bind(...dead).run(); } catch (e) {}
+    }
+    return { sent, failed, pruned: dead.length };
+  } catch (err) {
+    return { sent: 0, error: String(err.message || err) };
   }
 }

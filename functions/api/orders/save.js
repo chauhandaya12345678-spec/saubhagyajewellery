@@ -15,7 +15,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to ShipPrime order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock, logOrderEvent, computeExpectedTotalPaise, constantTimeEqual, genSessionToken, orderProductLabel } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock, logOrderEvent, computeExpectedTotalPaise, constantTimeEqual, genSessionToken, orderProductLabel, sendFcmToAdmins, logEvent } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -292,6 +292,17 @@ export async function onRequest(context) {
         .then(r => logOrderEvent(db, orderId, 'whatsapp_sent', r && r.sent ? 1 : 0, r && r.sent ? 'msgId ' + r.msgId : (r && r.error) || 'unknown'))
         .catch(() => {});
       if (context.waitUntil) context.waitUntil(waJob);
+
+      // Push alert to admin devices — "New order placed" → Pack/Cancel from phone.
+      const pushJob = sendFcmToAdmins(env,
+        { title: `New order ${orderId}`,
+          body: `${orderForJobs.name || 'Customer'} · ₹${Math.round((total || 0) / 100)} · ${orderProductLabel(orderForJobs)}` },
+        { type: 'new_order', order_id: String(orderId) }
+      )
+        .then(r => logEvent(db, { level: r && r.sent ? 'info' : 'warn', source: 'fcm_admin_push', orderId,
+          message: r && r.sent ? `pushed to ${r.sent} device(s)` : (r && (r.error || r.note) || 'no send'), meta: r }))
+        .catch(() => {});
+      if (context.waitUntil) context.waitUntil(pushJob);
 
       }  // end if (!isTest)
 
