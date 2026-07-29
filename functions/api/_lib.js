@@ -378,7 +378,7 @@ export function adminCorsHeaders(request) {
   const origin = reqOrigin && allowed.indexOf(reqOrigin) !== -1 ? reqOrigin : 'https://saubhagyajewellery.com';
   return {
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, x-admin-key, x-admin-session',
     'Vary': 'Origin',
   };
