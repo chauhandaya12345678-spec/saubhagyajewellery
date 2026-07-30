@@ -202,7 +202,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         <input type="file" id="np-file" accept="image/*" title="Product photo" style="font-size:11px;max-width:150px">
         <input type="text" id="np-name" placeholder="Name" style="width:170px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
         <input type="text" id="np-sku" placeholder="SKU (unique)" style="width:130px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
-        <input type="text" id="np-category" placeholder="Category" style="width:110px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+        <select id="np-category" title="Category" style="width:130px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"><option value="">Category…</option></select>
         <input type="number" id="np-price" placeholder="Price ₹" style="width:90px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
         <input type="number" id="np-mrp" placeholder="MRP ₹" style="width:90px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
         <input type="number" id="np-weight" placeholder="Weight g" style="width:90px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
@@ -624,6 +624,16 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       .then(function (data) {
         var list = Array.isArray(data) ? data : (data && data.products || []);
         lastProducts = list;
+        // Populate the New-Product category dropdown from existing categories.
+        var cats = Array.from(new Set(list.map(function (p) { return p.category; }).filter(Boolean))).sort();
+        var sel = document.getElementById('np-category');
+        if (sel) {
+          var cur = sel.value;
+          sel.innerHTML = '<option value="">Category…</option>' +
+            cats.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('') +
+            '<option value="__new__">+ New category…</option>';
+          sel.value = cur;
+        }
         renderInventoryRows();
       })
       .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
@@ -761,6 +771,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var st = document.getElementById('np-status');
     var g = function (id) { return (document.getElementById(id).value || '').trim(); };
     var name = g('np-name'), sku = g('np-sku'), category = g('np-category');
+    if (category === '__new__') { category = (window.prompt('New category name:') || '').trim(); }
     var price = g('np-price'), mrp = g('np-mrp'), weight = g('np-weight'), stock = g('np-stock');
     if (!name || !sku || !category || !price) { st.style.color = '#b02f33'; st.textContent = 'Name, SKU, category and price are required'; return; }
     var fileEl = document.getElementById('np-file');

@@ -32,7 +32,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, low_stock_threshold, new_sku } = body || {};
+  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, category, low_stock_threshold, new_sku } = body || {};
   if (!sku) {
     return new Response(JSON.stringify({ error: 'sku required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -90,6 +90,7 @@ export async function onRequest(context) {
     if (typeof image === 'string' && image) { setClauses.push('image = ?'); params.push(image); }
     if (typeof altImage === 'string') { setClauses.push('altImage = ?'); params.push(altImage); }
     if (typeof name === 'string' && name.trim()) { setClauses.push('name = ?'); params.push(name.trim()); }
+    if (typeof category === 'string' && category.trim()) { setClauses.push('category = ?'); params.push(category.trim()); }
     if (typeof new_sku === 'string' && new_sku.trim() && new_sku.trim() !== sku) { setClauses.push('sku = ?'); params.push(new_sku.trim()); }
     if (setClauses.length === 1) {
       return new Response(JSON.stringify({ error: 'Nothing to update' }), {
