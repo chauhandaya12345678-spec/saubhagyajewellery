@@ -143,19 +143,28 @@
     });
   }
 
+  var gotResult = false;
   function startTracking() {
-    setStatus('Point your face at the camera…');
+    setStatus('Detecting your face…');
+    gotResult = false;
     faceMesh = new window.FaceMesh({ locateFile: function (f) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/' + f; } });
-    faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+    faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
     faceMesh.onResults(onResults);
     var loop = function () {
       if (!running) return;
       if (els.video.readyState >= 2) {
-        faceMesh.send({ image: els.video }).catch(function () {});
+        faceMesh.send({ image: els.video }).catch(function (e) { console.warn('[tryon] send failed', e); });
       }
       rafId = requestAnimationFrame(loop);
     };
     loop();
+    // If the detector never returns a frame, the MediaPipe engine failed to
+    // initialise (asset/CSP/WASM) - surface it instead of a stuck spinner.
+    setTimeout(function () {
+      if (running && !gotResult) {
+        setStatus("The try-on engine didn't start on this browser. Tell us your phone + browser and we'll fix it.", true);
+      }
+    }, 9000);
   }
 
   function fitCanvas() {
@@ -169,6 +178,7 @@
 
   function onResults(res) {
     if (!running || !fitCanvas()) return;
+    gotResult = true;
     var ctx = els.ctx, W = els.canvas.width, H = els.canvas.height;
     ctx.clearRect(0, 0, W, H);
     var lms = res.multiFaceLandmarks && res.multiFaceLandmarks[0];

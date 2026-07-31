@@ -265,17 +265,11 @@ $('send-btn').addEventListener('click', function() {
   pendingPhone = phone;
   armWatchdog();
 
-  if (window.turnstile) {
-    try {
-      try { turnstile.reset('#ts-container'); } catch (e) {}
-      turnstile.execute('#ts-container');
-    } catch (e) {
-      // Turnstile present but broken (bad render/sitekey) - don't block sign-in
-      startFirebaseOtp(phone);
-    }
-  } else {
-    startFirebaseOtp(phone);
-  }
+  // Go straight to Firebase phone auth. Firebase already runs its own required
+  // bot check (invisible reCAPTCHA + App Check); the extra Cloudflare Turnstile
+  // pre-gate only added a visible "verify you're human" widget that stalls,
+  // greys out and times out - the daily auth/internal-error. Bypassed.
+  startFirebaseOtp(phone);
 });
 
 $('verify-btn').addEventListener('click', function() {
