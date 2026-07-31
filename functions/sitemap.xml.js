@@ -10,6 +10,8 @@ const STATIC_PAGES = [
   '/', '/categories', '/gifting', '/track-orders', '/about', '/contact',
   '/trust', '/blogs', '/shipping-and-returns', '/es-policy', '/grievances',
   '/terms', '/offer-terms', '/privacy-policy', '/cookie-policy',
+  '/blogs/temple-jewellery-styling', '/blogs/kundan-vs-polki',
+  '/blogs/caring-matte-gold', '/blogs/bridal-set-6-hour-event',
 ];
 
 function esc(s) {
