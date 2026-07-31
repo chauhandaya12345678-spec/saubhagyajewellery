@@ -317,7 +317,7 @@
             return;
           }
           var rows = hits.map(function (p, i) {
-            return '<a class="nav-search-hit" role="option" data-idx="' + i + '" href="product?sku=' + encodeURIComponent(p.sku || p.id) + '">' +
+            return '<a class="nav-search-hit" role="option" data-idx="' + i + '" href="/product/' + encodeURIComponent(p.sku || p.id) + '">' +
               '<div class="nav-search-hit-img" style="background-image:url(\'' + esc(p.image || '') + '\')"></div>' +
               '<div class="nav-search-hit-meta">' +
                 '<div class="nav-search-hit-name">' + esc(p.name) + '</div>' +

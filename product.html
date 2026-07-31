@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260731c"></script>
+<script src="layout.js?v=20260731d"></script>
 <script src="mpa.js?v=15" defer></script>
 <script src="catalog.js?v=20"></script>
 <script src="tryon.js?v=3" defer></script>
@@ -397,6 +397,7 @@
   'use strict';
   var $ = function(id) { return document.getElementById(id); };
   var sku = new URLSearchParams(location.search).get('sku') || '';
+  if (!sku) { var _pm = location.pathname.match(/\/product\/([^\/?#]+)/); if (_pm) sku = decodeURIComponent(_pm[1]); }
   if (!sku) { $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block'; return; }
 
   var product = null;
@@ -537,7 +538,7 @@
       grid.innerHTML = picks.map(function (x) {
         var id = x.sku || x.id;
         var mrp = (x.mrp && x.mrp > x.price) ? '<span class="mrp">' + fmt(x.mrp) + '</span>' : '';
-        return '<a class="ctl-card" href="product?sku=' + encodeURIComponent(id) + '">' +
+        return '<a class="ctl-card" href="/product/' + encodeURIComponent(id) + '">' +
           '<div class="ctl-img"><img src="' + esc(x.image || '') + '" alt="' + esc(x.name) + '" loading="lazy" width="400" height="500"></div>' +
           '<div class="ctl-name">' + esc(x.name) + '</div>' +
           '<div class="ctl-price">' + fmt(x.price) + mrp + '</div></a>';
@@ -717,7 +718,7 @@
     img.style.opacity = '0';
     function apply(row) {
       product = row; sku = row.sku || vsku;
-      try { history.replaceState(null, '', 'product?sku=' + encodeURIComponent(sku)); } catch (e) {}
+      try { history.replaceState(null, '', '/product/' + encodeURIComponent(sku)); } catch (e) {}
       setTimeout(function () {
         render();
         var im = $('pdp-image');

@@ -59,7 +59,7 @@ export async function onRequest(context) {
 
     const title = `${p.name} — ${seoSubtitle(p)}`.slice(0, 148);
     const desc = `Buy ${p.name} online at ₹${p.price}. ${seoSubtitle(p)}. Handcrafted in Mumbai from skin-friendly, lead & nickel-free Zamak alloy with a high gold-plated (1 gram gold look) finish. Free insured shipping across India.`;
-    const link = `${SITE_URL}/product?sku=${encodeURIComponent(p.sku)}`;
+    const link = `${SITE_URL}/product/${encodeURIComponent(p.sku)}`;
     const img = absImg(p.image);
     const avail = (p.stock_count != null && p.stock_count <= 0) ? 'out_of_stock' : 'in_stock';
 

@@ -46,7 +46,7 @@
   (function () {
     var q = new URLSearchParams(location.search);
     var p = q.get('product');
-    if (p) { location.replace('product?sku=' + encodeURIComponent(p)); return; }
+    if (p) { location.replace('/product/' + encodeURIComponent(p)); return; }
     var c = q.get('collection');
     var map = { south: 'categories.html?cat=south-temple-necklace', modern: 'categories.html?cat=necklaces', bridal: 'categories.html?cat=bridal-set' };
     if (c && map[c]) location.replace(map[c]);
@@ -56,7 +56,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260731c"></script>
+<script src="layout.js?v=20260731d"></script>
 <script src="mpa.js?v=15" defer></script>
 <script src="catalog.js?v=20"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Saubhagya Jewellery","url":"https://saubhagyajewellery.com/","logo":"https://saubhagyajewellery.com/images/banners/saubhagya-logo.png","sameAs":["https://www.instagram.com/saubhagyajewellery_","https://www.facebook.com/profile.php?id=61591767526538"],"address":{"@type":"PostalAddress","streetAddress":"Tanaji Nagar Rd, opp Vishwakarma Mandir, Hanuman Nagar, Kandivali East","addressLocality":"Mumbai","addressRegion":"Maharashtra","postalCode":"400101","addressCountry":"IN"},"contactPoint":{"@type":"ContactPoint","telephone":"+91-99870-08435","contactType":"customer service","areaServed":"IN","availableLanguage":["English","Hindi"]}}</script>
@@ -328,7 +328,7 @@
             return '<img class="im sj-fade' + (i === 0 ? ' on' : '') + '" src="' + esc(v.image) + '" alt="' + altText + '" loading="lazy" decoding="async" width="400" height="500"' + (i === 0 ? ' style="view-transition-name:' + vtn + '"' : '') + '>';
           }).join('')
         : '<img class="im" src="' + esc(p.image) + '" alt="' + altText + '" title="' + esc(p.name) + ' - Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500" style="view-transition-name:' + vtn + '">';
-      return '<a class="tr-card" href="product?sku=' + encodeURIComponent(p.id) + '" title="' + esc(p.name) + '">' +
+      return '<a class="tr-card" href="/product/' + encodeURIComponent(p.id) + '" title="' + esc(p.name) + '">' +
         '<div class="tr-img"' + (multi ? ' data-rot' : '') + '>' + imgsHtml +
           (multi ? '' : '<button class="tr-quick" data-sku="' + esc(p.id) + '">QUICK ADD</button>') +
         '</div>' +

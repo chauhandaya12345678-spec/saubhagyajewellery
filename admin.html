@@ -657,7 +657,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         '<td><div class="ai-cell-flex">' +
           '<input class="ai-input ai-sku" style="width:110px;margin:0" type="text" value="' + esc(p.sku) + '" data-field="sku" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Rename SKU">✎</button>' +
-          '<a href="product?sku=' + encodeURIComponent(p.sku) + '" target="_blank" rel="noopener" title="View live product page" style="text-decoration:none;font-size:14px">🔗</a>' +
+          '<a href="/product/' + encodeURIComponent(p.sku) + '" target="_blank" rel="noopener" title="View live product page" style="text-decoration:none;font-size:14px">🔗</a>' +
         '</div></td>' +
         '<td><div class="ai-cell-flex">' +
           '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.name) + '" data-field="name" disabled>' +

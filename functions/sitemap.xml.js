@@ -46,7 +46,7 @@ export async function onRequest(context) {
       const imageTag = img
         ? `<image:image><image:loc>${esc(img)}</image:loc><image:title>${esc(p.name || '')}</image:title></image:image>`
         : '';
-      return `  <url><loc>${SITE_URL}/product?sku=${encodeURIComponent(p.sku)}</loc><lastmod>${lastmod}</lastmod>${imageTag}</url>`;
+      return `  <url><loc>${SITE_URL}/product/${encodeURIComponent(p.sku)}</loc><lastmod>${lastmod}</lastmod>${imageTag}</url>`;
     })
   );
 
