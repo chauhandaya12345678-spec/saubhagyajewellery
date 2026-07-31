@@ -857,7 +857,7 @@ export async function sendOrderEmail(env, order) {
       <div style="font-size:13px;line-height:1.6;color:#1A1A1A">${esc(order.name || '')}<br>${esc(addrLine)}<br>${esc(order.phone || '')}</div>
       <div style="font-size:12px;color:#0B291C;margin-top:10px"><strong>Estimated delivery:</strong> ${esc(eta.text)}</div>
     </div>
-    <p style="font-size:12px;line-height:1.7;color:#9a9a9a;margin-top:20px">Ready pieces dispatch in 2–4 business days (10–14 for made-to-order bridal). A tracking link arrives on WhatsApp &amp; email once shipped. All sales are final; manufacturing defects are repaired or replaced.</p>
+    <p style="font-size:12px;line-height:1.7;color:#9a9a9a;margin-top:20px">Ready pieces dispatch in 2–4 business days (10–14 for made-to-order bridal sets). A tracking link arrives on WhatsApp &amp; email once shipped. As jewellery is a personal-wear item we don't offer change-of-mind returns, but any manufacturing defect is repaired or replaced free of charge.</p>
     <p style="font-size:12px;color:#9a9a9a">Questions? <a href="https://wa.me/919987008435" style="color:#0B291C">WhatsApp us</a>.</p>
   </div>
 </div>`;

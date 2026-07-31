@@ -77,9 +77,9 @@ export async function onRequest(context) {
     // ── COD: OTP-verified only, capped, rate-limited (see COD-SECURITY.md).
     // Online payment (Razorpay) is never touched by any of this.
     if (payment_method === 'cod') {
-      const COD_MAX_PAISE = 200000; // ₹2,000 cap
+      const COD_MAX_PAISE = 100000; // ₹1,000 cap
       if (Number(total) > COD_MAX_PAISE) {
-        return json({ error: 'Cash on Delivery is available up to ₹2,000 only. Please pay online for larger orders.' }, 400);
+        return json({ error: 'Cash on Delivery is available up to ₹1,000 only. Please pay online for larger orders.' }, 400);
       }
 
       const vToken = body.verification_token;

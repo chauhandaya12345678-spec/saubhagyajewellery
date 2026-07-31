@@ -59,23 +59,23 @@
   .ctl-price .mrp { color:#3a3a3a; text-decoration: line-through; margin-left: 6px; font-weight: 500; font-size: 12px; }
   @media (max-width: 700px) { .ctl-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
   .pdp-region { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #3a3a3a; margin-bottom: 20px; }
-  .pdp-price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
-  .pdp-price { font-family:'Playfair Display',serif; font-size: 30px; font-weight: 700; color: #0B291C; }
-  .pdp-mrp { font-family: 'Montserrat',sans-serif; font-size: 16px; font-weight: 500; color: #3a3a3a; text-decoration: line-through; }
-  .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #0B291C; font-weight: 500; }
-  .pdp-color-lbl { font-family: 'Montserrat',sans-serif; font-size: 13.5px; font-weight: 500; letter-spacing: .3px; color: #2b2b2b; text-transform: none; margin: 18px 0 10px; }
-  .pdp-color-lbl strong { color: #1A1A1A; font-size: 15.5px; font-weight: 600; }
-  .pdp-color-count { color: #8A6D2F; font-size: 12px; margin-left: 8px; letter-spacing: .5px; }
+  .pdp-price-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .pdp-price { font-family:'Playfair Display',serif; font-size: 42px; font-weight: 700; color: #14110A; letter-spacing: -.5px; line-height: 1; }
+  .pdp-mrp { font-family: 'Montserrat',sans-serif; font-size: 18px; font-weight: 500; color: #8a8a8a; text-decoration: line-through; }
+  .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #fff; font-weight: 700; background: #D32F2F; padding: 4px 10px; border-radius: 5px; letter-spacing: .3px; line-height: 1; white-space: nowrap; }
+  .pdp-color-lbl { font-family: 'Montserrat',sans-serif; font-size: 16px; font-weight: 500; letter-spacing: .2px; color: #2b2b2b; text-transform: none; margin: 20px 0 12px; }
+  .pdp-color-lbl strong { color: #14110A; font-size: 18px; font-weight: 700; }
+  .pdp-color-count { color: #8A6D2F; font-size: 13px; font-weight: 600; margin-left: 8px; letter-spacing: .3px; }
   .pdp-swatches { display: flex; gap: 10px; margin: 0 0 20px; flex-wrap: wrap; }
   .pdp-img { transition: opacity .28s ease; }
   .pdp-swatch { width: 48px; height: 48px; border-radius: 50%; padding: 2px; border: 2px solid #e4ddcd; background: #f0ede5; cursor: pointer; transition: border-color .25s cubic-bezier(.25,1,.5,1), transform .25s cubic-bezier(.25,1,.5,1), box-shadow .25s; }
   .pdp-swatch img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
   .pdp-swatch:hover { transform: translateY(-2px); border-color: #C5A880; }
   .pdp-swatch.on { border-color: #0B291C; box-shadow: 0 0 0 3px rgba(197,168,128,.4); }
-  .pdp-tax { font-family: 'Montserrat',sans-serif; font-size:13px; color: #3a3a3a; margin-bottom: 6px; }
-  .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #2b2b2b; margin-bottom: 4px; }
-  .pdp-ship .free { color: #1B7A3D; font-weight: 600; }
-  .pdp-stock { display:inline-flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:500; color:#0B291C; margin-bottom:12px; animation:pulse 2s infinite; }
+  .pdp-tax { font-family: 'Montserrat',sans-serif; font-size:13px; color: #6a6a6a; margin-bottom: 8px; }
+  .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 14px; color: #2b2b2b; margin-bottom: 6px; }
+  .pdp-ship .free { color: #1B7A3D; font-weight: 700; }
+  .pdp-stock { display:inline-flex; align-items:center; gap:6px; font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; color:#0B291C; margin-bottom:14px; animation:pulse 2s infinite; }
   .pdp-stock.low { color:#c0392b; }
   .pdp-stock .dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
   .pdp-noreturn { font-family: 'Montserrat',sans-serif; font-size:13px; color: #3a3a3a; margin-bottom: 22px; }
@@ -156,11 +156,11 @@
   .pdp-qty .pdp-q:hover { background: #0B291C; color: #fff; }
   .pdp-qty .pdp-v { width: 36px; font-size: 13px; border-left: 1px solid #ddd6c6; border-right: 1px solid #ddd6c6; }
   .pdp-qty .pdp-v:hover { background: transparent; }
-  .pdp-add { flex: 1; height: 48px; border: none; background: #0B291C; color: #fff; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; white-space: nowrap; border-radius: 14px; box-shadow: 0 2px 8px rgba(11,41,28,.18); transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .pdp-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.28); background: #071B12; }
+  .pdp-add { flex: 1; height: 52px; border: none; background: #C8901F; color: #241703; font-family: 'Montserrat',sans-serif; font-size:14px; font-weight: 700; letter-spacing:1.5px; cursor: pointer; white-space: nowrap; border-radius: 14px; box-shadow: 0 3px 12px rgba(200,144,31,.35); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .pdp-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(200,144,31,.5); background: #B07D14; }
   .pdp-add:active { transform: scale(.96); transition: transform .1s; }
-  .pdp-buy { width: 100%; height: 48px; border: 1px solid #0B291C; background: transparent; color: #0B291C; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing:1.5px; cursor: pointer; margin-bottom: 24px; border-radius: 14px; transition: all .4s cubic-bezier(.25,1,.5,1); }
-  .pdp-buy:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(11,41,28,.12); background: #0B291C; color: #fff; }
+  .pdp-buy { width: 100%; height: 52px; border: none; background: #0B291C; color: #fff; font-family: 'Montserrat',sans-serif; font-size:14px; font-weight: 700; letter-spacing:1.5px; cursor: pointer; margin-bottom: 24px; border-radius: 14px; box-shadow: 0 3px 12px rgba(11,41,28,.22); transition: all .4s cubic-bezier(.25,1,.5,1); }
+  .pdp-buy:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.32); background: #071B12; }
   .pdp-buy:disabled { border-color: #ddd6c6; color: #3a3a3a; background: #f3f0e9; cursor: not-allowed; }
   .pdp-buy:disabled:hover { transform: none; box-shadow: none; background: #f3f0e9; color: #3a3a3a; }
   /* Full-width accordion (description / details / care) — sits below the
@@ -195,7 +195,7 @@
     .pdp-grid { grid-template-columns: 1fr; gap: 24px; }
     .pdp-wrap { padding: 0 16px calc(96px + env(safe-area-inset-bottom)); }
     .pdp-name { font-size: 30px; }
-    .pdp-price { font-size: 25px; }
+    .pdp-price { font-size: 34px; }
     .pdp-img-wrap { max-width: 100%; }
     .pdp-img { aspect-ratio: 1/1; }
     .pdp-desc { max-width: 100%; }
@@ -214,10 +214,10 @@
     /* Floating CTA bar on mobile — visible from load, hides once reviews are reached */
     .pdp-mobile-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(90,136,0,.28); box-shadow: 0 -6px 24px rgba(11,41,28,.08); transform: translateY(120%); transition: transform .4s cubic-bezier(.25,1,.5,1); }
     .pdp-mobile-bar.on { transform: translateY(0); }
-    .pdp-mobile-bar .price { flex: none; font-family:'Playfair Display',serif; font-size: 18px; font-weight: 600; color: #0B291C; align-self: center; padding: 0 4px; }
+    .pdp-mobile-bar .price { flex: none; font-family:'Playfair Display',serif; font-size: 21px; font-weight: 700; color: #14110A; align-self: center; padding: 0 4px; }
     .pdp-mobile-bar button { flex: 1; height: 48px; border: none; border-radius: 14px; font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 1.8px; cursor: pointer; box-shadow: 0 2px 8px rgba(11,41,28,.12); transition: all .3s; }
   .pdp-mobile-bar button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(11,41,28,.2); }
-    .pdp-mobile-bar .add { background: #fff; color: #0B291C; border: 1px solid #0B291C; }
+    .pdp-mobile-bar .add { background: #C8901F; color: #241703; border: none; box-shadow: 0 4px 14px rgba(200,144,31,.4); }
     .pdp-mobile-bar .buy { background: #0B291C; color: #fff; box-shadow: 0 6px 16px rgba(11,41,28,.24); }
     .pdp-mobile-bar .buy:hover { background: #071B12; }
   }
@@ -260,7 +260,7 @@
           <div class="pdp-tax">incl. of all taxes</div>
           <div class="pdp-ship"><span class="free">✓ FREE Insured Delivery</span> across India — no extra charges at checkout</div>
           <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
-          <div class="pdp-noreturn">All sales are final: no returns or exchanges. Manufacturing defects claimed within 48 hours of delivery (with continuous unboxing video) are repaired or replaced free — see <a href="trust.html">our standards</a>.<br><br><strong>Country of origin:</strong> India · <strong>Manufactured by:</strong> Saubhagya Jewellery</div>
+          <div class="pdp-noreturn"><strong>Country of origin:</strong> India · <strong>Manufactured by:</strong> Saubhagya Jewellery</div>
           <div class="pdp-pincheck">
             <div class="pdp-pincheck-title">CHECK DELIVERY DATE</div>
             <div class="pdp-pincheck-row">
@@ -411,19 +411,14 @@
       $('pdp-mrp').textContent = fmt(p.mrp);
       $('pdp-mrp').style.display = '';
       var off = Math.round((1 - p.price / p.mrp) * 100);
-      $('pdp-save').textContent = off + '% off';
+      $('pdp-save').textContent = off + '% OFF';
     } else {
       $('pdp-mrp').style.display = 'none';
       $('pdp-save').textContent = '';
     }
     var mp = $('pdp-mobile-price'); if (mp) mp.textContent = fmt(p.price);
     $('pdp-image').alt = p.name + ' — ' + seo;
-    $('pdp-desc').innerHTML = '<strong>' + p.name + '</strong> is a ' + seo.toLowerCase() +
-      '. Handcrafted in our Mumbai workshop from skin-friendly <strong>Zamak alloy</strong> with a rich, long-lasting gold-tone plating' +
-      (/crystal/i.test(p.name) ? ' and hand-set crystal stones' : '') + '. ' +
-      'Lightweight, comfortable for all-day wear, and individually quality-checked before dispatch. ' +
-      'Buy this ' + (p.category === 'Earring' ? 'pair of ' + (/jhumka/i.test(p.name) ? 'jhumka earrings' : 'earrings') : (/crystal/i.test(p.name) ? 'crystal necklace' : 'gold-plated necklace')) +
-      ' online with free insured shipping across India.';
+    $('pdp-desc').innerHTML = pdpDescription(p, seo);
     renderSpec(p);
     renderCompleteTheLook(p);
     // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")
@@ -520,6 +515,67 @@
     return 'Handcrafted Gold-Plated Imitation Jewellery, Made in India';
   }
 
+  /* Current colour + shade count for the selected variant (empty for single-
+     colour products). Drives colour mentions in copy + spec table. */
+  function activeColourInfo(p) {
+    var opts = getImageOpts(p);
+    if (!opts || opts.length < 2) return { label: '', count: (opts ? opts.length : 1) };
+    var act = activeOptIndex(p, opts);
+    return { label: (opts[act] && opts[act].label) || '', count: opts.length };
+  }
+
+  /* Attribute-driven product description — auto-built from the fields entered
+     in admin (name, category, colour, weight). No two categories read the same
+     and the copy carries the keywords shoppers actually search. Zero per-
+     product maintenance: add a product, this writes its description. */
+  function pdpDescription(p, seo) {
+    var n = p.name || '';
+    var isJhumka = /jhumka/i.test(n), isEarring = p.category === 'Earring',
+        isCrystal = /crystal/i.test(n), isShort = /short/i.test(n);
+    var ci = activeColourInfo(p);
+    var material = 'skin-friendly <strong>Zamak alloy</strong> (a lead- and nickel-free base metal)';
+    var plating = ' finished in rich, long-lasting high gold plating';
+    var stones = isCrystal ? ' and set with hand-cut crystal stones that catch the light' : '';
+    var typeNoun, occasion, benefit;
+    if (isJhumka) {
+      typeNoun = 'pair of traditional jhumka earrings';
+      occasion = 'weddings, festivals and ethnic-wear occasions';
+      benefit = 'The classic bell-shaped drops sway with every movement and pair beautifully with sarees, lehengas and kurtis.';
+    } else if (isEarring) {
+      typeNoun = 'pair of earrings';
+      occasion = 'both everyday styling and festive dressing';
+      benefit = 'Light enough for all-day wear, they finish off office, college and party looks alike.';
+    } else if (isCrystal) {
+      typeNoun = 'crystal necklace';
+      occasion = 'weddings, receptions and party wear';
+      benefit = 'The hand-set stones give it a bridal, statement finish while staying light on the neck.';
+    } else if (isShort) {
+      typeNoun = 'short necklace';
+      occasion = 'festive and party wear';
+      benefit = 'The shorter length sits neatly at the collar and works with both ethnic and indo-western outfits.';
+    } else {
+      typeNoun = 'necklace';
+      occasion = 'weddings and festive occasions';
+      benefit = 'A versatile statement piece that lifts both traditional and modern outfits.';
+    }
+    var colourClause = '';
+    if (ci.label) {
+      colourClause = 'Shown here in <strong>' + ci.label + '</strong>' +
+        (ci.count > 1 ? ', with ' + (ci.count - 1) + ' more shade' + (ci.count - 1 > 1 ? 's' : '') + ' to choose from' : '') + '. ';
+    }
+    var weightClause = '';
+    if (typeof p.weightGrams === 'number' && p.weightGrams > 0) {
+      weightClause = 'At about ' + p.weightGrams + ' g it stays comfortable through long events. ';
+    }
+    return '<strong>' + n + '</strong> is a ' + seo.toLowerCase() +
+      '. Handcrafted in our Mumbai workshop from ' + material + ',' + plating + stones + '. ' +
+      benefit + ' ' +
+      colourClause +
+      weightClause +
+      'Every piece is individually quality-checked and hygienically sealed before dispatch, making it ideal for ' + occasion + '. ' +
+      'Buy this ' + typeNoun + ' online with free insured shipping across India.';
+  }
+
   /* Specs + care. Material is Zamak alloy across the range; weight comes from
      D1 (admin fills it in — shown as "updating" until then). Care list tells
      the buyer what to avoid so the plating lasts. */
@@ -531,9 +587,21 @@
       ? p.weightGrams + ' g (approx.)'
       : 'Updating soon';
     var esc2 = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var nm = p.name || '';
+    var isJhumka = /jhumka/i.test(nm), isCrystal = /crystal/i.test(nm), isShort = /short/i.test(nm);
+    var ci = activeColourInfo(p);
+    var typeLabel = isJhumka ? 'Jhumka earrings'
+      : (p.category === 'Earring' ? 'Earrings'
+      : (isCrystal ? 'Crystal necklace' : (isShort ? 'Short necklace' : 'Necklace')));
+    var bestFor = (p.category === 'Earring')
+      ? (isJhumka ? 'Weddings, festive &amp; ethnic wear' : 'Everyday &amp; festive wear')
+      : (isCrystal ? 'Weddings, receptions &amp; party wear' : 'Weddings, festive &amp; party wear');
     det.innerHTML =
       row('Material', 'Skin-friendly Zamak alloy (lead &amp; nickel-free base metal)') +
-      row('Finish', 'High gold-plated, antique look with hand-set stones') +
+      row('Finish', 'High gold-plated, antique look' + (isCrystal ? ' with hand-set crystal stones' : '')) +
+      (ci.label ? row('Colour', esc2(ci.label) + (ci.count > 1 ? ' (+' + (ci.count - 1) + ' more shade' + (ci.count - 1 > 1 ? 's' : '') + ')' : '')) : '') +
+      row('Type', typeLabel) +
+      row('Best for', bestFor) +
       row('Weight', wt) +
       row('Product Code', esc2(p.sku || sku)) +
       row('Origin', 'Handcrafted in Mumbai, India');

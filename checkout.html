@@ -212,7 +212,7 @@
   var savedAddresses = [];
   var selectedAddressId = null;
   var COD_FEE = 45;
-  var COD_MAX_TOTAL = 2000;
+  var COD_MAX_TOTAL = 1000;
   var pendingCod = null;
 
   function isCodSelected() {
@@ -754,7 +754,7 @@
     var itemsTotal = lines.reduce(function (s, l) { return s + l.price * l.qty; }, 0);
     var grandTotal = itemsTotal + COD_FEE;
     if (grandTotal > COD_MAX_TOTAL) {
-      $('co-error').textContent = 'Cash on Delivery is available up to ' + fmt(COD_MAX_TOTAL) + ' only. Please pay online for larger orders.';
+      $('co-error').textContent = 'Cash on Delivery is available up to ' + fmt(COD_MAX_TOTAL) + ' only. Please pay online for higher-value orders.';
       $('co-error').style.display = 'block';
       $('co-submit').disabled = false;
       $('co-submit').textContent = 'VERIFY & PLACE ORDER';
