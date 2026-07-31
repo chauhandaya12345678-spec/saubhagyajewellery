@@ -1,9 +1,9 @@
 /**
- * Saubhagya — Virtual Try-On (WebAR, on-device)
+ * Saubhagya - Virtual Try-On (WebAR, on-device)
  * 2D-sprite approach: MediaPipe FaceMesh tracks face landmarks, the product's
  * transparent cutout (images/tryon/<SKU>.png) is pinned to the earlobes
  * (earrings) or draped below the chin (necklaces), scaled + rotated to head
- * movement. Camera never leaves the device — no upload, no server.
+ * movement. Camera never leaves the device - no upload, no server.
  *
  * Public API: window.SJTryOn.open(product)   product = D1 row (sku, name, category, image)
  *             window.SJTryOn.supported(product) -> bool (cutout may still 404 at load)
@@ -172,7 +172,7 @@
     var ctx = els.ctx, W = els.canvas.width, H = els.canvas.height;
     ctx.clearRect(0, 0, W, H);
     var lms = res.multiFaceLandmarks && res.multiFaceLandmarks[0];
-    if (!lms) { setStatus('Move into the frame — no face detected.'); return; }
+    if (!lms) { setStatus('Move into the frame - no face detected.'); return; }
     setStatus('');
     lastLm = lms;
     if (!spriteReady) return;

@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260724a"></script>
-<script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=19"></script>
+<script src="layout.js?v=20260731c"></script>
+<script src="mpa.js?v=15" defer></script>
+<script src="catalog.js?v=20"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
   window.CC_PAYMENTS = {
@@ -178,7 +178,7 @@
           <button class="co-btn" id="co-submit">PLACE ORDER &amp; PAY</button>
           <div class="co-error" id="co-error" style="display:none"></div>
           <div class="co-secure" id="co-secure-text">&#128274; Secured by Razorpay &middot; 256-bit SSL</div>
-          <div class="co-noreturn">📹 <strong>Please film a continuous unboxing video</strong> — it's the only proof we accept for a damage or defect claim. Report any damage or manufacturing defect within 48 hours of delivery and we repair or replace it free. As jewellery is a personal-wear item, change-of-mind returns aren't accepted. <a href="shipping-and-returns.html">Full policy</a>.</div>
+          <div class="co-noreturn">🔒 100% secure payment · Free insured shipping across India · Every piece quality-checked before dispatch.</div>
         </div>
       </div>
     </div>
@@ -256,7 +256,7 @@
     return false;
   }
 
-  // Payable items only — out-of-stock lines are never charged or sent to
+  // Payable items only - out-of-stock lines are never charged or sent to
   // Razorpay, even if they're still sitting in the saved cart (cart.html
   // keeps them there as "saved for later"). Indices map back to the real
   // cartItems array so qty +/- and remove still work on the right row.
@@ -281,7 +281,7 @@
       return '<div class="co-item"><div class="co-item-top"><span class="co-item-name">' + esc((window.SJ_NAME ? SJ_NAME(p) : p.name) || ci.id) + '</span><span class="co-x" data-act="rm" data-idx="' + idx + '" title="Remove">&times;</span></div><div class="co-item-bot"><span class="co-qty"><button type="button" class="co-qbtn" data-act="dec" data-idx="' + idx + '" aria-label="Decrease">&minus;</button><span class="co-qv">' + ci.qty + '</span><button type="button" class="co-qbtn" data-act="inc" data-idx="' + idx + '" aria-label="Increase">+</button></span><span class="co-item-price">' + fmt((p.price || 0) * ci.qty) + '</span></div></div>';
     }).join('');
     if (oosCount > 0) {
-      $('co-items').innerHTML += '<div style="font-family:Montserrat,sans-serif;font-size:12px;color:#c0392b;padding:10px 0;">' + oosCount + ' item' + (oosCount > 1 ? 's' : '') + ' in your bag ' + (oosCount > 1 ? 'are' : 'is') + ' out of stock and not included here — <a href="cart.html" style="color:#0B291C;">manage your bag</a>.</div>';
+      $('co-items').innerHTML += '<div style="font-family:Montserrat,sans-serif;font-size:12px;color:#c0392b;padding:10px 0;">' + oosCount + ' item' + (oosCount > 1 ? 's' : '') + ' in your bag ' + (oosCount > 1 ? 'are' : 'is') + ' out of stock and not included here - <a href="cart.html" style="color:#0B291C;">manage your bag</a>.</div>';
     }
     $('co-subtotal').textContent = fmt(subtotal);
     updateTotalDisplay();
@@ -424,7 +424,7 @@
     clearTimeout(pinTimer);
     pinTimer = setTimeout(function() {
       pincodeLookup(pin).then(function(res) {
-        if (!res) { $('pincode-hint').textContent = 'Could not verify — please enter city and state manually.'; return; }
+        if (!res) { $('pincode-hint').textContent = 'Could not verify - please enter city and state manually.'; return; }
         $('pincode-hint').textContent = 'Delivers to ' + res.city + ', ' + res.state;
         $('pincode-hint').className = 'hint-ok';
         if (!$('f-city').value.trim()) $('f-city').value = res.city;
@@ -455,7 +455,7 @@
         if (d && d.success && d.addresses && d.addresses.length) {
           savedAddresses = d.addresses;
           // Only auto-fill the form on the INITIAL page load. While the user is
-          // typing a new address, just show saved ones as pickable suggestions —
+          // typing a new address, just show saved ones as pickable suggestions -
           // never overwrite what they're entering or hide the form.
           if (autoSelect) {
             var def = savedAddresses.find(function(a){ return a.is_default; });
@@ -531,7 +531,7 @@
     var body = Object.assign({}, payload, { is_default: save && !savedAddresses.length });
     if (selectedAddressId) {
       // If the user changed the phone while editing a saved address, this is
-      // effectively a NEW address — don't send address_id, or the backend
+      // effectively a NEW address - don't send address_id, or the backend
       // rejects the phone that doesn't match the saved row (403 forbidden).
       var selAddr = savedAddresses.find(function(a){ return a.id === selectedAddressId; });
       var samePhone = selAddr && String(selAddr.phone || '').replace(/\D/g,'').slice(-10) === payload.phone;
@@ -564,7 +564,7 @@
       }));
     } catch(e) {}
     // Stash item names so the success page can show what was ordered (names,
-    // not SKUs — the customer never sees SKUs; admin does).
+    // not SKUs - the customer never sees SKUs; admin does).
     try { localStorage.setItem('cc_lastorder_items', JSON.stringify((saveBody.items || []).map(function(l){ return { name: l.name, qty: l.qty }; }))); } catch(e) {}
     var isCod = saveBody.payment_method === 'cod';
     showOverlay();
@@ -595,7 +595,7 @@
     }).then(function(r){ return r.json(); }).catch(function(){ return null; });
 
     if (isCod) {
-      // COD has NO payment-gateway webhook backstop — the save IS the order.
+      // COD has NO payment-gateway webhook backstop - the save IS the order.
       // Wait for it and confirm only on real success; never fake-confirm.
       save.then(function(d) {
         if (d && d.success && d.order_id) { goSuccess(d); }
@@ -609,7 +609,7 @@
       });
     } else {
       // Razorpay: payment already captured; confirm optimistically even if the
-      // save is slow — the razorpay webhook backstop persists it regardless.
+      // save is slow - the razorpay webhook backstop persists it regardless.
       var timeout = new Promise(function(res){ setTimeout(function(){ res(null); }, 8000); });
       Promise.race([save, timeout]).then(goSuccess);
     }
@@ -618,7 +618,7 @@
   function doPayment(pack) {
     var addr = pack.address;
     // Out-of-stock lines never reach Razorpay or /api/orders/save, even if
-    // they're still sitting in the saved cart — see payableEntries().
+    // they're still sitting in the saved cart - see payableEntries().
     var cart = payableEntries().map(function(e) { return e.ci; });
     var lines = cart.map(function(ci) {
       var p = products[ci.id] || {};
@@ -810,10 +810,10 @@
     }).then(function (r) { return r.json(); }).then(function (d) {
       if (d && d.success) {
         if (d.uat && d.otp) {
-          // UAT sandbox: no real email — show + prefill the code for testing.
+          // UAT sandbox: no real email - show + prefill the code for testing.
           $('co-otp-input').value = d.otp;
-          msg.textContent = 'UAT sandbox — test code is ' + d.otp + ' (prefilled).';
-        } else { msg.textContent = 'Code sent — check your email.'; }
+          msg.textContent = 'UAT sandbox - test code is ' + d.otp + ' (prefilled).';
+        } else { msg.textContent = 'Code sent - check your email.'; }
         msg.style.color = '#0B291C';
       }
       else { msg.textContent = (d && d.error) || 'Failed to send code'; msg.style.color = '#c0392b'; }

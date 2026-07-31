@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260724a"></script>
-<script src="mpa.js?v=14" defer></script>
+<script src="layout.js?v=20260731c"></script>
+<script src="mpa.js?v=15" defer></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -46,7 +46,7 @@
   </div>
   <div id="auth-form">
     <h1 class="auth-title">Welcome Back</h1>
-    <p class="auth-sub">Sign in with your mobile number — we'll text you a code</p>
+    <p class="auth-sub">Sign in with your mobile number - we'll text you a code</p>
 
     <div id="phone-section">
       <label class="auth-label">Mobile Number</label>
@@ -64,12 +64,12 @@
     <div class="auth-success" id="auth-success"></div>
 
     <!-- Turnstile widget must stay in layout (not display:none): when Cloudflare
-         escalates to an interactive challenge it renders here — hiding the
+         escalates to an interactive challenge it renders here - hiding the
          container left the SEND button spinning forever. -->
     <div id="ts-container" class="cf-turnstile" data-sitekey="0x4AAAAAAD7dybSbH-6hyTGP" data-execution="execute" data-callback="__tsToken" data-error-callback="__tsError" data-timeout-callback="__tsError" style="margin:10px auto;text-align:center"></div>
     <div id="recaptcha-container"></div>
 
-    <div class="auth-link">New here? Sign in with your phone — your account will be created automatically.</div>
+    <div class="auth-link">New here? Sign in with your phone - your account will be created automatically.</div>
   </div>
 </div>
 </main>
@@ -93,7 +93,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // App Check is best-effort: if the reCAPTCHA Enterprise key/script is broken
-// or blocked, a thrown error here used to kill this whole module — every
+// or blocked, a thrown error here used to kill this whole module - every
 // button on the page went dead. Sign-in must survive App Check failure.
 try {
   initializeAppCheck(app, {
@@ -190,18 +190,18 @@ window.__tsToken = function(token) {
       if (d.success) startFirebaseOtp(pendingPhone);
       else { clearLoading($('send-btn'), 'SEND OTP'); showError('Verification failed. Please try again.'); }
     }).catch(function() {
-      // Turnstile check unreachable — fail open to Firebase rather than
+      // Turnstile check unreachable - fail open to Firebase rather than
       // blocking sign-in entirely over an outage of an extra safety layer.
       startFirebaseOtp(pendingPhone);
     });
 };
 window.__tsError = function() {
-  // Same reasoning — don't let a Turnstile hiccup block sign-in.
+  // Same reasoning - don't let a Turnstile hiccup block sign-in.
   startFirebaseOtp(pendingPhone);
 };
 
 // Watchdog: whatever silently stalls (Turnstile, reCAPTCHA, App Check,
-// network), never leave the customer on an infinite spinner — reset the
+// network), never leave the customer on an infinite spinner - reset the
 // button and say so.
 var sendWatchdog = null;
 function armWatchdog() {
@@ -211,7 +211,7 @@ function armWatchdog() {
     if (btn.disabled && !window.confirmationResult) {
       clearLoading(btn, 'SEND OTP');
       if (window.recaptchaVerifier) { try { window.recaptchaVerifier.clear(); } catch (e) {} window.recaptchaVerifier = null; }
-      showError('Taking too long — please tap SEND OTP again. If it repeats, check your connection or try another browser.');
+      showError('Taking too long - please tap SEND OTP again. If it repeats, check your connection or try another browser.');
     }
   }, 25000);
 }
@@ -233,7 +233,7 @@ function uatSendOtp(phone) {
       $('phone-section').style.display = 'none';
       $('otp-section').style.display = 'block';
       $('otp-input').value = d.otp || '';
-      showInfo('UAT sandbox — test OTP is ' + d.otp + ' (prefilled; no real SMS sent).');
+      showInfo('UAT sandbox - test OTP is ' + d.otp + ' (prefilled; no real SMS sent).');
       $('otp-input').focus();
     })
     .catch(function (e) { clearLoading($('send-btn'), 'SEND OTP'); showError(e.message); });
@@ -270,7 +270,7 @@ $('send-btn').addEventListener('click', function() {
       try { turnstile.reset('#ts-container'); } catch (e) {}
       turnstile.execute('#ts-container');
     } catch (e) {
-      // Turnstile present but broken (bad render/sitekey) — don't block sign-in
+      // Turnstile present but broken (bad render/sitekey) - don't block sign-in
       startFirebaseOtp(phone);
     }
   } else {

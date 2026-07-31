@@ -39,7 +39,10 @@ export async function onRequest(context) {
             (SELECT o2.name FROM orders o2 WHERE o2.phone = o.phone AND o2.name IS NOT NULL AND o2.name != 'Guest' ORDER BY o2.created_at DESC LIMIT 1),
             'Guest'
           ) AS name,
-          (SELECT u.email FROM users u WHERE u.phone = o.phone AND u.email IS NOT NULL LIMIT 1) AS email,
+          COALESCE(
+            (SELECT u.email FROM users u WHERE u.phone = o.phone AND u.email IS NOT NULL LIMIT 1),
+            (SELECT o3.email FROM orders o3 WHERE o3.phone = o.phone AND o3.email IS NOT NULL ORDER BY o3.created_at DESC LIMIT 1)
+          ) AS email,
           COUNT(*) AS order_count,
           COALESCE(SUM(o.total), 0) AS lifetime_total,
           MIN(o.created_at) AS created_at

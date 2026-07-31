@@ -29,10 +29,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260724a"></script>
-<script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=19"></script>
-<script src="tryon.js?v=1" defer></script>
+<script src="layout.js?v=20260731c"></script>
+<script src="mpa.js?v=15" defer></script>
+<script src="catalog.js?v=20"></script>
+<script src="tryon.js?v=2" defer></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -97,14 +97,14 @@
   .pdp-pincheck-result { margin-top:8px; font-family:'Montserrat',sans-serif; font-size:12px; color:#0B291C; min-height:16px; }
   .pdp-pincheck-result.err { color:#c0392b; }
   .pdp-noreturn a { color: #0B291C; }
-  /* reviews — single column: horizontal-scrolling review strip on top (never
+  /* reviews - single column: horizontal-scrolling review strip on top (never
      reserves empty vertical space, however many/few reviews exist), compact
      "write a review" form below it. */
   .rv-wrap { max-width: 760px; margin: 16px auto 0; padding: 16px 0 0; border-top: 1px solid #eae5d8; }
   .rv-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
   .rv-title { font-family:'Playfair Display',serif; font-size: 19px; color: #1A1A1A; margin: 0; }
   .rv-avg { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #C5A880; }
-  /* minimal, no card/box — plain text separated by a hairline divider, like a
+  /* minimal, no card/box - plain text separated by a hairline divider, like a
      product-review strip on a retail site rather than a stack of bordered tiles */
   .rv-right { display: flex; gap: 0; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scroll-snap-type: x proximity; }
   .rv-item { flex: 0 0 200px; scroll-snap-align: start; padding: 0 16px; border-left: 1px solid #eae5d8; }
@@ -164,7 +164,7 @@
   .pdp-buy:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,41,28,.32); background: #071B12; }
   .pdp-buy:disabled { border-color: #ddd6c6; color: #3a3a3a; background: #f3f0e9; cursor: not-allowed; }
   .pdp-buy:disabled:hover { transform: none; box-shadow: none; background: #f3f0e9; color: #3a3a3a; }
-  /* Full-width accordion (description / details / care) — sits below the
+  /* Full-width accordion (description / details / care) - sits below the
      product grid so the details fill the row instead of stacking in a narrow
      column beside a blank left half. */
   .pdp-acc { max-width: 1080px; margin: 40px auto 0; border-top: 1px solid #eae5d8; }
@@ -209,10 +209,10 @@
     .pdp-qty .pdp-v { width: 50px; height: 48px; font-size: 15px; }
     .pdp-add { height: 52px; font-size: 12px; letter-spacing: 2.2px; }
     .pdp-buy { height: 52px; font-size: 12px; letter-spacing: 2.2px; }
-    /* Static CTAs replaced by the floating bar on mobile — one set of buttons, not two */
+    /* Static CTAs replaced by the floating bar on mobile - one set of buttons, not two */
     .pdp-qtyrow .pdp-add { display: none; }
     .pdp-buy { display: none; }
-    /* Floating CTA bar on mobile — visible from load, hides once reviews are reached */
+    /* Floating CTA bar on mobile - visible from load, hides once reviews are reached */
     .pdp-mobile-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid rgba(90,136,0,.28); box-shadow: 0 -6px 24px rgba(11,41,28,.08); transform: translateY(120%); transition: transform .4s cubic-bezier(.25,1,.5,1); }
     .pdp-mobile-bar.on { transform: translateY(0); }
     .pdp-mobile-bar .price { flex: none; font-family:'Playfair Display',serif; font-size: 21px; font-weight: 700; color: #14110A; align-self: center; padding: 0 4px; }
@@ -289,9 +289,9 @@
             <span class="pdp-save" id="pdp-save"></span>
           </div>
           <div class="pdp-tax">incl. of all taxes</div>
-          <div class="pdp-ship"><span class="free">✓ FREE Insured Delivery</span> across India — no extra charges at checkout</div>
+          <div class="pdp-ship"><span class="free">✓ FREE Insured Delivery</span> across India - no extra charges at checkout</div>
           <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
-          <div class="pdp-noreturn"><strong>Country of origin:</strong> India · <strong>Manufactured by:</strong> Saubhagya Jewellery</div>
+          <div class="pdp-noreturn"><strong>Country of origin:</strong> India · <strong>Manufactured by:</strong> Saubhagya Jewellery<br><a href="shipping-and-returns.html">Return &amp; defect policy</a></div>
           <div class="pdp-pincheck">
             <div class="pdp-pincheck-title">CHECK DELIVERY DATE</div>
             <div class="pdp-pincheck-row">
@@ -311,13 +311,13 @@
           <button class="pdp-buy" id="pdp-buynow">BUY IT NOW</button>
           <button class="pdp-tryon" id="pdp-tryon" type="button" style="display:none">
             <span class="pdp-tryon-ic">✨</span>
-            <span class="pdp-tryon-tx"><strong>Try It On</strong><small>See it on you — live mirror</small></span>
+            <span class="pdp-tryon-tx"><strong>Try It On</strong><small>See it on you - live mirror</small></span>
             <span class="pdp-tryon-cam" aria-hidden="true">📷</span>
           </button>
         </div>
       </div>
 
-      <!-- Description / details / care — full-width collapsible accordion -->
+      <!-- Description / details / care - full-width collapsible accordion -->
       <section class="pdp-acc" id="pdp-acc">
         <div class="pdp-acc-item">
           <button class="pdp-acc-head" type="button" aria-expanded="false"><span>Description</span><span class="pdp-acc-ic" aria-hidden="true"></span></button>
@@ -336,7 +336,7 @@
       <!-- COMPLETE THE LOOK (cross-sell / bundle) -->
       <section class="ctl-wrap" id="ctl-wrap" style="display:none">
         <h2 class="ctl-title">Complete the Look</h2>
-        <p class="ctl-sub">Pair it with a matching piece — free insured shipping on the whole order.</p>
+        <p class="ctl-sub">Pair it with a matching piece - free insured shipping on the whole order.</p>
         <div class="ctl-grid" id="ctl-grid"></div>
       </section>
 
@@ -347,7 +347,7 @@
           <span class="rv-avg" id="rv-avg"></span>
         </div>
         <div class="rv-right" id="rv-right">
-          <div id="rv-list"><div class="rv-empty-nice">Be the first to review —<br>your feedback helps others find their perfect piece.</div></div>
+          <div id="rv-list"><div class="rv-empty-nice">Be the first to review -<br>your feedback helps others find their perfect piece.</div></div>
         </div>
         <button type="button" class="rv-seeall" id="rv-seeall" style="display:none"></button>
         <div class="rv-form">
@@ -425,7 +425,7 @@
     var twImg = document.querySelector('meta[name="twitter:image"]');
     if (!twImg) { twImg = document.createElement('meta'); twImg.setAttribute('name','twitter:image'); document.head.appendChild(twImg); }
     twImg.setAttribute('content', absImg);
-    // Breadcrumb — points to Categories hub (regional pages retired)
+    // Breadcrumb - points to Categories hub (regional pages retired)
     $('pdp-crumb').innerHTML = '<a href="index.html">Home</a><i>/</i><a href="categories.html">Categories</a><i>/</i><span>' + p.name + '</span>';
     $('pdp-cat').textContent = p.category || '';
     $('pdp-name').textContent = p.name;
@@ -453,7 +453,7 @@
       $('pdp-save').textContent = '';
     }
     var mp = $('pdp-mobile-price'); if (mp) mp.textContent = fmt(p.price);
-    $('pdp-image').alt = p.name + ' — ' + seo;
+    $('pdp-image').alt = p.name + ' - ' + seo;
     $('pdp-desc').innerHTML = pdpDescription(p, seo);
     renderSpec(p);
     renderCompleteTheLook(p);
@@ -462,22 +462,22 @@
     if (toBtn && window.SJTryOn && window.SJTryOn.supported()) {
       toBtn.style.display = 'flex';
       toBtn.querySelector('.pdp-tryon-tx small').textContent =
-        (p.category === 'Necklace') ? 'See it on your neckline — live mirror' : 'See it on your ears — live mirror';
+        (p.category === 'Necklace') ? 'See it on your neckline - live mirror' : 'See it on your ears - live mirror';
       toBtn.onclick = function () { window.SJTryOn.open(p); };
       window.SJ_TRYON_ADD = function () { var b = $('pdp-addcart'); if (b) b.click(); };
     } else if (toBtn) { toBtn.style.display = 'none'; }
     // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")
     var stockLbl = '', stockCls = '';
     if (p.inStock === 0 || p.inStock === false) { stockLbl = 'Out of stock'; stockCls = 'low'; }
-    else if (typeof p.stock_count === 'number' && p.stock_count <= 0) { stockLbl = 'Out of stock — check back soon'; stockCls = 'low'; }
-    else if (typeof p.stock_count === 'number' && p.stock_count > 0 && p.stock_count <= 3) { stockLbl = 'Only ' + p.stock_count + ' left — order soon'; stockCls = 'low'; }
+    else if (typeof p.stock_count === 'number' && p.stock_count <= 0) { stockLbl = 'Out of stock - check back soon'; stockCls = 'low'; }
+    else if (typeof p.stock_count === 'number' && p.stock_count > 0 && p.stock_count <= 3) { stockLbl = 'Only ' + p.stock_count + ' left - order soon'; stockCls = 'low'; }
     else stockLbl = 'In stock · dispatches within 2–4 business days';
     $('pdp-stock-txt').textContent = stockLbl;
     $('pdp-stock').className = 'pdp-stock ' + stockCls;
     $('pdp-stock').style.display = 'inline-flex';
     // Out of stock: Add to Bag stays live (so a signed-in customer can still
     // queue it up and buy once it's back). Buy Now is hidden entirely rather
-    // than shown disabled — nothing to click means nothing to be confused by.
+    // than shown disabled - nothing to click means nothing to be confused by.
     isOos = (p.inStock === 0 || p.inStock === false || (typeof p.stock_count === 'number' && p.stock_count <= 0));
     $('pdp-addcart').style.display = '';
     $('pdp-addcart').textContent = isOos ? 'ADD TO BAG FOR LATER' : 'ADD TO BAG';
@@ -497,7 +497,7 @@
     $('pdp-loading').style.display = 'none';
     $('pdp-content').style.display = 'block';
     // Product JSON-LD is injected server-side by functions/product.js (SSR shell
-    // rewrite) so crawlers see it in the first response — no client duplicate needed.
+    // rewrite) so crawlers see it in the first response - no client duplicate needed.
     try {
       if (window.gtag) {
         window.gtag('event', 'view_item', {
@@ -508,7 +508,7 @@
     } catch (e) {}
   }
 
-  /* "Complete the Look" cross-sell — suggests pieces from the COMPLEMENTARY
+  /* "Complete the Look" cross-sell - suggests pieces from the COMPLEMENTARY
      category (necklace PDP -> earrings, and vice-versa) to lift order value.
      One card per design (skips colour-variant duplicates), current item and
      out-of-stock excluded. Falls back to same-category picks if needed. */
@@ -530,7 +530,7 @@
             x.inStock !== 0 && x.inStock !== false && x.category === p.category;
         });
       }
-      if (!pool.length) return true; // nothing to show — leave hidden
+      if (!pool.length) return true; // nothing to show - leave hidden
       // light shuffle so it's not always the same 4
       for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
       var picks = pool.slice(0, 4);
@@ -569,7 +569,7 @@
     return { label: (opts[act] && opts[act].label) || '', count: opts.length };
   }
 
-  /* Attribute-driven product description — auto-built from the fields entered
+  /* Attribute-driven product description - auto-built from the fields entered
      in admin (name, category, colour, weight). No two categories read the same
      and the copy carries the keywords shoppers actually search. Zero per-
      product maintenance: add a product, this writes its description. */
@@ -622,7 +622,7 @@
   }
 
   /* Specs + care. Material is Zamak alloy across the range; weight comes from
-     D1 (admin fills it in — shown as "updating" until then). Care list tells
+     D1 (admin fills it in - shown as "updating" until then). Care list tells
      the buyer what to avoid so the plating lasts. */
   function renderSpec(p) {
     var det = $('pdp-details');
@@ -651,11 +651,11 @@
       row('Product Code', esc2(p.sku || sku)) +
       row('Origin', 'Handcrafted in Mumbai, India');
     if (care) care.innerHTML = '<ul>' +
-      '<li><strong>Avoid water, sweat &amp; humidity</strong> — remove before bathing, swimming or workouts.</li>' +
-      '<li><strong>Keep away from perfume, deodorant &amp; hairspray</strong> — spray first, wear jewellery last.</li>' +
-      '<li><strong>No harsh chemicals</strong> — soap, sanitiser, lotion and cleaning agents dull the plating.</li>' +
-      '<li><strong>Store dry &amp; separate</strong> — keep in the pouch/box, away from other metal, in a moisture-free spot.</li>' +
-      '<li><strong>Wipe after use</strong> — a soft dry cloth only; never rub with tissue or water.</li>' +
+      '<li><strong>Avoid water, sweat &amp; humidity</strong> - remove before bathing, swimming or workouts.</li>' +
+      '<li><strong>Keep away from perfume, deodorant &amp; hairspray</strong> - spray first, wear jewellery last.</li>' +
+      '<li><strong>No harsh chemicals</strong> - soap, sanitiser, lotion and cleaning agents dull the plating.</li>' +
+      '<li><strong>Store dry &amp; separate</strong> - keep in the pouch/box, away from other metal, in a moisture-free spot.</li>' +
+      '<li><strong>Wipe after use</strong> - a soft dry cloth only; never rub with tissue or water.</li>' +
       '</ul>';
     function row(k, v) {
       return '<div class="pdp-spec-row"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
@@ -678,7 +678,7 @@
     });
   })();
 
-  /* Colour variants — each colour is its own SKU row in D1; p.variants
+  /* Colour variants - each colour is its own SKU row in D1; p.variants
      ([{sku,label,image}]) links the siblings. Clicking a swatch/thumb swaps
      the WHOLE product (sku, image, stock, name) with a crossfade, so the
      cart receives the exact colour SKU. Legacy rows without variants fall
@@ -752,7 +752,7 @@
     var box = $('pdp-swatches');
     var lbl = $('pdp-color-lbl');
     var opts = getImageOpts(p);
-    // A lone swatch is meaningless — only show swatches for a real choice (2+)
+    // A lone swatch is meaningless - only show swatches for a real choice (2+)
     if (opts.length < 2) { box.style.display = 'none'; box.innerHTML = ''; lbl.style.display = 'none'; return; }
     var act = activeOptIndex(p, opts);
     if (opts[act] && opts[act].label) {
@@ -841,7 +841,7 @@
   $('pdp-pin').addEventListener('keydown', function(e) { if (e.key === 'Enter') doPinCheck(); });
   try { var stored = localStorage.getItem('cc_pin'); if (stored) { $('pdp-pin').value = stored; doPinCheck(); } } catch(e) {}
 
-  // Single write path — calling both MPA.addToCart AND a manual write doubled the qty
+  // Single write path - calling both MPA.addToCart AND a manual write doubled the qty
   function addToBag() {
     try {
       if (window.gtag && product) {
@@ -873,7 +873,7 @@
     window.location.href = 'checkout.html';
   });
 
-  /* Sticky mobile CTA bar — mirrors ADD TO BAG + BUY NOW, reveals on scroll */
+  /* Sticky mobile CTA bar - mirrors ADD TO BAG + BUY NOW, reveals on scroll */
   var mAdd = $('pdp-mobile-add'), mBuy = $('pdp-mobile-buy'), mBar = $('pdp-mobile-bar');
   if (mAdd) mAdd.addEventListener('click', function () {
     if (!product) return;
@@ -963,7 +963,7 @@
             $('rv-seeall').style.display = 'none';
           }
         } else {
-          $('rv-list').innerHTML = '<div class="rv-empty-nice">Be the first to review —<br>your feedback helps others find their perfect piece.</div>';
+          $('rv-list').innerHTML = '<div class="rv-empty-nice">Be the first to review -<br>your feedback helps others find their perfect piece.</div>';
           $('rv-seeall').style.display = 'none';
         }
       }).catch(function() {});

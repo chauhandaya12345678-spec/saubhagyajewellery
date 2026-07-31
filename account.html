@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260724a"></script>
-<script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=19"></script>
+<script src="layout.js?v=20260731c"></script>
+<script src="mpa.js?v=15" defer></script>
+<script src="catalog.js?v=20"></script>
 <style>
   * { box-sizing: border-box; }
   body { background:#F0F5FA; margin:0; }
@@ -61,13 +61,13 @@
         <div style="background:#fff;border:1px solid #eae5d8;border-radius:8px;padding:20px 22px;">
           <div style="display:grid;grid-template-columns:120px 1fr;gap:10px 16px;font-family:'Montserrat',sans-serif;font-size:13px;color:#3a3a3a;line-height:1.6;">
             <div style="color:#3a3a3a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Name</div>
-            <div id="pf-name" style="color:#1A1A1A;">—</div>
+            <div id="pf-name" style="color:#1A1A1A;">-</div>
             <div style="color:#3a3a3a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Email</div>
-            <div id="pf-email" style="color:#1A1A1A;word-break:break-word;">—</div>
+            <div id="pf-email" style="color:#1A1A1A;word-break:break-word;">-</div>
             <div style="color:#3a3a3a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Phone</div>
-            <div id="pf-phone" style="color:#1A1A1A;">—</div>
+            <div id="pf-phone" style="color:#1A1A1A;">-</div>
             <div style="color:#3a3a3a;text-transform:uppercase;font-size:10px;letter-spacing:1.5px;padding-top:2px;">Member since</div>
-            <div id="pf-since" style="color:#1A1A1A;">—</div>
+            <div id="pf-since" style="color:#1A1A1A;">-</div>
           </div>
           <div style="margin-top:14px;font-family:'Montserrat',sans-serif;font-size:13px;color:#3a3a3a;">
             To change your email or phone, write to <a href="mailto:care@saubhagyajewellery.com" style="color:#0B291C;">care@saubhagyajewellery.com</a>.
@@ -98,7 +98,7 @@
 
   function fmtDate(d) { if (!d) return ''; return new Date(String(d).replace(' ','T')+'Z').toLocaleDateString('en-IN', { month:'short', day:'numeric', year:'numeric' }); }
 
-  // Same status vocabulary as track-orders.html — live from ShipPrime, not the
+  // Same status vocabulary as track-orders.html - live from ShipPrime, not the
   // static D1 orders.status column (which just says "confirmed" from checkout
   // onward; real transit state only exists at the courier).
   var SP_LABELS = {
@@ -167,7 +167,7 @@
   }
 
   function profileUI(user, oldestOrder) {
-    $('pf-name').textContent = user.name || '—';
+    $('pf-name').textContent = user.name || '-';
     $('pf-email').textContent = user.email || 'Not on file';
     $('pf-phone').textContent = user.phone ? '+91 ' + user.phone : 'Not on file';
     var since = oldestOrder && oldestOrder.created_at

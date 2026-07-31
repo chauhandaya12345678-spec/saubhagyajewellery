@@ -117,12 +117,12 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <!-- DASHBOARD PANEL -->
     <div id="panel-dashboard">
       <div class="ai-dash-grid">
-        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="" data-date="today"><div class="ai-dash-num" id="dash-today-orders">—</div><div class="ai-dash-label">Today's Orders</div></div>
-        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="" data-date="today"><div class="ai-dash-num" id="dash-today-revenue">—</div><div class="ai-dash-label">Today's Revenue</div></div>
-        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="confirmed,packed" data-date=""><div class="ai-dash-num" id="dash-pending">—</div><div class="ai-dash-label">Pending to Ship</div></div>
-        <div class="ai-dash-card ai-dash-warn ai-dash-click" data-nav="orders" data-status="confirmed,packed" data-date=""><div class="ai-dash-num" id="dash-attention">—</div><div class="ai-dash-label">Needs Attention</div></div>
-        <div class="ai-dash-card ai-dash-warn ai-dash-click" data-nav="inventory-lowstock"><div class="ai-dash-num" id="dash-lowstock">—</div><div class="ai-dash-label">Low Stock SKUs</div></div>
-        <div class="ai-dash-card ai-dash-click" data-nav="customers"><div class="ai-dash-num" id="dash-customers">—</div><div class="ai-dash-label">Total Customers</div></div>
+        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="" data-date="today"><div class="ai-dash-num" id="dash-today-orders">-</div><div class="ai-dash-label">Today's Orders</div></div>
+        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="" data-date="today"><div class="ai-dash-num" id="dash-today-revenue">-</div><div class="ai-dash-label">Today's Revenue</div></div>
+        <div class="ai-dash-card ai-dash-click" data-nav="orders" data-status="confirmed,packed" data-date=""><div class="ai-dash-num" id="dash-pending">-</div><div class="ai-dash-label">Pending to Ship</div></div>
+        <div class="ai-dash-card ai-dash-warn ai-dash-click" data-nav="orders" data-status="confirmed,packed" data-date=""><div class="ai-dash-num" id="dash-attention">-</div><div class="ai-dash-label">Needs Attention</div></div>
+        <div class="ai-dash-card ai-dash-warn ai-dash-click" data-nav="inventory-lowstock"><div class="ai-dash-num" id="dash-lowstock">-</div><div class="ai-dash-label">Low Stock SKUs</div></div>
+        <div class="ai-dash-card ai-dash-click" data-nav="customers"><div class="ai-dash-num" id="dash-customers">-</div><div class="ai-dash-label">Total Customers</div></div>
       </div>
 
       <div class="ai-table-wrap" style="padding:20px 24px;margin-bottom:20px">
@@ -136,16 +136,16 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           </div>
         </div>
         <div class="ai-dash-grid" style="margin-bottom:0">
-          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-revenue">—</div><div class="ai-dash-label">Revenue</div></div>
-          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-orders">—</div><div class="ai-dash-label">Orders</div></div>
-          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-aov">—</div><div class="ai-dash-label">Avg Order Value</div></div>
+          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-revenue">-</div><div class="ai-dash-label">Revenue</div></div>
+          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-orders">-</div><div class="ai-dash-label">Orders</div></div>
+          <div class="ai-dash-card"><div class="ai-dash-num" id="dash-period-aov">-</div><div class="ai-dash-label">Avg Order Value</div></div>
         </div>
       </div>
 
       <div class="ai-dash-grid">
-        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-cod-today">—</div><div class="ai-dash-label">COD Orders Today</div></div>
-        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-online-today">—</div><div class="ai-dash-label">Online Orders Today</div></div>
-        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-rto">—</div><div class="ai-dash-label">Total RTO</div></div>
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-cod-today">-</div><div class="ai-dash-label">COD Orders Today</div></div>
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-online-today">-</div><div class="ai-dash-label">Online Orders Today</div></div>
+        <div class="ai-dash-card"><div class="ai-dash-num" id="dash-rto">-</div><div class="ai-dash-label">Total RTO</div></div>
       </div>
       <div class="ai-status" id="dash-status"></div>
     </div>
@@ -193,7 +193,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         <span style="display:inline-flex;gap:6px;align-items:center;border-left:1px solid #ddd6c6;padding-left:10px;margin-left:4px">
           <input type="text" id="i-up-sku" placeholder="SKU (e.g. SJ-SN06-GL)" style="width:150px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
           <input type="file" id="i-up-file" accept="image/webp,image/jpeg,image/png" style="font-size:11px;max-width:150px">
-          <button class="ai-btn small" id="i-up-btn" type="button" title="Upload a photo to R2 and set it on this SKU — no deploy needed">UPLOAD IMG</button>
+          <button class="ai-btn small" id="i-up-btn" type="button" title="Upload a photo to R2 and set it on this SKU - no deploy needed">UPLOAD IMG</button>
         </span>
       </div>
       <!-- NEW PRODUCT -->
@@ -261,7 +261,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <!-- USERS PANEL (owner only) -->
     <div id="panel-users" style="display:none">
       <div class="ai-table-wrap" style="padding:20px;margin-bottom:20px">
-        <div style="font-size:12px;color:#9a9a9a;margin-bottom:12px">Add admin account — staff gets read-only access (view, export CSV, print packing slips; no editing).</div>
+        <div style="font-size:12px;color:#9a9a9a;margin-bottom:12px">Add admin account - staff gets read-only access (view, export CSV, print packing slips; no editing).</div>
         <div class="ai-form-row">
           <input type="text" id="u-new-username" placeholder="Username">
           <input type="password" id="u-new-password" placeholder="Password (min 8 chars)">
@@ -321,7 +321,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     if (isNaN(d.getTime())) return esc(s);
     return d.toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
-  // order.total is stored in paise (see functions/api/orders/save.js) — always
+  // order.total is stored in paise (see functions/api/orders/save.js) - always
   // divide by 100 before display, never print the raw integer.
   function inr(paise) {
     var r = (Number(paise) || 0) / 100;
@@ -329,7 +329,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
   function rupeeNum(paise) { return ((Number(paise) || 0) / 100).toFixed(2); }
 
-  // Dispatch SLA by PIN zone — mirrors etaForPin() in functions/api/_lib.js:
+  // Dispatch SLA by PIN zone - mirrors etaForPin() in functions/api/_lib.js:
   // Mumbai 400/401 → 4 days, Maharashtra 41-44 → 5 days, rest of India → 8 days.
   function dispatchDeadline(createdAt, pin) {
     var p = String(pin || '').replace(/\D/g, '');
@@ -341,7 +341,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
   var PRE_SHIP_STATUSES = ['confirmed', 'packed'];
 
-  // Live ShipPrime status overlay — same public endpoint account.html uses
+  // Live ShipPrime status overlay - same public endpoint account.html uses
   // (no admin key needed), so the admin panel always shows the same truth
   // customers see instead of the D1 cache, which only updates via webhook.
   var SP_LABELS = {
@@ -497,7 +497,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           var addr = o.address || {};
           var addrLine = [addr.street, addr.apt, addr.city, addr.state, addr.pin].filter(Boolean).map(esc).join(', ');
           var items = (o.items || []).map(function (it) {
-            return '<div>' + esc(it.name || it.sku || '') + ' × ' + esc(it.qty || it.quantity || 1) + '<br><span style="font-size:11px;font-weight:600;color:#c0392b">SKU: ' + esc(it.sku || it.id || '—') + '</span></div>';
+            return '<div>' + esc(it.name || it.sku || '') + ' × ' + esc(it.qty || it.quantity || 1) + '<br><span style="font-size:11px;font-weight:600;color:#c0392b">SKU: ' + esc(it.sku || it.id || '-') + '</span></div>';
           }).join('');
           var badgeClass = 'b-' + String(o.status || '').toLowerCase().replace(/\s+/g, '_');
           var actions = '<div class="ai-actions">';
@@ -519,7 +519,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
             '<td>' + inr(o.total) + '</td>' +
             '<td class="ai-status-cell"><span class="ai-badge ' + badgeClass + '">' + esc(o.status || '') + '</span>' +
               (needsAttention ? '<div class="ai-attention-flag">Needs attention</div>' : '') + '</td>' +
-            '<td class="ai-oid">' + esc(o.shipprime_awb || '—') + '</td>' +
+            '<td class="ai-oid">' + esc(o.shipprime_awb || '-') + '</td>' +
             '<td>' + actions + '</td>' +
             '</tr>';
         }).join('');
@@ -539,7 +539,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 
   // Overlays live ShipPrime status onto each row so the panel never shows a
   // stale D1-cached status when the webhook hasn't caught up (or isn't wired
-  // up in the ShipPrime dashboard) — same source of truth as account.html.
+  // up in the ShipPrime dashboard) - same source of truth as account.html.
   function syncLiveStatuses(orders) {
     orders.forEach(function (o) {
       if (!o.shipprime_awb) return;
@@ -593,7 +593,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       '<style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{font-size:18px;margin:0 0 4px}' +
       'table{width:100%;border-collapse:collapse;margin-top:16px}th{text-align:left;font-size:11px;letter-spacing:1px;color:#666;border-bottom:2px solid #111;padding-bottom:6px}' +
       '.meta{font-size:13px;line-height:1.7;margin-top:14px}</style></head><body>' +
-      '<h1>SAUBHAGYA JEWELLERY — PACKING SLIP</h1>' +
+      '<h1>SAUBHAGYA JEWELLERY - PACKING SLIP</h1>' +
       '<div style="font-size:12px;color:#666">Order ' + esc(o.id) + ' · ' + esc(fmtDate(o.created_at)) + '</div>' +
       '<div class="meta"><strong>Ship to:</strong><br>' + esc(o.name || '') + '<br>' + addrLine + '<br>' + esc(o.phone || '') + '</div>' +
       '<table><thead><tr><th>SKU</th><th>Item</th><th style="text-align:right">Qty</th></tr></thead><tbody>' + itemRows + '</tbody></table>' +
@@ -663,7 +663,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           '<input class="ai-input" style="width:160px;margin:0" type="text" value="' + esc(p.name) + '" data-field="name" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit name">✎</button>' +
         '</div></td>' +
-        /* numeric fields locked by default — ✎ unlocks (prevents accidental
+        /* numeric fields locked by default - ✎ unlocks (prevents accidental
            price/stock edits while scrolling the table) */
         '<td><div class="ai-cell-flex"><input class="ai-num" style="width:70px;margin:0" type="number" min="0" step="1" value="' + (p.price != null ? p.price : '') + '" data-field="price" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit price">✎</button></div></td>' +
@@ -710,13 +710,13 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
 
   // One-click save of every edited row. Reloads afterwards so all fields
-  // re-lock — fixes fields staying editable (and auto-committing) after a save.
+  // re-lock - fixes fields staying editable (and auto-committing) after a save.
   function saveAllEdited() {
     var btn = document.getElementById('i-saveall-btn');
     var status = document.getElementById('i-load-status');
     var rows = Array.prototype.slice.call(document.querySelectorAll('#i-tbody tr'));
     var edits = rows.map(collectRowBody).filter(function (b) { return Object.keys(b).length > 1; });
-    if (!edits.length) { status.textContent = 'Nothing to save — click ✎ to edit a field first.'; return; }
+    if (!edits.length) { status.textContent = 'Nothing to save - click ✎ to edit a field first.'; return; }
     btn.disabled = true; btn.textContent = 'SAVING…'; status.textContent = 'Saving ' + edits.length + '…';
     var ok = 0, errs = [];
     Promise.all(edits.map(function (body) {
@@ -732,7 +732,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
   document.getElementById('i-saveall-btn').addEventListener('click', saveAllEdited);
 
-  // Upload a product photo straight to R2 and set it on the SKU — zero deploy.
+  // Upload a product photo straight to R2 and set it on the SKU - zero deploy.
   document.getElementById('i-up-btn').addEventListener('click', function () {
     var status = document.getElementById('i-load-status');
     var fileEl = document.getElementById('i-up-file');
@@ -786,7 +786,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       }).then(function (d) {
         btn.disabled = false; btn.textContent = 'ADD PRODUCT';
         if (d && d.success) {
-          st.style.color = '#23784a'; st.textContent = '✓ Added ' + sku + ' — live on the website';
+          st.style.color = '#23784a'; st.textContent = '✓ Added ' + sku + ' - live on the website';
           ['np-name', 'np-sku', 'np-category', 'np-price', 'np-mrp', 'np-weight', 'np-stock'].forEach(function (id) { document.getElementById(id).value = ''; });
           fileEl.value = '';
           if (typeof loadProducts === 'function') loadProducts();
@@ -978,8 +978,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         tbody.innerHTML = d.users.map(function (u) {
           var expired = u.role_expires_at && new Date(u.role_expires_at.replace(' ', 'T') + 'Z') <= new Date();
           var expiryText = u.role_expires_at
-            ? esc(u.role_expires_at.slice(0, 10)) + (expired ? ' <span style="color:#c0392b">(expired — logs in as staff)</span>' : '')
-            : (u.role === 'owner' ? '<span style="color:#9a9a9a">Permanent</span>' : '—');
+            ? esc(u.role_expires_at.slice(0, 10)) + (expired ? ' <span style="color:#c0392b">(expired - logs in as staff)</span>' : '')
+            : (u.role === 'owner' ? '<span style="color:#9a9a9a">Permanent</span>' : '-');
           return '<tr>' +
             '<td>' + esc(u.username) + '</td>' +
             '<td><span class="ai-badge ' + (u.role === 'owner' ? 'b-confirmed' : 'b-packed') + '">' + esc(u.role) + '</span></td>' +

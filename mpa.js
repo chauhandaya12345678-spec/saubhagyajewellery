@@ -3,7 +3,7 @@
  * ------------------------------------------------------------
  * Self-contained hydration layer for every NON-SPA page
  * (about.html, contact.html, collection pages, track-orders…).
- * Zero dependencies — do NOT load support.js/React on these
+ * Zero dependencies - do NOT load support.js/React on these
  * pages; support.js is the generated DC runtime for index.html
  * only and must not be hand-edited.
  *
@@ -118,7 +118,7 @@
         if (!iconOnly) a.textContent = 'Hi, ' + first;
         a.setAttribute('href', a.getAttribute('data-mpa-account-href') || 'index.html');
         a.setAttribute('title', iconOnly ? ('Hi, ' + first) : (user.email || user.phone || ''));
-        a.setAttribute('aria-label', iconOnly ? ('Account — Hi, ' + first) : (a.getAttribute('aria-label') || ''));
+        a.setAttribute('aria-label', iconOnly ? ('Account - Hi, ' + first) : (a.getAttribute('aria-label') || ''));
       } else {
         if (!iconOnly) a.textContent = 'Sign in';
         a.setAttribute('href', a.getAttribute('data-mpa-signin-href') || 'index.html');
@@ -156,7 +156,7 @@
           emit('orders');
         }
       })
-      .catch(function () { /* silent — network can fail on static pages */ });
+      .catch(function () { /* silent - network can fail on static pages */ });
   }
 
   function initMPA() {

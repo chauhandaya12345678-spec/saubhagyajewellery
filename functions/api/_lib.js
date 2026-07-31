@@ -150,6 +150,23 @@ export function genSessionToken() {
    path, which never creates an account — recover the real name/email from
    their most recent orders row instead of defaulting to "Guest" and locking
    in a wrong name permanently. Shared by every OTP-based sign-in path. */
+/* Attach past guest orders (user_id IS NULL) to a now-signed-in account by
+   phone suffix. Without this, an order placed as a guest never shows in the
+   customer's profile even though track-orders (by phone+order id) finds it —
+   the "order in Track but 'no orders yet' in profile" bug. Matches on the
+   last 10 digits since orders.phone is bare 10-digit and users.phone may carry
+   a +91 prefix. Best-effort; never throws. */
+export async function linkGuestOrders(db, userId, phone) {
+  if (!userId || !phone) return;
+  const last10 = String(phone).replace(/\D/g, '').slice(-10);
+  if (last10.length < 10) return;
+  try {
+    await db.prepare(
+      "UPDATE orders SET user_id = ? WHERE user_id IS NULL AND phone IS NOT NULL AND phone LIKE '%' || ?"
+    ).bind(userId, last10).run();
+  } catch (e) {}
+}
+
 export async function findOrCreateUserByPhone(db, phone, opts) {
   opts = opts || {};
   let user = await db.prepare('SELECT * FROM users WHERE phone = ?').bind(phone).first();
@@ -159,6 +176,7 @@ export async function findOrCreateUserByPhone(db, phone, opts) {
         await db.prepare("UPDATE users SET is_guest = 0, updated_at = datetime('now') WHERE id = ?").bind(user.id).run();
       } catch (e) {}
     }
+    await linkGuestOrders(db, user.id, phone);
     return user;
   }
   let recoveredName = null, recoveredEmail = null;
@@ -175,6 +193,7 @@ export async function findOrCreateUserByPhone(db, phone, opts) {
     const created = await db.prepare(
       'INSERT INTO users (name, phone, email, password, is_guest) VALUES (?, ?, ?, ?, 0)'
     ).bind(name, phone, email, autoPwd).run();
+    await linkGuestOrders(db, created.meta.last_row_id, phone);
     return { id: created.meta.last_row_id, name, email, phone };
   } catch (e) {
     if (!/no such column/i.test(e.message)) throw e;

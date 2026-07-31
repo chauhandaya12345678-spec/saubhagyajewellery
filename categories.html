@@ -23,14 +23,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260724a"></script>
-<script src="mpa.js?v=14" defer></script>
-<script src="catalog.js?v=19"></script>
+<script src="layout.js?v=20260731c"></script>
+<script src="mpa.js?v=15" defer></script>
+<script src="catalog.js?v=20"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://saubhagyajewellery.com/categories"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Shop by Category | Saubhagya Jewellery","url":"https://saubhagyajewellery.com/categories","description":"Shop Saubhagya jewellery by category: necklaces, chokers, waist chains, jhumkas, earrings, pendants, bridal sets and South temple necklaces.","isPartOf":{"@type":"WebSite","name":"Saubhagya Jewellery","url":"https://saubhagyajewellery.com/"}}</script>
 <style>
   body { background: #F0F5FA; margin: 0; }
-  /* Hero band over a real model photo — dark overlay keeps text legible */
+  /* Hero band over a real model photo - dark overlay keeps text legible */
   .cat-hero { position: relative; max-width: 1280px; margin: 14px auto 0; padding: 96px 40px 88px; text-align: center; border-radius: 18px; overflow: hidden;
     background-image: linear-gradient(rgba(11,41,28,.58), rgba(11,41,28,.72)), url('images/models/hero-wide.webp');
     background-size: cover; background-position: center 28%; box-shadow: 0 30px 60px -34px rgba(11,41,28,.5); }
@@ -102,7 +102,7 @@
     .cat-title { font-size: 22px; }
     .cat-card { aspect-ratio: 3/4; }
   }
-  /* Scroll into cat-hub anchor on filter tap — offset for sticky header */
+  /* Scroll into cat-hub anchor on filter tap - offset for sticky header */
   .cat-filterbar { scroll-margin-top: 130px; }
 
 </style>
@@ -114,7 +114,7 @@
 <section class="cat-hero">
   <div class="cat-kicker">OUR COLLECTIONS</div>
   <h1 class="cat-title">Shop by Category</h1>
-  <p class="cat-sub">Necklaces, earrings and jhumka earrings — handcrafted in Mumbai, shipped free &amp; insured across India.</p>
+  <p class="cat-sub">Necklaces, earrings and jhumka earrings - handcrafted in Mumbai, shipped free &amp; insured across India.</p>
 </section>
 
 <section class="cat-hub">
@@ -145,7 +145,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
 
-  /* Subcategory definitions — each maps to a name/category matcher.
+  /* Subcategory definitions - each maps to a name/category matcher.
      `image` = a representative photo we already have.
      `match(p)` gets the product; returns true if it belongs.        */
   /* Tiles with model photography use `img`; categories still awaiting their
@@ -163,7 +163,7 @@
 
   function getParam(name) { return new URLSearchParams(location.search).get(name) || ''; }
 
-  // Jhumka is now part of Earrings — remap any old ?cat=jhumkas deep link.
+  // Jhumka is now part of Earrings - remap any old ?cat=jhumkas deep link.
   var _cat = getParam('cat');
   if (_cat === 'jhumkas') { _cat = 'earrings'; try { var u = new URL(location.href); u.searchParams.set('cat', 'earrings'); history.replaceState(null, '', u.toString()); } catch (e) {} }
   var current = { cat: _cat, q: getParam('q') };
@@ -213,7 +213,7 @@
       var img = p.image || '';
       var sku = p.sku || p.id;
       var vtn = 'prod-' + String(sku).replace(/[^A-Za-z0-9_-]/g, '');
-      var altText = esc(p.name + ' — ' + (p.category || 'handcrafted jewellery') + ' from Saubhagya Jewellery');
+      var altText = esc(p.name + ' - ' + (p.category || 'handcrafted jewellery') + ' from Saubhagya Jewellery');
       /* Multi-colour designs: crossfade all shades, no QUICK ADD (colour is
          chosen on the product page). Single-colour keeps QUICK ADD. */
       var vars = Array.isArray(p.variants) ? p.variants.filter(function (v) { return v && v.image; }) : [];
@@ -222,7 +222,7 @@
         ? vars.map(function (v, i) {
             return '<img class="im sj-fade' + (i === 0 ? ' on' : '') + '" src="' + esc(v.image) + '" alt="' + altText + '" loading="lazy" decoding="async" width="400" height="500"' + (i === 0 ? ' style="view-transition-name:' + vtn + '"' : '') + '>';
           }).join('')
-        : '<img class="im" src="' + esc(img) + '" alt="' + altText + '" title="' + esc(p.name) + ' — Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500" style="view-transition-name:' + vtn + '">';
+        : '<img class="im" src="' + esc(img) + '" alt="' + altText + '" title="' + esc(p.name) + ' - Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500" style="view-transition-name:' + vtn + '">';
       return '<a class="p-card" href="product?sku=' + encodeURIComponent(sku) + '" title="' + esc(p.name) + '">' +
         '<div class="p-img"' + (multi ? ' data-rot' : '') + '>' + imgsHtml +
           (multi ? '' : '<button class="tr-quick" data-sku="' + esc(sku) + '">QUICK ADD</button>') +

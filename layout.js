@@ -19,7 +19,7 @@
       fav.rel = 'icon'; fav.type = 'image/png'; fav.href = 'images/brand/favicon-mark.png?v=1';
       d.head.appendChild(fav);
     }
-    /* Google Analytics (gtag.js) — was homepage-only before; every page needs
+    /* Google Analytics (gtag.js) - was homepage-only before; every page needs
        it or product/category/checkout views never reach GA at all. */
     if (!window.__gtagLoaded) {
       window.__gtagLoaded = true;
@@ -173,10 +173,10 @@
     return '<header class="site">' +
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
-      '<a class="logo logo-real" href="index.html" title="Saubhagya Jewellery — Home">' +
+      '<a class="logo logo-real" href="index.html" title="Saubhagya Jewellery - Home">' +
       '<img class="brand-logo" src="images/brand/logo-mark-gold.png?v=1" alt="" width="45" height="45">' +
       '<span class="logo-stack"><span class="logo-name">SAUBHAGYA</span><span class="logo-sub">JEWELLERY</span></span>' +
-      '<span class="sr-only">Saubhagya Jewellery — handcrafted imitation jewellery, Mumbai. Home.</span>' +
+      '<span class="sr-only">Saubhagya Jewellery - handcrafted imitation jewellery, Mumbai. Home.</span>' +
       '</a>' +
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +

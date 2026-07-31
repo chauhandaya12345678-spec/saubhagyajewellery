@@ -2,7 +2,7 @@
 //  SAUBHAGYA - PRODUCT CATALOG
 //  ------------------------------------------------------------
 //  Products come from D1 database via /api/products.
-//  Zero-deploy architecture — update prices, stock, images
+//  Zero-deploy architecture - update prices, stock, images
 //  directly in D1, no push required.
 //
 //  For static SEO page regeneration, see build/site.js.
@@ -48,7 +48,7 @@
   function publish(catalog) {
     // Canonical product id = sku. D1 rows carry a numeric id while the static
     // fallback JSON has none, and SEO deep links (?product=CC-SI-001) use the
-    // sku — without this, links and carts break depending on data source.
+    // sku - without this, links and carts break depending on data source.
     catalog = (catalog || []).map(function (p) {
       var q = {};
       for (var k in p) q[k] = p[k];
@@ -57,7 +57,7 @@
       if (typeof q.variants === 'string' && q.variants) {
         try { q.variants = JSON.parse(q.variants); } catch (e) { q.variants = null; }
       }
-      // listing pages show ONE card per design — siblings beyond the first
+      // listing pages show ONE card per design - siblings beyond the first
       // colour are flagged so grids can skip them (cart/PDP still see all)
       q.isVariantDup = !!(Array.isArray(q.variants) && q.variants.length &&
         q.variants[0].sku && q.variants[0].sku !== q.id);
