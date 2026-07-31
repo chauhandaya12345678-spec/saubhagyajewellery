@@ -24,7 +24,9 @@ export async function onRequest(context) {
   const status = (url.searchParams.get('status') || '').trim().toLowerCase();
   const q = (url.searchParams.get('q') || '').trim();
   const date = (url.searchParams.get('date') || '').trim().toLowerCase();
-  const limit = Math.min(parseInt(url.searchParams.get('limit'), 10) || 200, 500);
+  const from = (url.searchParams.get('from') || '').trim(); // YYYY-MM-DD
+  const to = (url.searchParams.get('to') || '').trim();     // YYYY-MM-DD
+  const limit = Math.min(parseInt(url.searchParams.get('limit'), 10) || 500, 2000);
 
   try {
     const db = env.DB;
@@ -38,7 +40,13 @@ export async function onRequest(context) {
       clauses.push('status IN (' + statuses.map(() => '?').join(',') + ')');
       params.push(...statuses);
     }
+    // Relative windows (week/month/year) + today, plus an explicit from/to range.
     if (date === 'today') { clauses.push("date(created_at) = date('now')"); }
+    else if (date === 'week') { clauses.push("date(created_at) >= date('now','-7 days')"); }
+    else if (date === 'month') { clauses.push("date(created_at) >= date('now','-1 month')"); }
+    else if (date === 'year') { clauses.push("date(created_at) >= date('now','-1 year')"); }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(from)) { clauses.push("date(created_at) >= date(?)"); params.push(from); }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(to)) { clauses.push("date(created_at) <= date(?)"); params.push(to); }
     if (q) {
       clauses.push('(id LIKE ? OR phone LIKE ? OR name LIKE ? OR email LIKE ?)');
       const like = '%' + q + '%';

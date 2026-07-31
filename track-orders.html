@@ -28,46 +28,52 @@
   .track-btn:disabled { opacity:.6; cursor:not-allowed; }
   .track-btn:hover:not(:disabled) { background:#071B12; transform:translateY(-2px); box-shadow:0 6px 20px rgba(11,41,28,.25); }
 
-  .order-card { border:1px solid rgba(90,136,0,.25); border-radius:12px; padding:20px; background:#fff; margin-bottom:20px; }
-  .order-id-font { font-family:'Montserrat',sans-serif; font-size:14px; font-weight:600; letter-spacing:1px; color:#0B291C; font-variant-numeric:tabular-nums; }
-  .order-date { font-family:'Montserrat',sans-serif; font-size:13px; color:#3a3a3a; margin-top:3px; }
-  .order-total { font-family:'Montserrat',sans-serif; font-size:15px; font-weight:600; color:#0B291C; margin-left:auto; }
+  .order-card { position:relative; border:1px solid rgba(197,168,128,.35); border-radius:20px; padding:24px 24px 20px; margin-bottom:22px;
+    background:linear-gradient(160deg,#ffffff 0%,#fbfaf6 100%);
+    box-shadow:0 18px 44px -20px rgba(11,41,28,.4), 0 4px 12px rgba(11,41,28,.06), inset 0 1px 0 rgba(255,255,255,.9); }
+  .order-id-font { font-family:'Montserrat',sans-serif; font-size:15px; font-weight:700; letter-spacing:.8px; color:#14110A; font-variant-numeric:tabular-nums; }
+  .order-date { font-family:'Montserrat',sans-serif; font-size:13px; color:#6a6a6a; margin-top:4px; }
+  .order-total { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#14110A; margin-left:auto; }
 
-  /* Progress bar - absolute connector line under dots, no overflow */
-  .progress-bar { position:relative; display:flex; justify-content:space-between; margin:22px 4px 8px; padding:0 12px; }
-  .progress-bar::before {
-    content:''; position:absolute; top:8px; left:calc(10% + 12px); right:calc(10% + 12px);
-    height:2px; background:#e0dcd0; z-index:0; border-radius:2px;
-  }
-  .progress-bar::after {
-    content:''; position:absolute; top:8px; left:calc(10% + 12px);
-    width: calc(var(--pb-done, 0) * (80% - 24px));
-    height:2px; background:#0B291C; z-index:0; border-radius:2px;
-    transition:width .4s cubic-bezier(.25,1,.5,1);
-  }
+  /* Premium progress: icon circles + gradient connector */
+  .progress-bar { position:relative; display:flex; justify-content:space-between; margin:28px 0 6px; }
+  .progress-bar::before { content:''; position:absolute; top:22px; left:22px; right:22px; height:3px; background:#e6e1d5; z-index:0; border-radius:3px; }
+  .progress-bar::after { content:''; position:absolute; top:22px; left:22px; width:calc(var(--pb-done,0)*(100% - 44px)); height:3px;
+    background:linear-gradient(90deg,#134a34,#C8901F); z-index:0; border-radius:3px; transition:width .5s cubic-bezier(.25,1,.5,1); box-shadow:0 0 8px rgba(200,144,31,.4); }
   .progress-step { position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; min-width:0; }
-  .progress-dot { width:16px; height:16px; border-radius:50%; background:#e0dcd0; transition:background .3s, box-shadow .3s; }
-  .progress-dot.done { background:#0B291C; }
-  .progress-dot.current { background:#C5A880; box-shadow:0 0 0 4px rgba(90,136,0,.3); }
-  .progress-label { font-family:'Montserrat',sans-serif; font-size:9px; letter-spacing:.5px; color:#3a3a3a; margin-top:8px; text-align:center; line-height:1.3; word-break:break-word; }
-  .progress-label.done { color:#0B291C; font-weight:600; }
+  .progress-ic { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:19px;
+    background:#fff; border:2px solid #e6e1d5; box-shadow:0 2px 8px rgba(11,41,28,.08); transition:all .35s cubic-bezier(.25,1,.5,1); filter:grayscale(.6) opacity(.75); }
+  .progress-ic.done { background:linear-gradient(150deg,#1a6045,#0B291C); border-color:#0B291C; box-shadow:0 6px 16px -4px rgba(11,41,28,.45); filter:none; }
+  .progress-ic.current { background:linear-gradient(150deg,#E7CFA0,#C8901F); border-color:#C8901F; box-shadow:0 0 0 5px rgba(200,144,31,.22), 0 8px 20px -4px rgba(200,144,31,.5); filter:none; animation:tpulse 1.8s ease-in-out infinite; }
+  @keyframes tpulse { 0%,100%{box-shadow:0 0 0 5px rgba(200,144,31,.22),0 8px 20px -4px rgba(200,144,31,.5)} 50%{box-shadow:0 0 0 9px rgba(200,144,31,.10),0 8px 20px -4px rgba(200,144,31,.5)} }
+  .progress-label { font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.2px; color:#8a8a8a; margin-top:10px; text-align:center; line-height:1.3; }
+  .progress-label.done { color:#14110A; font-weight:700; }
 
-  .status-badge { display:inline-block; font-family:'Montserrat',sans-serif; font-size:9px; font-weight:500; letter-spacing:1.5px; padding:5px 14px; border-radius:20px; }
-  .status-CONFIRMED, .status-PACKED { background:#C5A880; color:#fff; }
-  .status-SHIPPED, .status-OUT_FOR_DELIVERY { background:#0B291C; color:#fff; }
-  .status-DELIVERED { background:#27ae60; color:#fff; }
-  .status-CANCELLED, .status-LOST, .status-RTO { background:#c0392b; color:#fff; }
+  .status-badge { display:inline-block; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; letter-spacing:1px; padding:6px 15px; border-radius:20px; box-shadow:0 2px 8px rgba(11,41,28,.12); }
+  .status-CONFIRMED, .status-PACKED { background:linear-gradient(135deg,#D9BE88,#C5A880); color:#241703; }
+  .status-SHIPPED, .status-OUT_FOR_DELIVERY { background:linear-gradient(135deg,#134a34,#0B291C); color:#fff; }
+  .status-DELIVERED { background:linear-gradient(135deg,#2ecc71,#27ae60); color:#fff; }
+  .status-CANCELLED, .status-LOST, .status-RTO { background:linear-gradient(135deg,#e05650,#c0392b); color:#fff; }
 
-  .track-link { display:inline-block; margin-top:12px; padding:10px 20px; background:#0B291C; color:#fff; text-decoration:none; font-family:'Montserrat',sans-serif; font-size:13px; letter-spacing:1px; border-radius:8px; }
-  .track-link:hover { background:#071B12; }
+  .track-link { display:inline-block; margin-top:12px; padding:11px 22px; background:linear-gradient(135deg,#134a34,#0B291C); color:#fff; text-decoration:none; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600; letter-spacing:.8px; border-radius:12px; box-shadow:0 4px 14px -4px rgba(11,41,28,.4); transition:all .3s; }
+  .track-link:hover { transform:translateY(-2px); box-shadow:0 8px 22px -6px rgba(11,41,28,.5); }
 
-  .guest-box { text-align:center; padding:30px 20px; border:1px solid #eae5d8; border-radius:12px; background:#faf8f3; }
-  .guest-box h3 { font-family:'Playfair Display',serif; font-size:18px; margin:0 0 8px; }
-  .guest-box p { font-family:'Montserrat',sans-serif; font-size:12px; color:#2b2b2b; margin:0 0 12px; }
+  .guest-box { text-align:center; padding:34px 22px; border:1px solid rgba(197,168,128,.35); border-radius:18px; background:linear-gradient(160deg,#fff,#faf8f3); box-shadow:0 12px 34px -18px rgba(11,41,28,.3); }
+  .guest-box h3 { font-family:'Playfair Display',serif; font-size:20px; margin:0 0 8px; }
+  .guest-box p { font-family:'Montserrat',sans-serif; font-size:13px; color:#2b2b2b; margin:0 0 14px; }
   .guest-box a { color:#0B291C; text-decoration:none; border-bottom:1px solid #C5A880; }
 
-  .eta-text { font-family:'Montserrat',sans-serif; font-size:12px; color:#2b2b2b; margin-top:8px; }
-  .eta-text strong { color:#0B291C; }
+  .eta-text { font-family:'Montserrat',sans-serif; font-size:13px; color:#2b2b2b; margin-top:12px; }
+  .eta-text strong { color:#0B291C; font-weight:700; }
+
+  /* Collapsible "look up another order" */
+  .track-manual-toggle { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; cursor:pointer;
+    border:1px solid rgba(197,168,128,.4); border-radius:14px; background:linear-gradient(160deg,#ffffff,#faf8f3);
+    box-shadow:0 6px 20px -10px rgba(11,41,28,.25); font-family:'Playfair Display',serif; font-size:16px; color:#14110A; transition:all .3s; }
+  .track-manual-toggle:hover { transform:translateY(-1px); box-shadow:0 10px 26px -10px rgba(11,41,28,.35); }
+  .track-manual-toggle .tmt-ic { font-family:'Montserrat',sans-serif; font-size:24px; font-weight:300; color:#C8901F; line-height:1; transition:transform .3s cubic-bezier(.25,1,.5,1); }
+  .track-manual-toggle.open .tmt-ic { transform:rotate(45deg); }
+  .track-manual-body { margin-top:14px; padding:24px 22px; background:#fff; border:1px solid #eae5d8; border-radius:14px; box-shadow:0 10px 30px -18px rgba(11,41,28,.3); }
 
   @media (max-width:600px) {
     .progress-label { font-size:8px; }
@@ -75,7 +81,7 @@
     .track-field { min-width:100%; }
     .track-row input { height:54px; font-size:15px; }
     .track-btn { width:100%; height:54px; margin-top:4px; }
-    .track-manual { padding:22px 18px !important; }
+    .track-manual-body { padding:20px 16px !important; }
   }
 </style>
 </head>
@@ -104,21 +110,25 @@
   </div>
 
   <!-- Manual lookup (always available below orders) -->
-  <div id="track-manual" class="track-manual" style="display:none; margin-top:28px; padding:28px 26px; background:#fff; border:1px solid #eae5d8; border-radius:14px;">
-    <h3 style="font-family:'Playfair Display',serif;font-size:16px;margin:0 0 6px;">Look up another order</h3>
-    <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:#3a3a3a;margin:0 0 4px;">Enter your phone number and order ID.</p>
-    <div class="track-form">
-      <div class="track-row">
-        <div class="track-field">
-          <label class="track-label" for="track-phone">Mobile Number</label>
-          <input id="track-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+  <div id="track-manual" class="track-manual" style="display:none; margin-top:28px;">
+    <button type="button" id="track-manual-toggle" class="track-manual-toggle">
+      <span>Look up another order</span><span class="tmt-ic" aria-hidden="true">+</span>
+    </button>
+    <div id="track-manual-body" class="track-manual-body" style="display:none;">
+      <p style="font-family:'Montserrat',sans-serif;font-size:13px;color:#3a3a3a;margin:0 0 14px;">Enter your phone number and order ID.</p>
+      <div class="track-form">
+        <div class="track-row">
+          <div class="track-field">
+            <label class="track-label" for="track-phone">Mobile Number</label>
+            <input id="track-phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number">
+          </div>
+          <div class="track-field">
+            <label class="track-label" for="track-oid">Order ID</label>
+            <input id="track-oid" type="text" placeholder="Order ID (CC-...)" style="text-transform:uppercase;">
+          </div>
         </div>
-        <div class="track-field">
-          <label class="track-label" for="track-oid">Order ID</label>
-          <input id="track-oid" type="text" placeholder="Order ID (CC-...)" style="text-transform:uppercase;">
-        </div>
+        <button class="track-btn" id="track-btn">TRACK</button>
       </div>
-      <button class="track-btn" id="track-btn">TRACK</button>
     </div>
   </div>
 
@@ -182,8 +192,8 @@
       var s = steps[i];
       var done = i <= idx;
       html += '<div class="progress-step">';
-      html += '<div class="progress-dot' + (done ? (i === idx ? ' current' : ' done') : '') + '"></div>';
-      html += '<div class="progress-label' + (done ? ' done' : '') + '">' + s.emoji + '<br>' + s.label + '</div>';
+      html += '<div class="progress-ic' + (done ? (i === idx ? ' current' : ' done') : '') + '">' + s.emoji + '</div>';
+      html += '<div class="progress-label' + (done ? ' done' : '') + '">' + s.label + '</div>';
       html += '</div>';
     }
     html += '</div>';
@@ -422,6 +432,17 @@
 
   // ── Button handlers ──
   $('track-btn').addEventListener('click', doTrack);
+  (function () {
+    var t = $('track-manual-toggle');
+    if (!t) return;
+    t.addEventListener('click', function () {
+      var body = $('track-manual-body');
+      var open = body.style.display !== 'none';
+      body.style.display = open ? 'none' : 'block';
+      t.classList.toggle('open', !open);
+      if (!open) { var p = $('track-phone'); if (p) setTimeout(function () { p.focus(); }, 60); }
+    });
+  })();
   $('track-oid').addEventListener('keydown', function(e) { if (e.key === 'Enter') doTrack(); });
   $('track-phone').addEventListener('keydown', function(e) { if (e.key === 'Enter') $('track-oid').focus(); });
 
