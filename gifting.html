@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722l">
+<link rel="stylesheet" href="site.css?v=20260731a">
 <script src="layout.js?v=20260724a"></script>
 <script src="mpa.js?v=14" defer></script>
 <script src="catalog.js?v=19"></script>
@@ -44,8 +44,9 @@
   .p-img .im { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform .6s cubic-bezier(.25,1,.5,1); }
   @media(hover:hover) { .p-card:hover .p-img .im { transform: scale(1.05); } }
   .p-name { font-family:'Playfair Display',serif; font-size: 17px; color: #1A1A1A; margin-top: 10px; }
-  .p-price { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #0B291C; font-weight: 500; margin-top: 3px; }
-  .p-mrp { font-family: 'Montserrat',sans-serif; font-size:13px; color: #3a3a3a; text-decoration: line-through; margin-left: 8px; font-weight: 300; }
+  .p-price { font-family: 'Montserrat',sans-serif; font-size: 18px; color: #14110A; font-weight: 700; margin-top: 5px; letter-spacing:.2px; }
+  .p-mrp { font-family: 'Montserrat',sans-serif; font-size:14px; color: #8a8a8a; text-decoration: line-through; margin-left: 8px; font-weight: 500; }
+  .p-off { display:inline-block; background:#D32F2F; color:#fff; font-family:'Montserrat',sans-serif; font-size:11px; font-weight:700; padding:2px 7px; border-radius:4px; margin-left:8px; letter-spacing:.3px; vertical-align:2px; }
   .gf-empty { text-align: center; padding: 60px 24px; font-family: 'Montserrat',sans-serif; color: #3a3a3a; }
   .gf-loading { text-align: center; padding: 40px; font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing:1.5px; color: #3a3a3a; }
   .crumb { max-width: 1280px; margin: 0 auto; padding: 18px 40px 0; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 1px; color: #3a3a3a; }
@@ -127,7 +128,7 @@
         '</div>' +
         '<div class="p-name">' + esc(p.name) + '</div>' +
         '<div class="p-price">' + fmt(p.price) +
-          (p.mrp && p.mrp > p.price ? '<span class="p-mrp">' + fmt(p.mrp) + '</span>' : '') +
+          (p.mrp && p.mrp > p.price ? '<span class="p-mrp">' + fmt(p.mrp) + '</span><span class="p-off">' + Math.round((1 - p.price / p.mrp) * 100) + '% OFF</span>' : '') +
         '</div></a>';
     }).join('');
     return true;

@@ -55,7 +55,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260722l">
+<link rel="stylesheet" href="site.css?v=20260731a">
 <script src="layout.js?v=20260724a"></script>
 <script src="mpa.js?v=14" defer></script>
 <script src="catalog.js?v=19"></script>
@@ -334,7 +334,7 @@
         '</div>' +
         '<h3 class="tr-name">' + esc(p.name) + '</h3>' +
         '<div class="tr-price">' + fmt(p.price) +
-          (p.mrp && p.mrp > p.price ? '<span class="tr-mrp">' + fmt(p.mrp) + '</span>' : '') +
+          (p.mrp && p.mrp > p.price ? '<span class="tr-mrp">' + fmt(p.mrp) + '</span><span class="tr-off">' + Math.round((1 - p.price / p.mrp) * 100) + '% OFF</span>' : '') +
         '</div>' +
         (multi ? '<div class="tr-multi">MULTI COLOUR &middot; ' + vars.length + ' SHADES</div>' : '') +
         '</a>';
