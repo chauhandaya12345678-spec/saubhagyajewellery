@@ -45,7 +45,7 @@ export async function onRequest(context) {
   let rows = [];
   try {
     const { results } = await env.DB.prepare(
-      'SELECT sku, name, category, price, mrp, image, inStock, stock_count, variants FROM products WHERE inStock = 1 ORDER BY sku'
+      'SELECT sku, name, category, price, mrp, image, inStock, stock_count, variants FROM products WHERE inStock = 1 AND sku != \'TEST-RS1\' ORDER BY sku'
     ).all();
     rows = results || [];
   } catch (e) { /* DB down — return an empty but valid feed, never 500 */ }
