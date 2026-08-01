@@ -1,9 +1,10 @@
 /**
  * POST /api/auth/otp-send
  * Body: { phone, turnstileToken }
- * Sign-in OTP, delivered over WhatsApp (login_otp Authentication template) —
- * replaces Firebase Phone Auth + Google reCAPTCHA. Cloudflare Turnstile
- * gates it instead: proof-of-work, no visual challenge for real users.
+ * Sign-in OTP, delivered over WhatsApp (meta_otp Authentication template) —
+ * replaces Firebase Phone Auth + Google reCAPTCHA. Turnstile is OPTIONAL
+ * (fail-open): WhatsApp OTP + rate limiting are the real anti-bot layer,
+ * so a Turnstile hiccup or missing secret never blocks sign-in.
  */
 import { rateLimitCheck } from '../_lib.js';
 
@@ -21,13 +22,13 @@ export async function onRequest(context) {
   if (request.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
   try {
-    const { phone, turnstileToken } = await request.json();
+    const { phone } = await request.json();
     const phoneN = String(phone || '').replace(/\D/g, '').slice(-10);
     if (phoneN.length !== 10) return json({ error: 'Enter a valid 10-digit mobile number.' }, 400);
 
-    // UAT sandbox: no Firebase, no Turnstile, no real WhatsApp. Generate a test
-    // OTP, store it, and RETURN it so the tester sees it on screen. Gated on
-    // env.UAT_MODE (only set in the Preview environment) so live never leaks it.
+    // UAT sandbox: no real WhatsApp. Generate a test OTP, store it, and
+    // RETURN it so the tester sees it on screen. Gated on env.UAT_MODE
+    // (only set in the Preview environment) so live never leaks it.
     if (env.UAT_MODE === 'true') {
       const otp = String(Math.floor(100000 + Math.random() * 900000));
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
@@ -35,20 +36,7 @@ export async function onRequest(context) {
       return json({ success: true, uat: true, otp, message: 'UAT sandbox - OTP not sent to any real number.' });
     }
 
-    if (!turnstileToken) return json({ error: 'Verification failed. Please try again.' }, 400);
-
-    const secret = env.TURNSTILE_SECRET_KEY;
-    if (!secret) return json({ error: 'Sign-in is not configured yet.' }, 501);
-
     const ip = request.headers.get('CF-Connecting-IP') || '';
-    const tsRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ secret, response: turnstileToken, remoteip: ip }),
-    });
-    const tsData = await tsRes.json().catch(() => ({}));
-    if (!tsData.success) return json({ error: 'Verification failed. Please try again.' }, 400);
-
     const db = env.DB;
     const okIp = await rateLimitCheck(db, 'otp-send-ip:' + ip, 10, 15);
     const okPhone = await rateLimitCheck(db, 'otp-send-phone:' + phoneN, 4, 15);
@@ -77,6 +65,7 @@ export async function onRequest(context) {
           language: { code: 'en' },
           components: [
             { type: 'body', parameters: [{ type: 'text', text: otp }] },
+            { type: 'button', sub_type: 'OTP', index: '0' },
           ],
         },
       }),
