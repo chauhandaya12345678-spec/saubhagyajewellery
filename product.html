@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="/">
 <title>Handcrafted Imitation Jewellery | Saubhagya Jewellery</title>
 <meta name="author" content="Saubhagya Jewellery">
 <meta name="publisher" content="Saubhagya Jewellery">
@@ -291,7 +292,7 @@
           <div class="pdp-tax">incl. of all taxes</div>
           <div class="pdp-ship"><span class="free">✓ FREE Insured Delivery</span> across India - no extra charges at checkout</div>
           <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
-          <div class="pdp-noreturn"><strong>Country of origin:</strong> India · <strong>Manufactured by:</strong> Saubhagya Jewellery<br><a href="shipping-and-returns.html">Return &amp; defect policy</a></div>
+          <div class="pdp-noreturn"><strong>Country of origin:</strong> India · <strong>Manufactured by:</strong> Saubhagya Jewellery</div>
           <div class="pdp-pincheck">
             <div class="pdp-pincheck-title">CHECK DELIVERY DATE</div>
             <div class="pdp-pincheck-row">
@@ -871,7 +872,7 @@
   $('pdp-buynow').addEventListener('click', function() {
     if (!product) return;
     addToBag();
-    window.location.href = 'checkout.html';
+    window.location.href = '/checkout.html';
   });
 
   /* Sticky mobile CTA bar - mirrors ADD TO BAG + BUY NOW, reveals on scroll */
@@ -885,7 +886,7 @@
   if (mBuy) mBuy.addEventListener('click', function () {
     if (!product) return;
     addToBag();
-    window.location.href = 'checkout.html';
+    window.location.href = '/checkout.html';
   });
   if (mBar) {
     var _rvVisible = false;
