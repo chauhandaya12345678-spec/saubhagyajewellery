@@ -55,8 +55,8 @@
         '<div class="sj-to-brand">Saubhagya · Virtual Try-On</div>' +
       '</div>' +
       '<div class="sj-to-panel">' +
-        '<div class="sj-to-row"><span>Size</span><input type="range" class="sj-to-size" min="50" max="180" value="100" aria-label="Jewellery size"></div>' +
-        '<div class="sj-to-row"><span>Position</span><input type="range" class="sj-to-drop" min="-40" max="60" value="0" aria-label="Jewellery position"></div>' +
+        '<div class="sj-to-row"><span>Size</span><input type="range" class="sj-to-size" min="30" max="260" value="100" aria-label="Jewellery size"></div>' +
+        '<div class="sj-to-row"><span>Up / Down</span><input type="range" class="sj-to-drop" min="-100" max="160" value="0" aria-label="Jewellery position"></div>' +
         '<div class="sj-to-btns"><button class="sj-to-cap">📸 Capture</button><button class="sj-to-add">Add to Bag</button></div>' +
         '<div class="sj-to-priv">🔒 Your camera runs only on your device. Nothing is recorded or uploaded.</div>' +
       '</div>';
@@ -156,24 +156,24 @@
   function px(lm, W, H) { return { x: lm.x * W, y: lm.y * H }; }
 
   function drawJewellery(ctx, lms, W, H) {
-    var lo = px(lms[L_OVAL], W, H), ro = px(lms[R_OVAL], W, H);
+    var lo = px(lms[L_OVAL], W, H), ro = px(lms[R_OVAL], W, H);   // face-oval sides ≈ ear-canal height
     var faceW = Math.hypot(ro.x - lo.x, ro.y - lo.y);
+    var chin = px(lms[CHIN], W, H), fore = px(lms[FOREHEAD], W, H);
+    var faceH = Math.hypot(chin.y - fore.y, chin.x - fore.x) || faceW * 1.4;
     var le = px(lms[L_EYE], W, H), re = px(lms[R_EYE], W, H);
     var roll = Math.atan2(re.y - le.y, re.x - le.x);
 
     if (mode === 'neck') {
-      var chin = px(lms[CHIN], W, H), fore = px(lms[FOREHEAD], W, H);
-      var fh = Math.hypot(chin.y - fore.y, chin.x - fore.x);
-      var cx = chin.x, cy = chin.y + fh * (0.42 + userDrop);
-      var w = faceW * 1.85 * userScale, h = w * (sprite.height / sprite.width);
+      var cx = chin.x, cy = chin.y + faceH * (0.30 + userDrop * 0.45);
+      var w = faceW * 1.7 * userScale, h = w * (sprite.height / sprite.width);
       blit(ctx, sprite, cx, cy, w, h, roll, 0.5, 0.0);
     } else {
-      var lE = px(lms[L_EAR], W, H), rE = px(lms[R_EAR], W, H);
-      var drop = faceW * (0.06 + userDrop);
-      var ew = faceW * 0.30 * userScale, halfW = sprite.width / 2, sh = sprite.height;
+      // Earrings hang from the earlobe, a little below the ear-canal point.
+      var drop = faceH * (0.12 + userDrop * 0.30);
+      var ew = faceW * 0.22 * userScale, halfW = sprite.width / 2, sh = sprite.height;
       var eh = ew * (sh / halfW);
-      blitCrop(ctx, sprite, 0, 0, halfW, sh, lE.x, lE.y + drop, ew, eh, roll, 0.5, 0.0);
-      blitCrop(ctx, sprite, halfW, 0, halfW, sh, rE.x, rE.y + drop, ew, eh, roll, 0.5, 0.0);
+      blitCrop(ctx, sprite, 0, 0, halfW, sh, lo.x, lo.y + drop, ew, eh, roll, 0.5, 0.0);
+      blitCrop(ctx, sprite, halfW, 0, halfW, sh, ro.x, ro.y + drop, ew, eh, roll, 0.5, 0.0);
     }
   }
 
