@@ -181,7 +181,17 @@
                         : '/api/orders/track?email=' + encodeURIComponent(user.email);
     var opts = {};
     try { var t = localStorage.getItem('cc_token'); if (t) opts.headers = { 'Authorization': 'Bearer ' + t }; } catch(e) {}
-    fetch(url, opts).then(function(r) { return r.json(); }).then(function(d) {
+    fetch(url, opts).then(function(r) { return r.json().then(function(d){ return { st: r.status, d: d }; }); }).then(function(res) {
+      // Session token stale/expired → the API returns 401. Silently showing
+      // "No orders yet" made real orders look lost. Clear the bad token and
+      // tell the customer to sign in again so a fresh, valid session loads them.
+      if (res.st === 401 || (res.d && res.d.error && /sign in/i.test(res.d.error))) {
+        try { localStorage.removeItem('cc_token'); } catch(e) {}
+        profileUI(user, null);
+        $('ac-orders').innerHTML = '<div class="ac-empty">Your session expired. <a href="signin.html">Sign in again</a> to view your orders.</div>';
+        return;
+      }
+      var d = res.d;
       var list = (d && d.success && d.orders) ? d.orders : [];
       var oldest = list.length ? list.slice().sort(function(a,b){ return String(a.created_at||'').localeCompare(String(b.created_at||'')); })[0] : null;
       profileUI(user, oldest);

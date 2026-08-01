@@ -33,7 +33,7 @@
 <script src="layout.js?v=20260731d"></script>
 <script src="mpa.js?v=15" defer></script>
 <script src="catalog.js?v=20"></script>
-<script src="tryon.js?v=3" defer></script>
+<script src="tryon.js?v=4" defer></script>
 <style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -81,6 +81,7 @@
   .pdp-stock.low { color:#c0392b; }
   .pdp-stock .dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
   .pdp-noreturn { font-family: 'Montserrat',sans-serif; font-size:13px; color: #3a3a3a; margin-bottom: 22px; }
+  .pdp-origin-val { color:#B8791C; font-weight:800; font-size:15.5px; letter-spacing:.2px; }
   .pdp-img-fav { position:absolute; top:12px; right:12px; z-index:3; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#3a3a3a; transition:all .25s; box-shadow:0 2px 8px rgba(0,0,0,.12); border:none; line-height:1; padding:0; }
   .pdp-img-fav svg { width:19px; height:19px; overflow:visible; }
   .pdp-img-fav svg path { fill:none; stroke:currentColor; stroke-width:1.8; stroke-linejoin:round; transition:fill .2s; }
@@ -292,7 +293,7 @@
           <div class="pdp-tax">incl. of all taxes</div>
           <div class="pdp-ship"><span class="free">✓ FREE Insured Delivery</span> across India - no extra charges at checkout</div>
           <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
-          <div class="pdp-noreturn"><strong>Country of origin:</strong> India · <strong>Manufactured by:</strong> Saubhagya Jewellery</div>
+          <div class="pdp-noreturn"><strong>Country of origin:</strong> <span class="pdp-origin-val">India</span> · <strong>Manufactured by:</strong> <span class="pdp-origin-val">Saubhagya Jewellery</span></div>
           <div class="pdp-pincheck">
             <div class="pdp-pincheck-title">CHECK DELIVERY DATE</div>
             <div class="pdp-pincheck-row">

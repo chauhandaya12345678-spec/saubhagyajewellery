@@ -12,7 +12,8 @@
  */
 (function () {
   'use strict';
-  var MP_SRC = 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';
+  var MP_DIR = '/vendor/mediapipe/face_mesh/';
+  var MP_SRC = MP_DIR + 'face_mesh.js';
   var mpLoading = null;
   var els = {};            // overlay DOM refs
   var running = false;
@@ -116,7 +117,7 @@
     els.root.classList.add('on');
     document.documentElement.style.overflow = 'hidden';
     running = true;
-    setStatus('Loading try-on…');
+    setStatus('Loading try-on engine…');
     // load sprite
     spriteReady = false; sprite = new Image(); sprite.crossOrigin = 'anonymous';
     sprite.onload = function () { spriteReady = true; };
@@ -147,7 +148,7 @@
   function startTracking() {
     setStatus('Detecting your face…');
     gotResult = false;
-    faceMesh = new window.FaceMesh({ locateFile: function (f) { return 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/' + f; } });
+    faceMesh = new window.FaceMesh({ locateFile: function (f) { return MP_DIR + f; } });
     faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
     faceMesh.onResults(onResults);
     var loop = function () {
@@ -162,9 +163,9 @@
     // initialise (asset/CSP/WASM) - surface it instead of a stuck spinner.
     setTimeout(function () {
       if (running && !gotResult) {
-        setStatus("The try-on engine didn't start on this browser. Tell us your phone + browser and we'll fix it.", true);
+        setStatus("Still loading the try-on engine… if this doesn't clear, check your connection and reopen.", true);
       }
-    }, 9000);
+    }, 16000);
   }
 
   function fitCanvas() {
