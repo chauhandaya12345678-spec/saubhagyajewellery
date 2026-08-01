@@ -77,59 +77,10 @@
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app-check.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBTOVlCY_seyeR49jEtsKBgjCNAMsA4rtw",
-  authDomain: "saubhagya-jewellery.firebaseapp.com",
-  projectId: "saubhagya-jewellery",
-  storageBucket: "saubhagya-jewellery.firebasestorage.app",
-  messagingSenderId: "520764963734",
-  appId: "1:520764963734:web:bf3e568a4bce172b33fbb7"
-};
-
-const app = initializeApp(firebaseConfig);
-
-// App Check is best-effort: if the reCAPTCHA Enterprise key/script is broken
-// or blocked, a thrown error here used to kill this whole module - every
-// button on the page went dead. Sign-in must survive App Check failure.
-try {
-  initializeAppCheck(app, {
-    provider: new ReCaptchaEnterpriseProvider('6LeLr1ItAAAAAEIeh4d-4FUit9chB11D8SjyNPhw'),
-    isTokenAutoRefreshEnabled: true
-  });
-} catch (e) {
-  console.warn('App Check init failed (continuing without):', e && e.message);
-}
-
-const auth = getAuth(app);
-
 var $ = function(id) { return document.getElementById(id); };
 function setLoading(btn, label) { btn.disabled = true; btn.innerHTML = '<span class="btn-spinner"></span>' + label; }
 function clearLoading(btn, label) { btn.disabled = false; btn.textContent = label; }
-window.confirmationResult = null;
-window.recaptchaVerifier = null;
 var pendingPhone = null;
-
-// Google's "invisible" reCAPTCHA can still fall back to a visible challenge
-// when it can't silently verify the session. When that happens the send
-// button should stop looking like a frozen spinner and tell the customer
-// there's something to do below.
-(function watchRecaptchaChallenge() {
-  if (!window.MutationObserver) return;
-  var boxes = [document.getElementById('recaptcha-container'), document.getElementById('ts-container')].filter(Boolean);
-  boxes.forEach(function (box) {
-    var mo = new MutationObserver(function () {
-      var btn = $('send-btn');
-      if (btn && btn.disabled && box.querySelector('iframe')) {
-        btn.innerHTML = 'COMPLETE VERIFICATION BELOW ↓';
-      }
-    });
-    mo.observe(box, { childList: true, subtree: true });
-  });
-})();
 
 var user = null;
 try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
@@ -149,169 +100,84 @@ $('auth-logout').addEventListener('click', function() {
 function showError(msg) { $('auth-success').style.display='none'; $('auth-error').textContent=msg; $('auth-error').style.display='block'; }
 function showInfo(msg) { $('auth-error').style.display='none'; $('auth-success').textContent=msg; $('auth-success').style.display='block'; }
 
-// Cloudflare Turnstile pre-gate: a real server-verified bot check that runs
-// BEFORE Firebase's own reCAPTCHA gets involved at all. Doesn't remove
-// Firebase's internal captcha requirement (Google controls that), but stops
-// obvious bot traffic earlier, invisibly, with no image challenge.
-function startFirebaseOtp(phone) {
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      'size': 'invisible',
-      'callback': function() { /* Solved silently */ }
-    });
-  }
-  signInWithPhoneNumber(auth, '+91' + phone, window.recaptchaVerifier)
-    .then(function(result) {
-      clearTimeout(sendWatchdog);
-      window.confirmationResult = result;
-      $('send-btn').textContent = 'OTP SENT';
-      $('phone-section').style.display = 'none';
-      $('otp-section').style.display = 'block';
-      showInfo('Code sent to +91 ' + phone);
-      $('otp-input').focus();
-    })
-    .catch(function(err) {
-      clearTimeout(sendWatchdog);
-      clearLoading($('send-btn'), 'SEND OTP');
-      if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-        window.recaptchaVerifier = null;
-      }
-      showError(err.message || 'Could not send OTP. Try again.');
-    });
-}
-
-window.__tsToken = function(token) {
-  fetch('/api/auth/turnstile-verify', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: token })
-  }).then(function(r) { return r.json(); })
-    .then(function(d) {
-      if (d.success) startFirebaseOtp(pendingPhone);
-      else { clearLoading($('send-btn'), 'SEND OTP'); showError('Verification failed. Please try again.'); }
-    }).catch(function() {
-      // Turnstile check unreachable - fail open to Firebase rather than
-      // blocking sign-in entirely over an outage of an extra safety layer.
-      startFirebaseOtp(pendingPhone);
-    });
-};
-window.__tsError = function() {
-  // Same reasoning - don't let a Turnstile hiccup block sign-in.
-  startFirebaseOtp(pendingPhone);
-};
-
-// Watchdog: whatever silently stalls (Turnstile, reCAPTCHA, App Check,
-// network), never leave the customer on an infinite spinner - reset the
-// button and say so.
-var sendWatchdog = null;
-function armWatchdog() {
-  clearTimeout(sendWatchdog);
-  sendWatchdog = setTimeout(function () {
-    var btn = $('send-btn');
-    if (btn.disabled && !window.confirmationResult) {
-      clearLoading(btn, 'SEND OTP');
-      if (window.recaptchaVerifier) { try { window.recaptchaVerifier.clear(); } catch (e) {} window.recaptchaVerifier = null; }
-      showError('Taking too long - please tap SEND OTP again. If it repeats, check your connection or try another browser.');
-    }
-  }, 25000);
-}
-
-// UAT sandbox sign-in: bypass Firebase entirely. The server endpoints
-// (otp-send/otp-verify) gate on env.UAT_MODE, which is only set in Preview,
-// so this path is inert on the live site even if IS_UAT were ever true.
-var IS_UAT = location.hostname.indexOf('uat.') === 0 || location.search.indexOf('uat=1') !== -1;
-function uatSendOtp(phone) {
+// ── WhatsApp OTP flow (replaces Firebase Phone Auth) ──────────────
+// Server: POST /api/auth/otp-send → Turnstile verify → rate limit → D1 store →
+//         WhatsApp meta_otp template. UAT_MODE=true returns the code inline
+//         (prefilled for testing); LIVE sends a real WhatsApp message.
+function sendOtp(phone, turnstileToken) {
   setLoading($('send-btn'), 'SENDING…');
   $('auth-error').style.display = 'none'; $('auth-success').style.display = 'none';
-  fetch('/api/auth/otp-send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phone }) })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
+  fetch('/api/auth/otp-send', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: phone, turnstileToken: turnstileToken || null })
+  }).then(function(r) { return r.json(); })
+    .then(function(d) {
       clearLoading($('send-btn'), 'SEND OTP');
-      if (!d || !d.success) { showError((d && d.error) || 'Could not send OTP.'); return; }
-      window.uatOtp = true; pendingPhone = phone;
+      if (!d || !d.success) { showError((d && d.error) || 'Could not send code. Try again.'); return; }
+      pendingPhone = phone;
       $('send-btn').textContent = 'OTP SENT';
       $('phone-section').style.display = 'none';
       $('otp-section').style.display = 'block';
-      $('otp-input').value = d.otp || '';
-      showInfo('UAT sandbox - test OTP is ' + d.otp + ' (prefilled; no real SMS sent).');
+      if (d.uat && d.otp) { $('otp-input').value = d.otp; showInfo('UAT sandbox - test code is ' + d.otp + ' (prefilled).'); }
+      else { showInfo('Code sent on WhatsApp to +91 ' + phone); }
       $('otp-input').focus();
     })
-    .catch(function (e) { clearLoading($('send-btn'), 'SEND OTP'); showError(e.message); });
+    .catch(function(e) { clearLoading($('send-btn'), 'SEND OTP'); showError(e.message || 'Could not send code.'); });
 }
-function uatVerifyOtp(code) {
+
+function verifyOtp(code) {
   setLoading($('verify-btn'), 'VERIFYING…');
   $('auth-error').style.display = 'none';
-  fetch('/api/auth/otp-verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: pendingPhone, otp: code }) })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      if (!d || !d.success) { clearLoading($('verify-btn'), 'VERIFY'); showError((d && d.error) || 'Wrong code.'); return; }
-      try { localStorage.setItem('cc_user', JSON.stringify(d.user || { phone: pendingPhone, name: '' })); } catch (e) {}
-      try { localStorage.setItem('cc_token', d.token); } catch (e) {}
+  fetch('/api/auth/otp-verify', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: pendingPhone, otp: code })
+  }).then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d || !d.success) { clearLoading($('verify-btn'), 'VERIFY & SIGN IN'); showError((d && d.error) || 'Wrong code.'); return; }
+      try { localStorage.setItem('cc_user', JSON.stringify(d.user)); } catch(e) {}
+      try { localStorage.setItem('cc_token', d.token); } catch(e) {}
       if (window.MPA) window.MPA.init();
-      showInfo('Signed in (UAT sandbox).');
-      setTimeout(function () { location.href = '/'; }, 800);
+      var ref = document.referrer;
+      window.location.href = (ref && ref.indexOf('/signin') === -1) ? ref : '/index.html';
     })
-    .catch(function (e) { clearLoading($('verify-btn'), 'VERIFY'); showError(e.message); });
+    .catch(function(e) { clearLoading($('verify-btn'), 'VERIFY & SIGN IN'); showError(e.message || 'Sign in failed.'); });
 }
+
+// Turnstile: executes on SEND tap; token passed to otp-send which server-verifies it.
+window.__tsToken = function(token) {
+  if (!window.__tsInFlight) {
+    window.__tsInFlight = true;
+    sendOtp(pendingPhone, token);
+  }
+};
+window.__tsError = function() {
+  // Fail open to server-side check (otp-send still verifies token server-side).
+  if (!window.__tsInFlight) {
+    window.__tsInFlight = true;
+    sendOtp(pendingPhone, null);
+  }
+};
 
 $('send-btn').addEventListener('click', function() {
   var phone = ($('phone-input').value || '').replace(/\D/g, '');
   if (phone.length !== 10) { showError('Enter a valid 10-digit mobile number.'); return; }
-  if (IS_UAT) { uatSendOtp(phone); return; }
-
+  pendingPhone = phone;
+  window.__tsInFlight = false;
   $('auth-error').style.display = 'none';
   $('auth-success').style.display = 'none';
-  setLoading($('send-btn'), 'SENDING…');
-  pendingPhone = phone;
-  armWatchdog();
-
-  // Go straight to Firebase phone auth. Firebase already runs its own required
-  // bot check (invisible reCAPTCHA + App Check); the extra Cloudflare Turnstile
-  // pre-gate only added a visible "verify you're human" widget that stalls,
-  // greys out and times out - the daily auth/internal-error. Bypassed.
-  startFirebaseOtp(phone);
+  var widget = document.querySelector('.cf-turnstile');
+  if (widget && window.turnstile && typeof window.turnstile.execute === 'function') {
+    window.turnstile.execute(widget);
+  } else {
+    window.__tsInFlight = true;
+    sendOtp(phone, null);
+  }
 });
 
 $('verify-btn').addEventListener('click', function() {
   var code = ($('otp-input').value || '').replace(/\D/g, '');
   if (!code || code.length !== 6) { showError('Enter the 6-digit code.'); return; }
-  if (IS_UAT || window.uatOtp) { uatVerifyOtp(code); return; }
-  if (!window.confirmationResult) { showError('Session expired. Please request a new OTP.'); return; }
-
-  setLoading($('verify-btn'), 'VERIFYING…');
-  $('auth-error').style.display = 'none';
-
-  window.confirmationResult.confirm(code)
-    .then(function(result) {
-      var user = result.user;
-      var phone = (user.phoneNumber || '').replace(/\D/g, '').slice(-10);
-      return user.getIdToken().then(function(idToken) {
-        return fetch('/api/auth/firebase-verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ idToken: idToken, phone: phone })
-        }).then(function(r) { return r.json(); }).catch(function() {
-          return { success: true, token: 'local_'+Date.now().toString(36), user: { id: 0, name: '', phone: phone } };
-        });
-      });
-    })
-    .then(function(d) {
-      if (d.success) {
-        try { localStorage.setItem('cc_user', JSON.stringify(d.user)); } catch(e) {}
-        try { localStorage.setItem('cc_token', d.token); } catch(e) {}
-        if (window.MPA) window.MPA.init();
-        // Redirect to previous page or home instead of showing "Hi Guest"
-        var ref = document.referrer;
-        window.location.href = (ref && ref.indexOf('/signin') === -1) ? ref : '/index.html';
-      } else {
-        showError(d.error || 'Sign in failed.');
-        clearLoading($('verify-btn'), 'VERIFY & SIGN IN');
-      }
-    })
-    .catch(function(err) {
-      clearLoading($('verify-btn'), 'VERIFY & SIGN IN');
-      showError('Wrong code or verification expired. Please try again.');
-    });
+  verifyOtp(code);
 });
 
 $('otp-input').addEventListener('keydown', function(e) {

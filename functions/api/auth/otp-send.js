@@ -73,11 +73,10 @@ export async function onRequest(context) {
         to: '91' + phoneN,
         type: 'template',
         template: {
-          name: 'login_otp',
-          language: { code: 'en_US' },
+          name: 'meta_otp',
+          language: { code: 'en' },
           components: [
             { type: 'body', parameters: [{ type: 'text', text: otp }] },
-            { type: 'button', sub_type: 'url', index: '0', parameters: [{ type: 'text', text: otp }] },
           ],
         },
       }),
