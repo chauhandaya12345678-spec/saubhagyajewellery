@@ -163,6 +163,13 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           <option value="cancelled">Cancelled</option>
           <option value="rto">RTO</option>
         </select>
+        <select id="o-filter-date">
+          <option value="">All time</option>
+          <option value="today">Today</option>
+          <option value="week">Last 7 days</option>
+          <option value="month">Last 30 days</option>
+          <option value="year">Last 1 year</option>
+        </select>
         <input type="text" id="o-filter-q" placeholder="Search order id / phone / name / email">
         <button class="ai-btn small" id="o-reload-btn" type="button">SEARCH</button>
         <button class="ai-btn small ghost" id="o-export-btn" type="button">EXPORT CSV</button>
@@ -463,6 +470,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   document.getElementById('o-reload-btn').addEventListener('click', loadOrders);
   document.getElementById('o-filter-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') loadOrders(); });
   document.getElementById('o-filter-status').addEventListener('change', loadOrders);
+  document.getElementById('o-filter-date').addEventListener('change', loadOrders);
   document.getElementById('o-export-btn').addEventListener('click', function () {
     var rows = [['Order ID', 'Date', 'Name', 'Phone', 'Email', 'Items', 'Address', 'Total', 'Status', 'AWB', 'Test']];
     lastOrders.forEach(function (o) {
@@ -478,7 +486,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var status = document.getElementById('o-load-status');
     var tbody = document.getElementById('o-tbody');
     var filterStatus = orderStatusOverride !== null ? orderStatusOverride : document.getElementById('o-filter-status').value;
-    var filterDate = orderDateOverride !== null ? orderDateOverride : '';
+    var filterDate = orderDateOverride !== null ? orderDateOverride : (document.getElementById('o-filter-date') ? document.getElementById('o-filter-date').value : '');
     orderStatusOverride = null; orderDateOverride = null;
     var q = document.getElementById('o-filter-q').value.trim();
     status.textContent = 'Loading…';
