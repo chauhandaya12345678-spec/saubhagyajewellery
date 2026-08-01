@@ -231,7 +231,7 @@
       social + '</div>' +
       col('COMPANY', company) + col('POLICY', policy) +
       '<details class="fcol fcol-support"><summary class="fhead">SELLER &amp; SUPPORT</summary>' +
-      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Tanaji Nagar Rd, opp Vishwakarma Mandir<br>Hanuman Nagar, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A880">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
+      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Shop/Gala Premises, Lokmanya Chawl Committee<br>opp Vishwakarma Mandir, Wadarapada Rd 1<br>Hanuman Nagar, Akurli Cross Rd, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A880">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
       '<a class="fwa" href="' + WHATSAPP + '" rel="noopener" target="_blank">WhatsApp Support &rarr;</a>' +
       '</details></div>' +
       '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; SSL secured</span>' +

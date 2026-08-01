@@ -441,7 +441,7 @@ export async function pushToShipPrime(env, order, db) {
     let pickup = {
       name: env.SHIPPRIME_PICKUP_NAME || 'Saubhagya Jewellery',
       phone: env.SHIPPRIME_PICKUP_PHONE || '9987008435',
-      address1: env.SHIPPRIME_PICKUP_ADDRESS1 || 'Tanaji Nagar Rd, Vadar Pada Rd Number 2, opp vishwakarma mandir, Hanuman Nagar, Kandivali East',
+      address1: env.SHIPPRIME_PICKUP_ADDRESS1 || 'Shop/Gala Premises, upper floor, Lokmanya Chawl Committee opp Vishwakarma Mandir, tanaji nagar rd, Wadarapada Road 1, Hanuman Nagar, Akurli Cross Road, Kandivali East',
       address2: env.SHIPPRIME_PICKUP_ADDRESS2 || '',
       city: env.SHIPPRIME_PICKUP_CITY || 'Mumbai',
       state: env.SHIPPRIME_PICKUP_STATE || 'Maharashtra',

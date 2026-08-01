@@ -19,7 +19,7 @@ export async function onRequest(context) {
   const defaults = {
     pickup_name: 'Saubhagya Jewellery',
     pickup_phone: '9987008435',
-    pickup_address1: 'Tanaji Nagar Rd, Vadar Pada Rd Number 2, opp vishwakarma mandir, Hanuman Nagar, Kandivali East',
+    pickup_address1: 'Shop/Gala Premises, upper floor, Lokmanya Chawl Committee opp Vishwakarma Mandir, tanaji nagar rd, Wadarapada Road 1, Hanuman Nagar, Akurli Cross Road, Kandivali East',
     pickup_address2: '',
     pickup_city: 'Mumbai',
     pickup_state: 'Maharashtra',
