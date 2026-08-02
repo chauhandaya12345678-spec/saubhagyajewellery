@@ -32,9 +32,7 @@
 <link rel="stylesheet" href="site.css?v=20260731b">
 <script src="layout.js?v=20260731d"></script>
 <script src="mpa.js?v=15" defer></script>
-<script src="catalog.js?v=20"></script>
-<script src="tryon.js?v=6" defer></script>
-<style>
+<script src="catalog.js?v=20"></script><style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
   .pdp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px 80px; animation: fadeUp .6s cubic-bezier(.25,1,.5,1); }
@@ -225,36 +223,6 @@
     .pdp-mobile-bar .buy:hover { background: #071B12; }
   }
   @media (min-width: 901px) { .pdp-mobile-bar { display: none; } }
-  /* ── Virtual Try-On button (premium glass) ── */
-  .pdp-tryon { width:100%; margin:-6px 0 24px; display:flex; align-items:center; gap:14px; padding:13px 18px; border:none; border-radius:16px; cursor:pointer; position:relative; overflow:hidden; background:linear-gradient(135deg,#0B291C 0%,#134a34 55%,#0B291C 100%); box-shadow:0 6px 22px rgba(11,41,28,.28), inset 0 1px 0 rgba(255,255,255,.18); transition:transform .3s, box-shadow .3s; }
-  .pdp-tryon::before { content:''; position:absolute; inset:0; background:linear-gradient(120deg,transparent 30%,rgba(197,168,128,.28) 50%,transparent 70%); transform:translateX(-120%); }
-  .pdp-tryon:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(11,41,28,.36), inset 0 1px 0 rgba(255,255,255,.25); }
-  .pdp-tryon:hover::before { animation:sjShine 1.1s ease; }
-  @keyframes sjShine { from{transform:translateX(-120%)} to{transform:translateX(120%)} }
-  .pdp-tryon-ic { font-size:20px; filter:drop-shadow(0 0 6px rgba(197,168,128,.7)); }
-  .pdp-tryon-tx { flex:1; text-align:left; display:flex; flex-direction:column; line-height:1.2; }
-  .pdp-tryon-tx strong { color:#fff; font-family:'Montserrat',sans-serif; font-size:15px; font-weight:700; letter-spacing:1px; }
-  .pdp-tryon-tx small { color:#E7CFA0; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:.3px; margin-top:2px; }
-  .pdp-tryon-cam { font-size:15px; opacity:.9; border:1px solid rgba(231,207,160,.5); border-radius:50%; padding:6px 7px; background:rgba(255,255,255,.06); }
-  /* ── Try-On fullscreen overlay ── */
-  .sj-tryon { position:fixed; inset:0; z-index:9999; background:#0b0f0d; display:none; flex-direction:column; }
-  .sj-tryon.on { display:flex; }
-  .sj-to-stage { position:relative; flex:1; overflow:hidden; background:#000; }
-  .sj-to-video, .sj-to-canvas { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
-  .sj-to-canvas { pointer-events:none; }
-  .sj-to-close { position:absolute; top:14px; right:14px; z-index:5; width:42px; height:42px; border-radius:50%; border:1px solid rgba(255,255,255,.35); background:rgba(0,0,0,.35); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); color:#fff; font-size:24px; line-height:1; cursor:pointer; }
-  .sj-to-brand { position:absolute; top:20px; left:16px; z-index:5; color:rgba(255,255,255,.9); font-family:'Playfair Display',serif; font-size:15px; letter-spacing:.5px; text-shadow:0 1px 6px rgba(0,0,0,.5); }
-  .sj-to-status { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:4; max-width:80%; text-align:center; color:#fff; font-family:'Montserrat',sans-serif; font-size:14px; line-height:1.5; background:rgba(0,0,0,.45); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); padding:14px 20px; border-radius:14px; border:1px solid rgba(255,255,255,.15); }
-  .sj-to-status.err { border-color:rgba(224,75,74,.6); }
-  .sj-to-panel { flex:none; padding:16px 18px calc(18px + env(safe-area-inset-bottom)); background:rgba(11,20,16,.72); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-top:1px solid rgba(197,168,128,.28); }
-  .sj-to-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
-  .sj-to-row span { color:#E7CFA0; font-family:'Montserrat',sans-serif; font-size:12px; font-weight:600; letter-spacing:.5px; width:64px; }
-  .sj-to-row input[type=range] { flex:1; accent-color:#C8901F; }
-  .sj-to-btns { display:flex; gap:10px; margin-top:6px; }
-  .sj-to-btns button { flex:1; height:50px; border:none; border-radius:14px; font-family:'Montserrat',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; cursor:pointer; }
-  .sj-to-cap { background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.3)!important; }
-  .sj-to-add { background:#C8901F; color:#241703; }
-  .sj-to-priv { margin-top:12px; text-align:center; color:rgba(255,255,255,.6); font-family:'Montserrat',sans-serif; font-size:11px; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -311,11 +279,6 @@
             <button class="pdp-add" id="pdp-addcart">ADD TO BAG</button>
           </div>
           <button class="pdp-buy" id="pdp-buynow">BUY IT NOW</button>
-          <button class="pdp-tryon" id="pdp-tryon" type="button" style="display:none">
-            <span class="pdp-tryon-ic">✨</span>
-            <span class="pdp-tryon-tx"><strong>Try It On</strong><small>See it on you - live mirror</small></span>
-            <span class="pdp-tryon-cam" aria-hidden="true">📷</span>
-          </button>
         </div>
       </div>
 
@@ -460,15 +423,6 @@
     $('pdp-desc').innerHTML = pdpDescription(p, seo);
     renderSpec(p);
     renderCompleteTheLook(p);
-    // Virtual try-on: show for every product when the browser has a camera.
-    var toBtn = $('pdp-tryon');
-    if (toBtn && window.SJTryOn && window.SJTryOn.supported()) {
-      toBtn.style.display = 'flex';
-      toBtn.querySelector('.pdp-tryon-tx small').textContent =
-        (p.category === 'Necklace') ? 'See it on your neckline - live mirror' : 'See it on your ears - live mirror';
-      toBtn.onclick = function () { window.SJTryOn.open(p); };
-      window.SJ_TRYON_ADD = function () { var b = $('pdp-addcart'); if (b) b.click(); };
-    } else if (toBtn) { toBtn.style.display = 'none'; }
     // Stock indicator: derive from D1's inStock flag (real inventory not tagged yet, so treat >0 as "in stock, ready to dispatch")
     var stockLbl = '', stockCls = '';
     if (p.inStock === 0 || p.inStock === false) { stockLbl = 'Out of stock'; stockCls = 'low'; }

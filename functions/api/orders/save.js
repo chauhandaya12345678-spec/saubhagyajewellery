@@ -283,7 +283,6 @@ export async function onRequest(context) {
       const emailJob = sendOrderEmail(env, orderForJobs)
         .then(r => logOrderEvent(db, orderId, 'email_sent', r && r.sent ? 1 : 0, r && r.sent ? 'sent' : (r && r.error) || 'unknown'))
         .catch(() => {});
-      if (context.waitUntil) context.waitUntil(emailJob);
 
       // WhatsApp: order confirmed notification
       const waJob = sendWhatsAppMessage(env, orderForJobs.phone, 'confirm_order',
@@ -291,7 +290,6 @@ export async function onRequest(context) {
       )
         .then(r => logOrderEvent(db, orderId, 'whatsapp_sent', r && r.sent ? 1 : 0, r && r.sent ? 'msgId ' + r.msgId : (r && r.error) || 'unknown'))
         .catch(() => {});
-      if (context.waitUntil) context.waitUntil(waJob);
 
       // Push alert to admin devices — "New order placed" → Pack/Cancel from phone.
       const pushJob = sendFcmToAdmins(env,
@@ -302,7 +300,16 @@ export async function onRequest(context) {
         .then(r => logEvent(db, { level: r && r.sent ? 'info' : 'warn', source: 'fcm_admin_push', orderId,
           message: r && r.sent ? `pushed to ${r.sent} device(s)` : (r && (r.error || r.note) || 'no send'), meta: r }))
         .catch(() => {});
-      if (context.waitUntil) context.waitUntil(pushJob);
+
+      // Free-tier isolates die the instant we `return`, so a bare
+      // context.waitUntil often never runs — that's why LIVE-order pushes were
+      // silently dropped while the manual test-push (awaited) worked. Await the
+      // notification bundle here so email/WhatsApp/FCM actually fire, capped at
+      // 15s so a slow external call can't hang order confirmation (the order is
+      // already saved above). waitUntil stays as a best-effort tail.
+      const notifyBundle = Promise.allSettled([emailJob, waJob, pushJob]);
+      if (context.waitUntil) context.waitUntil(notifyBundle);
+      await Promise.race([notifyBundle, new Promise((r) => setTimeout(r, 15000))]);
 
       }  // end if (!isTest)
 
