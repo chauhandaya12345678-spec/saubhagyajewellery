@@ -12,6 +12,8 @@ const STATIC_PAGES = [
   '/terms', '/offer-terms', '/privacy-policy', '/cookie-policy',
   '/blogs/temple-jewellery-styling', '/blogs/kundan-vs-polki',
   '/blogs/caring-matte-gold', '/blogs/bridal-set-6-hour-event',
+  '/blogs/real-vs-fake-gold-plated', '/blogs/indian-bridal-jewellery-guide',
+  '/blogs/care-tips-imitation-jewellery',
 ];
 
 function esc(s) {

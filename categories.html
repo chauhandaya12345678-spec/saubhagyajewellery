@@ -79,6 +79,10 @@
   .cat-grid > .p-card:nth-child(3) { animation-delay: .10s; } .cat-grid > .p-card:nth-child(4) { animation-delay: .14s; }
   .cat-grid > .p-card:nth-child(5) { animation-delay: .18s; } .cat-grid > .p-card:nth-child(6) { animation-delay: .22s; }
   .cat-grid > .p-card:nth-child(7) { animation-delay: .26s; } .cat-grid > .p-card:nth-child(8) { animation-delay: .30s; }
+  .cat-card.coming-soon { pointer-events: none; opacity: 0.7; }
+  .cat-card.coming-soon .shade { background: linear-gradient(to top, rgba(11,41,28,.92) 0%, rgba(11,41,28,0) 55%); }
+  .cat-card.coming-soon .lbl .arr { color: #D4A853; }
+  .cat-card.coming-soon::after { content: ''; position: absolute; inset: 0; border: 2px dashed rgba(213,168,83,.4); border-radius: 10px; pointer-events: none; }
   .cat-filterbar.pulse { animation: catFadeUp .5s cubic-bezier(.25,1,.5,1) both; }
   .crumb { max-width: 1280px; margin: 0 auto; padding: 18px 40px 0; font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 1px; color: #3a3a3a; }
   .crumb a { color: #0B291C; text-decoration: none; }
@@ -312,11 +316,26 @@
     setTimeout(function() { btn.textContent = 'QUICK ADD'; }, 1400);
   });
 
+  function markEmptyCategories() {
+    var all = window.SAUBHAGYA_CATALOG || [];
+    var cards = $('cat-hub-grid').querySelectorAll('.cat-card');
+    SUBS.forEach(function (sub, i) {
+      var hasProducts = all.some(function (p) { return p.inStock && !p.isVariantDup && sub.match(p); });
+      if (!hasProducts && cards[i]) {
+        cards[i].classList.add('coming-soon');
+        cards[i].querySelector('.arr').textContent = 'COMING SOON';
+        cards[i].removeAttribute('href');
+      }
+    });
+  }
+
   var rendered = renderList();
   if (!rendered) {
-    window.addEventListener('catalog-ready', function () { renderList(); });
+    window.addEventListener('catalog-ready', function () { renderList(); markEmptyCategories(); });
     var tries = 0;
     var poll = setInterval(function () { if (renderList() || ++tries > 60) clearInterval(poll); }, 150);
+  } else {
+    markEmptyCategories();
   }
 })();
 </script>
