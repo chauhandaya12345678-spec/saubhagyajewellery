@@ -1,8 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta name="facebook-domain-verification" content="18syh2s5cm1q9w5mmbbun08du51dc3" />
-<meta name="p:domain_verify" content="33db9093b08e27fdd1a546d1cce2b9c9"/>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="HOM1ZDpKGJ9AM_W94zqul2Uk0dYZ3HgblDx6Z4u4hKI">
@@ -129,6 +127,9 @@
   .cat-tile.small .cat-text { bottom: 20px; left: 24px; }
   .cat-tile.small .cat-text .t { font-size: 22px; color:#fff; }
   .cat-text .go { font-family: 'Montserrat',sans-serif; font-size:13px; color: #C5A880; margin-top: 3px; }
+  .cat-tile.coming-soon { pointer-events: none; opacity: 0.82; cursor: default; }
+  .cat-tile.coming-soon .cat-shade { background: linear-gradient(to top, rgba(11,41,28,.75) 0%, rgba(11,41,28,0) 40%); }
+  .cat-tile.coming-soon .cat-text .k { color: #D4A853; }
 
   .her3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
   .her-tile { position: relative; height: 420px; overflow: hidden; border-radius: 12px; cursor: pointer; display: block; text-decoration: none; background-size: cover; background-position: center; }
@@ -230,17 +231,17 @@
 
   <div class="hm-ctas">
     <a class="hm-btn primary" href="categories.html">EXPLORE CATEGORIES</a>
-    <a class="hm-btn ghost" href="categories.html?cat=bridal-set">SHOP BRIDAL</a>
+    <a class="hm-btn ghost" href="categories.html">SHOP ALL</a>
   </div>
 
   <!-- CATEGORY BANNERS: original images -->
   <section class="hm-section">
     <div class="cat2">
-      <a class="cat-tile big" href="categories.html?cat=bridal-set" aria-label="Shop Bridal Sets - temple necklace with matching jhumkas">
+      <div class="cat-tile big coming-soon" aria-label="Bridal Sets — Coming Soon">
         <div class="cat-bg" style="background-image:url('images/models/cat-bridal.webp');background-color:#0B291C;background-position:center 55%"></div>
         <div class="cat-shade"></div>
-        <div class="cat-text"><div class="k">SHOP NOW </div><h3 class="t">Bridal Sets </h3><div class="s">Temple necklace &amp; matching jhumkas</div></div>
-      </a>
+        <div class="cat-text"><div class="k">COMING SOON</div><h3 class="t">Bridal Sets</h3><div class="s">Temple necklace &amp; matching jhumkas</div></div>
+      </div>
       <a class="cat-tile big" href="categories.html?cat=earrings" aria-label="Shop Earrings - kundan chandbali and drops">
         <div class="cat-bg" style="background-image:url('images/models/cat-earrings.webp');background-color:#0B291C"></div>
         <div class="cat-shade"></div>
@@ -253,11 +254,11 @@
         <div class="cat-shade"></div>
         <div class="cat-text"><div class="k">SHOP NOW </div><h3 class="t">Necklaces </h3><div class="s">Short, temple &amp; crystal necklaces</div></div>
       </a>
-      <a class="cat-tile big" href="categories.html?cat=pendants" aria-label="Shop Pendants">
+      <div class="cat-tile big coming-soon" aria-label="Pendants — Coming Soon">
         <div class="cat-bg" style="background-image:url('images/models/cat-pendant.webp');background-color:#0B291C"></div>
         <div class="cat-shade"></div>
-        <div class="cat-text"><div class="k">SHOP NOW </div><h3 class="t">Pendants </h3><div class="s">Coming soon</div></div>
-      </a>
+        <div class="cat-text"><div class="k">COMING SOON</div><h3 class="t">Pendants</h3><div class="s">Coming soon</div></div>
+      </div>
     </div>
   </section>
 
