@@ -25,12 +25,12 @@
       window.__gtagLoaded = true;
       var gtagScript = d.createElement('script');
       gtagScript.async = true;
-      gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-BFMQ8LVSF3';
+      gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-MQQ74M9SPR';
       d.head.appendChild(gtagScript);
       window.dataLayer = window.dataLayer || [];
       window.gtag = function () { window.dataLayer.push(arguments); };
       window.gtag('js', new Date());
-      window.gtag('config', 'G-BFMQ8LVSF3');
+      window.gtag('config', 'G-MQQ74M9SPR');
     }
     if (!d.querySelector('meta[name="theme-color"]')) {
       var tc = d.createElement('meta');
