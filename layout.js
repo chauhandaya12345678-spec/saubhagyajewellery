@@ -62,7 +62,9 @@
       '.nav-search-icon{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}',
       '.nav-profile-btn{display:none;align-items:center;justify-content:center;width:34px;height:34px;color:#1A1A1A}',
       '.nav-profile-icon{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none}',
-      '.nav-bag [data-mpa-cart-count]{align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:4px;border-radius:9px;background:#0B291C;color:#fff;font-size:10px;font-weight:600;line-height:1;vertical-align:middle}',
+      '.nav-bag{display:inline-flex;align-items:center;gap:6px;color:#1A1A1A;text-decoration:none}',
+      '.nav-bag-icon{width:21px;height:21px;stroke:currentColor;stroke-width:1.7;fill:none;flex:none}',
+      '.nav-bag [data-mpa-cart-count]{align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:0;border-radius:9px;background:#0B291C;color:#fff;font-size:10px;font-weight:600;line-height:1;vertical-align:middle}',
       '.nav-bag [data-mpa-cart-count]:not([style*="none"]){display:inline-flex}',
       '.nav-burger{order:0;display:none;flex-direction:column;justify-content:center;gap:5px;width:34px;height:34px;padding:0;background:none;border:none;cursor:pointer}',
       '.nav-burger span{display:block;height:2px;width:22px;background:#0B291C;border-radius:2px;transition:transform .35s,opacity .25s}',
@@ -113,12 +115,12 @@
       '  .nav{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:11px 14px;gap:8px}',
       '  .navlinks,.nav-icons{flex:none}',
       '  .nav-burger{display:flex}',
-      '  .logo{order:1;flex:none;justify-content:flex-start;margin-right:auto}',
-      '  .logo-name{font-size:19px;letter-spacing:1.5px}',
+      '  .logo{order:1;flex:none;justify-content:flex-start;margin-right:auto;margin-left:-4px}',
+      '  .logo-name{font-size:16px;letter-spacing:1px}',
       '  .navlinks{display:none}',
-      '  .nav-icons{order:2;gap:4px}',
-      '  .nav-icons .ni-hide{display:none}',
-      '  .nav-profile-btn{display:flex}',
+      '  .nav-icons{order:2;gap:6px}',
+      '  .nav-icons .ni-hide{display:inline-flex;font-size:12px;letter-spacing:.5px}',
+      '  .nav-profile-btn{display:none}',
       '  .nav-bag{display:inline-flex;align-items:center;height:34px}',
       '  .nav-drawer{display:flex}',
       '  .nav-search-sheet{padding:14px 14px 18px}',
@@ -170,6 +172,8 @@
       '<svg class="nav-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>';
     var profileIcon =
       '<svg class="nav-profile-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6"/><path d="M5 20c0-3.9 3.4-6.2 7-6.2s7 2.3 7 6.2" stroke-linecap="round"/></svg>';
+    var bagIcon =
+      '<svg class="nav-bag-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8h11l.9 12.2a1 1 0 0 1-1 1.1H6.6a1 1 0 0 1-1-1.1L6.5 8z"/><path d="M9 10.5V6.7a3 3 0 0 1 6 0v3.8" stroke-linecap="round"/></svg>';
     return '<header class="site">' +
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
@@ -184,7 +188,7 @@
       '<a class="ni-hide" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
       '<a class="nav-profile-btn" data-mpa-auth data-mpa-auth-icon data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '" aria-label="Account">' + profileIcon + '</a>' +
       '<a class="ni-hide nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>' +
-      '<a class="nav-bag" href="' + CART + '" aria-label="Bag">Bag <span data-mpa-cart-count style="display:none"></span></a>' +
+      '<a class="nav-bag" href="' + CART + '" aria-label="Bag">' + bagIcon + '<span data-mpa-cart-count style="display:none"></span></a>' +
       '</div></div>' +
       '<div class="nav-drawer" id="nav-drawer">' + drawerLinks + '</div>' +
       '<div class="nav-drawer-backdrop" id="nav-drawer-backdrop"></div>' +
