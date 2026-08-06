@@ -110,5 +110,20 @@ export async function renderProductShell(html, p, env) {
       `<script type="application/ld+json">${JSON.stringify(productLd)}</script>` +
       `<script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>` +
       `</head>`
+    )
+    // SSR body: prevent soft-404 by removing misleading text Googlebot sees in raw HTML.
+    // pdp-loading / pdp-error / oos-stamp are client-side managed via JS — but Googlebot
+    // doesn't execute JS, so it reads "Product Not Found" + "OUT OF STOCK" from source.
+    // When we've confirmed the product EXISTS in D1, scrub those strings from the shell.
+    .replace('id="pdp-loading"', 'id="pdp-loading" style="display:none"')
+    .replace(
+      '<p class="pdp-error-title">Product Not Found</p>',
+      '<p class="pdp-error-title" style="display:none"></p>'
+    )
+    .replace(
+      'id="pdp-oos-stamp" style="display:none"',
+      inStock
+        ? 'id="pdp-oos-stamp" style="display:none"'   // in stock → hidden OK, text still "OUT OF STOCK" but hidden
+        : 'id="pdp-oos-stamp"'                         // out of stock → keep visible for Google
     );
 }
