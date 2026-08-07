@@ -77,7 +77,9 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 <body>
 <div class="ai-header">
   <div style="display:flex;align-items:center;gap:10px">
-    <img src="images/brand/logo-mark-gold.webp?v=3" alt="" width="30" height="30" style="display:block">
+    <!-- Absolute path: admin is served at the /admin clean URL, so a relative
+         "images/..." resolved to /admin/images/... and 404'd (broken icon). -->
+    <img src="/images/brand/logo-mark-clean.webp?v=4" alt="Saubhagya" width="30" height="30" style="display:block">
     <h1>SAUBHAGYA <span style="font-size:9px;letter-spacing:2px;color:#C5A880;border:1px solid #C5A880;border-radius:4px;padding:3px 7px;margin-left:4px;font-weight:600">ADMIN</span></h1>
   </div>
   <div class="ai-tabs" id="ai-tabs" style="display:none">
@@ -828,7 +830,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     };
 
     if (file) {
-      var fd = new FormData(); fd.append('file', file); fd.append('sku', sku);
+      var fd = new FormData(); fd.append('file', file); fd.append('sku', sku); fd.append('name', name);
       apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
         .then(function (d) { doAdd(d && d.url); })
         .catch(function () { doAdd(''); });

@@ -52,7 +52,20 @@ export async function onRequest(context) {
   let key = cleanKey(form.get('key'));
   if (!key) {
     const sku = clean(form.get('sku'));
-    if (sku) key = 'products/' + sku + ext;
+    // SEO filename: derive a keyword slug from the product NAME and keep the
+    // SKU as a suffix so the object stays uniquely findable and the SKU (the
+    // real identifier) never changes. e.g. "Kundan Bridal Choker" + SJ-KC01
+    // -> products/kundan-bridal-choker-SJ-KC01.webp. Falls back to bare SKU
+    // when no name is supplied (e.g. the standalone upload button).
+    const slug = String(form.get('name') || '')
+      .toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, '-')   // spaces/punct -> hyphen
+      .replace(/^-+|-+$/g, '')
+      .replace(/-{2,}/g, '-')
+      .split('-').slice(0, 6).join('-'); // cap length, keep it readable
+    if (sku && slug) key = 'products/' + slug + '-' + sku + ext;
+    else if (sku) key = 'products/' + sku + ext;
     else {
       const orig = clean(file.name) || ('upload-' + Date.now() + ext);
       key = 'products/' + orig;
