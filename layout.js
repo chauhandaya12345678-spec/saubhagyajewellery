@@ -129,7 +129,7 @@
       '.nav-search-backdrop.on{opacity:1;pointer-events:auto}',
       /* mobile layout */
       '@media(max-width:900px){',
-      '  .nav{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:10px 10px;gap:6px}',
+      '  .nav{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:10px 24px 10px 10px;gap:6px}',
       '  .navlinks,.nav-icons{flex:none}',
       '  .nav-burger{display:flex}',
       '  .logo{order:1;flex:1 1 auto;min-width:0;justify-content:flex-start;margin-right:auto;margin-left:-4px}',
@@ -165,7 +165,7 @@
       '  #nav-search-btn .nav-search-icon{width:22px;height:22px;stroke:#1A1A1A;stroke-width:1.6}',
       '  .nav-account .nav-profile-btn{width:26px;height:26px}',
       '  .nav-account .nav-profile-icon{width:22px;height:22px;stroke-width:1.6}',
-      '  .nav-bag{display:inline-flex;align-items:center;height:26px}',
+      '  .nav-bag{display:inline-flex;align-items:center;height:26px;padding:9px 10px}',
       '  .nav-bag-icon{width:22px;height:22px;stroke-width:1.6}',
       '  .nav-bag [data-mpa-cart-count]{top:-6px;right:-7px;min-width:15px;height:15px;font-size:9px}',
       '  .nav-drawer{display:flex;top:70px}',
