@@ -46,12 +46,12 @@
       '.nav{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:14px 40px}',
       '.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;flex:none;order:0}',
       '.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}',
-      '.brand-logo{height:45px;width:auto;object-fit:contain;display:block;background:none}',
+      '.brand-logo{height:40px;width:auto;object-fit:contain;display:block;background:none}',
       '@media(max-width:480px){.brand-logo{height:36px}}',
+      '@media(max-width:480px){body{padding-top:82px}}',
       '.logo-stack{display:flex;flex-direction:column;align-items:flex-start;line-height:1}',
-      '.logo-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:#0B291C;letter-spacing:1.5px;line-height:1}',
-      '.logo-sub{font-size:8px;letter-spacing:5px;color:#C5A880;margin-top:4px}',
-      '@media(max-width:480px){.logo-name{font-size:18px}}',
+      '.logo-name{font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:600;color:#0B291C;letter-spacing:1.5px;line-height:1}',
+      '.logo-sub{font-size:9px;letter-spacing:4.5px;color:#C5A880;margin-top:4px}',
       '.navlinks{order:1;flex:1;display:flex;justify-content:center;gap:24px;flex-wrap:nowrap;font-size:12px;letter-spacing:.6px;margin:0}',
       '.navlink{padding-bottom:3px;border-bottom:1px solid transparent;white-space:nowrap;color:#1A1A1A;text-decoration:none;transition:border-color .3s,color .3s}',
       '.navlink:hover,.navlink.is-active{border-bottom-color:#C5A880;color:#0B291C}',
@@ -62,18 +62,35 @@
       '.nav-search-icon{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}',
       '.nav-profile-btn{display:none;align-items:center;justify-content:center;width:34px;height:34px;color:#1A1A1A}',
       '.nav-profile-icon{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none}',
-      '.nav-bag{display:inline-flex;align-items:center;gap:6px;color:#1A1A1A;text-decoration:none}',
-      '.nav-bag-icon{width:21px;height:21px;stroke:currentColor;stroke-width:1.7;fill:none;flex:none}',
-      '.nav-bag [data-mpa-cart-count]{align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:0;border-radius:9px;background:#0B291C;color:#fff;font-size:10px;font-weight:600;line-height:1;vertical-align:middle}',
+      '.nav-bag{position:relative;display:inline-flex;align-items:center;color:#1A1A1A;text-decoration:none;padding:2px}',
+      '.nav-bag-icon{width:26px;height:26px;stroke:currentColor;stroke-width:1.6;fill:none;flex:none}',
+      /* badge hangs off the bag\'s top-right corner (half on, half off) instead of floating beside it as a bare number */
+      '.nav-bag [data-mpa-cart-count]{position:absolute;top:-4px;right:-6px;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#0B291C;color:#fff;font-size:10px;font-weight:700;line-height:1;box-shadow:0 0 0 2px #fff}',
       '.nav-bag [data-mpa-cart-count]:not([style*="none"]){display:inline-flex}',
+      '.nav-bag{flex:none}',
+      /* Desktop: invisible grouping wrapper, search/"Hi, Name"/"Sign out" lay out exactly as before. */
+      '.nav-account{display:contents}',
+      /* "›" signals the greeting is a link to the profile, not just a label. */
+      '.nav-hi::after,.nav-hi-mobile::after{content:"›";margin-left:3px;color:#C5A880;font-size:15px;font-weight:700}',
+      /* Mobile-only versions - desktop keeps using "Hi, Name"/"Sign in" on .nav-hi.
+         Mobile needs its own copies (not just CSS-hiding .nav-hi) because a
+         signed-in user must show "Hi, Name", never the icon, never "Sign in". */
+      '.nav-signin-mobile{display:none}',
+      '.nav-hi-mobile{display:none}',
       '.nav-burger{order:0;display:none;flex-direction:column;justify-content:center;gap:5px;width:34px;height:34px;padding:0;background:none;border:none;cursor:pointer}',
       '.nav-burger span{display:block;height:2px;width:22px;background:#0B291C;border-radius:2px;transition:transform .35s,opacity .25s}',
       '.nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}',
       '.nav-burger.open span:nth-child(2){opacity:0}',
       '.nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}',
       /* slide-down drawer */
-      '.nav-drawer{display:none;flex-direction:column;background:#fff;border-bottom:1px solid rgba(90,136,0,.2);overflow:hidden;max-height:0;transition:max-height .45s cubic-bezier(.25,1,.5,1);padding-bottom:env(safe-area-inset-bottom);position:fixed;top:59px;left:0;right:0;z-index:70;isolation:isolate;box-shadow:0 12px 30px rgba(11,41,28,.12)}',
-      '.nav-drawer.open{max-height:calc(100vh - 59px);overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      /* CRITICAL: when closed, this box must paint NOTHING. max-height:0 does
+         NOT clip padding, border or box-shadow - a collapsed drawer with
+         padding-bottom (safe-area inset) + white bg + shadow rendered as a
+         big white bar pinned under the header on every scroll. So padding,
+         border and shadow are ALL moved to .open, and visibility:hidden makes
+         it bulletproof. */
+      '.nav-drawer{display:none;flex-direction:column;background:#fff;overflow:hidden;max-height:0;padding:0;border:0;box-shadow:none;visibility:hidden;transition:max-height .45s cubic-bezier(.25,1,.5,1),visibility 0s linear .45s;position:fixed;top:70px;left:0;right:0;z-index:70;isolation:isolate}',
+      '.nav-drawer.open{visibility:visible;max-height:calc(100vh - 70px);overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:env(safe-area-inset-bottom);border-bottom:1px solid rgba(90,136,0,.2);box-shadow:0 12px 30px rgba(11,41,28,.12);transition:max-height .45s cubic-bezier(.25,1,.5,1),visibility 0s}',
       '.nav-drawer a{padding:17px 22px;font:500 14px "Montserrat",sans-serif;letter-spacing:.6px;color:#1A1A1A;text-decoration:none;border-top:1px solid #f0ece1;transition:background .2s,color .2s;display:flex;align-items:center;justify-content:space-between}',
       '.nav-drawer a::after{content:"›";color:#C5A880;font-size:20px;opacity:.6;transition:transform .25s}',
       '.nav-drawer a:hover,.nav-drawer a:active{background:#faf8f3;color:#0B291C}',
@@ -112,27 +129,72 @@
       '.nav-search-backdrop.on{opacity:1;pointer-events:auto}',
       /* mobile layout */
       '@media(max-width:900px){',
-      '  .nav{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:11px 14px;gap:8px}',
+      '  .nav{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:10px 10px;gap:6px}',
       '  .navlinks,.nav-icons{flex:none}',
       '  .nav-burger{display:flex}',
-      '  .logo{order:1;flex:none;justify-content:flex-start;margin-right:auto;margin-left:-4px}',
-      '  .logo-name{font-size:16px;letter-spacing:1px}',
+      '  .logo{order:1;flex:1 1 auto;min-width:0;justify-content:flex-start;margin-right:auto;margin-left:-4px}',
+      '  .logo{gap:7px}',
+      '  .logo-name{font-size:17px;letter-spacing:.3px}',
+      '  .logo-sub{font-size:8px;letter-spacing:3px;margin-top:3px}',
+      /* Ellipsis safety net for extreme cases, but the cap is generous now -
+         the icon row is 3 plain small icons, not the wider pill buttons this
+         was originally sized against, so "SAUBHAGYA" was clipping for no reason. */
+      '  .logo-stack{min-width:0;max-width:190px;overflow:hidden}',
+      '  .logo-name,.logo-sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
       '  .navlinks{display:none}',
-      '  .nav-icons{order:2;gap:6px}',
-      '  .nav-icons .ni-hide{display:inline-flex;font-size:12px;letter-spacing:.5px}',
-      '  .nav-profile-btn{display:none}',
-      '  .nav-bag{display:inline-flex;align-items:center;height:34px}',
-      '  .nav-drawer{display:flex}',
+      '  .nav-icons{order:2;gap:6px;min-width:0}',
+      '  .nav-icons .ni-hide{display:inline-flex;font-size:12px;letter-spacing:.3px;font-weight:700}',
+      /* Sign out lives on account.html + the drawer only now, not the header.
+         Plain icons on mobile, same minimal style as the bag - no borders,
+         no pills. "Hi, Name" text (desktop) swaps for a plain "Sign in" link
+         (guests) or the profile icon (signed in) on mobile - never both, so
+         it's still obvious whether you're signed in. Search sits first. */
+      '  .nav-account{display:flex;flex-direction:row;align-items:center;gap:10px;min-width:0}',
+      '  .nav-account .nav-hi{display:none}',
+      /* Search moves out of the header into a floating button (below, near the
+         bag corner) - a long name was squeezing both the logo and the search
+         icon out of a too-narrow row. This alone frees most of the width back. */
+      /* Mobile shows a fixed-width "My Profile" instead of "Hi, <Name>": a long
+         name is unbounded and was pushing the logo out. This label never grows. */
+      '  .nav-account .nav-signin-mobile{display:inline-flex;order:1;font-family:"Montserrat",sans-serif;font-size:12px;font-weight:400;letter-spacing:.2px;color:#1A1A1A;white-space:nowrap}',
+      '  .nav-account .nav-hi-mobile{display:inline-block;order:1;font-family:"Montserrat",sans-serif;font-size:12px;font-weight:400;letter-spacing:.2px;color:#1A1A1A;white-space:nowrap;vertical-align:middle}',
+      '  .nav-hi-mobile::after{font-size:12px}',
+      /* Search back inline, sitting BETWEEN the name and the bag. All three
+         header controls share one 22px icon size so nothing looks oversized. */
+      '  #nav-search-btn{order:2;position:static;width:26px;height:26px;background:none;border:none;border-radius:0;box-shadow:none}',
+      '  #nav-search-btn .nav-search-icon{width:22px;height:22px;stroke:#1A1A1A;stroke-width:1.6}',
+      '  .nav-account .nav-profile-btn{width:26px;height:26px}',
+      '  .nav-account .nav-profile-icon{width:22px;height:22px;stroke-width:1.6}',
+      '  .nav-bag{display:inline-flex;align-items:center;height:26px}',
+      '  .nav-bag-icon{width:22px;height:22px;stroke-width:1.6}',
+      '  .nav-bag [data-mpa-cart-count]{top:-6px;right:-7px;min-width:15px;height:15px;font-size:9px}',
+      '  .nav-drawer{display:flex;top:70px}',
+      '  .nav-drawer.open{max-height:calc(100vh - 70px)}',
+      '  .nav-drawer-backdrop{top:70px}',
       '  .nav-search-sheet{padding:14px 14px 18px}',
       '  .nav-search-wrap{gap:6px}',
       '  .nav-search-go{padding:0 12px;font-size:10px}',
       '  .nav-search-close{width:34px;height:34px;flex:0 0 34px;display:inline-flex;align-items:center;justify-content:center;padding:0}',
       '}',
+      '@media(max-width:480px){',
+      '  .logo-name{font-size:16px;letter-spacing:.2px}',
+      '  .logo-sub{font-size:7.5px;letter-spacing:2.5px;margin-top:3px}',
+      '  .nav-drawer{top:82px}',
+      '  .nav-drawer.open{max-height:calc(100vh - 82px)}',
+      '  .nav-drawer-backdrop{top:82px}',
+      '}',
       /* footer: same brand SVG as header, sized down for the column,
          and a light brightness bump so the gold pops on deep green */
       'footer.site .fbrand{display:flex;flex-direction:column;align-items:flex-start;gap:14px}',
-      'footer.site .brand-logo-footer{height:auto;width:280px;max-width:100%;object-fit:contain}',
-      '@media(max-width:560px){footer.site .fbrand{align-items:center;text-align:center}footer.site .brand-logo-footer{width:220px}footer.site .fsocial{justify-content:center}}',
+      /* Footer now uses the SAME clean lotus mark as the header (green-safe,
+         transparent) + wordmark text, instead of a separate white wordmark image. */
+      'footer.site .flogo{display:inline-flex;align-items:center;gap:12px;text-decoration:none}',
+      'footer.site .flogo-mark{height:52px;width:auto;object-fit:contain;display:block}',
+      'footer.site .flogo-stack{display:flex;flex-direction:column;align-items:flex-start;line-height:1}',
+      'footer.site .flogo-name{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:600;color:#fff;letter-spacing:2px;line-height:1}',
+      'footer.site .flogo-sub{font-size:11px;letter-spacing:6px;color:#C5A880;margin-top:6px}',
+      'footer.site .flogo-tm{font-size:11px;letter-spacing:0;color:#C5A880;vertical-align:super;margin-left:2px;font-family:"Montserrat",sans-serif}',
+      '@media(max-width:560px){footer.site .fbrand{align-items:center;text-align:center}footer.site .flogo{justify-content:center}footer.site .fsocial{justify-content:center}}',
       'footer.site .fsocial{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}',
       'footer.site .fsocial a{font:500 12px "Montserrat",sans-serif;letter-spacing:.5px;color:#C5A880;text-decoration:none;border-bottom:1px solid rgba(90,136,0,.35);padding-bottom:2px;transition:color .3s,border-color .3s}',
       'footer.site .fsocial a:hover{color:#fff;border-bottom-color:#fff}',
@@ -167,6 +229,7 @@
       return '<a class="navlink' + (n.slug === active ? ' is-active' : '') + '" href="' + n.slug + '">' + n.label + '</a>';
     }).join('');
     var drawerLinks = links +
+      '<a class="navlink" data-mpa-onlyauth href="account.html" style="display:none">My Profile</a>' +
       '<a class="navlink nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>';
     var searchIcon =
       '<svg class="nav-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>';
@@ -178,16 +241,22 @@
       '<div class="nav">' +
       '<button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>' +
       '<a class="logo logo-real" href="index.html" title="Saubhagya Jewellery - Home">' +
-      '<img class="brand-logo" src="images/brand/logo-mark-gold.png?v=1" alt="" width="45" height="45">' +
+      '<img class="brand-logo" src="images/brand/logo-mark-clean.webp?v=4" alt="" width="347" height="257">' +
       '<span class="logo-stack"><span class="logo-name">SAUBHAGYA</span><span class="logo-sub">JEWELLERY</span></span>' +
       '<span class="sr-only">Saubhagya Jewellery - handcrafted imitation jewellery, Mumbai. Home.</span>' +
       '</a>' +
       '<nav class="navlinks">' + links + '</nav>' +
       '<div class="nav-icons">' +
+      '<div class="nav-account">' +
+      '<a class="ni-hide nav-hi" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '" title="View profile">Sign in</a>' +
+      '<a class="nav-signin-mobile" data-mpa-onlyguest href="' + SIGNIN + '">Sign in</a>' +
+      /* No data-mpa-auth here on purpose: that would overwrite the label with
+         "Hi, <Name>", whose width is unbounded and pushed the logo off-screen.
+         Fixed "My Profile" label instead; only visibility is auth-driven. */
+      '<a class="nav-hi-mobile" data-mpa-onlyauth href="account.html" title="View your profile">My Profile</a>' +
       '<button type="button" id="nav-search-btn" aria-label="Search">' + searchIcon + '</button>' +
-      '<a class="ni-hide" data-mpa-auth data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '">Sign in</a>' +
       '<a class="nav-profile-btn" data-mpa-auth data-mpa-auth-icon data-mpa-signin-href="' + SIGNIN + '" data-mpa-account-href="account.html" href="' + SIGNIN + '" aria-label="Account">' + profileIcon + '</a>' +
-      '<a class="ni-hide nav-signout" data-mpa-signout href="#" style="display:none">Sign out</a>' +
+      '</div>' +
       '<a class="nav-bag" href="' + CART + '" aria-label="Bag">' + bagIcon + '<span data-mpa-cart-count style="display:none"></span></a>' +
       '</div></div>' +
       '<div class="nav-drawer" id="nav-drawer">' + drawerLinks + '</div>' +
@@ -208,7 +277,7 @@
   }
 
   function footerHtml() {
-    var company = [['About Us', 'about.html'], ['Contact Us', 'contact.html'], ['Categories', 'categories.html'], ['Gifting', 'gifting.html'], ['Blogs', 'blogs.html']];
+    var company = [['About Us', 'about.html'], ['Contact Us', 'contact.html'], ['Categories', 'categories.html'], ['Gifting', 'gifting.html'], ['Blogs', 'blogs.html'], ['FAQ', 'faq.html'], ['Jewellery Care Guide', 'jewellery-guide.html']];
     var policy = [
       ['Track Orders', 'track-orders.html'], ['Shipping and Delivery', 'shipping-and-returns.html'],
       ['Return Policy', 'shipping-and-returns.html'], ['E & S Policy', 'es-policy.html'],
@@ -230,7 +299,10 @@
       '</div>';
     return '<div class="fwrap">' +
       '<div class="fbrand">' +
-      '<img class="brand-logo brand-logo-footer" src="images/brand/saubhagya-wordmark-white.png?v=2" alt="Saubhagya Jewellery">' +
+      '<a class="flogo" href="index.html" aria-label="Saubhagya Jewellery">' +
+      '<img class="flogo-mark" src="images/brand/logo-mark-clean.webp?v=4" alt="" width="347" height="257">' +
+      '<span class="flogo-stack"><span class="flogo-name">SAUBHAGYA<sup class="flogo-tm">&trade;</sup></span><span class="flogo-sub">JEWELLERY</span></span>' +
+      '</a>' +
       '<p>Handcrafted premium imitation jewellery from our Mumbai warehouse. Every piece is manufactured in-house, inspected and dispatched insured across India.</p>' +
       social + '</div>' +
       col('COMPANY', company) + col('POLICY', policy) +

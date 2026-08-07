@@ -30,8 +30,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260731d"></script>
-<script src="mpa.js?v=15" defer></script>
+<script src="layout.js?v=20260806d"></script>
+<script src="mpa.js?v=16" defer></script>
 <script src="catalog.js?v=20"></script><style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
@@ -72,6 +72,13 @@
   .pdp-swatch img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
   .pdp-swatch:hover { transform: translateY(-2px); border-color: #C5A880; }
   .pdp-swatch.on { border-color: #0B291C; box-shadow: 0 0 0 3px rgba(197,168,128,.4); }
+  /* Savings banner - makes the discount concrete in rupees, not just a % badge */
+  .pdp-savebar { display:none; align-items:center; gap:8px; margin:10px 0 12px; padding:11px 15px; border-radius:12px;
+    background:linear-gradient(135deg,#f2fbf5,#e4f5ea); border:1px solid #b8e0c6;
+    font-family:'Montserrat',sans-serif; font-size:14px; font-weight:700; color:#14110A; line-height:1.35; }
+  .pdp-savebar.on { display:flex; }
+  .pdp-savebar .sb-ic { font-size:16px; flex:none; }
+  .pdp-savebar b { color:#1b7a3e; font-weight:800; }
   .pdp-tax { font-family: 'Montserrat',sans-serif; font-size:13px; color: #6a6a6a; margin-bottom: 8px; }
   .pdp-ship { font-family: 'Montserrat',sans-serif; font-size: 14px; color: #2b2b2b; margin-bottom: 6px; }
   .pdp-ship .free { color: #1B7A3D; font-weight: 700; }
@@ -81,6 +88,11 @@
   .pdp-noreturn { font-family: 'Montserrat',sans-serif; font-size:13px; color: #3a3a3a; margin-bottom: 22px; }
   .pdp-origin-val { color:#B8791C; font-weight:800; font-size:15.5px; letter-spacing:.2px; }
   .pdp-img-fav { position:absolute; top:12px; right:12px; z-index:3; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#3a3a3a; transition:all .25s; box-shadow:0 2px 8px rgba(0,0,0,.12); border:none; line-height:1; padding:0; }
+  /* Share sits directly beside the heart, same floating-circle treatment */
+  .pdp-img-share { position:absolute; top:12px; right:58px; z-index:3; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.92); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#3a3a3a; transition:all .25s; box-shadow:0 2px 8px rgba(0,0,0,.12); border:none; line-height:1; padding:0; }
+  .pdp-img-share svg { width:18px; height:18px; stroke:currentColor; stroke-width:1.9; fill:none; }
+  .pdp-img-share:hover { color:#0B291C; background:rgba(255,255,255,1); box-shadow:0 3px 12px rgba(0,0,0,.18); transform:scale(1.06); }
+  .pdp-img-share.done { color:#1b7a3e; }
   .pdp-img-fav svg { width:19px; height:19px; overflow:visible; }
   .pdp-img-fav svg path { fill:none; stroke:currentColor; stroke-width:1.8; stroke-linejoin:round; transition:fill .2s; }
   .pdp-img-fav:hover { color:#c0392b; background:rgba(255,255,255,1); box-shadow:0 3px 12px rgba(0,0,0,.18); transform:scale(1.06); }
@@ -244,6 +256,9 @@
           <button type="button" id="pdp-fav" class="pdp-img-fav" aria-label="Save to favourites">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
           </button>
+          <button type="button" id="pdp-share" class="pdp-img-share" aria-label="Share this piece" title="Share">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6 15.4 6.4M8.6 13.4l6.8 4.2" stroke-linecap="round"/></svg>
+          </button>
           <div class="pdp-thumbs" id="pdp-thumbs"></div>
         </div>
         <div>
@@ -258,6 +273,7 @@
             <span class="pdp-mrp" id="pdp-mrp"></span>
             <span class="pdp-save" id="pdp-save"></span>
           </div>
+          <div class="pdp-savebar" id="pdp-savebar"><span class="sb-ic">🎉</span><span id="pdp-savebar-txt"></span></div>
           <div class="pdp-tax">incl. of all taxes</div>
           <div class="pdp-ship"><span class="free">✓ FREE Insured Delivery</span> across India - no extra charges at checkout</div>
           <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
@@ -414,9 +430,14 @@
       $('pdp-mrp').style.display = '';
       var off = Math.round((1 - p.price / p.mrp) * 100);
       $('pdp-save').textContent = off + '% OFF';
+      // Savings shown in real rupees - a "26% OFF" badge alone is far less
+      // motivating than "You save ₹190".
+      $('pdp-savebar-txt').innerHTML = 'You save <b>' + fmt(p.mrp - p.price) + '</b> on this piece';
+      $('pdp-savebar').classList.add('on');
     } else {
       $('pdp-mrp').style.display = 'none';
       $('pdp-save').textContent = '';
+      $('pdp-savebar').classList.remove('on');
     }
     var mp = $('pdp-mobile-price'); if (mp) mp.textContent = fmt(p.price);
     $('pdp-image').alt = p.name + ' - ' + seo;
@@ -828,6 +849,38 @@
     if (!product) return;
     addToBag();
     window.location.href = '/checkout.html';
+  });
+
+  /* Share: native share sheet on mobile (WhatsApp/Insta/etc), clipboard copy
+     as the desktop fallback. Shares the clean canonical /product/<SKU> URL. */
+  $('pdp-share').addEventListener('click', function() {
+    var url = (function() {
+      var c = document.querySelector('link[rel="canonical"]');
+      return (c && c.href) || window.location.href;
+    })();
+    var title = (product && product.name) || 'Saubhagya Jewellery';
+    var text = product
+      ? title + ' - ' + fmt(product.price) + ' at Saubhagya Jewellery'
+      : 'Handcrafted jewellery at Saubhagya Jewellery';
+    if (navigator.share) {
+      navigator.share({ title: title, text: text, url: url }).catch(function() {});
+      return;
+    }
+    var done = function() {
+      var btn = $('pdp-share');
+      btn.classList.add('done');
+      if (window.MPA && window.MPA.toast) window.MPA.toast('Link copied');
+      setTimeout(function() { btn.classList.remove('done'); }, 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done).catch(function() {});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
   });
 
   /* Sticky mobile CTA bar - mirrors ADD TO BAG + BUY NOW, reveals on scroll */

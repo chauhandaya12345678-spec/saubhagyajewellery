@@ -13,8 +13,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260731d"></script>
-<script src="mpa.js?v=15" defer></script>
+<script src="layout.js?v=20260806d"></script>
+<script src="mpa.js?v=16" defer></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Track Orders"}]}</script>
 <style>
   .track-wrap { max-width: 640px; margin: 0 auto; }
@@ -106,6 +106,15 @@
       <h3>Sign in to view your orders</h3>
       <p>Your orders are linked to your account. Sign in or enter your details below to track a specific order.</p>
       <a href="signin.html">Sign In →</a>
+    </div>
+  </div>
+
+  <!-- Signed in, but zero orders on the account - do NOT prompt sign-in again -->
+  <div id="track-empty" style="display:none;">
+    <div class="guest-box">
+      <h3>No orders yet</h3>
+      <p>You haven't placed an order with us yet — explore handcrafted temple, Kundan/Polki and American Diamond jewellery, free insured shipping across India.</p>
+      <a href="categories.html">Start Shopping →</a>
     </div>
   </div>
 
@@ -377,7 +386,7 @@
           if (d && d.success && d.orders && d.orders.length) {
             renderOrders(d.orders);
           } else {
-            showGuest();
+            showEmptyOrders();
           }
         })
         .catch(showGuest);
@@ -413,7 +422,7 @@
           if (d && d.success && d.orders && d.orders.length) {
             renderOrders(d.orders);
           } else {
-            showGuest();
+            showEmptyOrders();
           }
         })
         .catch(showGuest);
@@ -428,6 +437,14 @@
     $('track-guest').style.display = 'block';
     $('track-manual').style.display = 'block';
     $('track-lede').textContent = 'Sign in or enter your details to track your order.';
+  }
+
+  // Signed in (session or MPA user confirmed), just no orders on the account yet -
+  // showing "Sign in" here was confusing since they already are signed in.
+  function showEmptyOrders() {
+    $('track-empty').style.display = 'block';
+    $('track-manual').style.display = 'block';
+    $('track-lede').textContent = 'No orders yet.';
   }
 
   // ── Button handlers ──

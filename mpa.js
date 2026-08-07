@@ -91,6 +91,41 @@
     for (var i = 0; i < items.length; i++) if (items[i].id === id) hit = items[i];
     if (hit) hit.qty += (qty || 1); else items.push({ id: id, qty: qty || 1 });
     setCart(items);
+    toast('Added to bag');
+  }
+
+  /* Transient confirmation toast. Lives here (not per-page) so EVERY
+     add-to-bag across the site gets the same feedback. Auto-dismisses. */
+  var toastEl = null, toastTimer = null;
+  function toast(msg) {
+    try {
+      if (!toastEl) {
+        toastEl = document.createElement('div');
+        toastEl.className = 'mpa-toast';
+        toastEl.setAttribute('role', 'status');
+        toastEl.setAttribute('aria-live', 'polite');
+        var css = document.createElement('style');
+        css.textContent =
+          '.mpa-toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:200;' +
+          'display:flex;align-items:center;gap:9px;padding:13px 22px;border-radius:30px;' +
+          'background:#0B291C;color:#fff;font:600 13px/1 "Montserrat",sans-serif;letter-spacing:.4px;' +
+          'box-shadow:0 10px 30px rgba(11,41,28,.35);opacity:0;pointer-events:none;' +
+          'transition:opacity .28s ease,transform .28s cubic-bezier(.25,1,.5,1)}' +
+          '.mpa-toast.show{opacity:1;transform:translate(-50%,0)}' +
+          '.mpa-toast .mt-ic{width:18px;height:18px;border-radius:50%;background:#C8901F;color:#241703;' +
+          'display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none}' +
+          '@media(prefers-reduced-motion:reduce){.mpa-toast{transition:opacity .28s ease}}';
+        document.head.appendChild(css);
+        document.body.appendChild(toastEl);
+      }
+      toastEl.innerHTML = '<span class="mt-ic">&#10003;</span><span></span>';
+      toastEl.lastChild.textContent = msg;
+      // force reflow so the transition replays on repeat taps
+      void toastEl.offsetWidth;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+    } catch (e) { /* never let UI feedback break an add-to-cart */ }
   }
 
   function cartCount() {
@@ -129,6 +164,10 @@
     // Sign-out + auth-only links (Account, Sign out): shown ONLY when logged in
     var outs = document.querySelectorAll('[data-mpa-signout],[data-mpa-onlyauth]');
     for (var k = 0; k < outs.length; k++) outs[k].style.display = user ? '' : 'none';
+    // Inverse: shown ONLY when signed out (e.g. a mobile "Sign in" prompt that
+    // shouldn't sit next to the already-signed-in profile icon).
+    var guests = document.querySelectorAll('[data-mpa-onlyguest]');
+    for (var m = 0; m < guests.length; m++) guests[m].style.display = user ? 'none' : '';
   }
 
   /* ---- change propagation ---------------------------------------------- */
@@ -172,6 +211,7 @@
     setCart: setCart,
     addToCart: addToCart,
     cartCount: cartCount,
+    toast: toast,
     signOut: signOut,
     onChange: function (fn) { if (typeof fn === 'function') listeners.push(fn); }
   };

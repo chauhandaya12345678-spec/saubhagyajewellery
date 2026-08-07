@@ -8,6 +8,7 @@ const SITE_URL = 'https://saubhagyajewellery.com';
 
 const STATIC_PAGES = [
   '/', '/categories', '/gifting', '/track-orders', '/about', '/contact',
+  '/faq', '/jewellery-guide',
   '/trust', '/blogs', '/shipping-and-returns', '/es-policy', '/grievances',
   '/terms', '/offer-terms', '/privacy-policy', '/cookie-policy',
   '/blogs/temple-jewellery-styling', '/blogs/kundan-vs-polki',
