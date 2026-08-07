@@ -7,6 +7,8 @@
  * Canonical is ALWAYS the clean /product/<sku> URL so Google indexes one
  * URL per product (query-string URLs are poorly indexed for e-commerce).
  */
+import { seoSubtitle, productKeywords } from './_seo.js';
+
 const SITE_URL = 'https://saubhagyajewellery.com';
 
 export function esc(s) {
@@ -23,18 +25,11 @@ export function cleanProductUrl(sku) {
 }
 
 export async function renderProductShell(html, p, env) {
-  const seoSubtitle = (() => {
-    const n = p.name || '';
-    if (/jhumka/i.test(n)) return 'Traditional Gold-Plated Jhumka Earrings for Weddings & Festive Wear';
-    if (p.category === 'Earring') return 'Handcrafted Gold-Plated Earrings for Everyday & Festive Wear';
-    if (/crystal/i.test(n)) return 'Crystal-Studded High Gold-Plated Necklace for Weddings & Party Wear';
-    if (/short/i.test(n)) return 'High Gold-Plated Short Necklace for Festive & Party Wear';
-    if (p.category === 'Necklace') return 'Handcrafted High Gold-Plated Necklace for Weddings & Festive Wear';
-    return 'Handcrafted Gold-Plated Imitation Jewellery, Made in India';
-  })();
+  const subtitle = seoSubtitle(p);        // shared region/style-aware engine
+  const keywords = productKeywords(p);
 
-  const title = `${p.name} - ${seoSubtitle} | Saubhagya Jewellery`;
-  const desc = `Buy ${p.name} online at ₹${p.price}. ${seoSubtitle}, handcrafted in Mumbai from skin-friendly Zamak alloy. Free insured shipping across India.`;
+  const title = `${p.name} - ${subtitle} | Saubhagya Jewellery`;
+  const desc = `Buy ${p.name} online at ₹${p.price}. ${subtitle}, handcrafted in Mumbai from skin-friendly Zamak alloy. Free insured shipping across India.`;
   const canonical = cleanProductUrl(p.sku);
   const image = abs(p.image);
   const inStock = (p.inStock === 0 || p.inStock === false) ? false : true;
@@ -107,6 +102,7 @@ export async function renderProductShell(html, p, env) {
       `<meta name="twitter:title" content="${esc(title)}">` +
       `<meta name="twitter:description" content="${esc(desc)}">` +
       `<meta name="twitter:image" content="${esc(image)}">` +
+      `<meta name="keywords" content="${esc(keywords)}">` +
       `<script type="application/ld+json">${JSON.stringify(productLd)}</script>` +
       `<script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>` +
       `</head>`

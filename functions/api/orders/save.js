@@ -15,7 +15,7 @@
  * Flow: verify signature (when order id present) → save to D1 (idempotent on
  * payment id) → push to ShipPrime order (skipped for tests).
  */
-import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock, logOrderEvent, computeExpectedTotalPaise, constantTimeEqual, genSessionToken, orderProductLabel, sendFcmToAdmins, logEvent } from '../_lib.js';
+import { hmacSha256Hex, hashPassword, pushToShipPrime, recordShipprimeResult, normEmail, normPhone, sendOrderEmail, sendWhatsAppMessage, decrementStock, logOrderEvent, computeExpectedTotalPaise, codFeePaise, constantTimeEqual, genSessionToken, orderProductLabel, sendFcmToAdmins, logEvent } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -69,7 +69,14 @@ export async function onRequest(context) {
     // involved), and a defense-in-depth backstop for Razorpay orders in case
     // this endpoint is ever hit directly instead of via checkout.html.
     const itemsForVerify = typeof items === 'string' ? JSON.parse(items) : items;
-    const expectedTotal = await computeExpectedTotalPaise(db, itemsForVerify, payment_method);
+    // Goods value on its own (no COD fee) - the COD cap below is applied to
+    // THIS, not to the fee-inclusive total. The fee is proportional now, so
+    // capping the total would silently shrink the real order limit as the fee
+    // grows with basket size.
+    const goodsPaise = await computeExpectedTotalPaise(db, itemsForVerify, 'online');
+    const expectedTotal = payment_method === 'cod'
+      ? goodsPaise + codFeePaise(goodsPaise)
+      : goodsPaise;
     if (expectedTotal !== Number(total)) {
       return json({ error: 'Order total does not match current pricing. Please refresh and try again.' }, 400);
     }
@@ -77,9 +84,9 @@ export async function onRequest(context) {
     // ── COD: OTP-verified only, capped, rate-limited (see COD-SECURITY.md).
     // Online payment (Razorpay) is never touched by any of this.
     if (payment_method === 'cod') {
-      const COD_MAX_PAISE = 100000; // ₹1,000 cap
-      if (Number(total) > COD_MAX_PAISE) {
-        return json({ error: 'Cash on Delivery is available up to ₹1,000 only. Please pay online for larger orders.' }, 400);
+      const COD_MAX_PAISE = 200000; // ₹2,000 cap on GOODS value (fee is on top)
+      if (goodsPaise > COD_MAX_PAISE) {
+        return json({ error: 'Cash on Delivery is available up to ₹2,000 only. Please pay online for larger orders.' }, 400);
       }
 
       const vToken = body.verification_token;

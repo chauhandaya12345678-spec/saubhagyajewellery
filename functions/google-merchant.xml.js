@@ -9,6 +9,8 @@
  *
  * Spec: https://support.google.com/merchant/answer/7052112
  */
+import { seoSubtitle } from './_seo.js';   // shared region/style-aware engine
+
 const SITE_URL = 'https://saubhagyajewellery.com';
 const BRAND = 'Saubhagya Jewellery';
 
@@ -19,17 +21,6 @@ function esc(s) {
 function absImg(url) {
   if (!url) return null;
   return /^https?:\/\//i.test(url) ? url : `${SITE_URL}/${String(url).replace(/^\/+/, '')}`;
-}
-
-// Same Material + Style + Use-case line as the PDP H2 / SSR meta.
-function seoSubtitle(p) {
-  const n = p.name || '';
-  if (/jhumka/i.test(n)) return 'Traditional Gold-Plated Jhumka Earrings for Weddings & Festive Wear';
-  if (p.category === 'Earring') return 'Handcrafted Gold-Plated Earrings for Everyday & Festive Wear';
-  if (/crystal/i.test(n)) return 'Crystal-Studded High Gold-Plated Necklace for Weddings & Party Wear';
-  if (/short/i.test(n)) return 'High Gold-Plated Short Necklace for Festive & Party Wear';
-  if (p.category === 'Necklace') return 'Handcrafted High Gold-Plated Necklace for Weddings & Festive Wear';
-  return 'Handcrafted Gold-Plated Imitation Jewellery, Made in India';
 }
 
 const GOOGLE_CATEGORY = {

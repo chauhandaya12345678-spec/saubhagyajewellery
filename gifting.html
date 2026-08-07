@@ -20,8 +20,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Gifting","item":"https://saubhagyajewellery.com/gifting"}]}</script>
-<link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260806d"></script>
+<link rel="stylesheet" href="site.css?v=20260807b">
+<script src="layout.js?v=20260808a"></script>
 <script src="mpa.js?v=16" defer></script>
 <script src="catalog.js?v=20"></script>
 <style>
@@ -60,6 +60,20 @@
     .gf-tab { padding: 10px 16px; font-size: 10.5px; }
     .gf-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
   }
+  /* Phones: the hero was taking half the first screen before a single product
+     was visible. Tighten the type and hide the long marketing sentence so
+     product cards appear sooner. */
+  @media (max-width: 560px) {
+    .gf-hero { padding: 16px 18px 0; }
+    .gf-kicker { font-size: 10px; letter-spacing: 2.6px; margin-bottom: 6px; }
+    .gf-title { font-size: 23px; line-height: 1.18; margin-bottom: 6px; }
+    .gf-sub { font-size: 12.5px; line-height: 1.5; }
+    .gf-sub-long { display: none; }
+    .gf-tabs { margin-top: 16px; gap: 8px; }
+    .gf-tab { padding: 9px 13px; font-size: 10px; letter-spacing: 1px; }
+    .gf-heads { margin-top: 20px; margin-bottom: 8px; }
+    .gf-heads h2 { font-size: 19px; }
+  }
 </style>
 </head>
 <body>
@@ -69,7 +83,7 @@
 <section class="gf-hero">
   <div class="gf-kicker">GIFTS FOR HER</div>
   <h1 class="gf-title">Jewellery Gifts under <em>₹1,000</em></h1>
-  <p class="gf-sub">Handcrafted gold-plated necklaces and earrings - thoughtful, affordable gifts for birthdays, anniversaries and festive occasions. Free insured shipping across India.</p>
+  <p class="gf-sub">Handcrafted gold-plated necklaces and earrings<span class="gf-sub-long"> - thoughtful, affordable gifts for birthdays, anniversaries and festive occasions</span>. Free insured shipping across India.</p>
 </section>
 
 <div class="gf-tabs" id="gf-tabs">
@@ -123,9 +137,11 @@
     $('gf-empty').style.display = 'none';
     $('gf-grid').innerHTML = list.map(function (p) {
       var img = p.image || '';
+      var hasOff = p.mrp && p.mrp > p.price;
       return '<a class="p-card" href="/product/' + encodeURIComponent(p.sku || p.id) + '">' +
         '<div class="p-img">' +
           '<img class="im" src="' + esc(img) + '" alt="' + esc(p.name || '') + ' - Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500">' +
+          (hasOff ? '<span class="p-save">SAVE ' + fmt(p.mrp - p.price) + '</span>' : '') +
         '</div>' +
         '<div class="p-name">' + esc(p.name) + '</div>' +
         '<div class="p-price">' + fmt(p.price) +

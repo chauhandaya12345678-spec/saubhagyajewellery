@@ -77,7 +77,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 <body>
 <div class="ai-header">
   <div style="display:flex;align-items:center;gap:10px">
-    <img src="images/brand/logo-mark-gold.png?v=1" alt="" width="30" height="30" style="display:block">
+    <img src="images/brand/logo-mark-gold.webp?v=3" alt="" width="30" height="30" style="display:block">
     <h1>SAUBHAGYA <span style="font-size:9px;letter-spacing:2px;color:#C5A880;border:1px solid #C5A880;border-radius:4px;padding:3px 7px;margin-left:4px;font-weight:600">ADMIN</span></h1>
   </div>
   <div class="ai-tabs" id="ai-tabs" style="display:none">
@@ -216,6 +216,31 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         <input type="number" id="np-stock" placeholder="Stock" style="width:80px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
         <button class="ai-btn small" id="np-add-btn" type="button">ADD PRODUCT</button>
         <span id="np-status" style="font-size:12px;color:#6a6a6a"></span>
+        <!-- SEO naming guide: the site auto-writes each product's title, meta,
+             on-page keywords and Google Shopping listing FROM THE NAME. A good
+             name = free ranking; a vague one = generic keywords. -->
+        <details style="flex-basis:100%;margin-top:6px;background:#fff;border:1px solid #ece4d4;border-radius:8px;padding:0">
+          <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#0B291C;padding:9px 12px;list-style:none">
+            💡 How to name a product for Google (tap to open)
+          </summary>
+          <div style="font-size:12px;line-height:1.7;color:#3a3a3a;padding:2px 14px 14px">
+            The website reads the <strong>Name</strong> you type and automatically writes the Google title, description, keywords and Shopping listing. So put the <strong>style words people actually search</strong> in the name.
+            <div style="margin:8px 0 4px;font-weight:600;color:#14110A">Formula: [Style/Region] + [Material] + [Type]</div>
+            <div style="display:grid;grid-template-columns:1fr;gap:4px;margin-top:4px">
+              <div>✅ <strong>Kundan Bridal Choker Necklace</strong> &nbsp;&nbsp; ✅ <strong>Punjabi Jhumki Earrings</strong></div>
+              <div>✅ <strong>Meenakari Chandbali Earrings</strong> &nbsp;&nbsp; ✅ <strong>Temple Lakshmi Long Haaram</strong></div>
+              <div>✅ <strong>American Diamond Mangalsutra</strong> &nbsp;&nbsp; ✅ <strong>Antique Oxidised Jhumka</strong></div>
+              <div style="color:#c0392b;margin-top:4px">❌ "Elegant Necklace" · "New Design 2" · "Beautiful Earring" — no style word = generic, weak ranking.</div>
+            </div>
+            <div style="margin-top:8px">Words the engine recognises — use any that fit:</div>
+            <div style="margin-top:3px;color:#6a6a6a">
+              <b>Material/style:</b> Kundan, Polki, Jadau, Meenakari, Temple, Antique, Oxidised, American Diamond (AD), Crystal, Pearl<br>
+              <b>Region:</b> Rajasthani, Punjabi, Bengali, Maharashtrian, Gujarati<br>
+              <b>Type:</b> Jhumka, Jhumki, Chandbali, Stud, Drop, Choker, Rani Haar, Haaram, Mangalsutra, Pendant, Bangle, Maang Tikka, Nath, Anklet, Ring, Bridal Set
+            </div>
+            <div style="margin-top:8px;color:#8a6d2f">You don't need every word — 2 to 4 that describe the piece is perfect. Keep it readable, like a real product name.</div>
+          </div>
+        </details>
       </div>
       <div class="ai-table-wrap">
         <table>

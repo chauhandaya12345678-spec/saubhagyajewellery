@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260806d"></script>
+<link rel="stylesheet" href="site.css?v=20260807b">
+<script src="layout.js?v=20260808a"></script>
 <script src="mpa.js?v=16" defer></script>
 <script src="catalog.js?v=20"></script><style>
   * { box-sizing: border-box; }
@@ -57,7 +57,21 @@
   .ctl-name { font-family:'Playfair Display',serif; font-size: 15px; color: #1A1A1A; margin-top: 9px; line-height: 1.25; }
   .ctl-price { font-family:'Montserrat',sans-serif; font-size: 13px; color: #0B291C; font-weight: 500; margin-top: 3px; }
   .ctl-price .mrp { color:#3a3a3a; text-decoration: line-through; margin-left: 6px; font-weight: 500; font-size: 12px; }
-  @media (max-width: 700px) { .ctl-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+  /* Quick add - mirrors .tr-quick on the homepage/category cards */
+  .ctl-quick { position:absolute; left:10px; right:10px; bottom:10px; z-index:3; padding:10px 0;
+    background:rgba(255,255,255,.96); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    color:#0B291C; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:600; letter-spacing:1.4px;
+    text-align:center; border:none; cursor:pointer; border-radius:8px; box-shadow:0 4px 14px rgba(11,41,28,.18);
+    opacity:0; transform:translateY(8px); transition:opacity .35s ease, transform .35s ease; }
+  @media(hover:hover){ .ctl-card:hover .ctl-quick { opacity:1; transform:translateY(0); } }
+  .ctl-save { position:absolute; top:10px; left:10px; z-index:3; padding:4px 9px; border-radius:6px;
+    background:linear-gradient(135deg,#1b7a3e,#146030); color:#fff; font-family:'Montserrat',sans-serif;
+    font-size:9.5px; font-weight:700; letter-spacing:.4px; box-shadow:0 2px 8px rgba(11,41,28,.3); }
+  @media (max-width: 700px) {
+    .ctl-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    /* Always visible on touch - there is no hover to reveal it */
+    .ctl-quick { opacity:1; transform:none; font-size:9.5px; padding:9px 0; }
+  }
   .pdp-region { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #3a3a3a; margin-bottom: 20px; }
   .pdp-price-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
   .pdp-price { font-family:'Playfair Display',serif; font-size: 42px; font-weight: 700; color: #14110A; letter-spacing: -.5px; line-height: 1; }
@@ -65,6 +79,14 @@
   .pdp-save { font-family: 'Montserrat',sans-serif; font-size: 13px; color: #fff; font-weight: 700; background: #D32F2F; padding: 4px 10px; border-radius: 5px; letter-spacing: .3px; line-height: 1; white-space: nowrap; }
   .pdp-color-lbl { font-family: 'Montserrat',sans-serif; font-size: 16px; font-weight: 500; letter-spacing: .2px; color: #2b2b2b; text-transform: none; margin: 20px 0 12px; }
   .pdp-color-lbl strong { color: #14110A; font-size: 18px; font-weight: 700; }
+  /* Mobile colour readout under the image (hidden on desktop, where the
+     full colour label is already visible beside the image). */
+  .pdp-color-mob { display: none; }
+  .pdp-color-mob .ccm { display:inline-flex; align-items:center; gap:7px; margin-top:12px; padding:7px 14px;
+    border-radius:22px; background:linear-gradient(135deg,#faf8f3,#f3ede1); border:1px solid rgba(197,168,128,.55);
+    font-family:'Montserrat',sans-serif; font-size:13px; color:#2b2b2b; }
+  .pdp-color-mob .ccm b { color:#14110A; font-weight:700; }
+  .pdp-color-mob .ccm i { font-style:normal; color:#8a7a55; font-size:11.5px; }
   .pdp-color-count { color: #8A6D2F; font-size: 13px; font-weight: 600; margin-left: 8px; letter-spacing: .3px; }
   .pdp-swatches { display: flex; gap: 10px; margin: 0 0 20px; flex-wrap: wrap; }
   .pdp-img { transition: opacity .28s ease; }
@@ -211,6 +233,10 @@
     .pdp-price { font-size: 34px; }
     .pdp-img-wrap { max-width: 100%; }
     .pdp-img { aspect-ratio: 1/1; }
+    /* Colour readout right under the image; the full label lower down is
+       then redundant on mobile, so hide that one instead of showing both. */
+    .pdp-color-mob { display: block; }
+    .pdp-color-lbl { display: none !important; }
     .pdp-desc { max-width: 100%; }
     .pdp-acc { margin-top: 28px; }
     #pdp-care ul { columns: 1; }
@@ -260,6 +286,10 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6 15.4 6.4M8.6 13.4l6.8 4.2" stroke-linecap="round"/></svg>
           </button>
           <div class="pdp-thumbs" id="pdp-thumbs"></div>
+          <!-- Mobile-only colour readout: on phones the grid stacks, so the
+               real colour label sits far below the fold. This shows which
+               shade you are looking at right under the image. -->
+          <div class="pdp-color-mob" id="pdp-color-mob" style="display:none"></div>
         </div>
         <div>
           <div class="pdp-cat" id="pdp-cat"></div>
@@ -514,9 +544,14 @@
       var picks = pool.slice(0, 4);
       grid.innerHTML = picks.map(function (x) {
         var id = x.sku || x.id;
-        var mrp = (x.mrp && x.mrp > x.price) ? '<span class="mrp">' + fmt(x.mrp) + '</span>' : '';
+        var hasOff = x.mrp && x.mrp > x.price;
+        var mrp = hasOff ? '<span class="mrp">' + fmt(x.mrp) + '</span>' : '';
+        var save = hasOff ? '<span class="ctl-save">SAVE ' + fmt(x.mrp - x.price) + '</span>' : '';
         return '<a class="ctl-card" href="/product/' + encodeURIComponent(id) + '">' +
-          '<div class="ctl-img"><img src="' + esc(x.image || '') + '" alt="' + esc(x.name) + '" loading="lazy" width="400" height="500"></div>' +
+          '<div class="ctl-img"><img src="' + esc(x.image || '') + '" alt="' + esc(x.name) + '" loading="lazy" width="400" height="500">' +
+            save +
+            '<button type="button" class="ctl-quick" data-sku="' + esc(id) + '">QUICK ADD</button>' +
+          '</div>' +
           '<div class="ctl-name">' + esc(x.name) + '</div>' +
           '<div class="ctl-price">' + fmt(x.price) + mrp + '</div></a>';
       }).join('');
@@ -524,18 +559,78 @@
       return true;
     }
     if (!build()) window.addEventListener('catalog-ready', function once() { window.removeEventListener('catalog-ready', once); build(); });
+
+    // One delegated listener - build() can run more than once (catalog-ready).
+    if (!grid.__quickBound) {
+      grid.__quickBound = true;
+      grid.addEventListener('click', function (e) {
+        var btn = e.target.closest('.ctl-quick');
+        if (!btn) return;
+        e.preventDefault();           // don't follow the card link
+        e.stopPropagation();
+        if (window.MPA) window.MPA.addToCart(btn.getAttribute('data-sku'), 1);
+        var old = btn.textContent;
+        btn.textContent = '✓ ADDED';
+        setTimeout(function () { btn.textContent = old; }, 1500);
+      });
+    }
   }
 
-  /* Keyword-rich H2 line: Material + Style + Use-case. Drives long-tail
-     search intent ("gold plated jhumka earrings for weddings" etc.). */
+  /* Keyword-rich H2 line: Material + Style + Region + Use-case. MIRRORS
+     seoSubtitle() in functions/_seo.js VERBATIM (browser copy — no build step
+     to share edge code). Region/style aware so every uploaded design, South
+     temple to North Kundan to Punjabi jhumki, auto-gets pan-India keywords. */
   function seoSubtitle(p) {
-    var n = p.name || '';
-    if (/jhumka/i.test(n)) return 'Traditional Gold-Plated Jhumka Earrings for Weddings & Festive Wear';
-    if (p.category === 'Earring') return 'Handcrafted Gold-Plated Earrings for Everyday & Festive Wear';
-    if (/crystal/i.test(n)) return 'Crystal-Studded High Gold-Plated Necklace for Weddings & Party Wear';
-    if (/short/i.test(n)) return 'High Gold-Plated Short Necklace for Festive & Party Wear';
-    if (p.category === 'Necklace') return 'Handcrafted High Gold-Plated Necklace for Weddings & Festive Wear';
-    return 'Handcrafted Gold-Plated Imitation Jewellery, Made in India';
+    var s = ((p.name || '') + ' ' + (p.category || '')).toLowerCase();
+    var cat = (p.category || '').toLowerCase();
+    var material = '';
+    if (/kundan/.test(s) && /polki/.test(s)) material = 'Kundan & Polki';
+    else if (/kundan/.test(s)) material = 'Kundan';
+    else if (/polki/.test(s)) material = 'Polki';
+    else if (/jadau/.test(s)) material = 'Jadau';
+    else if (/meenakari|meena/.test(s)) material = 'Meenakari';
+    else if (/temple|lakshmi|laxmi|nagas|nakshi|peacock/.test(s)) material = 'South Indian Temple';
+    else if (/antique|oxidis|oxidiz/.test(s)) material = 'Antique Gold-Finish';
+    else if (/american diamond|\bad\b|\bcz\b|cubic|zircon/.test(s)) material = 'American Diamond';
+    else if (/crystal/.test(s)) material = 'Crystal-Studded';
+    else if (/pearl|moti/.test(s)) material = 'Pearl';
+    else if (/stone|studded/.test(s)) material = 'Stone-Studded';
+    var region = '';
+    if (/rajwadi|rajasthani|borla|rakhdi|aad/.test(s)) region = 'Rajasthani';
+    else if (/punjabi|jhumki|pippal|tikka.?set/.test(s)) region = 'Punjabi';
+    else if (/bengali|bangla|chik|ratanchur|sita ?haar/.test(s)) region = 'Bengali';
+    else if (/maharashtrian|thushi|kolhapuri|saaj|\bnath\b/.test(s)) region = 'Maharashtrian';
+    else if (/gujarati/.test(s)) region = 'Gujarati';
+    var type = 'Imitation Jewellery';
+    if (/jhumka|jhumki/.test(s)) type = 'Jhumka Earrings';
+    else if (/chandbali|chand ?bali/.test(s)) type = 'Chandbali Earrings';
+    else if (/stud/.test(s)) type = 'Stud Earrings';
+    else if (/drop|dangler/.test(s)) type = 'Drop Earrings';
+    else if (/hoop|bali/.test(s) && cat === 'earring') type = 'Hoop Earrings';
+    else if (cat === 'earring' || /earring/.test(s)) type = 'Earrings';
+    else if (/choker/.test(s)) type = 'Choker Necklace';
+    else if (/rani ?haar|haaram|long ?necklace|long ?haar|mala/.test(s)) type = 'Long Necklace';
+    else if (/mangalsutra/.test(s)) type = 'Mangalsutra';
+    else if (/pendant/.test(s)) type = 'Pendant Set';
+    else if (/bangle|kada|kangan/.test(s)) type = 'Bangles';
+    else if (/bracelet/.test(s)) type = 'Bracelet';
+    else if (/maang ?tikka|matha ?patti|\btikka\b|borla|rakhdi/.test(s)) type = 'Maang Tikka';
+    else if (/\bnath\b|nose ?ring|nathni/.test(s)) type = 'Nath';
+    else if (/anklet|payal/.test(s)) type = 'Anklets';
+    else if (/\bring\b/.test(s)) type = 'Ring';
+    else if (/bridal ?set|full ?set|combo|\bset\b/.test(s)) type = 'Bridal Jewellery Set';
+    else if (/short/.test(s)) type = 'Short Necklace';
+    else if (cat === 'necklace' || /necklace/.test(s)) type = 'Necklace';
+    var occ = 'Weddings, Festive & Party Wear';
+    if (/bridal|mangalsutra|rani ?haar|haaram/.test(s) || /Kundan|Polki|Jadau/.test(material)) occ = 'Weddings, Receptions & Festive Wear';
+    else if (type === 'Stud Earrings' || /office|daily|everyday|casual/.test(s)) occ = 'Everyday, Office & Festive Wear';
+    var parts = [];
+    if (material) parts.push(material);
+    else if (region) parts.push(region);
+    parts.push('Gold-Plated');
+    if (region && material) parts.push(region);
+    parts.push(type);
+    return parts.join(' ') + ' for ' + occ;
   }
 
   /* Current colour + shade count for the selected variant (empty for single-
@@ -679,12 +774,21 @@
 
   function switchMainImage(src) {
     $('pdp-image').src = src;
+    var active = null;
     $('pdp-swatches').querySelectorAll('.pdp-swatch').forEach(function (b) {
-      b.classList.toggle('on', b.getAttribute('data-img') === src);
+      var on = b.getAttribute('data-img') === src;
+      b.classList.toggle('on', on);
+      if (on) active = b.getAttribute('title') || '';
     });
     $('pdp-thumbs').querySelectorAll('.pdp-thumb').forEach(function (b) {
       b.classList.toggle('on', b.getAttribute('data-img') === src);
     });
+    // Keep the mobile colour chip in sync - this path doesn't re-render.
+    var mob = $('pdp-color-mob');
+    if (mob && active) {
+      var b = mob.querySelector('b');
+      if (b) b.textContent = active;
+    }
   }
 
   var switching = false;
@@ -729,15 +833,29 @@
   function renderSwatches(p) {
     var box = $('pdp-swatches');
     var lbl = $('pdp-color-lbl');
+    var mob = $('pdp-color-mob');
     var opts = getImageOpts(p);
     // A lone swatch is meaningless - only show swatches for a real choice (2+)
-    if (opts.length < 2) { box.style.display = 'none'; box.innerHTML = ''; lbl.style.display = 'none'; return; }
+    if (opts.length < 2) {
+      box.style.display = 'none'; box.innerHTML = '';
+      lbl.style.display = 'none';
+      if (mob) { mob.style.display = 'none'; mob.innerHTML = ''; }
+      return;
+    }
     var act = activeOptIndex(p, opts);
     if (opts[act] && opts[act].label) {
       lbl.innerHTML = 'Colour: <strong>' + opts[act].label + '</strong>' +
         '<span class="pdp-color-count">' + opts.length + ' shades available</span>';
       lbl.style.display = 'block';
-    } else lbl.style.display = 'none';
+      if (mob) {
+        mob.innerHTML = '<span class="ccm">Colour: <b>' + opts[act].label + '</b>' +
+          '<i>· ' + opts.length + ' shades</i></span>';
+        mob.style.display = '';   // CSS media query decides mobile-vs-desktop
+      }
+    } else {
+      lbl.style.display = 'none';
+      if (mob) { mob.style.display = 'none'; mob.innerHTML = ''; }
+    }
     box.innerHTML = opts.map(function (o, i) {
       return '<button type="button" class="pdp-swatch' + (i === act ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" title="' + (o.label || '') + '" aria-label="' + (o.label || ('View ' + (i + 1))) + '"><img src="' + o.image + '" alt="' + (o.label || '') + '" loading="lazy"></button>';
     }).join('');

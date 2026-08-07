@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="site.css?v=20260731b">
-<script src="layout.js?v=20260806d"></script>
+<link rel="stylesheet" href="site.css?v=20260807b">
+<script src="layout.js?v=20260808a"></script>
 <script src="mpa.js?v=16" defer></script>
 <script src="catalog.js?v=20"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -55,6 +55,27 @@
   }
   .form-row input:focus, .form-row select:focus { border-color:#C5A880; }
   .form-row input.err, .form-row select.err { border-color:#c0392b; }
+  /* Live validation feedback */
+  .form-row input.ok, .form-row select.ok { border-color:#1b7a3e; }
+  .co-fielderr { display:none; margin-top:5px; font-family:'Montserrat',sans-serif; font-size:11.5px; color:#c0392b; line-height:1.35; }
+  /* Mobile: a compact always-visible total bar so the amount never scrolls
+     away while filling a long address form. Desktop keeps the sticky panel. */
+  .co-mobile-total { display:none; }
+  @media (max-width: 760px) {
+    .co-mobile-total { display:flex; position:fixed; left:0; right:0; bottom:0; z-index:60;
+      align-items:center; justify-content:space-between; gap:12px;
+      padding:11px 16px calc(11px + env(safe-area-inset-bottom));
+      background:rgba(255,255,255,.97); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+      border-top:1px solid rgba(197,168,128,.5); box-shadow:0 -6px 20px rgba(11,41,28,.12); }
+    .co-mobile-total .cmt-l { font-family:'Montserrat',sans-serif; font-size:10.5px; letter-spacing:1.2px; color:#3a3a3a; text-transform:uppercase; }
+    .co-mobile-total .cmt-v { font-family:'Playfair Display',serif; font-size:21px; font-weight:700; color:#14110A; line-height:1.1; }
+    .co-mobile-total .cmt-note { font-family:'Montserrat',sans-serif; font-size:10px; color:#6a6a6a; }
+    .co-mobile-total button { padding:13px 22px; border:none; border-radius:12px; background:#C8901F; color:#241703;
+      font-family:'Montserrat',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; cursor:pointer;
+      box-shadow:0 4px 14px rgba(200,144,31,.45); }
+    /* keep the fixed bar from covering the real submit button */
+    .co-wrap { padding-bottom: 108px; }
+  }
   .form-row select { appearance:none; padding-right:32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236a6a6a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position: right 12px center; }
   .form-row small { display:block; font-family:'Montserrat',sans-serif; font-size:10.5px; color:#3a3a3a; margin-top:4px; }
   .form-row .hint-ok { color:#0B291C; }
@@ -169,7 +190,7 @@
           <div class="co-line"><span>Subtotal</span><span id="co-subtotal">&#8377;0</span></div>
           <div class="co-line"><span>Shipping</span><span>FREE</span></div>
           <div class="co-line"><span>Taxes</span><span>Inclusive</span></div>
-          <div class="co-line" id="co-codfee-row" style="display:none"><span>Cash on Delivery fee</span><span id="co-codfee-amt">&#8377;45</span></div>
+          <div class="co-line" id="co-codfee-row" style="display:none"><span>Cash on Delivery fee</span><span id="co-codfee-amt"></span></div>
           <div class="co-total"><span>Total</span><span id="co-total-amt"></span></div>
           <div class="co-pm">
             <label class="co-pm-opt"><input type="radio" name="co-paymethod" value="online" checked>Pay Online<span class="co-pm-sub">Card / UPI / NetBanking</span></label>
@@ -183,6 +204,16 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Mobile-only running total; taps through to the real submit button. -->
+<div class="co-mobile-total" id="co-mobile-total">
+  <div>
+    <div class="cmt-l">Total</div>
+    <div class="cmt-v" id="cmt-total">&nbsp;</div>
+    <div class="cmt-note" id="cmt-note">Free insured delivery</div>
+  </div>
+  <button type="button" id="cmt-btn">PLACE ORDER</button>
 </div>
 
 <div class="co-otp-overlay" id="co-otp-overlay" style="display:none">
@@ -211,8 +242,16 @@
   var beginCheckoutFired = false;
   var savedAddresses = [];
   var selectedAddressId = null;
-  var COD_FEE = 45;
-  var COD_MAX_TOTAL = 1000;
+  /* COD fee: 12% of goods value, minimum ₹49. MUST match codFeePaise() in
+     functions/api/_lib.js — the server recomputes and rejects a mismatch.
+     The courier bills us max(10%, ₹21.19) + 18% GST ≈ 11.8%, so a flat fee
+     lost money on anything above ~₹381. Cap applies to GOODS, fee sits on top. */
+  var COD_FEE_PCT = 0.12;
+  var COD_FEE_MIN = 49;
+  var COD_MAX_TOTAL = 2000;   // cap on goods subtotal, not on goods+fee
+  function codFee(goods) {
+    return Math.round(Math.max(Math.round((goods || 0) * COD_FEE_PCT), COD_FEE_MIN));
+  }
   var pendingCod = null;
 
   function isCodSelected() {
@@ -222,20 +261,30 @@
 
   function updateTotalDisplay() {
     var codRadio = $('co-pm-cod');
-    var codTooHigh = (subtotal + COD_FEE) > COD_MAX_TOTAL;
+    var fee = codFee(subtotal);
+    var codTooHigh = subtotal > COD_MAX_TOTAL;
     codRadio.disabled = codTooHigh;
     codRadio.closest('.co-pm-opt').style.opacity = codTooHigh ? '.45' : '1';
     codRadio.closest('.co-pm-opt').querySelector('.co-pm-sub').textContent = codTooHigh
       ? 'Not available above ' + fmt(COD_MAX_TOTAL)
-      : '+' + fmt(COD_FEE) + ' fee';
+      : '+' + fmt(fee) + ' fee';
     if (codTooHigh && codRadio.checked) { document.querySelector('input[name="co-paymethod"][value="online"]').checked = true; }
     var cod = isCodSelected();
     $('co-codfee-row').style.display = cod ? 'flex' : 'none';
-    $('co-total-amt').textContent = fmt(subtotal + (cod ? COD_FEE : 0));
+    // Keep the fee line's amount in step with the proportional fee.
+    var feeAmtEl = $('co-codfee-amt');
+    if (feeAmtEl) feeAmtEl.textContent = fmt(fee);
+    $('co-total-amt').textContent = fmt(subtotal + (cod ? fee : 0));
     $('co-secure-text').innerHTML = cod
       ? '&#128274; Pay cash at your doorstep &middot; verified by OTP'
       : '&#128274; Secured by Razorpay &middot; 256-bit SSL';
     $('co-submit').textContent = cod ? 'VERIFY & PLACE ORDER' : 'PLACE ORDER & PAY';
+
+    // Mirror into the mobile sticky bar so the amount is always on screen.
+    var mt = $('cmt-total'), mn = $('cmt-note'), mb = $('cmt-btn');
+    if (mt) mt.textContent = fmt(subtotal + (cod ? fee : 0));
+    if (mn) mn.textContent = cod ? ('Includes ' + fmt(fee) + ' COD fee') : 'Free insured delivery';
+    if (mb) mb.textContent = cod ? 'VERIFY & ORDER' : 'PLACE ORDER';
   }
   document.querySelectorAll('input[name="co-paymethod"]').forEach(function (r) {
     r.addEventListener('change', updateTotalDisplay);
@@ -504,6 +553,71 @@
     return errs;
   }
 
+  /* ── Live inline validation ────────────────────────────────────────────
+     Same rules as validate() above, expressed once per field so the two can
+     never disagree. A field is only judged AFTER the shopper has left it
+     (blur) - validating while someone is mid-typing their name is hostile.
+     Once a field has been marked wrong it re-checks on every keystroke so
+     the error clears the instant it's fixed. */
+  var FIELD_RULES = {
+    'f-name':     { test: function (v) { return v.trim().length >= 2; },              msg: 'Enter your full name' },
+    'f-phone':    { test: function (v) { return v.replace(/\D/g, '').length === 10; }, msg: 'Enter a 10-digit mobile number' },
+    'f-email':    { test: function (v) { return !v.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()); }, msg: 'Check this email address' },
+    'f-address1': { test: function (v) { return v.trim().length >= 5; },              msg: 'Flat / house / building' },
+    'f-address2': { test: function (v) { return v.trim().length >= 3; },              msg: 'Street / area' },
+    'f-pincode':  { test: function (v) { return /^\d{6}$/.test(v.trim()); },          msg: 'Enter a 6-digit PIN code' },
+    'f-city':     { test: function (v) { return v.trim().length >= 2; },              msg: 'City is required' },
+    'f-state':    { test: function (v) { return v.trim().length >= 2; },              msg: 'State is required' }
+  };
+
+  function fieldMsgEl(id) {
+    var input = $(id);
+    if (!input) return null;
+    var el = input.parentNode.querySelector('.co-fielderr');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'co-fielderr';
+      input.parentNode.appendChild(el);
+    }
+    return el;
+  }
+
+  function checkField(id, force) {
+    var input = $(id), rule = FIELD_RULES[id];
+    if (!input || !rule) return true;
+    // Don't shout at an untouched, still-empty field.
+    if (!force && !input.value.trim() && !input.classList.contains('err')) return true;
+    var ok = rule.test(input.value || '');
+    input.classList.toggle('err', !ok);
+    input.classList.toggle('ok', ok && !!input.value.trim());
+    var msg = fieldMsgEl(id);
+    if (msg) { msg.textContent = ok ? '' : rule.msg; msg.style.display = ok ? 'none' : 'block'; }
+    return ok;
+  }
+
+  /* Mobile bar delegates to the one real submit button, so there is exactly
+     one order-placing code path (no duplicated submit logic to drift). */
+  (function () {
+    var mb = $('cmt-btn');
+    if (mb) mb.addEventListener('click', function () {
+      var s = $('co-submit');
+      if (!s || s.disabled) return;
+      s.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      s.click();
+    });
+  })();
+
+  Object.keys(FIELD_RULES).forEach(function (id) {
+    var input = $(id);
+    if (!input) return;
+    input.addEventListener('blur', function () { checkField(id, true); });
+    input.addEventListener('input', function () {
+      // Re-check live only once it's already flagged, so the tick/error
+      // resolves as soon as they correct it.
+      if (input.classList.contains('err') || input.classList.contains('ok')) checkField(id, true);
+    });
+  });
+
   function showOverlay() {
     var d = document.createElement('div');
     d.className = 'co-overlay';
@@ -752,8 +866,8 @@
       return;
     }
     var itemsTotal = lines.reduce(function (s, l) { return s + l.price * l.qty; }, 0);
-    var grandTotal = itemsTotal + COD_FEE;
-    if (grandTotal > COD_MAX_TOTAL) {
+    // Cap is on goods value; the COD fee is charged on top of it.
+    if (itemsTotal > COD_MAX_TOTAL) {
       $('co-error').textContent = 'Cash on Delivery is available up to ' + fmt(COD_MAX_TOTAL) + ' only. Please pay online for higher-value orders.';
       $('co-error').style.display = 'block';
       $('co-submit').disabled = false;
@@ -774,6 +888,9 @@
       city: addr.city, state: addr.state, pin: addr.pincode
     });
     var codOrderId = Date.now().toString(36).toUpperCase();
+    // Goods + proportional COD fee, in rupees. MUST equal the server's
+    // computeExpectedTotalPaise + codFeePaise or save.js rejects the order.
+    var grandTotal = itemsTotal + codFee(itemsTotal);
     var saveBody = {
       razorpay_payment_id: 'COD-' + codOrderId,
       items: lines, total: (grandTotal) * 100, subtotal: itemsTotal * 100, discount: 0,
