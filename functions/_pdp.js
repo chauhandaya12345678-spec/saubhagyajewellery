@@ -117,9 +117,9 @@ export async function renderProductShell(html, p, env) {
       '<p class="pdp-error-title" style="display:none"></p>'
     )
     .replace(
-      'id="pdp-oos-stamp" style="display:none"',
+      '<div class="pdp-oos-stamp" id="pdp-oos-stamp" style="display:none">OUT OF STOCK</div>',
       inStock
-        ? 'id="pdp-oos-stamp" style="display:none"'   // in stock → hidden OK, text still "OUT OF STOCK" but hidden
-        : 'id="pdp-oos-stamp"'                         // out of stock → keep visible for Google
+        ? '<div class="pdp-oos-stamp" id="pdp-oos-stamp" style="display:none"></div>'   // in stock → scrub text from raw HTML (no soft-404 signal)
+        : '<div class="pdp-oos-stamp" id="pdp-oos-stamp">OUT OF STOCK</div>'           // out of stock → visible, honest signal
     );
 }
