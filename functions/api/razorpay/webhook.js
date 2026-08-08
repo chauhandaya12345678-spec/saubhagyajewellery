@@ -13,7 +13,7 @@
  *   Secret: value of RAZORPAY_WEBHOOK_SECRET
  *   Events: payment.captured, order.paid
  */
-import { hmacSha256Hex, recordShipprimeResult, sendOrderEmail, sendWhatsAppMessage, decrementStock, constantTimeEqual, logOrderEvent, orderProductLabel } from '../_lib.js';
+import { hmacSha256Hex, recordShipprimeResult, sendOrderEmail, sendWhatsAppMessage, decrementStock, constantTimeEqual, logOrderEvent, orderProductLabel, sendFcmToAdmins, logEvent } from '../_lib.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -207,6 +207,29 @@ export async function onRequest(context) {
           .catch(() => {});
         if (context.waitUntil) context.waitUntil(waJob); else await waJob;
       }
+
+      // Owner push. Same gap as the WhatsApp call above: an order that lands
+      // here instead of via save.js (browser closed / network dropped before
+      // save.js finished) created the order, emailed and WhatsApp'd the
+      // customer, but never notified the owner's phone at all. Awaited, not
+      // fire-and-forget, so it can't be lost to isolate teardown.
+      const pushJob = sendFcmToAdmins(env, {
+        title: 'New order ' + orderId,
+        body: (notes.customer_name || 'Guest') + ' · ₹' + Math.round((p.amount || 0) / 100),
+      }, { type: 'new_order', order_id: String(orderId), source: 'razorpay_webhook' })
+        .then(r => logEvent(db, {
+          level: (r && r.sent) ? 'info' : 'warn',
+          source: 'fcm_admin_push',
+          message: (r && r.sent) ? `pushed to ${r.sent} device(s) (webhook)` : `no push (${(r && (r.error || r.note)) || 'no send'})`,
+          orderId,
+          meta: r,
+        }))
+        .catch(() => {});
+      // Razorpay treats a webhook as failed past ~5s and retries, so cap
+      // well under that; waitUntil keeps the send alive past the response
+      // if it loses the race, instead of dying with the isolate.
+      if (context.waitUntil) context.waitUntil(pushJob);
+      await Promise.race([pushJob, new Promise(res => setTimeout(res, 3000))]);
     }
 
     return json({ ok: true, order_id: orderId, shipprime: sp || { pushed: false } });

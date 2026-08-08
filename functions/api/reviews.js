@@ -2,9 +2,12 @@
  * Saubhagya – Reviews API (verified-buyer gated)
  *
  * GET  /api/reviews?sku=X
- *   → { success, reviews:[{name, rating, review_text, created_at, verified:1}], average, count }
+ *   → { success, reviews:[{name, rating, review_text, image_url, created_at, verified:1}], average, count }
  *
- * POST /api/reviews  { product_sku, email?, phone?, name, rating, review_text }
+ * GET  /api/reviews?latest=1&limit=12   (no sku — homepage feed)
+ *   → { success, reviews:[{product_sku, name, rating, review_text, image_url, created_at, verified:1}], count }
+ *
+ * POST /api/reviews  { product_sku, email?, phone?, name, rating, review_text, image_url? }
  *   → 200 { success } iff:
  *     - a confirmed order exists for this email/phone that contains product_sku
  *     - user hasn't already reviewed this product
@@ -30,16 +33,44 @@ export async function onRequest(context) {
   try {
     const db = env.DB;
     const url = new URL(request.url);
+    // reviews.image_url ships with build/migrate-review-images.sql. Until that
+    // has been run the column doesn't exist, so every read falls back to the
+    // pre-migration SELECT instead of 500ing the whole reviews block.
+    const q = async (sqlWith, sqlWithout, ...bind) => {
+      try { return await db.prepare(sqlWith).bind(...bind).all(); }
+      catch (e) {
+        if (!/no such column|has no column named/i.test(e.message || '')) throw e;
+        return await db.prepare(sqlWithout).bind(...bind).all();
+      }
+    };
 
     if (request.method === 'GET') {
       const sku = url.searchParams.get('sku');
+
+      // Homepage feed: newest reviews across ALL products. Only when no sku.
+      if (!sku && url.searchParams.get('latest') === '1') {
+        const n = parseInt(url.searchParams.get('limit'), 10);
+        const limit = Math.min(Math.max(Number.isFinite(n) ? n : 12, 1), 24);
+        // image_url is surfaced ONLY once the owner approves the photo;
+        // the review text itself publishes immediately.
+        const { results } = await q(
+          "SELECT product_sku, name, rating, review_text, CASE WHEN image_status = 'approved' THEN image_url END AS image_url, created_at FROM reviews ORDER BY created_at DESC LIMIT ?",
+          'SELECT product_sku, name, rating, review_text, created_at FROM reviews ORDER BY created_at DESC LIMIT ?',
+          limit
+        );
+        const feed = (results || []).map(r => ({ product_sku: r.product_sku, name: r.name, rating: r.rating, review_text: r.review_text, image_url: r.image_url || null, created_at: r.created_at, verified: 1 }));
+        return json({ success: true, reviews: feed, count: feed.length });
+      }
+
       if (!sku) return json({ error: 'sku required' }, 400);
-      const { results } = await db.prepare(
-        'SELECT name, rating, review_text, created_at FROM reviews WHERE product_sku = ? ORDER BY created_at DESC'
-      ).bind(sku).all();
+      const { results } = await q(
+        "SELECT name, rating, review_text, CASE WHEN image_status = 'approved' THEN image_url END AS image_url, created_at FROM reviews WHERE product_sku = ? ORDER BY created_at DESC",
+        'SELECT name, rating, review_text, created_at FROM reviews WHERE product_sku = ? ORDER BY created_at DESC',
+        sku
+      );
       const avg = results.length ? Math.round(results.reduce((s, r) => s + r.rating, 0) / results.length * 10) / 10 : 0;
       // Public payload — no user_id, no email leak; every published review is verified by construction
-      const list = results.map(r => ({ name: r.name, rating: r.rating, review_text: r.review_text, created_at: r.created_at, verified: 1 }));
+      const list = results.map(r => ({ name: r.name, rating: r.rating, review_text: r.review_text, image_url: r.image_url || null, created_at: r.created_at, verified: 1 }));
       return json({ success: true, reviews: list, average: avg, count: results.length });
     }
 
@@ -54,6 +85,19 @@ export async function onRequest(context) {
       if (!email && !phone) return json({ error: 'email or phone required so we can verify your order' }, 400);
       if (rating < 1 || rating > 5) return json({ error: 'rating must be 1-5' }, 400);
       if (String(review_text).length > 2000) return json({ error: 'review too long' }, 400);
+
+      // image_url must be an object WE wrote via /api/review-image — anything
+      // else would let a poster park an arbitrary external URL in our DB (and
+      // on the storefront). Prefix check, not a "contains", so no
+      // https://evil.com/?x=https://img.../reviews/ bypass.
+      const imgBase = (env.R2_PUBLIC_BASE || 'https://img.saubhagyajewellery.com').replace(/\/+$/, '');
+      let imageUrl = null;
+      if (body.image_url !== undefined && body.image_url !== null && body.image_url !== '') {
+        if (typeof body.image_url !== 'string' || !body.image_url.startsWith(imgBase + '/reviews/')) {
+          return json({ error: 'invalid image_url' }, 400);
+        }
+        imageUrl = body.image_url;
+      }
 
       // Match confirmed orders for this email/phone; check items JSON contains the sku
       const rows = await db.prepare(
@@ -81,13 +125,27 @@ export async function onRequest(context) {
         if (u) userId = u.id;
       }
 
-      await db.prepare('INSERT INTO reviews (product_sku, user_id, name, rating, review_text) VALUES (?, ?, ?, ?, ?)')
-        .bind(product_sku, userId, String(name).slice(0, 60), rating, review_text).run();
+      const safeName = String(name).slice(0, 60);
+      try {
+        await db.prepare('INSERT INTO reviews (product_sku, user_id, name, rating, review_text, image_url) VALUES (?, ?, ?, ?, ?, ?)')
+          .bind(product_sku, userId, safeName, rating, review_text, imageUrl).run();
+      } catch (e) {
+        // SQLite words this differently per statement type: SELECT gives
+        // "no such column: x", INSERT gives "table reviews has no column
+        // named x". Match both or the fallback never fires.
+        if (!/no such column|has no column named/i.test(e.message || '')) throw e;
+        await db.prepare('INSERT INTO reviews (product_sku, user_id, name, rating, review_text) VALUES (?, ?, ?, ?, ?)')
+          .bind(product_sku, userId, safeName, rating, review_text).run();
+        // The photo is already in R2 but can't be referenced — tell the
+        // caller so it isn't reported as a fully successful submission.
+        if (imageUrl) return json({ success: true, verified: true, photoStored: false });
+      }
       return json({ success: true, verified: true });
     }
 
     return json({ error: 'Method not allowed' }, 405);
   } catch (err) {
-    return json({ error: err.message }, 500);
+    console.log('reviews error:', err && err.message);
+    return json({ error: 'Could not process that right now. Please try again.' }, 500);
   }
 }

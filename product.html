@@ -378,6 +378,12 @@
           <label class="rv-label" for="rv-text">Your review</label>
           <textarea class="rv-textarea" id="rv-text" placeholder="How was the piece? Fit, finish, occasion…" maxlength="600"></textarea>
           <div class="rv-char-count" id="rv-char-count">0 / 600</div>
+          <label class="rv-label" for="rv-photo">Add a photo <span style="font-weight:400;color:#8a8a8a">(optional)</span></label>
+          <input type="file" id="rv-photo" accept="image/jpeg,image/png,image/webp" style="font-size:13px;margin-bottom:10px">
+          <div id="rv-photo-preview" hidden style="margin-bottom:12px">
+            <img id="rv-photo-img" alt="Your photo" style="max-width:140px;border-radius:12px;display:block">
+            <button type="button" id="rv-photo-clear" style="background:none;border:none;color:#c0392b;font-size:12px;padding:6px 0;cursor:pointer">Remove photo</button>
+          </div>
           <button class="rv-submit" id="rv-submit">SUBMIT REVIEW</button>
           <div class="rv-msg" id="rv-msg"></div>
         </div>
@@ -1056,10 +1062,14 @@
 
   function reviewCardHtml(r) {
     var stars = '★'.repeat(Math.max(1, Math.min(5, r.rating))) + '☆'.repeat(Math.max(0, 5 - Math.min(5, r.rating)));
+    var photo = r.image_url
+      ? '<img src="' + esc(r.image_url) + '" alt="Customer photo" loading="lazy" decoding="async" ' +
+        'style="margin-top:10px;width:100%;max-width:190px;aspect-ratio:4/3;object-fit:cover;border-radius:12px;display:block">'
+      : '';
     return '<div class="rv-item">' +
       '<div class="rv-stars">' + stars + '</div>' +
       '<div class="rv-name">' + esc(r.name) + '</div>' +
-      '<div class="rv-text">' + esc(r.review_text) + '</div></div>';
+      '<div class="rv-text">' + esc(r.review_text) + '</div>' + photo + '</div>';
   }
 
   var allReviews = [];
@@ -1113,27 +1123,96 @@
       return;
     }
     this.disabled = true;
-    fetch('/api/reviews', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        product_sku: sku, name: name, rating: rvRating, review_text: text,
-        email: user.email || '', phone: user.phone || ''
-      })
-    }).then(function(r) { return r.json(); })
-      .then(function(d) {
-        $('rv-submit').disabled = false;
-        if (d && d.success) {
-          msg.style.color = '#0B291C'; msg.textContent = 'Thank you! Your review is live.';
-          $('rv-name').value = ''; $('rv-text').value = '';
-          loadReviews();
-        } else {
-          msg.style.color = '#c0392b'; msg.textContent = (d && d.error) || 'Could not submit. Try again.';
-        }
-      }).catch(function() {
-        $('rv-submit').disabled = false;
-        msg.style.color = '#c0392b'; msg.textContent = 'Network error. Try again.';
-      });
+
+    // Photo first (if any): upload returns the R2 URL that /api/reviews will
+    // accept. A failed photo must not silently drop the written review, so we
+    // stop and tell the customer rather than posting the text alone.
+    var file = rvPhotoFile;
+    var step = file ? uploadReviewPhoto(file, user) : Promise.resolve(null);
+
+    step.then(function(imageUrl) {
+      return fetch('/api/reviews', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_sku: sku, name: name, rating: rvRating, review_text: text,
+          email: user.email || '', phone: user.phone || '',
+          image_url: imageUrl || ''
+        })
+      }).then(function(r) { return r.json(); });
+    }).then(function(d) {
+      $('rv-submit').disabled = false;
+      if (d && d.success) {
+        msg.style.color = '#0B291C'; msg.textContent = 'Thank you! Your review is live.';
+        $('rv-name').value = ''; $('rv-text').value = '';
+        clearReviewPhoto();
+        loadReviews();
+      } else {
+        msg.style.color = '#c0392b'; msg.textContent = (d && d.error) || 'Could not submit. Try again.';
+      }
+    }).catch(function(e) {
+      $('rv-submit').disabled = false;
+      msg.style.color = '#c0392b';
+      // Only our own upload errors are customer-appropriate; anything else
+      // (e.g. a Cloudflare HTML error page failing JSON.parse) gets the
+      // generic line instead of leaking parser output into the storefront.
+      msg.textContent = (e && e.userFacing && e.message) || 'Could not submit right now. Please try again.';
+    });
   });
+
+  /* ---- review photo (optional) ---- */
+  var rvPhotoFile = null;
+  var MAX_PHOTO = 5 * 1024 * 1024;
+
+  function clearReviewPhoto() {
+    rvPhotoFile = null;
+    var inp = $('rv-photo');
+    if (inp) inp.value = '';
+    var prev = $('rv-photo-preview');
+    if (prev) prev.hidden = true;
+    var img = $('rv-photo-img');
+    if (img && img.src.indexOf('blob:') === 0) { URL.revokeObjectURL(img.src); img.removeAttribute('src'); }
+  }
+
+  function uploadReviewPhoto(file, user) {
+    var fd = new FormData();
+    fd.append('file', file);
+    fd.append('product_sku', sku);
+    fd.append('email', user.email || '');
+    fd.append('phone', user.phone || '');
+    return fetch('/api/review-image', { method: 'POST', body: fd })
+      .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, d: d }; }); })
+      .then(function(res) {
+        if (!res.ok || !res.d || !res.d.url) {
+          var upErr = new Error((res.d && res.d.error) || 'Photo upload failed. Try a smaller image.');
+          upErr.userFacing = true;
+          throw upErr;
+        }
+        return res.d.url;
+      });
+  }
+
+  if ($('rv-photo')) {
+    $('rv-photo').addEventListener('change', function() {
+      var f = this.files && this.files[0];
+      var msg = $('rv-msg');
+      if (!f) { clearReviewPhoto(); return; }
+      if (['image/jpeg', 'image/png', 'image/webp'].indexOf(f.type) < 0) {
+        msg.style.color = '#c0392b'; msg.textContent = 'Photo must be a JPG, PNG or WebP.';
+        clearReviewPhoto(); return;
+      }
+      if (f.size > MAX_PHOTO) {
+        msg.style.color = '#c0392b'; msg.textContent = 'Photo is over 5 MB — please pick a smaller one.';
+        clearReviewPhoto(); return;
+      }
+      msg.textContent = '';
+      rvPhotoFile = f;
+      var img = $('rv-photo-img');
+      if (img.src.indexOf('blob:') === 0) URL.revokeObjectURL(img.src);
+      img.src = URL.createObjectURL(f);
+      $('rv-photo-preview').hidden = false;
+    });
+    $('rv-photo-clear').addEventListener('click', clearReviewPhoto);
+  }
 
   // Fetch product (catalog.js static fallback if the API is unreachable)
   function fromCatalog() {

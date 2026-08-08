@@ -1140,8 +1140,12 @@ export async function sendFcmToAdmins(env, notif, data) {
     const dataStr = {};
     for (const k in (data || {})) dataStr[k] = String(data[k]);
 
+    // Fan out in parallel. This used to be a sequential await-per-token loop:
+    // with several stale tokens (each still costing a full round-trip until
+    // FCM answers NOT_FOUND) the whole bundle could exceed the caller's 15s
+    // cap and die with the isolate, losing both the sends and the log row.
     let sent = 0, failed = 0; const dead = [];
-    for (const token of tokens) {
+    const sendResults = await Promise.all(tokens.map(async (token) => {
       const msg = {
         message: {
           token,
@@ -1150,18 +1154,24 @@ export async function sendFcmToAdmins(env, notif, data) {
           android: { priority: 'high', notification: { channel_id: 'orders', click_action: 'OPEN_ORDER' } },
         },
       };
-      const r = await fetch(`https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`, {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
-        body: JSON.stringify(msg),
-      });
-      if (r.ok) { sent++; }
-      else {
-        failed++;
+      try {
+        const r = await fetch(`https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify(msg),
+        });
+        if (r.ok) return { ok: true };
         const err = await r.json().catch(() => ({}));
         const code = err && err.error && (err.error.status || '');
-        if (code === 'NOT_FOUND' || code === 'UNREGISTERED' || r.status === 404) dead.push(token);
+        const gone = code === 'NOT_FOUND' || code === 'UNREGISTERED' || r.status === 404;
+        return { ok: false, token: gone ? token : null };
+      } catch (e) {
+        return { ok: false, token: null };
       }
+    }));
+    for (const r of sendResults) {
+      if (r.ok) sent++;
+      else { failed++; if (r.token) dead.push(r.token); }
     }
     if (dead.length) {
       const ph = dead.map(() => '?').join(',');
