@@ -21,6 +21,9 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"The Complete Jewellery Care and Buying Guide","description":"How to make gold plating last for years, clean imitation jewellery safely, store it through the Indian monsoon, and choose the right pieces by occasion and face shape.","author":{"@type":"Organization","name":"Saubhagya Jewellery"},"publisher":{"@type":"Organization","name":"Saubhagya Jewellery","logo":{"@type":"ImageObject","url":"https://saubhagyajewellery.com/images/brand/logo-mark-clean.webp"}},"datePublished":"2026-08-06","dateModified":"2026-08-06","mainEntityOfPage":{"@type":"WebPage","@id":"https://saubhagyajewellery.com/jewellery-guide"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"How to make gold-plated jewellery last for years","description":"A simple wear-and-store routine that protects micron gold plating on imitation jewellery.","totalTime":"PT1M","step":[{"@type":"HowToStep","name":"Dress first, jewellery last","text":"Apply perfume, hairspray, lotion and makeup, let everything dry completely, then put your jewellery on."},{"@type":"HowToStep","name":"Remove before water and sleep","text":"Take jewellery off before bathing, swimming, exercising, cooking and sleeping."},{"@type":"HowToStep","name":"Wipe after every wear","text":"Wipe each piece with a dry microfibre cloth to remove sweat and skin oils before putting it away."},{"@type":"HowToStep","name":"Store dry and separated","text":"Store each piece in its own soft pouch in a dry, airtight box with a silica gel sachet."}]}</script>
 <style>
+  /* Small-page hero header - centered like .ph on other pages (was unstyled, sat on the left edge) */
+  .hero-sm { max-width: 900px; margin: 0 auto; padding: 30px 40px 8px; }
+  @media(max-width:760px){ .hero-sm { padding: 22px 18px 8px; } }
   .gd-wrap { max-width: 800px; margin: 0 auto; }
   .gd-toc { padding:22px 24px; margin:0 0 38px; border-radius:16px;
     background:linear-gradient(160deg,#fff,#faf8f3); border:1px solid rgba(197,168,128,.4);
@@ -58,16 +61,90 @@
     background:#C8901F; color:#241703; box-shadow:0 6px 18px -6px rgba(0,0,0,.5); transition:all .3s; }
   .gd-cta a:hover { transform:translateY(-2px); background:#dda32b; }
   @media(max-width:600px){ .gd-do { grid-template-columns:1fr; } .gd-wrap h2.gd-h { font-size:23px; } }
+
+  /* ===== Premium visual upgrade ===== */
+  .gd-hero { position: relative; max-width: 1280px; margin: 0 auto; border-radius: 22px; overflow: hidden;
+    background: linear-gradient(140deg, rgba(11,41,28,.94), rgba(19,74,52,.78)), url('images/banners/jewellery-every-generation.webp') center/cover;
+    padding: 64px 48px 58px; text-align: center; box-shadow: 0 24px 60px -28px rgba(11,41,28,.65); }
+  .gd-hero .kicker { color: #E7CFA0; letter-spacing: 5px; margin-bottom: 16px; }
+  .gd-hero h1 { font-family:'Playfair Display',serif; font-weight:600; font-size:44px; color:#fff; margin:0 0 14px; line-height:1.15; }
+  .gd-hero .lede { color: rgba(255,255,255,.88); max-width: 620px; margin: 0 auto; font-size:16.5px; }
+  .gd-hero .hero-rule { width: 84px; height: 2px; margin: 22px auto 0; background: linear-gradient(90deg,#C8901F,#E7CFA0); border-radius: 2px; }
+  @media(max-width:760px){ .gd-hero { padding: 44px 20px 40px; border-radius: 16px; } .gd-hero h1 { font-size: 30px; } }
+
+  .gd-h-rule { display:flex; align-items:center; gap:14px; margin: 46px 0 6px; }
+  .gd-h-rule::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, rgba(197,168,128,.55), rgba(197,168,128,0)); }
+  .gd-h-rule h2.gd-h { margin: 0; }
+  .gd-h-rule .h-ic { width: 40px; height: 40px; border-radius: 50%; flex: none; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(150deg,#0B291C,#134a34); color:#E7CFA0; font-family:'Playfair Display',serif; font-size:18px; font-weight:600;
+    box-shadow: 0 6px 16px -6px rgba(11,41,28,.5); }
+
+  .gd-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin:24px 0 8px; }
+  .gd-step { position:relative; padding:24px 18px 20px; border-radius:16px; border:1px solid rgba(197,168,128,.4);
+    background:linear-gradient(165deg,#fff,#faf8f3); box-shadow:0 10px 26px -18px rgba(11,41,28,.35); }
+  .gd-step .n { position:absolute; top:-14px; left:16px; width:30px; height:30px; border-radius:50%;
+    background:linear-gradient(150deg,#C8901F,#E7CFA0); color:#241703; font:700 14px 'Montserrat',sans-serif;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px -3px rgba(200,144,31,.6); }
+  .gd-step h4 { font-family:'Playfair Display',serif; font-size:16.5px; color:#14110A; margin:6px 0 8px; font-weight:600; }
+  .gd-step p { font-size:13.5px; line-height:1.7; color:#3a3a3a; margin:0; }
+  .gd-step .t { display:block; font:600 10px 'Montserrat',sans-serif; letter-spacing:1.6px; text-transform:uppercase; color:#C8901F; margin-bottom:2px; }
+  @media(max-width:900px){ .gd-steps { grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:520px){ .gd-steps { grid-template-columns:1fr; } }
+
+  .gd-enemies { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin:24px 0 8px; }
+  .gd-enemy { padding:20px 14px 16px; text-align:center; border-radius:16px; border:1px solid rgba(197,168,128,.4);
+    background:linear-gradient(170deg,#fff,#fbfaf6); box-shadow:0 8px 22px -16px rgba(11,41,28,.3); }
+  .gd-enemy .ic { width:44px; height:44px; margin:0 auto 10px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(150deg,#faf0e0,#f5e6c8); font-size:20px; }
+  .gd-enemy h4 { font-family:'Montserrat',sans-serif; font-size:12.5px; font-weight:700; color:#14110A; margin:0 0 6px; letter-spacing:.3px; }
+  .gd-enemy p { font-size:12.5px; line-height:1.65; color:#4a4a4a; margin:0; }
+  @media(max-width:960px){ .gd-enemies { grid-template-columns:repeat(3,1fr); } }
+  @media(max-width:560px){ .gd-enemies { grid-template-columns:repeat(2,1fr); } }
+
+  .gd-occ { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin:26px 0 8px; }
+  .gd-occ a { position:relative; display:block; border-radius:16px; overflow:hidden; text-decoration:none;
+    aspect-ratio:3/4; box-shadow:0 12px 30px -18px rgba(11,41,28,.5); transition:transform .3s; }
+  .gd-occ a:hover { transform:translateY(-4px); }
+  .gd-occ img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .gd-occ .shade { position:absolute; inset:0; background:linear-gradient(to top, rgba(11,41,28,.9) 0%, rgba(11,41,28,0) 55%); }
+  .gd-occ .cap { position:absolute; left:0; right:0; bottom:0; padding:14px 12px 12px; text-align:center; }
+  .gd-occ .cap .t { display:block; font:600 9.5px 'Montserrat',sans-serif; letter-spacing:2px; text-transform:uppercase; color:#E7CFA0; margin-bottom:3px; }
+  .gd-occ .cap b { display:block; font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#fff; }
+  @media(max-width:960px){ .gd-occ { grid-template-columns:repeat(3,1fr); } }
+  @media(max-width:560px){ .gd-occ { grid-template-columns:repeat(2,1fr); } }
+
+  .gd-mini { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:22px 0 8px; }
+  .gd-mini .m { padding:18px 16px; border-radius:14px; border:1px solid rgba(197,168,128,.35);
+    background:linear-gradient(165deg,#fff,#faf8f3); box-shadow:0 8px 20px -16px rgba(11,41,28,.3); }
+  .gd-mini .m b { display:block; font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#14110A; margin-bottom:6px; }
+  .gd-mini .m p { font-size:13px; line-height:1.65; color:#3a3a3a; margin:0; }
+  @media(max-width:860px){ .gd-mini { grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:480px){ .gd-mini { grid-template-columns:1fr; } }
+
+  .gd-feat { margin:40px 0 8px; border-radius:20px; overflow:hidden; border:1px solid rgba(197,168,128,.4);
+    background:linear-gradient(170deg,#fff,#fbfaf6); box-shadow:0 14px 40px -22px rgba(11,41,28,.4); }
+  .gd-feat .f-head { display:flex; align-items:center; justify-content:space-between; padding:22px 26px 14px; }
+  .gd-feat .f-head h3 { font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#14110A; margin:0; }
+  .gd-feat .f-head .f-link { font:600 11px 'Montserrat',sans-serif; letter-spacing:1.5px; text-transform:uppercase; color:#0B291C; text-decoration:none; border-bottom:1px solid #C5A880; padding-bottom:2px; }
+  .gd-feat .f-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:0 26px 24px; }
+  .gd-feat a.f-item { position:relative; border-radius:14px; overflow:hidden; aspect-ratio:1/1; display:block; text-decoration:none; box-shadow:0 8px 22px -14px rgba(11,41,28,.45); transition:transform .3s; }
+  .gd-feat a.f-item:hover { transform:translateY(-3px); }
+  .gd-feat .f-item img { width:100%; height:100%; object-fit:cover; }
+  .gd-feat .f-item .f-cap { position:absolute; left:0; right:0; bottom:0; padding:26px 12px 10px; text-align:center;
+    background:linear-gradient(to top, rgba(11,41,28,.88), rgba(11,41,28,0)); }
+  .gd-feat .f-item .f-cap b { font-family:'Playfair Display',serif; font-size:14.5px; font-weight:600; color:#fff; display:block; }
+  .gd-feat .f-item .f-cap span { font:600 9px 'Montserrat',sans-serif; letter-spacing:1.8px; text-transform:uppercase; color:#E7CFA0; }
+  @media(max-width:760px){ .gd-feat .f-row { grid-template-columns:repeat(2,1fr); } .gd-feat .f-head { flex-direction:column; gap:8px; align-items:flex-start; } }
 </style>
 </head>
 <body>
 <x-layout page="jewellery-guide.html"></x-layout>
 <main>
-<section class="hero-sm">
-  <nav class="crumb"><a href="index.html">Home</a> <span>/</span> <span>Jewellery Guide</span></nav>
+<section class="gd-hero">
   <p class="kicker">CARE &amp; BUYING GUIDE</p>
   <h1>The Complete Jewellery Care Guide</h1>
   <p class="lede">How to keep gold plating looking new for years - and how to choose pieces that suit you.</p>
+  <div class="hero-rule"></div>
 </section>
 <section class="prose">
 <div class="gd-wrap">
@@ -90,16 +167,24 @@
   <p>At Saubhagya every piece uses <strong>micron gold plating</strong>, finished with kundan, polki, American Diamond or semi-precious stone work by hand. That's why a heritage temple necklace that would cost lakhs in solid gold sits comfortably in the &#8377;500-&#8377;3,000 range - you are paying for craftsmanship and design, not bullion weight.</p>
   <div class="gd-callout"><p><strong>The honest truth:</strong> no plating is permanent. Plating is a surface, and every surface wears. Everything in this guide is about slowing that wear down - and it genuinely works. The difference between careless and careful handling is measured in years, not weeks.</p></div>
 
-  <h2 class="gd-h" id="routine">The 60-second routine that saves your plating</h2>
+  <div class="gd-h-rule"><div class="h-ic">2</div><h2 class="gd-h" id="routine">The 60-second routine that saves your plating</h2></div>
   <p>If you remember nothing else from this page, remember this sequence. It costs you a minute a day and is by far the highest-impact thing you can do.</p>
-  <ol class="gd-list">
-    <li><strong>Dress completely first.</strong> Perfume, hairspray, deodorant, lotion, makeup - all of it goes on first and must be fully dry before jewellery touches your skin. Jewellery is the <em>last</em> thing you put on.</li>
-    <li><strong>Take it off before water.</strong> Bathing, swimming, washing dishes, exercising, sleeping. Jewellery is the <em>first</em> thing that comes off when you get home.</li>
-    <li><strong>Wipe it down after every wear.</strong> A dry microfibre cloth, ten seconds per piece. Sweat and skin oils are mildly acidic and sit on the plating overnight if you skip this.</li>
-    <li><strong>Store it dry and separated.</strong> Own pouch, dry box, closed lid. Never a loose pile in a drawer.</li>
-  </ol>
+  <div class="gd-steps">
+    <div class="gd-step"><span class="n">1</span><span class="t">Dress first</span>
+      <h4>Jewellery goes on last</h4>
+      <p>Perfume, hairspray, deodorant, lotion, makeup - all of it goes on first and must be fully dry before jewellery touches your skin.</p></div>
+    <div class="gd-step"><span class="n">2</span><span class="t">Water off</span>
+      <h4>Take it off before water</h4>
+      <p>Bathing, swimming, washing dishes, exercising, sleeping. Jewellery is the first thing that comes off when you get home.</p></div>
+    <div class="gd-step"><span class="n">3</span><span class="t">Wipe down</span>
+      <h4>Ten seconds after wear</h4>
+      <p>A dry microfibre cloth, ten seconds per piece. Sweat and skin oils are mildly acidic and sit on the plating overnight if you skip this.</p></div>
+    <div class="gd-step"><span class="n">4</span><span class="t">Store right</span>
+      <h4>Dry and separated</h4>
+      <p>Own pouch, dry box, closed lid. Never a loose pile in a drawer - pieces rubbing against each other scratch through the plating.</p></div>
+  </div>
 
-  <h2 class="gd-h" id="enemies">Five things that destroy gold plating</h2>
+  <div class="gd-h-rule"><div class="h-ic">3</div><h2 class="gd-h" id="enemies">Five things that destroy gold plating</h2></div>
   <div class="gd-do">
     <div class="gd-card do">
       <h4>Do</h4>
@@ -122,7 +207,13 @@
       </ul>
     </div>
   </div>
-  <p><strong>1. Perfume and alcohol sprays.</strong> The single biggest killer. Alcohol strips the protective top coat and dulls the finish permanently. <strong>2. Water and chlorine.</strong> Chlorine is aggressive on plating; even tap water leaves mineral deposits. <strong>3. Sweat.</strong> Mildly acidic and unavoidable - which is why the post-wear wipe matters so much. <strong>4. Abrasion.</strong> Pieces rubbing against each other scratch through the plating layer. <strong>5. Humidity.</strong> Trapped moisture tarnishes the base metal from the edges inward.</p>
+  <div class="gd-enemies">
+    <div class="gd-enemy"><div class="ic">🧴</div><h4>Perfume &amp; sprays</h4><p>Alcohol strips the protective top coat and dulls the finish permanently - the single biggest killer.</p></div>
+    <div class="gd-enemy"><div class="ic">💧</div><h4>Water &amp; chlorine</h4><p>Chlorine is aggressive on plating; even tap water leaves mineral deposits as it dries.</p></div>
+    <div class="gd-enemy"><div class="ic">😓</div><h4>Sweat</h4><p>Mildly acidic and unavoidable - which is why the post-wear wipe matters so much.</p></div>
+    <div class="gd-enemy"><div class="ic">✋</div><h4>Abrasion</h4><p>Pieces rubbing against each other scratch through the plating layer in weeks.</p></div>
+    <div class="gd-enemy"><div class="ic">🌧️</div><h4>Humidity</h4><p>Trapped moisture tarnishes the base metal from the edges inward, fast in monsoons.</p></div>
+  </div>
 
   <h2 class="gd-h" id="cleaning">How to clean each type safely</h2>
   <h3>Plain gold-plated pieces</h3>
@@ -145,31 +236,52 @@
     <li><strong>Lay necklaces flat.</strong> Hanging heavy pieces long-term stretches the chain and stresses the clasp.</li>
   </ul>
 
-  <h2 class="gd-h" id="choosing">Choosing jewellery by occasion and face shape</h2>
+  <div class="gd-h-rule"><div class="h-ic">6</div><h2 class="gd-h" id="choosing">Choosing jewellery by occasion and face shape</h2></div>
   <h3>By occasion</h3>
-  <ul>
-    <li><strong>Wedding or reception (yours):</strong> a full bridal set - long haaram plus short necklace, statement jhumkas, maang tikka. Go bold; photographs flatten detail.</li>
-    <li><strong>Attending someone else's wedding:</strong> one hero piece only - either a statement necklace or statement earrings, never both. Let the bride be the brightest.</li>
-    <li><strong>Festive and pooja:</strong> temple jewellery, Lakshmi motifs, antique gold finish. Traditional, and it photographs beautifully in warm light.</li>
-    <li><strong>Office and daily wear:</strong> small studs, a thin chain, a delicate pendant. Comfort and durability matter more than drama.</li>
-    <li><strong>Gifting:</strong> a short necklace set or classic jhumkas - almost universally flattering and safe if you don't know their taste.</li>
-  </ul>
+  <div class="gd-occ">
+    <a href="categories.html?cat=bridal-set">
+      <img src="images/models/cat-bridal.webp" alt="Bridal jewellery sets" loading="lazy">
+      <div class="shade"></div>
+      <div class="cap"><span class="t">Wedding</span><b>Full bridal set</b></div>
+    </a>
+    <a href="categories.html?cat=earrings">
+      <img src="images/models/cat-jhumka.webp" alt="Jhumka earrings for wedding guests" loading="lazy">
+      <div class="shade"></div>
+      <div class="cap"><span class="t">As a guest</span><b>One hero piece</b></div>
+    </a>
+    <a href="categories.html?cat=necklaces">
+      <img src="images/models/hero-temple.webp" alt="Temple jewellery for festive and pooja" loading="lazy">
+      <div class="shade"></div>
+      <div class="cap"><span class="t">Festive &amp; pooja</span><b>Temple motifs</b></div>
+    </a>
+    <a href="categories.html?cat=earrings">
+      <img src="images/models/cat-earrings.webp" alt="Daily wear studs and pendants for office" loading="lazy">
+      <div class="shade"></div>
+      <div class="cap"><span class="t">Office &amp; daily</span><b>Small studs</b></div>
+    </a>
+    <a href="gifting.html">
+      <img src="images/models/cat-necklace.webp" alt="Jewellery gift sets under 1000" loading="lazy">
+      <div class="shade"></div>
+      <div class="cap"><span class="t">Gifting</span><b>Classic set</b></div>
+    </a>
+  </div>
+  <p>Wedding or reception (yours): a full bridal set - long haaram plus short necklace, statement jhumkas, maang tikka. Go bold; photographs flatten detail. Attending someone else's wedding: one hero piece only - either a statement necklace or statement earrings, never both. Festive and pooja: temple jewellery with Lakshmi motifs and antique gold finish, traditional and warm in photos. Office and daily: small studs, a thin chain, a delicate pendant. Gifting: a short necklace set or classic jhumkas - safe if you don't know their taste.</p>
   <h3>By face shape (earrings)</h3>
-  <ul>
-    <li><strong>Round face:</strong> long dangles and linear drops add length. Avoid large hoops and round studs.</li>
-    <li><strong>Oval face:</strong> almost everything works - the most flexible shape. Jhumkas and studs both flatter.</li>
-    <li><strong>Square or angular jaw:</strong> curved shapes soften angles - hoops, chandbalis and rounded jhumkas.</li>
-    <li><strong>Heart-shaped face:</strong> wider-at-the-bottom shapes balance a narrow chin - chandbalis and teardrops.</li>
-  </ul>
+  <div class="gd-mini">
+    <div class="m"><b>Round face</b><p>Long dangles and linear drops add length. Avoid large hoops and round studs.</p></div>
+    <div class="m"><b>Oval face</b><p>Almost everything works - the most flexible shape. Jhumkas and studs both flatter.</p></div>
+    <div class="m"><b>Square jaw</b><p>Curved shapes soften angles - hoops, chandbalis and rounded jhumkas.</p></div>
+    <div class="m"><b>Heart-shaped</b><p>Wider-at-the-bottom shapes balance a narrow chin - chandbalis and teardrops.</p></div>
+  </div>
   <h3>By neckline (necklaces)</h3>
-  <ul>
-    <li><strong>Deep V or sweetheart:</strong> a pendant that follows the V, or a short necklace sitting just above it.</li>
-    <li><strong>High or closed neck:</strong> a long haaram worn over the fabric, or skip the necklace and go statement earrings.</li>
-    <li><strong>Boat neck:</strong> a choker or short necklace - long chains fight the horizontal line.</li>
-    <li><strong>Saree blouse:</strong> a layered look - short necklace plus long haaram - is the classic and still the most photogenic.</li>
-  </ul>
+  <div class="gd-mini">
+    <div class="m"><b>Deep V / sweetheart</b><p>A pendant that follows the V, or a short necklace sitting just above it.</p></div>
+    <div class="m"><b>High / closed neck</b><p>A long haaram worn over the fabric, or skip the necklace and go statement earrings.</p></div>
+    <div class="m"><b>Boat neck</b><p>A choker or short necklace - long chains fight the horizontal line.</p></div>
+    <div class="m"><b>Saree blouse</b><p>A layered look - short necklace plus long haaram - the classic, most photogenic combo.</p></div>
+  </div>
 
-  <h2 class="gd-h" id="buying">How to judge quality before you buy</h2>
+  <div class="gd-h-rule"><div class="h-ic">8</div><h2 class="gd-h" id="buying">How to judge quality before you buy</h2></div>
   <ul>
     <li><strong>Ask about plating, not just "gold finish".</strong> A seller who can tell you the plating type and base metal is being specific; vague "gold look" wording tells you nothing.</li>
     <li><strong>Look at the back of the piece.</strong> Quality manufacturers finish the reverse properly. Rough edges, visible glue or unfinished solder are the fastest tell.</li>
@@ -178,6 +290,31 @@
     <li><strong>Buy from a manufacturer, not a reseller.</strong> When the seller makes the piece in-house, defects get repaired instead of argued about.</li>
   </ul>
   <p>Every Saubhagya piece is manufactured in our own Mumbai workshop, individually inspected and sealed before dispatch, and any manufacturing defect is repaired or replaced free. More detail on <a class="inline" href="shipping-and-returns.html">Shipping &amp; Returns</a>, and common questions are answered on our <a class="inline" href="faq.html">FAQ page</a>.</p>
+
+  <div class="gd-feat">
+    <div class="f-head">
+      <h3>Styles the guide is talking about</h3>
+      <a class="f-link" href="categories.html">View all →</a>
+    </div>
+    <div class="f-row">
+      <a class="f-item" href="categories.html?cat=necklaces">
+        <img src="images/models/hero-necklace.webp" alt="Choker and short necklaces" loading="lazy">
+        <div class="f-cap"><b>Necklaces</b><span>Chokers &amp; haaram</span></div>
+      </a>
+      <a class="f-item" href="categories.html?cat=earrings">
+        <img src="images/models/hero-jhumka.webp" alt="Jhumka and chandbali earrings" loading="lazy">
+        <div class="f-cap"><b>Jhumkas</b><span>Chandbali &amp; drops</span></div>
+      </a>
+      <a class="f-item" href="categories.html?cat=necklaces">
+        <img src="images/models/hero-temple.webp" alt="Temple jewellery necklaces" loading="lazy">
+        <div class="f-cap"><b>Temple</b><span>Lakshmi &amp; peacock</span></div>
+      </a>
+      <a class="f-item" href="categories.html?cat=pendants">
+        <img src="images/models/cat-pendant.webp" alt="Pendants for daily wear" loading="lazy">
+        <div class="f-cap"><b>Pendants</b><span>Daily wear</span></div>
+      </a>
+    </div>
+  </div>
 
   <div class="gd-cta">
     <h3>Ready to find your piece?</h3>

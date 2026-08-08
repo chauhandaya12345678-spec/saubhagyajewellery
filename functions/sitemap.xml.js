@@ -15,6 +15,8 @@ const STATIC_PAGES = [
   '/blogs/caring-matte-gold', '/blogs/bridal-set-6-hour-event',
   '/blogs/real-vs-fake-gold-plated', '/blogs/indian-bridal-jewellery-guide',
   '/blogs/care-tips-imitation-jewellery',
+  '/blogs/punjabi-wedding-jewellery', '/blogs/bengali-bride-jewellery',
+  '/blogs/maharashtrian-jewellery', '/blogs/south-indian-temple-jewellery',
 ];
 
 function esc(s) {
