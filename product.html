@@ -28,11 +28,17 @@
 <meta name="twitter:image" content="https://saubhagyajewellery.com/images/banners/Website_hero_banner_concept_art._202606221611.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Fonts load async (same pattern as index.html). A plain <link rel=stylesheet>
+     here was render-blocking on a cold cross-origin connection, so in-app
+     browsers (Instagram/Facebook WebView) painted nothing for seconds. -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
 <link rel="stylesheet" href="site.css?v=20260807b">
-<script src="layout.js?v=20260808b"></script>
+<!-- defer: layout.js only registers custom elements and catalog.js is an async
+     fallback source - neither needs to block the parser. -->
+<script src="layout.js?v=20260808b" defer></script>
 <script src="mpa.js?v=16" defer></script>
-<script src="catalog.js?v=20"></script><style>
+<script src="catalog.js?v=20" defer></script><style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
   .pdp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px 80px; animation: fadeUp .6s cubic-bezier(.25,1,.5,1); }
@@ -222,6 +228,11 @@
   #pdp-care li { break-inside: avoid; margin-bottom: 8px; }
   #pdp-care li strong { color: #1A1A1A; }
   .pdp-loading { text-align: center; padding: 80px 24px; font-family: 'Montserrat',sans-serif; font-size: 13px; color: #3a3a3a; letter-spacing:1.5px; }
+  /* SSR pre-paint: functions/_pdp.js drops the real name/price in here so a slow
+     client (in-app browser, 4G) sees the product instantly instead of a blank page. */
+  .pdp-pre-name { font-family:'Playfair Display',serif; font-size: 26px; font-weight: 500; color:#1A1A1A; letter-spacing: 0; margin: 0 0 10px; }
+  .pdp-pre-price { font-family:'Montserrat',sans-serif; font-size: 18px; font-weight: 600; color:#0B291C; letter-spacing: 0; margin: 0 0 22px; }
+  .pdp-pre-dots { font-size: 12px; letter-spacing: 1.5px; color:#6b6b6b; }
   .pdp-error { text-align: center; padding: 80px 24px; }
   .pdp-error-title { font-family:'Playfair Display',serif; font-weight: 600; font-size: 28px; color: #1A1A1A; margin: 0 0 14px; }
   .pdp-error a { color: #0B291C; text-decoration: none; border-bottom: 1px solid #C5A880; padding-bottom: 2px; }
@@ -1215,27 +1226,55 @@
   }
 
   // Fetch product (catalog.js static fallback if the API is unreachable)
+  //
+  // Whoever produces a product first wins, and a late winner still wins: on a very
+  // slow link the API can land after the fallback already gave up, and rendering
+  // real data then is strictly better than leaving "Product Not Found" up.
+  var rendered = false;
+  function show(p) {
+    if (rendered) return;
+    rendered = true;
+    clearTimeout(softTimer); clearTimeout(hardTimer);
+    $('pdp-error').style.display = 'none';
+    product = p;
+    render();
+  }
+
   function fromCatalog() {
     var hit = (window.SAUBHAGYA_CATALOG || []).find(function(p) { return p.id === sku || p.sku === sku; });
-    if (hit) { product = hit; render(); return true; }
+    if (hit) { show(hit); return true; }
     return false;
   }
-  function showError() { $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block'; }
+  function showError() {
+    if (rendered) return;
+    $('pdp-loading').style.display = 'none';
+    $('pdp-error').style.display = 'block';
+  }
 
   function fallbackWithPoll() {
-    if (fromCatalog()) return;
+    if (rendered || fromCatalog()) return;
     var tries = 0;
     var poll = setInterval(function() {
+      if (rendered) { clearInterval(poll); return; }
       if (fromCatalog()) { clearInterval(poll); return; }
       if (++tries > 30) { clearInterval(poll); showError(); }
     }, 150);
   }
 
+  // A stalled request (common in in-app browsers when the network switches or the
+  // host app backgrounds the WebView) never rejects, so .catch never fires and the
+  // page would sit on the loading state forever. Two deadlines, and the request is
+  // deliberately NOT aborted so a slow-but-working connection can still win late:
+  //   6s  - paint from the static catalog if it is already in memory. Never errors.
+  //   20s - the request is hung for good; poll the catalog, then surface the error.
+  var softTimer = setTimeout(function() { if (!rendered) fromCatalog(); }, 6000);
+  var hardTimer = setTimeout(function() { if (!rendered) fallbackWithPoll(); }, 20000);
+
   fetch('/api/products?sku=' + encodeURIComponent(sku))
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var list = Array.isArray(data) ? data : (data && data.products || []);
-      if (list && list.length) { product = list[0]; render(); return; }
+      if (list && list.length) { show(list[0]); return; }
       fallbackWithPoll();
     })
     .catch(fallbackWithPoll);

@@ -3,5 +3,18 @@
   "include": [
     "/*"
   ],
-  "exclude": []
+  "exclude": [
+    "/images/*",
+    "/assets/*",
+    "/blogs/*",
+    "/.well-known/*",
+    "/site.css",
+    "/catalog.js",
+    "/layout.js",
+    "/mpa.js",
+    "/products.json",
+    "/manifest.json",
+    "/favicon.svg",
+    "/robots.txt"
+  ]
 }

@@ -127,10 +127,25 @@ export async function renderProductShell(html, p, env) {
       `</head>`
     )
     // SSR body: prevent soft-404 by removing misleading text Googlebot sees in raw HTML.
-    // pdp-loading / pdp-error / oos-stamp are client-side managed via JS — but Googlebot
-    // doesn't execute JS, so it reads "Product Not Found" + "OUT OF STOCK" from source.
+    // pdp-error / oos-stamp are client-side managed via JS — but Googlebot doesn't
+    // execute JS, so it reads "Product Not Found" + "OUT OF STOCK" from source.
     // When we've confirmed the product EXISTS in D1, scrub those strings from the shell.
-    .replace('id="pdp-loading"', 'id="pdp-loading" style="display:none"')
+    //
+    // #pdp-loading is deliberately LEFT VISIBLE. It used to be hidden here, which
+    // meant the served HTML had zero visible content until the client fetch of
+    // /api/products resolved — a blank page for seconds on cold in-app browsers
+    // (Instagram/Facebook WebView). "LOADING…" is not a soft-404 signal; instead we
+    // fill it with the real name + price so the first paint is already useful.
+    // Regex (not a literal) so a copy tweak in product.html can never silently
+    // turn this into a no-op — worst case the shell keeps its own "LOADING…".
+    .replace(
+      /<div class="pdp-loading" id="pdp-loading">[\s\S]*?<\/div>/,
+      `<div class="pdp-loading" id="pdp-loading">` +
+        `<p class="pdp-pre-name">${esc(p.name)}</p>` +
+        `<p class="pdp-pre-price">&#8377;${esc(p.price)}</p>` +
+        `<p class="pdp-pre-dots">LOADING DETAILS&hellip;</p>` +
+      `</div>`
+    )
     .replace(
       '<p class="pdp-error-title">Product Not Found</p>',
       '<p class="pdp-error-title" style="display:none"></p>'
