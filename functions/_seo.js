@@ -98,10 +98,28 @@ export function seoSubtitle(p) {
   const parts = [];
   if (material) parts.push(material);
   else if (region) parts.push(region);
-  parts.push('Gold-Plated');
+  // "Antique Gold-Finish" + "Gold-Plated" read as two finishes in a row. The
+  // material already names the finish, so skip the generic one.
+  if (!/gold/i.test(material)) parts.push('Gold-Plated');
   if (region && material) parts.push(region); // keep both as keywords when distinct
-  parts.push(type);
+  parts.push(dedupeType(type, material));
   return parts.join(' ') + ' for ' + occ;
+}
+
+/**
+ * "South Indian Temple" + "Temple Jewellery Set" read as "South Indian Temple
+ * Gold-Plated Temple Jewellery Set" on every temple product - the same word
+ * twice in one line. Both halves are derived from the same trigger word in the
+ * name, so drop it from the type when the material has already said it.
+ * Keeps the keyword, loses the stutter.
+ */
+function dedupeType(type, material) {
+  if (!material) return type;
+  const mat = material.toLowerCase().split(/\s+/);
+  const words = type.split(/\s+/);
+  return (words.length > 1 && mat.indexOf(words[0].toLowerCase()) !== -1)
+    ? words.slice(1).join(' ')
+    : type;
 }
 
 /**
@@ -118,7 +136,9 @@ export function productKeywords(p) {
   const base = [
     p.name,
     type + ' online India',
-    (material ? material + ' ' + type : type),
+    // Same stutter as the subtitle had: "South Indian Temple" + "Temple
+    // Jewellery Set" gave "South Indian Temple Temple Jewellery Set".
+    (material ? material + ' ' + dedupeType(type, material) : type),
     (region ? region + ' ' + type : ''),
     'gold plated ' + type.toLowerCase(),
     'imitation ' + type.toLowerCase(),

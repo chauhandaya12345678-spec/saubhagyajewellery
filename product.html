@@ -36,21 +36,64 @@
 <link rel="stylesheet" href="site.css?v=20260810seo">
 <!-- defer: layout.js only registers custom elements and catalog.js is an async
      fallback source - neither needs to block the parser. -->
-<script src="layout.js?v=20260808b" defer></script>
+<script src="layout.js?v=20260810d2c2" defer></script>
 <script src="mpa.js?v=16" defer></script>
 <script src="catalog.js?v=20" defer></script><style>
   * { box-sizing: border-box; }
   body { background: #F0F5FA; margin: 0; }
-  .pdp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px 80px; animation: fadeUp .6s cubic-bezier(.25,1,.5,1); }
+  /* No bottom padding: .pdp-more is a sibling BELOW this wrap, so 80px here was
+     not page-end breathing room - it was a hole in the middle of the page,
+     between the review CTA and "More necklaces". The breathing room now sits on
+     .pdp-more, which really is the last block before the footer. */
+  .pdp-wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px 4px; animation: fadeUp .6s cubic-bezier(.25,1,.5,1); }
   #pdp-crumb { margin: 0 auto 18px; max-width: 1080px; padding-left: 48px; padding-right: 48px; }
   /* image capped at a regular card size instead of half the monitor */
   .pdp-grid { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 56px; align-items: start; justify-content: center; }
-  .pdp-img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 12px; background: #f0ede5; }
-  .pdp-img-wrap { position: relative; overflow: hidden; border-radius: 12px; max-width: 440px; margin: 0 auto; }
-  @media(hover:hover){ .pdp-img-wrap:hover .pdp-img { transform: scale(1.05); transition: transform 0.5s cubic-bezier(.25,1,.5,1); } }
+  /* Every product photo is now built to 4:5 with the piece filling the same
+     share of it, so this box is identical on every product page - which it was
+     not while each shot kept its own proportions: one product showed a wide
+     necklace, the next a narrow tall one, and on some the name was pushed off
+     the first screen. Nothing is cropped here; the frame was extended around
+     the piece when the photos were prepared. Detail goes to the tap-to-enlarge
+     viewer rather than to a taller page. */
+  .pdp-img { display: block; width: auto; height: auto; max-width: 100%; max-height: 58vh;
+    aspect-ratio: 4/5; border-radius: 12px; background: #f0ede5; cursor: zoom-in; }
+  .pdp-img-wrap { position: relative; display: flex; align-items: center; justify-content: center;
+    width: fit-content; max-width: 100%; min-height: 260px; margin: 0 auto; border-radius: 12px; }
+  /* Affordance: without it people do not know the photo opens. */
+  .pdp-zoom-hint { position: absolute; left: 12px; bottom: 12px; z-index: 3; display: inline-flex;
+    align-items: center; gap: 6px; padding: 6px 11px; border-radius: 20px; pointer-events: none;
+    background: rgba(255,255,255,.92); color: #3a3a3a; box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    font-family: 'Montserrat',sans-serif; font-size: 11px; letter-spacing: .4px; }
+  .pdp-zoom-hint svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+  /* Full-screen viewer. Tap or click to go to 2.5x at the point touched, drag to
+     pan, tap again to come back. */
+  .pdp-lb { position: fixed; inset: 0; z-index: 9999; display: none; background: rgba(12,10,6,.96);
+    align-items: center; justify-content: center; overscroll-behavior: contain; }
+  .pdp-lb.on { display: flex; }
+  .pdp-lb img { max-width: 100%; max-height: 100%; display: block; touch-action: none;
+    transform-origin: 0 0; cursor: zoom-in; user-select: none; -webkit-user-drag: none;
+    transition: transform .3s cubic-bezier(.22,1,.36,1); }
+  .pdp-lb.zoomed img { cursor: grab; }
+  .pdp-lb.zoomed.dragging img { cursor: grabbing; transition: none; }
+  .pdp-lb-close { position: absolute; top: 14px; right: 14px; z-index: 2; width: 42px; height: 42px;
+    border: none; border-radius: 50%; background: rgba(255,255,255,.14); color: #fff; font-size: 26px;
+    line-height: 1; cursor: pointer; transition: background .2s; }
+  .pdp-lb-close:hover { background: rgba(255,255,255,.26); }
+  .pdp-lb-close:focus-visible { outline: 2px solid #C8901F; outline-offset: 3px; }
+  .pdp-lb-cap { position: absolute; left: 0; right: 0; bottom: 16px; text-align: center; color: rgba(255,255,255,.72);
+    font-family: 'Montserrat',sans-serif; font-size: 12px; letter-spacing: .6px; pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { .pdp-lb img { transition: none; } }
   .pdp-badge { display: inline-block; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; padding: 5px 12px; background: #C5A880; color: #fff; margin-bottom: 14px; }
   .pdp-cat { font-family: 'Montserrat',sans-serif; font-size:13px; letter-spacing: 3px; color: #a8823f; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; }
-  .pdp-name { font-family:'Playfair Display',serif; font-size: 38px; font-weight: 600; color: #17150F; line-height: 1.15; margin: 0 0 6px; }
+  /* Names run to 76 characters now that every necklace says "Set with Jhumkas",
+     so the size is set in the viewport rather than fixed: it stays large on a
+     wide screen and steps down on a phone, where 38px wrapped to four lines and
+     pushed the price off the first screen. `balance` stops a lone orphan word
+     on the last line. */
+  .pdp-name { font-family:'Playfair Display',serif; font-size: clamp(25px, 3.4vw, 38px);
+    font-weight: 600; color: #17150F; line-height: 1.14; margin: 0 0 6px; text-wrap: balance; }
   .pdp-sub-seo { font-family: 'Montserrat',sans-serif; font-size: 15px; font-weight: 500; color: #2b2b2b; line-height: 1.45; margin: 0 0 14px; }
   .ctl-wrap { max-width: 1080px; margin: 30px auto 0; padding: 26px 0 0; border-top: 1px solid #eae5d8; }
   .ctl-title { font-family:'Playfair Display',serif; font-size: 24px; color: #1A1A1A; margin: 0 0 4px; }
@@ -146,9 +189,39 @@
   .rv-avg { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #C5A880; }
   /* minimal, no card/box - plain text separated by a hairline divider, like a
      product-review strip on a retail site rather than a stack of bordered tiles */
-  .rv-right { display: flex; gap: 0; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scroll-snap-type: x proximity; }
-  .rv-item { flex: 0 0 200px; scroll-snap-align: start; padding: 0 16px; border-left: 1px solid #eae5d8; }
+  .rv-right { margin-bottom: 14px; }
+  .rv-item { padding: 0 16px; border-left: 1px solid #eae5d8; }
   .rv-item:first-child { border-left: none; padding-left: 0; }
+  /* Collapsed review rows. A stack of open reviews - each with a full-width
+     photo - pushed the rest of the page a screen and a half down; the row
+     carries name + rating + the first line, and the photo only loads weight
+     on the page once someone opens it. */
+  .rv-ac { border-bottom: 1px solid #f0ebe0; }
+  .rv-ac:last-of-type { border-bottom: none; }
+  .rv-ac-sum { display: flex; align-items: center; gap: 12px; padding: 11px 2px;
+    cursor: pointer; list-style: none; }
+  .rv-ac-sum::-webkit-details-marker { display: none; }
+  .rv-ac-sum:focus-visible { outline: 2px solid #C8901F; outline-offset: -2px; border-radius: 8px; }
+  .rv-ac-t { flex: 1 1 auto; min-width: 0; }
+  .rv-ac-top { display: flex; align-items: baseline; gap: 8px; }
+  .rv-ac-top .rv-name { margin-top: 0; }
+  .rv-ac-snip { display: block; font-family: 'Montserrat',sans-serif; font-size: 12.5px;
+    color: #6b6b6b; line-height: 1.45; margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rv-ac[open] .rv-ac-snip { display: none; }
+  .rv-chev { flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-flex;
+    align-items: center; justify-content: center; font-size: 17px; line-height: 1;
+    color: #C8901F; background: rgba(200,144,31,.09);
+    transition: transform .35s cubic-bezier(.22,1,.36,1), background .3s; }
+  .rv-ac-sum:hover .rv-chev { background: rgba(200,144,31,.16); }
+  .rv-ac[open] .rv-chev { transform: rotate(45deg); }
+  .rv-ac-body { padding: 0 2px 14px; animation: rvIn .32s cubic-bezier(.22,1,.36,1) both; }
+  .rv-ac-body .rv-text { -webkit-line-clamp: unset; margin-top: 0; }
+  @keyframes rvIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .rv-chev { transition: none; }
+    .rv-ac-body { animation: none; }
+  }
   .rv-stars { color: #C5A880; font-size: 12px; letter-spacing:1px; }
   .rv-name { font-family: 'Montserrat',sans-serif; font-size: 11px; color: #1A1A1A; font-weight: 500; margin-top: 3px; }
   .rv-text { font-family: 'Montserrat',sans-serif; font-size: 12.5px; color: #2b2b2b; line-height: 1.55; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
@@ -167,8 +240,26 @@
   .rv-modal-list .rv-item:last-child { border-bottom: none; padding-bottom: 0; }
   .rv-modal-list .rv-item:first-child { padding-top: 0; }
   .rv-modal-list .rv-text { -webkit-line-clamp: unset; }
-  .rv-form { margin-top: 0; max-width: 100%; padding-top: 12px; border-top: 1px solid #f3ede1; }
+  .rv-form { margin-top: 0; max-width: 100%; padding-top: 16px; border-top: 1px solid #f3ede1; }
   .rv-form h3 { font-family:'Playfair Display',serif; font-size: 16px; color: #1A1A1A; margin: 0 0 8px; }
+
+  /* Link to the review page, styled like the other raised tiles on the site. */
+  .rv-cta { display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:17px 20px; margin-top:14px; text-decoration:none; border-radius:16px;
+    border:1px solid rgba(197,168,128,.45);
+    background:linear-gradient(180deg,#ffffff 0%,#faf7f0 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 2px rgba(11,41,28,.05), 0 10px 26px -16px rgba(11,41,28,.45);
+    transition: transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .35s; }
+  .rv-cta:hover { transform:translateY(-2px); border-color:rgba(197,168,128,.8);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 2px 4px rgba(11,41,28,.06), 0 18px 34px -18px rgba(11,41,28,.55); }
+  .rv-cta:focus-visible { outline:2px solid #C8901F; outline-offset:3px; }
+  .rv-cta strong { display:block; font-family:'Playfair Display',serif; font-weight:500; font-size:17px; color:#14110A; }
+  .rv-cta em { display:block; font-style:normal; font-family:'Montserrat',sans-serif; font-size:12.5px; color:#6b6b6b; margin-top:3px; }
+  .rv-cta-ic { flex:none; width:30px; height:30px; border-radius:50%; display:inline-flex;
+    align-items:center; justify-content:center; color:#C8901F; background:rgba(200,144,31,.09);
+    transition: transform .35s cubic-bezier(.22,1,.36,1), background .3s; }
+  .rv-cta:hover .rv-cta-ic { transform:translateX(3px); background:rgba(200,144,31,.16); }
+  @media (prefers-reduced-motion: reduce) { .rv-cta, .rv-cta-ic { transition:none; } .rv-cta:hover { transform:none; } }
   .rv-form-row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 8px; }
   .rv-form-row > div { flex: 1; min-width: 160px; }
   .rv-input, .rv-textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd6c6; font-family: 'Montserrat',sans-serif; font-size: 13px; outline: none; background: #fff; margin-bottom: 8px; box-sizing: border-box; }
@@ -239,29 +330,109 @@
   /* Server-rendered related links. Text only on purpose — the images rail is
      already handled by "Complete the Look"; this block exists so the page has
      crawlable outbound links without adding another 6 thumbnails of weight. */
-  .pdp-more { max-width: 1180px; margin: 46px auto 0; padding: 0 40px 10px; }
+  /* 46px section margin stacked on the h2's own 28px top margin left ~75px of
+     blank page between the review CTA and "More necklaces". They collapse to
+     one gap now, and the first heading in the section drops its top margin. */
+  .pdp-more { max-width: 1180px; margin: 8px auto 0; padding: 0 40px 44px; }
   .pdp-more:empty { display: none; }
-  .pdp-more h2 { font-family:'Playfair Display',serif; font-weight:500; font-size:22px; color:#1A1A1A; margin:28px 0 12px; }
+  .pdp-more h2 { font-family:'Playfair Display',serif; font-weight:500; font-size:22px; color:#1A1A1A; margin:26px 0 12px; }
+  .pdp-more > h2:first-child { margin-top: 4px; }
   .pm-grid, .pm-links { list-style:none; margin:0; padding:0; }
-  .pm-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0 26px; }
-  .pm-grid li, .pm-links li { border-top:1px solid #eae5d8; }
-  .pm-grid a, .pm-links a { display:flex; gap:12px; justify-content:space-between; align-items:baseline;
-    padding:12px 2px; font-family:'Montserrat',sans-serif; font-size:14px; color:#0B291C; text-decoration:none; }
-  .pm-grid a .p { color:#6b6b6b; white-space:nowrap; }
+  /* Horizontal rail. As a stacked list these six cards ran the length of a
+     phone screen and a half for links nobody had asked for yet; sideways they
+     show a bigger photo in a fifth of the height. Negative margin + matching
+     padding lets the row bleed to the section edge without clipping the card
+     shadows. */
+  .pm-grid { display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x proximity;
+    padding:6px 6px 14px; margin:0 -6px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:thin; scrollbar-color:#ded6c6 transparent; }
+  .pm-grid::-webkit-scrollbar { height:6px; }
+  .pm-grid::-webkit-scrollbar-thumb { background:#ded6c6; border-radius:99px; }
+  .pm-grid::-webkit-scrollbar-track { background:transparent; }
+  .pm-links li { border-top:1px solid #eae5d8; }
+  .pm-links li:last-child { border-bottom:1px solid #eae5d8; }
+  /* Raised tiles with a thumbnail. Same lift-on-focus behaviour as the review
+     composer, so the page reads as one interaction language throughout. */
+  .pm-grid li {
+    flex:0 0 172px; scroll-snap-align:start;
+    border:1px solid rgba(197,168,128,.36); border-radius:16px;
+    background:linear-gradient(180deg,#ffffff 0%,#faf7f0 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 1px 2px rgba(11,41,28,.04), 0 10px 24px -18px rgba(11,41,28,.4);
+    transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .35s;
+  }
+  .pm-grid li:hover, .pm-grid li:focus-within {
+    transform:translateY(-3px); border-color:rgba(197,168,128,.7);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 2px 5px rgba(11,41,28,.06), 0 20px 38px -20px rgba(11,41,28,.5);
+  }
+  .pm-grid a {
+    display:block; padding:10px 10px 12px;
+    font-family:'Montserrat',sans-serif; font-size:13px; line-height:1.4;
+    color:#0B291C; text-decoration:none;
+  }
+  .pm-th { width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; border-radius:12px; display:block;
+    background:#f2ece1; border:1px solid rgba(197,168,128,.3); }
+  /* Two lines, then ellipsis. The names run to 76 characters since the set
+     rename, and a card that grows to five lines breaks the rail's rhythm. */
+  .pm-grid a .n { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    overflow:hidden; margin-top:9px; min-height:2.8em; }
+  .pm-grid a .p { display:block; margin-top:5px; color:#6b6b6b; white-space:nowrap;
+    font-weight:600; font-variant-numeric:tabular-nums; }
+  .pm-links a { display:flex; gap:12px; justify-content:space-between; align-items:baseline;
+    padding:13px 2px; font-family:'Montserrat',sans-serif; font-size:14.5px; color:#0B291C; text-decoration:none; }
   .pm-links a::after { content:'\2192'; color:#C5A880; }
   .pm-grid a:hover, .pm-links a:hover { color:#C5A880; }
-  @media(max-width:900px){ .pdp-more { padding:0 18px 10px; } .pm-grid { grid-template-columns:1fr; } }
+  .pm-grid a:focus-visible, .pm-links a:focus-visible { outline:2px solid #C8901F; outline-offset:2px; border-radius:10px; }
+
+  /* "Read next", folded into the same raised tile the review CTA uses so the
+     bottom of the page reads as one material rather than three treatments. */
+  .pm-next { margin-top:30px; border-radius:16px; overflow:hidden;
+    border:1px solid rgba(197,168,128,.45);
+    background:linear-gradient(180deg,#ffffff 0%,#faf7f0 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 2px rgba(11,41,28,.05), 0 10px 26px -16px rgba(11,41,28,.45);
+    transition: box-shadow .35s, border-color .35s; }
+  .pm-next[open] { border-color:rgba(197,168,128,.75);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 2px 5px rgba(11,41,28,.06), 0 20px 40px -20px rgba(11,41,28,.55); }
+  .pm-sum { display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:17px 20px; cursor:pointer; list-style:none; }
+  .pm-sum::-webkit-details-marker { display:none; }
+  .pm-sum:focus-visible { outline:2px solid #C8901F; outline-offset:-3px; border-radius:16px; }
+  .pm-sum-t b { display:block; font-family:'Playfair Display',serif; font-weight:500; font-size:17px; color:#14110A; }
+  .pm-sum-t em { display:block; font-style:normal; font-family:'Montserrat',sans-serif;
+    font-size:12.5px; color:#6b6b6b; margin-top:3px; }
+  .pm-chev { flex:none; width:30px; height:30px; border-radius:50%; display:inline-flex;
+    align-items:center; justify-content:center; font-size:19px; line-height:1;
+    color:#C8901F; background:rgba(200,144,31,.09);
+    transition: transform .35s cubic-bezier(.22,1,.36,1), background .3s; }
+  .pm-sum:hover .pm-chev { background:rgba(200,144,31,.16); transform:scale(1.08); }
+  .pm-next[open] .pm-chev { transform:rotate(45deg); }
+  .pm-next[open] .pm-sum:hover .pm-chev { transform:rotate(45deg) scale(1.08); }
+  .pm-next .pm-links { padding:0 20px 8px; }
+  .pm-next .pm-links li:last-child { border-bottom:none; }
+  .pm-next[open] .pm-links { animation:pmIn .38s cubic-bezier(.22,1,.36,1) both; }
+  @keyframes pmIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pm-grid li, .pm-next, .pm-chev { transition:none; }
+    .pm-grid li:hover { transform:none; }
+    .pm-next[open] .pm-links { animation:none; }
+  }
+  @media(max-width:900px){ .pdp-more { padding:0 18px 36px; } .pm-grid li { flex-basis:158px; } }
+  @media(max-width:600px){ .pm-sum { padding:15px 16px; } .pm-next .pm-links { padding:0 16px 6px; } }
   .pdp-error { text-align: center; padding: 80px 24px; }
   .pdp-error-title { font-family:'Playfair Display',serif; font-weight: 600; font-size: 28px; color: #1A1A1A; margin: 0 0 14px; }
   .pdp-error a { color: #0B291C; text-decoration: none; border-bottom: 1px solid #C5A880; padding-bottom: 2px; }
   @media (max-width: 900px) {
     #pdp-crumb { padding-left: 16px; padding-right: 16px; }
     .pdp-grid { grid-template-columns: 1fr; gap: 24px; }
-    .pdp-wrap { padding: 0 16px calc(96px + env(safe-area-inset-bottom)); }
-    .pdp-name { font-size: 30px; }
+    .pdp-wrap { padding: 0 16px 4px; }
+    .pdp-name { font-size: 25px; }
     .pdp-price { font-size: 34px; }
-    .pdp-img-wrap { max-width: 100%; }
-    .pdp-img { aspect-ratio: 1/1; }
+    /* Tighter on a phone so the name, the price and the set banner are all on
+       the first screen. The whole piece is still shown - it is smaller, not
+       cropped - and tapping it opens the full-screen viewer. */
+    .pdp-img-wrap { max-width: 100%; min-height: 200px; }
+    .pdp-img { max-height: 46vh; }
+    .pdp-zoom-hint { left: 8px; bottom: 8px; padding: 5px 10px; font-size: 10.5px; }
     /* Colour readout right under the image; the full label lower down is
        then redundant on mobile, so hide that one instead of showing both. */
     .pdp-color-mob { display: block; }
@@ -305,15 +476,24 @@
     </div>
     <div id="pdp-content" style="display:none">
       <div class="pdp-grid">
-        <div class="pdp-img-wrap">
-          <img class="pdp-img" id="pdp-image" src="" alt="" fetchpriority="high" decoding="async">
-          <div class="pdp-oos-stamp" id="pdp-oos-stamp" style="display:none">OUT OF STOCK</div>
-          <button type="button" id="pdp-fav" class="pdp-img-fav" aria-label="Save to favourites">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          </button>
-          <button type="button" id="pdp-share" class="pdp-img-share" aria-label="Share this piece" title="Share">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6 15.4 6.4M8.6 13.4l6.8 4.2" stroke-linecap="round"/></svg>
-          </button>
+        <!-- The wrap holds ONLY the photo and the controls that sit on top of
+             it: it is a flex box that hugs the image, so a block child here
+             would land beside the photo instead of under it. -->
+        <div>
+          <div class="pdp-img-wrap">
+            <img class="pdp-img" id="pdp-image" src="" alt="" fetchpriority="high" decoding="async">
+            <div class="pdp-oos-stamp" id="pdp-oos-stamp" style="display:none">OUT OF STOCK</div>
+            <button type="button" id="pdp-fav" class="pdp-img-fav" aria-label="Save to favourites">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </button>
+            <button type="button" id="pdp-share" class="pdp-img-share" aria-label="Share this piece" title="Share">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6 15.4 6.4M8.6 13.4l6.8 4.2" stroke-linecap="round"/></svg>
+            </button>
+            <span class="pdp-zoom-hint">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.2-4.2M11 8v6M8 11h6" stroke-linecap="round"/></svg>
+              Tap to enlarge
+            </span>
+          </div>
           <div class="pdp-thumbs" id="pdp-thumbs"></div>
           <!-- Mobile-only colour readout: on phones the grid stacks, so the
                real colour label sits far below the fold. This shows which
@@ -334,7 +514,9 @@
           </div>
           <div class="pdp-savebar" id="pdp-savebar"><span class="sb-ic">🎉</span><span id="pdp-savebar-txt"></span></div>
           <div class="pdp-tax">incl. of all taxes</div>
-          <div class="pdp-ship"><span class="free">✓ FREE Insured Delivery</span> across India - no extra charges at checkout</div>
+          <!-- Claims shipping only. A COD order does add a fee at checkout, so
+               a blanket "no extra charges" line did not hold for every order. -->
+          <div class="pdp-ship"><span class="free">✓ FREE Insured Delivery</span> across India</div>
           <div class="pdp-stock" id="pdp-stock" style="display:none"><span class="dot"></span><span id="pdp-stock-txt"></span></div>
           <div class="pdp-noreturn"><strong>Country of origin:</strong> <span class="pdp-origin-val">India</span> · <strong>Manufactured by:</strong> <span class="pdp-origin-val">Saubhagya Jewellery</span></div>
           <div class="pdp-pincheck">
@@ -387,35 +569,21 @@
           <span class="rv-avg" id="rv-avg"></span>
         </div>
         <div class="rv-right" id="rv-right">
-          <div id="rv-list"><div class="rv-empty-nice">Be the first to review -<br>your feedback helps others find their perfect piece.</div></div>
+          <div id="rv-list"></div>
         </div>
         <button type="button" class="rv-seeall" id="rv-seeall" style="display:none"></button>
-        <div class="rv-form">
-          <h3>Write a review</h3>
-          <div class="rv-form-row">
-            <div>
-              <label class="rv-label">Your rating</label>
-              <div class="rv-starpick" id="rv-starpick" title="Tap to rate">
-                <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
-              </div>
-            </div>
-            <div>
-              <label class="rv-label" for="rv-name">Your name</label>
-              <input class="rv-input" id="rv-name" placeholder="e.g. Priya M." maxlength="60" style="margin-bottom:0">
-            </div>
-          </div>
-          <label class="rv-label" for="rv-text">Your review</label>
-          <textarea class="rv-textarea" id="rv-text" placeholder="How was the piece? Fit, finish, occasion…" maxlength="600"></textarea>
-          <div class="rv-char-count" id="rv-char-count">0 / 600</div>
-          <label class="rv-label" for="rv-photo">Add a photo <span style="font-weight:400;color:#8a8a8a">(optional)</span></label>
-          <input type="file" id="rv-photo" accept="image/jpeg,image/png,image/webp" style="font-size:13px;margin-bottom:10px">
-          <div id="rv-photo-preview" hidden style="margin-bottom:12px">
-            <img id="rv-photo-img" alt="Your photo" style="max-width:140px;border-radius:12px;display:block">
-            <button type="button" id="rv-photo-clear" style="background:none;border:none;color:#c0392b;font-size:12px;padding:6px 0;cursor:pointer">Remove photo</button>
-          </div>
-          <button class="rv-submit" id="rv-submit">SUBMIT REVIEW</button>
-          <div class="rv-msg" id="rv-msg"></div>
-        </div>
+        <!-- No composer here on purpose.
+             A form on the product page only works if the visitor is signed in
+             AND bought THIS exact piece; everyone else meets an error after
+             filling it in. /review lists what the customer actually received,
+             so the piece is never chosen wrongly and the form never fails. -->
+        <a class="rv-cta" href="review.html">
+          <span>
+            <strong>Bought this piece?</strong>
+            <em>Rate it and add a photo. Takes a minute.</em>
+          </span>
+          <span class="rv-cta-ic" aria-hidden="true">&rarr;</span>
+        </a>
       </div>
 
       <!-- All-reviews modal: full sorted (high→low) scrollable list -->
@@ -442,12 +610,25 @@
     <button class="buy" id="pdp-mobile-buy" type="button">BUY NOW</button>
   </div>
 </main>
+
+<!-- Full-screen photo viewer. The page shows the piece small enough to keep the
+     name and price on the first screen; anyone who wants to inspect the finish
+     opens it here instead of scrolling past a very tall image. -->
+<div class="pdp-lb" id="pdp-lb" role="dialog" aria-modal="true" aria-label="Product photo">
+  <button type="button" class="pdp-lb-close" id="pdp-lb-close" aria-label="Close">&times;</button>
+  <img id="pdp-lb-img" src="" alt="">
+  <div class="pdp-lb-cap" id="pdp-lb-cap">Tap the photo to zoom</div>
+</div>
 <x-footer></x-footer>
 
 <script>
 (function () {
   'use strict';
   var $ = function(id) { return document.getElementById(id); };
+  // Used by the related-products rail and the review cards. It used to sit in
+  // the review composer block; when that was removed this went with it and
+  // both renderers threw ReferenceError, so it lives up here now.
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   var sku = new URLSearchParams(location.search).get('sku') || '';
   if (!sku) { var _pm = location.pathname.match(/\/product\/([^\/?#]+)/); if (_pm) sku = decodeURIComponent(_pm[1]); }
   if (!sku) { $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block'; return; }
@@ -672,8 +853,17 @@
     var parts = [];
     if (material) parts.push(material);
     else if (region) parts.push(region);
-    parts.push('Gold-Plated');
+    // "Antique Gold-Finish Gold-Plated" named the finish twice.
+    if (!/gold/i.test(material)) parts.push('Gold-Plated');
     if (region && material) parts.push(region);
+    // "South Indian Temple" + "Temple Jewellery Set" said Temple twice. Both
+    // come from the same word in the name, so drop it from the type when the
+    // material already carries it. Mirrors dedupeType() in functions/_seo.js.
+    var tWords = type.split(/\s+/);
+    var mWords = material.toLowerCase().split(/\s+/);
+    if (material && tWords.length > 1 && mWords.indexOf(tWords[0].toLowerCase()) !== -1) {
+      type = tWords.slice(1).join(' ');
+    }
     parts.push(type);
     return parts.join(' ') + ' for ' + occ;
   }
@@ -841,6 +1031,108 @@
     }
     return 0;
   }
+
+  /* ---- full-screen photo viewer ----
+     The page deliberately shows the piece small, so this is where the detail
+     lives: tap to go to 2.5x at the point touched, drag to pan, tap again to
+     come back. Escape, the close button and the backdrop all shut it. */
+  (function () {
+    var lb = $('pdp-lb'), lbImg = $('pdp-lb-img'), cap = $('pdp-lb-cap'), main = $('pdp-image');
+    if (!lb || !lbImg || !main) return;
+
+    var ZOOM = 2.5;
+    var scale = 1, tx = 0, ty = 0;
+    var dragging = false, moved = false, sx = 0, sy = 0, stx = 0, sty = 0;
+    var lastFocus = null;
+
+    function apply() {
+      lbImg.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+    }
+    function reset() {
+      scale = 1; tx = 0; ty = 0;
+      lb.classList.remove('zoomed');
+      cap.textContent = 'Tap the photo to zoom';
+      apply();
+    }
+    // Keep the panned image from being dragged off screen entirely.
+    function clamp() {
+      var r = lbImg.getBoundingClientRect();
+      var w = lbImg.offsetWidth * scale, h = lbImg.offsetHeight * scale;
+      var maxX = Math.max(0, (w - window.innerWidth) / 2 + 40);
+      var maxY = Math.max(0, (h - window.innerHeight) / 2 + 40);
+      tx = Math.min(maxX, Math.max(-maxX, tx));
+      ty = Math.min(maxY, Math.max(-maxY, ty));
+      return r;
+    }
+
+    function open() {
+      var src = main.getAttribute('src');
+      if (!src) return;
+      lastFocus = document.activeElement;
+      lbImg.src = src;
+      lbImg.alt = main.alt || '';
+      reset();
+      lb.classList.add('on');
+      document.body.style.overflow = 'hidden';
+      $('pdp-lb-close').focus();
+    }
+    function close() {
+      lb.classList.remove('on');
+      document.body.style.overflow = '';
+      lbImg.removeAttribute('src');
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    main.addEventListener('click', open);
+    $('pdp-lb-close').addEventListener('click', close);
+    lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && lb.classList.contains('on')) close();
+    });
+
+    // Tap toggles zoom, but only when the pointer did not travel - otherwise
+    // every pan would also toggle.
+    lbImg.addEventListener('pointerdown', function (e) {
+      if (scale === 1) return;
+      dragging = true; moved = false;
+      sx = e.clientX; sy = e.clientY; stx = tx; sty = ty;
+      lb.classList.add('dragging');
+      lbImg.setPointerCapture(e.pointerId);
+    });
+    lbImg.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+      tx = stx + dx; ty = sty + dy;
+      clamp(); apply();
+    });
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      lb.classList.remove('dragging');
+      try { lbImg.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+    lbImg.addEventListener('pointerup', endDrag);
+    lbImg.addEventListener('pointercancel', endDrag);
+
+    lbImg.addEventListener('click', function (e) {
+      if (moved) { moved = false; return; }
+      if (scale === 1) {
+        var r = lbImg.getBoundingClientRect();
+        // Zoom about the point touched, so the detail under the finger stays put.
+        var ox = e.clientX - (r.left + r.width / 2);
+        var oy = e.clientY - (r.top + r.height / 2);
+        scale = ZOOM;
+        tx = -ox * (ZOOM - 1);
+        ty = -oy * (ZOOM - 1);
+        lb.classList.add('zoomed');
+        cap.textContent = 'Drag to move · tap to zoom out';
+        clamp(); apply();
+      } else {
+        reset();
+      }
+    });
+  })();
 
   function switchMainImage(src) {
     $('pdp-image').src = src;
@@ -1085,45 +1377,45 @@
     window.location.href = '/checkout.html';
   });
   if (mBar) {
-    var _rvVisible = false;
-    function _updateBar() {
-      var show = !_rvVisible;
-      mBar.classList.toggle('on', show);
-      mBar.setAttribute('aria-hidden', show ? 'false' : 'true');
+    /* The bar belongs to the deciding part of the page. It stays up through the
+       specs and the care copy, goes away when "Complete the Look" arrives -
+       from there down the page is browsing, not deciding - and comes straight
+       back the moment the customer scrolls up above that line again.
+
+       A scroll handler, not IntersectionObserver: #ctl-wrap starts display:none
+       and is only revealed once the related pieces load, and an observer on a
+       display:none element reports a zero rect that reads as "already scrolled
+       past" - which is what hid the bar for good. offsetParent is the cheap
+       is-it-actually-laid-out test. */
+    function _showBar(on) {
+      mBar.classList.toggle('on', on);
+      mBar.setAttribute('aria-hidden', on ? 'false' : 'true');
     }
-    var _rvWrap = document.querySelector('.rv-wrap');
-    if (_rvWrap) {
-      new IntersectionObserver(function(entries) {
-        _rvVisible = entries[0].isIntersecting;
-        _updateBar();
-      }, { threshold: 0.1 }).observe(_rvWrap);
+    function _barStop() {
+      var c = document.getElementById('ctl-wrap');
+      if (c && c.offsetParent) return c;
+      var r = document.querySelector('.rv-wrap');   // no related pieces to show
+      return (r && r.offsetParent) ? r : null;
     }
-    _updateBar();
+    var _barQueued = false;
+    function _barSync() {
+      _barQueued = false;
+      var stop = _barStop();
+      _showBar(!stop || stop.getBoundingClientRect().top > window.innerHeight - 40);
+    }
+    window.addEventListener('scroll', function () {
+      if (_barQueued) return;
+      _barQueued = true;
+      requestAnimationFrame(_barSync);
+    }, { passive: true });
+    window.addEventListener('resize', _barSync, { passive: true });
+    _barSync();
   }
 
-  /* ---- reviews (existing /api/reviews backend) ---- */
-  var rvRating = 5;
-  var starWrap = $('rv-starpick');
-  function paintStars() {
-    [].forEach.call(starWrap.children, function(s) {
-      s.classList.toggle('on', Number(s.getAttribute('data-v')) <= rvRating);
-    });
-  }
-  starWrap.addEventListener('click', function(e) {
-    var v = e.target.getAttribute && e.target.getAttribute('data-v');
-    if (v) { rvRating = Number(v); paintStars(); }
-  });
-  paintStars();
-
-  var rvTextArea = $('rv-text'), rvCharCount = $('rv-char-count');
-  if (rvTextArea && rvCharCount) {
-    rvTextArea.addEventListener('input', function () {
-      rvCharCount.textContent = rvTextArea.value.length + ' / 600';
-    });
-  }
-
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-
+  /* ---- reviews: DISPLAY ONLY ----
+     Submission moved to review.html. The composer that used to live here
+     could only succeed for a signed-in customer who had bought this exact
+     piece; everyone else filled it in and then met an error. ---- */
   function reviewCardHtml(r) {
     var stars = '★'.repeat(Math.max(1, Math.min(5, r.rating))) + '☆'.repeat(Math.max(0, 5 - Math.min(5, r.rating)));
     var photo = r.image_url
@@ -1134,6 +1426,31 @@
       '<div class="rv-stars">' + stars + '</div>' +
       '<div class="rv-name">' + esc(r.name) + '</div>' +
       '<div class="rv-text">' + esc(r.review_text) + '</div>' + photo + '</div>';
+  }
+
+  /* One collapsed row per review. `open` is forced when there is only one,
+     because a lone review behind a click reads as if the product has none. */
+  function reviewRowHtml(r, open) {
+    var n = Math.max(1, Math.min(5, r.rating));
+    var stars = '★'.repeat(n) + '☆'.repeat(5 - n);
+    var text = String(r.review_text == null ? '' : r.review_text);
+    var photo = r.image_url
+      ? '<img src="' + esc(r.image_url) + '" alt="Customer photo" loading="lazy" decoding="async" ' +
+        'style="margin-top:10px;width:100%;max-width:190px;aspect-ratio:4/3;object-fit:cover;border-radius:12px;display:block">'
+      : '';
+    return '<details class="rv-ac"' + (open ? ' open' : '') + '>' +
+      '<summary class="rv-ac-sum">' +
+        '<span class="rv-ac-t">' +
+          '<span class="rv-ac-top">' +
+            '<span class="rv-name">' + esc(r.name) + '</span>' +
+            '<span class="rv-stars">' + stars + '</span>' +
+          '</span>' +
+          '<span class="rv-ac-snip">' + esc(text) + '</span>' +
+        '</span>' +
+        '<span class="rv-chev" aria-hidden="true">+</span>' +
+      '</summary>' +
+      '<div class="rv-ac-body"><div class="rv-text">' + esc(text) + '</div>' + photo + '</div>' +
+    '</details>';
   }
 
   var allReviews = [];
@@ -1149,6 +1466,13 @@
   $('rv-modal-backdrop').addEventListener('click', function (e) { if (e.target === $('rv-modal-backdrop')) closeReviewsModal(); });
   $('rv-seeall').addEventListener('click', openReviewsModal);
 
+  /* This product's reviews only.
+     A store-wide feed was tried here and reverted: the same handful of reviews
+     under every product reads as fabricated even when every one of them is
+     real, and store-wide ratings attached to a single Product would also be
+     false structured data. An unreviewed product showing nothing is the honest
+     state. The cross-product feed lives on the homepage and /reviews, where
+     each card names the product it is about. */
   function loadReviews() {
     fetch('/api/reviews?sku=' + encodeURIComponent(sku))
       .then(function(r) { return r.json(); })
@@ -1157,7 +1481,9 @@
         if (d.count > 0) $('rv-avg').textContent = '★ ' + d.average + ' · ' + d.count + ' review' + (d.count > 1 ? 's' : '');
         allReviews = d.reviews || [];
         if (allReviews.length) {
-          $('rv-list').innerHTML = allReviews.slice(0, RV_STRIP_MAX).map(reviewCardHtml).join('');
+          var only = allReviews.length === 1;
+          $('rv-list').innerHTML = allReviews.slice(0, RV_STRIP_MAX)
+            .map(function (r) { return reviewRowHtml(r, only); }).join('');
           if (allReviews.length > RV_STRIP_MAX) {
             $('rv-seeall').textContent = 'SEE ALL ' + allReviews.length + ' REVIEWS';
             $('rv-seeall').style.display = 'block';
@@ -1165,118 +1491,12 @@
             $('rv-seeall').style.display = 'none';
           }
         } else {
-          $('rv-list').innerHTML = '<div class="rv-empty-nice">Be the first to review -<br>your feedback helps others find their perfect piece.</div>';
+          $('rv-list').innerHTML = '';
           $('rv-seeall').style.display = 'none';
         }
       }).catch(function() {});
   }
   loadReviews();
-
-  $('rv-submit').addEventListener('click', function() {
-    var name = ($('rv-name').value || '').trim();
-    var text = ($('rv-text').value || '').trim();
-    var msg = $('rv-msg');
-    if (!name || !text) { msg.style.color = '#c0392b'; msg.textContent = 'Please add your name and a few words.'; return; }
-    // Only verified buyers can review. Pull email + phone from the logged-in
-    // session (or /api/orders/save auto-account) so it matches the buyer row.
-    var user = null;
-    try { user = window.MPA ? window.MPA.getUser() : null; } catch(e) {}
-    if (!user || !(user.email || user.phone)) {
-      msg.style.color = '#c0392b';
-      msg.innerHTML = 'Only verified buyers can review. Please <a href="signin.html" style="color:#0B291C">sign in</a> with the email or phone you used at checkout.';
-      return;
-    }
-    this.disabled = true;
-
-    // Photo first (if any): upload returns the R2 URL that /api/reviews will
-    // accept. A failed photo must not silently drop the written review, so we
-    // stop and tell the customer rather than posting the text alone.
-    var file = rvPhotoFile;
-    var step = file ? uploadReviewPhoto(file, user) : Promise.resolve(null);
-
-    step.then(function(imageUrl) {
-      return fetch('/api/reviews', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          product_sku: sku, name: name, rating: rvRating, review_text: text,
-          email: user.email || '', phone: user.phone || '',
-          image_url: imageUrl || ''
-        })
-      }).then(function(r) { return r.json(); });
-    }).then(function(d) {
-      $('rv-submit').disabled = false;
-      if (d && d.success) {
-        msg.style.color = '#0B291C'; msg.textContent = 'Thank you! Your review is live.';
-        $('rv-name').value = ''; $('rv-text').value = '';
-        clearReviewPhoto();
-        loadReviews();
-      } else {
-        msg.style.color = '#c0392b'; msg.textContent = (d && d.error) || 'Could not submit. Try again.';
-      }
-    }).catch(function(e) {
-      $('rv-submit').disabled = false;
-      msg.style.color = '#c0392b';
-      // Only our own upload errors are customer-appropriate; anything else
-      // (e.g. a Cloudflare HTML error page failing JSON.parse) gets the
-      // generic line instead of leaking parser output into the storefront.
-      msg.textContent = (e && e.userFacing && e.message) || 'Could not submit right now. Please try again.';
-    });
-  });
-
-  /* ---- review photo (optional) ---- */
-  var rvPhotoFile = null;
-  var MAX_PHOTO = 5 * 1024 * 1024;
-
-  function clearReviewPhoto() {
-    rvPhotoFile = null;
-    var inp = $('rv-photo');
-    if (inp) inp.value = '';
-    var prev = $('rv-photo-preview');
-    if (prev) prev.hidden = true;
-    var img = $('rv-photo-img');
-    if (img && img.src.indexOf('blob:') === 0) { URL.revokeObjectURL(img.src); img.removeAttribute('src'); }
-  }
-
-  function uploadReviewPhoto(file, user) {
-    var fd = new FormData();
-    fd.append('file', file);
-    fd.append('product_sku', sku);
-    fd.append('email', user.email || '');
-    fd.append('phone', user.phone || '');
-    return fetch('/api/review-image', { method: 'POST', body: fd })
-      .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, d: d }; }); })
-      .then(function(res) {
-        if (!res.ok || !res.d || !res.d.url) {
-          var upErr = new Error((res.d && res.d.error) || 'Photo upload failed. Try a smaller image.');
-          upErr.userFacing = true;
-          throw upErr;
-        }
-        return res.d.url;
-      });
-  }
-
-  if ($('rv-photo')) {
-    $('rv-photo').addEventListener('change', function() {
-      var f = this.files && this.files[0];
-      var msg = $('rv-msg');
-      if (!f) { clearReviewPhoto(); return; }
-      if (['image/jpeg', 'image/png', 'image/webp'].indexOf(f.type) < 0) {
-        msg.style.color = '#c0392b'; msg.textContent = 'Photo must be a JPG, PNG or WebP.';
-        clearReviewPhoto(); return;
-      }
-      if (f.size > MAX_PHOTO) {
-        msg.style.color = '#c0392b'; msg.textContent = 'Photo is over 5 MB — please pick a smaller one.';
-        clearReviewPhoto(); return;
-      }
-      msg.textContent = '';
-      rvPhotoFile = f;
-      var img = $('rv-photo-img');
-      if (img.src.indexOf('blob:') === 0) URL.revokeObjectURL(img.src);
-      img.src = URL.createObjectURL(f);
-      $('rv-photo-preview').hidden = false;
-    });
-    $('rv-photo-clear').addEventListener('click', clearReviewPhoto);
-  }
 
   // Fetch product (catalog.js static fallback if the API is unreachable)
   //

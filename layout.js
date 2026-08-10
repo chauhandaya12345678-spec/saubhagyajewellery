@@ -336,8 +336,10 @@
       '<p>Handcrafted premium imitation jewellery from our Mumbai warehouse. Every piece is manufactured in-house, inspected and dispatched insured across India.</p>' +
       social + '</div>' +
       col('COMPANY', company) + col('POLICY', policy) +
-      '<details class="fcol fcol-support"><summary class="fhead">SELLER &amp; SUPPORT</summary>' +
-      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Shop/Gala Premises, Lokmanya Chawl Committee<br>opp Vishwakarma Mandir, Wadarapada Rd 1<br>Hanuman Nagar, Akurli Cross Rd, Kandivali East<br>Mumbai 400101, Maharashtra, India<br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A880">Grievances</a><br>Ack. 48 hrs · Resolve within 30 days</p>' +
+      '<details class="fcol fcol-support"><summary class="fhead">REGISTERED OFFICE &amp; DISPATCH</summary>' +
+      /* Registered office and dispatch, NOT a shop. Saubhagya is online only,
+         so this must never read as an address a customer can walk into. */
+      '<p class="fatelier"><strong>Saubhagya Jewellery</strong><br>Kandivali East, Mumbai 400101<br>Maharashtra, India<br><br><a href="contact.html" style="color:#C5A880">Full address &rarr;</a><br><br>Care: +91 99870 08435<br>care@saubhagyajewellery.com<br><br>Grievance Officer: see <a href="grievances.html" style="color:#C5A880">Grievances</a><br>Ack. 48 hrs &middot; Resolve within 30 days</p>' +
       '<a class="fwa" href="' + WHATSAPP + '" rel="noopener" target="_blank">WhatsApp Support &rarr;</a>' +
       '</details></div>' +
       '<div class="fbar"><span>&copy; 2026 Saubhagya Jewellery &middot; SSL secured</span>' +

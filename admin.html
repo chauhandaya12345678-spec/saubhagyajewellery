@@ -59,7 +59,7 @@ tr.ai-attention td { background: #fdf0ef; }
 tr.ai-attention:hover td { background: #fbe4e2; }
 .ai-attention-flag { display: inline-block; margin-top: 4px; font-size: 9px; letter-spacing: .5px; color: #c0392b; font-weight: 700; text-transform: uppercase; }
 .role-staff .pack-btn, .role-staff .ai-save, .role-staff .edit-toggle, .role-staff #users-tab-btn,
-  .role-staff .ai-tab[data-tab="photos"] { display: none !important; }
+  .role-staff .ai-tab[data-tab="reviews"] { display: none !important; }
 .ai-toggle-link { font-size: 11px; color: #0B291C; text-decoration: underline; cursor: pointer; margin-top: 14px; display: inline-block; }
 .ai-role-badge { font-size: 9px; letter-spacing: 1px; color: #C5A880; margin-left: auto; padding: 4px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 20px; }
 .ai-form-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
@@ -89,7 +89,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <button class="ai-tab" data-tab="inventory" type="button">INVENTORY</button>
     <button class="ai-tab" data-tab="customers" type="button">CUSTOMERS</button>
     <button class="ai-tab" data-tab="activity" type="button">ACTIVITY</button>
-    <button class="ai-tab" data-tab="photos" type="button">PHOTOS <span id="ph-badge" style="display:none;background:#a3342b;color:#fff;border-radius:9px;padding:1px 6px;font-size:10px;margin-left:4px"></span></button>
+    <button class="ai-tab" data-tab="reviews" type="button">REVIEWS</button>
     <button class="ai-tab" data-tab="users" type="button" id="users-tab-btn">USERS</button>
   </div>
   <span class="ai-role-badge" id="ai-role-badge" style="display:none"></span>
@@ -279,14 +279,16 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       <div class="ai-status" id="c-load-status"></div>
     </div>
 
-    <!-- ACTIVITY PANEL -->
-    <div id="panel-photos" style="display:none">
+    <!-- REVIEWS PANEL (owner only) -->
+    <div id="panel-reviews" style="display:none">
       <div class="ai-toolbar">
-        <button class="ai-btn small" id="ph-reload-btn" type="button">REFRESH</button>
-        <span class="ai-count" id="ph-count"></span>
-        <span style="font-size:12px;color:#6b6257;margin-left:10px">Review text is already live &mdash; only the photo waits here.</span>
+        <input type="text" id="rv-filter-q" placeholder="Search name / SKU / words">
+        <button class="ai-btn small" id="rv-reload-btn" type="button">SEARCH</button>
+        <label style="font-size:12px;color:#4a4a4a;display:flex;align-items:center;gap:6px;margin-left:4px"><input type="checkbox" id="rv-photos-only"> With photo only</label>
+        <span class="ai-count" id="rv-count"></span>
+        <span style="font-size:12px;color:#6b6257;flex-basis:100%">Reviews and photos publish straight away. Take anything down here and it disappears from the site at once &mdash; deleting a photo also removes the file from storage.</span>
       </div>
-      <div id="ph-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;padding:4px 0"></div>
+      <div id="rv-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding:4px 0"></div>
     </div>
 
     <div id="panel-activity" style="display:none">
@@ -487,7 +489,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var btn = e.target.closest('.ai-tab');
     if (!btn) return;
     var tab = btn.getAttribute('data-tab');
-    if (tab === 'users' && authRole !== 'owner') return;
+    if ((tab === 'users' || tab === 'reviews') && authRole !== 'owner') return;
     document.querySelectorAll('.ai-tab').forEach(function (t) { t.classList.remove('active'); });
     btn.classList.add('active');
     document.getElementById('panel-dashboard').style.display = tab === 'dashboard' ? 'block' : 'none';
@@ -495,14 +497,14 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     document.getElementById('panel-inventory').style.display = tab === 'inventory' ? 'block' : 'none';
     document.getElementById('panel-customers').style.display = tab === 'customers' ? 'block' : 'none';
     document.getElementById('panel-activity').style.display = tab === 'activity' ? 'block' : 'none';
-    document.getElementById('panel-photos').style.display = tab === 'photos' ? 'block' : 'none';
+    document.getElementById('panel-reviews').style.display = tab === 'reviews' ? 'block' : 'none';
     document.getElementById('panel-users').style.display = tab === 'users' ? 'block' : 'none';
     if (tab === 'dashboard') loadDashboard();
     if (tab === 'orders' && !lastOrders.length) loadOrders();
     if (tab === 'inventory' && !lastProducts.length) loadProducts();
     if (tab === 'customers' && !lastCustomers.length) loadCustomers();
     if (tab === 'activity') loadActivity();
-    if (tab === 'photos') loadReviewPhotos();
+    if (tab === 'reviews') loadReviews();
     if (tab === 'users' && !lastUsers.length) loadUsers();
   });
 
@@ -959,48 +961,48 @@ tr.ai-attention:hover td { background: #fbe4e2; }
 
   // ================= ACTIVITY LOG =================
   document.getElementById('a-reload-btn').addEventListener('click', loadActivity);
-  // ---- Review photo moderation ----
-  // Customers' words go live immediately; their photos land here first so a
-  // bad image can never appear on the storefront or the homepage rail.
-  var phPending = [];
-
-  function phEsc(v) {
-    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
-
-  function loadReviewPhotos() {
-    var grid = document.getElementById('ph-grid');
+  // ================= REVIEWS =================
+  // No approval queue: everything a customer writes is already on the site.
+  // This panel exists to take down what should not have gone up.
+  function loadReviews() {
+    var grid = document.getElementById('rv-grid');
+    var q = (document.getElementById('rv-filter-q').value || '').trim();
+    var photosOnly = document.getElementById('rv-photos-only').checked;
     grid.innerHTML = '<div style="color:#6b6257;font-size:13px;padding:12px">Loading…</div>';
-    apiFetch('/api/admin/review-photos?status=pending').then(function (d) {
-      if (!d || d.error) {
-        grid.innerHTML = '<div style="color:#a3342b;font-size:13px;padding:12px">' + phEsc((d && d.error) || 'Failed to load') + '</div>';
+    var params = new URLSearchParams();
+    if (q) params.set('q', q);
+    if (photosOnly) params.set('only', 'photos');
+    apiFetch('/api/admin/reviews?' + params.toString()).then(function (d) {
+      if (!d || !d.success) {
+        grid.innerHTML = '<div style="color:#a3342b;font-size:13px;padding:12px">' + esc((d && d.error) || 'Failed to load') + '</div>';
         return;
       }
-      phPending = d.photos || [];
-      document.getElementById('ph-count').textContent = phPending.length + ' awaiting review';
-      var badge = document.getElementById('ph-badge');
-      badge.textContent = phPending.length;
-      badge.style.display = phPending.length ? 'inline-block' : 'none';
-
-      if (!phPending.length) {
-        grid.innerHTML = '<div style="color:#6b6257;font-size:13px;padding:12px">Nothing waiting — all customer photos have been reviewed.</div>';
+      var list = d.reviews || [];
+      document.getElementById('rv-count').textContent =
+        list.length + ' review' + (list.length === 1 ? '' : 's') + ' · ' + d.withPhotos + ' with a photo';
+      if (!list.length) {
+        grid.innerHTML = '<div style="color:#6b6257;font-size:13px;padding:12px">No reviews' + (q || photosOnly ? ' match that filter.' : ' yet.') + '</div>';
         return;
       }
-      grid.innerHTML = phPending.map(function (r) {
-        var stars = '★'.repeat(Math.max(1, Math.min(5, r.rating))) + '☆'.repeat(Math.max(0, 5 - Math.min(5, r.rating)));
-        return '<div style="border:1px solid #e3ded4;border-radius:14px;overflow:hidden;background:#fff">' +
-            '<a href="' + phEsc(r.image_url) + '" target="_blank" rel="noopener">' +
-              '<img src="' + phEsc(r.image_url) + '" alt="" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block">' +
-            '</a>' +
-            '<div style="padding:11px 12px 12px">' +
+      grid.innerHTML = list.map(function (r) {
+        var n = Math.max(0, Math.min(5, Number(r.rating) || 0));
+        var stars = '★'.repeat(n) + '☆'.repeat(5 - n);
+        return '<div style="border:1px solid #e3ded4;border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column">' +
+            (r.image_url
+              ? '<a href="' + esc(r.image_url) + '" target="_blank" rel="noopener">' +
+                  '<img src="' + esc(r.image_url) + '" alt="" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#f3ede1">' +
+                '</a>'
+              : '') +
+            '<div style="padding:11px 12px 12px;display:flex;flex-direction:column;flex:1">' +
               '<div style="color:#c5a880;font-size:13px;letter-spacing:2px">' + stars + '</div>' +
-              '<div style="font-weight:600;font-size:13.5px;margin-top:3px">' + phEsc(r.name) + ' · <span style="font-weight:400;color:#6b6257">' + phEsc(r.product_sku) + '</span></div>' +
-              '<div style="font-size:12.5px;color:#3a3a3a;margin-top:5px;line-height:1.45">' + phEsc(r.review_text) + '</div>' +
-              '<div style="display:flex;gap:8px;margin-top:11px">' +
-                '<button class="ai-btn small" type="button" data-ph-approve="' + r.id + '">APPROVE</button>' +
-                '<button class="ai-btn small" type="button" data-ph-reject="' + r.id + '" style="background:#a3342b;border-color:#a3342b">REJECT</button>' +
+              '<div style="font-weight:600;font-size:13.5px;margin-top:3px">' + esc(r.name) +
+                ' · <a href="/product/' + encodeURIComponent(r.product_sku) + '" target="_blank" rel="noopener" style="font-weight:400;color:#6b6257">' + esc(r.product_sku) + '</a></div>' +
+              '<div style="font-size:11px;color:#9a9a9a;margin-top:2px">' + fmtDate(r.created_at) +
+                (r.order_id ? ' · ' + esc(r.order_id) : '') + '</div>' +
+              '<div style="font-size:12.5px;color:#3a3a3a;margin-top:6px;line-height:1.45;flex:1">' + esc(r.review_text) + '</div>' +
+              '<div style="display:flex;gap:8px;margin-top:11px;flex-wrap:wrap">' +
+                (r.image_url ? '<button class="ai-btn small ghost" type="button" data-rv-photo="' + r.id + '" style="color:#a3342b;border-color:#a3342b">DELETE PHOTO</button>' : '') +
+                '<button class="ai-btn small" type="button" data-rv-del="' + r.id + '" style="background:#a3342b">DELETE REVIEW</button>' +
               '</div>' +
             '</div>' +
           '</div>';
@@ -1010,25 +1012,29 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     });
   }
 
-  document.getElementById('ph-grid').addEventListener('click', function (e) {
-    var ap = e.target.closest('[data-ph-approve]');
-    var rj = e.target.closest('[data-ph-reject]');
-    var btn = ap || rj;
+  document.getElementById('rv-grid').addEventListener('click', function (e) {
+    var ph = e.target.closest('[data-rv-photo]');
+    var del = e.target.closest('[data-rv-del]');
+    var btn = ph || del;
     if (!btn) return;
-    var id = parseInt(btn.getAttribute(ap ? 'data-ph-approve' : 'data-ph-reject'), 10);
-    var action = ap ? 'approve' : 'reject';
-    if (action === 'reject' && !confirm('Reject this photo? The review text stays published.')) return;
+    var id = parseInt(btn.getAttribute(ph ? 'data-rv-photo' : 'data-rv-del'), 10);
+    var msg = ph
+      ? 'Delete this photo? The customer’s words stay published and the image file is removed from storage.'
+      : 'Delete this review completely? The rating, the words and any photo all go. This cannot be undone.';
+    if (!confirm(msg)) return;
     btn.disabled = true;
-    apiFetch('/api/admin/review-photos', {
+    apiFetch('/api/admin/reviews', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: id, action: action })
+      body: JSON.stringify({ id: id, action: ph ? 'delete_photo' : 'delete' })
     }).then(function (d) {
       if (!d || !d.success) { alert((d && d.error) || 'Failed'); btn.disabled = false; return; }
-      loadReviewPhotos();
+      loadReviews();
     }).catch(function () { btn.disabled = false; alert('Network error'); });
   });
 
-  document.getElementById('ph-reload-btn').addEventListener('click', loadReviewPhotos);
+  document.getElementById('rv-reload-btn').addEventListener('click', loadReviews);
+  document.getElementById('rv-photos-only').addEventListener('change', loadReviews);
+  document.getElementById('rv-filter-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') loadReviews(); });
 
   function loadActivity() {
     var status = document.getElementById('a-load-status');

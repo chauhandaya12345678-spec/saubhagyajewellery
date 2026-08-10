@@ -51,10 +51,11 @@ export async function onRequest(context) {
       if (!sku && url.searchParams.get('latest') === '1') {
         const n = parseInt(url.searchParams.get('limit'), 10);
         const limit = Math.min(Math.max(Number.isFinite(n) ? n : 12, 1), 24);
-        // image_url is surfaced ONLY once the owner approves the photo;
-        // the review text itself publishes immediately.
+        // Photos publish with the words, no approval queue. Moderation is
+        // after the fact: deleting a photo in the admin panel NULLs image_url,
+        // so a row that still carries a URL is one the owner has left up.
         const { results } = await q(
-          "SELECT product_sku, name, rating, review_text, CASE WHEN image_status = 'approved' THEN image_url END AS image_url, created_at FROM reviews ORDER BY created_at DESC LIMIT ?",
+          'SELECT product_sku, name, rating, review_text, image_url, created_at FROM reviews ORDER BY created_at DESC LIMIT ?',
           'SELECT product_sku, name, rating, review_text, created_at FROM reviews ORDER BY created_at DESC LIMIT ?',
           limit
         );
@@ -64,7 +65,7 @@ export async function onRequest(context) {
 
       if (!sku) return json({ error: 'sku required' }, 400);
       const { results } = await q(
-        "SELECT name, rating, review_text, CASE WHEN image_status = 'approved' THEN image_url END AS image_url, created_at FROM reviews WHERE product_sku = ? ORDER BY created_at DESC",
+        'SELECT name, rating, review_text, image_url, created_at FROM reviews WHERE product_sku = ? ORDER BY created_at DESC',
         'SELECT name, rating, review_text, created_at FROM reviews WHERE product_sku = ? ORDER BY created_at DESC',
         sku
       );
@@ -77,6 +78,7 @@ export async function onRequest(context) {
     if (request.method === 'POST') {
       const body = await request.json();
       const { product_sku, name, rating, review_text } = body;
+      const orderId = typeof body.order_id === 'string' ? body.order_id.trim().slice(0, 40) : null;
       const email = normEmail(body.email);
       const phone = normPhone(body.phone);
       if (!product_sku || !name || !rating || !review_text) {
@@ -127,8 +129,11 @@ export async function onRequest(context) {
 
       const safeName = String(name).slice(0, 60);
       try {
-        await db.prepare('INSERT INTO reviews (product_sku, user_id, name, rating, review_text, image_url) VALUES (?, ?, ?, ?, ?, ?)')
-          .bind(product_sku, userId, safeName, rating, review_text, imageUrl).run();
+        // image_status is stamped 'approved' at insert so the column never
+        // claims a photo is waiting when it is already on the storefront.
+        // It flips to 'rejected' only when the owner deletes the photo.
+        await db.prepare('INSERT INTO reviews (product_sku, user_id, name, rating, review_text, image_url, image_status, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+          .bind(product_sku, userId, safeName, rating, review_text, imageUrl, imageUrl ? 'approved' : null, orderId).run();
       } catch (e) {
         // SQLite words this differently per statement type: SELECT gives
         // "no such column: x", INSERT gives "table reviews has no column

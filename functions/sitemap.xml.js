@@ -10,7 +10,7 @@ const STATIC_PAGES = [
   '/', '/categories', '/gifting', '/track-orders', '/about', '/contact',
   '/faq', '/jewellery-guide',
   '/trust', '/blogs', '/shipping-and-returns', '/es-policy', '/grievances',
-  '/terms', '/offer-terms', '/privacy-policy', '/cookie-policy',
+  '/terms', '/offer-terms', '/privacy-policy', '/cookie-policy', '/review',
   '/blogs/temple-jewellery-styling', '/blogs/kundan-vs-polki',
   '/blogs/caring-matte-gold', '/blogs/bridal-set-6-hour-event',
   '/blogs/real-vs-fake-gold-plated', '/blogs/indian-bridal-jewellery-guide',

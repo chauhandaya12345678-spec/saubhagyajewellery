@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css?v=20260810seo">
-<script src="layout.js?v=20260808b"></script>
+<script src="layout.js?v=20260810d2c2"></script>
 <script src="mpa.js?v=16" defer></script>
 <script src="catalog.js?v=20"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://saubhagyajewellery.com/"},{"@type":"ListItem","position":2,"name":"Categories","item":"https://saubhagyajewellery.com/categories"}]}</script>
@@ -63,21 +63,16 @@
     .cat-hero, .cat-kicker, .cat-title, .cat-sub,
     .cat-title::after, .cat-hub-grid .cat-card { animation: none !important; opacity: 1; transform: none; }
   }
-  /* Per-category copy + journal links at the foot of the page. */
-  .cat-more { max-width: 1180px; margin: 30px auto 0; padding: 0 40px 20px; }
-  .cat-more h2 { font-family:'Playfair Display',serif; font-weight:500; font-size:24px; color:#1A1A1A; margin:34px 0 14px; }
-  .cat-more h3 { font-family:'Playfair Display',serif; font-weight:600; font-size:18px; margin:0 0 8px; }
-  .cat-more h3 a { color:#0B291C; text-decoration:none; border-bottom:1px solid #C5A880; }
-  .cat-more p { font-family:'Montserrat',sans-serif; font-size:14.5px; line-height:1.8; color:#2b2b2b; margin:0; }
-  .cat-more strong { color:#14110A; }
-  .cm-cols { display:grid; grid-template-columns:repeat(3,1fr); gap:26px; }
-  .cm-links { list-style:none; margin:0; padding:0; max-width:680px; }
-  .cm-links li { border-top:1px solid #eae5d8; }
-  .cm-links li:last-child { border-bottom:1px solid #eae5d8; }
-  .cm-links a { display:block; padding:13px 2px; font-family:'Montserrat',sans-serif; font-size:15px; color:#0B291C; text-decoration:none; }
-  .cm-links a::after { content:'\2192'; float:right; color:#C5A880; }
-  .cm-links a:hover, .cat-more h3 a:hover { color:#C5A880; }
-  @media(max-width:900px){ .cat-more { padding:0 18px 20px; } .cm-cols { grid-template-columns:1fr; } }
+  /* Per-category copy folded into the SEO accordion above, so the page keeps
+     one container for this material instead of a second block below the fold
+     that read as belonging to a different page. */
+  .cs-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px 26px; margin-top: 20px; }
+  .cs-cols h3 { font-family:'Playfair Display',serif; font-weight:500; font-size:16px; color:#fff; margin:0; }
+  .cs-cols h3 a { color:#E7CFA0; border-bottom:1px solid rgba(231,207,160,.5); text-decoration:none; }
+  .cs-cols p { margin-top: 7px !important; font-size: 13px !important; line-height: 1.75 !important; }
+  .cs-more { font-size: 13px !important; }
+  .cs-more a { margin-right: 2px; }
+  @media(max-width:760px){ .cs-cols { grid-template-columns: 1fr; gap: 16px; } }
   .cat-hub { max-width: 1280px; margin: 32px auto 0; padding: 0 40px; }
   .cat-hub-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
   .cat-card { position: relative; display: block; border-radius: 10px; overflow: hidden; text-decoration: none; aspect-ratio: 1/1; background: #eae5d8; }
@@ -236,41 +231,33 @@
     <p>Saubhagya brings together the jewellery traditions of all of India in one place. From <strong>South Indian temple jewellery</strong> - Lakshmi and peacock motifs, antique gold-finish <strong>long haaram</strong> and <strong>short necklaces</strong> - to <strong>North Indian Kundan and Polki</strong> bridal sets, delicate <strong>Meenakari</strong> enamel work, sparkling <strong>American Diamond (AD/CZ)</strong> pieces, and everyday <strong>gold-plated</strong> designs, every style is handcrafted in our own Mumbai workshop and finished by hand.</p>
     <p>Shop <strong>jhumka and jhumki earrings</strong>, <strong>chandbali</strong>, studs and drops; <strong>choker necklaces</strong>, <strong>rani haar</strong>, <strong>mangalsutra</strong>, <strong>maang tikka</strong>, <strong>nath</strong> and complete <strong>bridal jewellery sets</strong>. Whether you are dressing for a <strong>wedding, reception, engagement</strong>, <strong>Diwali, Navratri or Karva Chauth</strong>, a festive pooja or everyday office wear, there is a piece for the moment - Rajasthani, Punjabi, Bengali, Maharashtrian and Gujarati looks included.</p>
     <p>Every order ships <strong>free and fully insured across India</strong>, is individually inspected and sealed before dispatch, and any manufacturing defect is repaired or replaced free. Explore the full collection above, or read our <a href="jewellery-guide.html">jewellery care &amp; buying guide</a> and <a href="faq.html">FAQ</a> before you order.</p>
+
+    <div class="cs-cols">
+      <div>
+        <h3><a href="categories.html?cat=necklaces">Necklaces</a></h3>
+        <p>Two shapes, both antique gold. The <strong>short temple necklace sets</strong> sit high at the collar on a back tie-cord with matching Lakshmi jhumkas - mango links, peacock panels, kemp stone work, in gold, green or pearl drops. The <strong>long harams</strong> are five strands of faceted crystal beads under a Lakshmi pendant, in maroon or green.</p>
+      </div>
+      <div>
+        <h3><a href="categories.html?cat=earrings">Earrings</a></h3>
+        <p>Two families. <strong>Kundan chandbali</strong> in six shapes - round, teardrop, fan and leaf - set with uncut-look stones and pearl drops. And <strong>jhumkas</strong> in two finishes: kundan-paved with a seed-pearl border, or plain deep-cut <strong>South Indian antique gold</strong>. Lightest pair is 27 g.</p>
+      </div>
+      <div>
+        <h3>Bridal sets &amp; pendants</h3>
+        <p>Both are in the workshop and not yet on sale. Bridal will be full sets - necklace, jhumkas and maang tikka matched as one - and pendants will be daily-wear pieces at the lighter end. Message us on WhatsApp to be told when either goes live.</p>
+      </div>
+    </div>
+
+    <p class="cs-more">Guides:
+      <a href="jewellery-guide.html">care &amp; buying guide</a>,
+      <a href="blogs/south-indian-temple-jewellery.html">South Indian temple jewellery</a>,
+      <a href="blogs/kundan-vs-polki.html">Kundan vs Polki</a>,
+      <a href="blogs/real-vs-fake-gold-plated.html">real vs fake gold plating</a>,
+      <a href="blogs/care-tips-imitation-jewellery.html">care tips</a>,
+      <a href="blogs.html">all articles</a>.</p>
     </div>
   </div>
 </section>
 
-<!-- Per-category copy + editorial links. The block above is one general
-     description of the whole catalogue; this one says something specific about
-     each category, and carries the only links from this page into the journal
-     (there were none before, so no authority flowed either way). -->
-<section class="cat-more">
-  <h2>What we make, category by category</h2>
-  <div class="cm-cols">
-    <div>
-      <h3><a href="categories.html?cat=necklaces">Necklaces</a></h3>
-      <p>Two shapes, both antique gold. The <strong>short temple necklace sets</strong> sit high at the collar on a back tie-cord and come with matching Lakshmi jhumkas - mango links, peacock panels, kemp stone work, and a choice of gold, green or pearl drops. The <strong>long harams</strong> are five strands of faceted crystal beads gathered by gold spacer bars under a Lakshmi pendant, in maroon or green, long enough to layer over a short set.</p>
-    </div>
-    <div>
-      <h3><a href="categories.html?cat=earrings">Earrings</a></h3>
-      <p>Two families. <strong>Kundan chandbali</strong> in six shapes - round, teardrop, fan and leaf - each set with uncut-look stones and finished with white pearl drops. And <strong>jhumkas</strong> in two finishes: kundan-paved with a seed-pearl border, or plain deep-cut <strong>South Indian antique gold</strong> with a pearl cluster, the everyday temple earring rather than the wedding one. The lightest pair is 27 g.</p>
-    </div>
-    <div>
-      <h3>Bridal sets &amp; pendants</h3>
-      <p>Both are in the workshop and not yet on sale. Bridal will be full sets - necklace, jhumkas and maang tikka matched as one - and the pendants range will be daily-wear pieces at the lighter end. If you want to be told when either goes live, message us on WhatsApp and we will keep you on the list.</p>
-    </div>
-  </div>
-
-  <h2>Before you buy</h2>
-  <ul class="cm-links">
-    <li><a href="jewellery-guide.html">The complete care &amp; buying guide</a></li>
-    <li><a href="blogs/south-indian-temple-jewellery.html">A guide to South Indian temple jewellery</a></li>
-    <li><a href="blogs/kundan-vs-polki.html">Kundan vs Polki: how to tell them apart</a></li>
-    <li><a href="blogs/real-vs-fake-gold-plated.html">Real vs fake: reading a gold-plated piece</a></li>
-    <li><a href="blogs/care-tips-imitation-jewellery.html">Care tips for imitation jewellery</a></li>
-    <li><a href="blogs.html">All articles in The Journal</a></li>
-  </ul>
-</section>
 </main>
 <x-footer></x-footer>
 

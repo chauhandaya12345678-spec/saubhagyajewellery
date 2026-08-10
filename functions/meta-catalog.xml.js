@@ -13,6 +13,8 @@
  *
  * Meta docs: https://www.facebook.com/business/help/1084093196372967
  */
+import { seoSubtitle } from './_seo.js';   // shared region/style-aware engine
+
 const SITE_URL = 'https://saubhagyajewellery.com';
 const BRAND = 'Saubhagya Jewellery';
 
@@ -25,15 +27,11 @@ function absImg(url) {
   return /^https?:\/\//i.test(url) ? url : `${SITE_URL}/${String(url).replace(/^\/+/, '')}`;
 }
 
-function seoSubtitle(p) {
-  const n = p.name || '';
-  if (/jhumka/i.test(n)) return 'Traditional Gold-Plated Jhumka Earrings for Weddings & Festive Wear';
-  if (p.category === 'Earring') return 'Handcrafted Gold-Plated Earrings for Everyday & Festive Wear';
-  if (/crystal/i.test(n)) return 'Crystal-Studded High Gold-Plated Necklace for Weddings & Party Wear';
-  if (/short/i.test(n)) return 'High Gold-Plated Short Necklace for Festive & Party Wear';
-  if (p.category === 'Necklace') return 'Handcrafted High Gold-Plated Necklace for Weddings & Festive Wear';
-  return 'Handcrafted Gold-Plated Imitation Jewellery, Made in India';
-}
+/* seoSubtitle used to be a second, hand-written copy here, frozen at six
+   hardcoded branches. It had drifted: the Meta feed described a temple set as
+   "Handcrafted High Gold-Plated Necklace" while the site and the Google feed
+   called the same SKU a "South Indian Temple Gold-Plated Jewellery Set". Now
+   all three read from functions/_seo.js. */
 
 const GOOGLE_CATEGORY = {
   Necklace: 'Apparel & Accessories > Jewelry > Necklaces',

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leave a Review | Saubhagya Jewellery</title>
+<meta name="description" content="Rate the pieces you received from Saubhagya Jewellery and share a photo.">
+<!-- Personal page: it lists one customer's own orders, so it must never be indexed. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css?v=20260810seo">
+<script src="layout.js?v=20260810d2c2"></script>
+<script src="mpa.js?v=16" defer></script>
+<style>
+  .rw-wrap { max-width: 780px; margin: 0 auto; padding: 0 40px 70px; }
+  .rw-state { font-family:'Montserrat',sans-serif; font-size:14.5px; line-height:1.8; color:#3a3a3a; }
+  .rw-state a.btn { margin-top: 16px; }
+
+  /* One card per piece received. The photo is the whole point: the customer
+     recognises the item instantly, so nothing has to be chosen from a list. */
+  .rw-card {
+    border:1px solid rgba(197,168,128,.42); border-radius:18px; margin-bottom:14px;
+    background:linear-gradient(180deg,#ffffff 0%,#fdfbf7 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 3px rgba(11,41,28,.05), 0 14px 32px -24px rgba(11,41,28,.45);
+    transition: box-shadow .35s, border-color .35s;
+  }
+  .rw-card.is-open { border-color:rgba(197,168,128,.8); box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 2px 6px rgba(11,41,28,.06), 0 26px 50px -28px rgba(11,41,28,.55); }
+  .rw-top { display:grid; grid-template-columns:auto 1fr; gap:16px; padding:16px 18px; align-items:start; }
+  .rw-th { width:74px; height:74px; object-fit:cover; border-radius:13px; display:block;
+    background:#f2ece1; border:1px solid rgba(197,168,128,.35); }
+  .rw-name { font-family:'Playfair Display',serif; font-size:17px; color:#14110A; margin:0 0 4px; line-height:1.25; }
+  .rw-meta { font-family:'Montserrat',sans-serif; font-size:12px; color:#6b6b6b; margin:0 0 10px; }
+  .rw-done { display:inline-block; font-family:'Montserrat',sans-serif; font-size:10.5px; letter-spacing:1.2px;
+    text-transform:uppercase; color:#1F6B4A; background:rgba(31,107,74,.11); padding:3px 9px; border-radius:7px; margin-left:8px; }
+
+  /* Star row is the entire first interaction. One tap commits the customer,
+     then the rest of the form appears; an empty textarea shown first is what
+     makes people leave without reviewing. */
+  .rw-stars { display:flex; gap:5px; font-size:27px; line-height:1; color:#ddd6c6; cursor:pointer; user-select:none; }
+  .rw-stars span { transition: transform .18s cubic-bezier(.22,1,.36,1), color .18s; }
+  .rw-stars span:hover { transform: scale(1.16); }
+  .rw-stars span.on { color:#C5A880; }
+  .rw-stars.locked { cursor:default; }
+  .rw-stars.locked span:hover { transform:none; }
+  .rw-hint { font-family:'Montserrat',sans-serif; font-size:11.5px; color:#9a9a9a; margin:7px 0 0; }
+
+  .rw-body { display:grid; grid-template-rows:0fr; transition:grid-template-rows .4s cubic-bezier(.22,1,.36,1); }
+  .rw-body > div { overflow:hidden; visibility:hidden; transition:visibility 0s linear .4s; }
+  .rw-card.is-open .rw-body { grid-template-rows:1fr; }
+  .rw-card.is-open .rw-body > div { visibility:visible; transition-delay:0s; }
+  .rw-body-pad { padding:0 18px 18px; }
+  .rw-label { display:block; font-family:'Montserrat',sans-serif; font-size:11px; letter-spacing:1.4px;
+    text-transform:uppercase; color:#6b6b6b; font-weight:600; margin:14px 0 7px; }
+  .rw-ta { width:100%; min-height:86px; resize:vertical; box-sizing:border-box;
+    font-family:'Montserrat',sans-serif; font-size:13.5px; line-height:1.7; color:#1A1A1A;
+    background:#fff; border:1px solid rgba(197,168,128,.45); border-radius:12px; padding:12px 14px;
+    transition:border-color .2s, box-shadow .2s; }
+  .rw-ta:focus { outline:none; border-color:#C8901F; box-shadow:0 0 0 3px rgba(200,144,31,.14); }
+  .rw-count { font-family:'Montserrat',sans-serif; font-size:11.5px; color:#9a9a9a; text-align:right; margin-top:5px; }
+  .rw-file { font-family:'Montserrat',sans-serif; font-size:12.5px; }
+  .rw-prev { margin-top:10px; display:flex; align-items:center; gap:12px; }
+  /* An author rule that sets display beats the UA's [hidden]{display:none},
+     so the empty preview stayed on screen as a broken-image icon and the
+     Remove button appeared to do nothing. Restore hidden explicitly. */
+  .rw-prev[hidden] { display:none; }
+  .rw-prev img { width:74px; height:74px; object-fit:cover; border-radius:12px; display:block; border:1px solid rgba(197,168,128,.35); }
+  .rw-shot { width:74px; height:74px; object-fit:cover; border-radius:12px; display:block;
+    border:1px solid rgba(197,168,128,.35); margin-top:10px; }
+  .rw-prev button { background:none; border:none; color:#A3342B; font-size:12px; padding:4px 0; cursor:pointer; font-family:'Montserrat',sans-serif; }
+  .rw-actions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:16px; }
+  .rw-submit { padding:13px 28px; background:#0B291C; color:#fff; border:none; border-radius:13px; cursor:pointer;
+    font-family:'Montserrat',sans-serif; font-size:12.5px; letter-spacing:1.5px; text-transform:uppercase;
+    box-shadow:0 2px 8px rgba(11,41,28,.16); transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s, background .25s; }
+  .rw-submit:hover:not(:disabled) { background:#071B12; transform:translateY(-2px); box-shadow:0 10px 24px -8px rgba(11,41,28,.4); }
+  .rw-submit:disabled { opacity:.5; cursor:default; transform:none; }
+  .rw-msg { font-family:'Montserrat',sans-serif; font-size:12.5px; }
+  .rw-said { font-family:'Montserrat',sans-serif; font-size:13.5px; line-height:1.75; color:#2b2b2b; margin:10px 0 0; }
+  .rw-edit { background:none; border:none; padding:0; cursor:pointer; font-family:'Montserrat',sans-serif;
+    font-size:12px; color:#0B291C; border-bottom:1px solid #C5A880; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rw-body, .rw-body > div, .rw-stars span, .rw-submit, .rw-card { transition:none !important; }
+  }
+  @media (max-width:600px) {
+    .rw-wrap { padding: 0 16px 56px; }
+    .rw-top { grid-template-columns:auto 1fr; gap:12px; padding:14px; }
+    .rw-th { width:62px; height:62px; }
+    .rw-body-pad { padding:0 14px 16px; }
+    .rw-stars { font-size:25px; }
+  }
+</style>
+</head>
+<body>
+<x-layout page="review.html"></x-layout>
+<main>
+<nav class="crumb"><a href="/">Home</a><i>/</i><span>Leave a Review</span></nav>
+<section class="ph">
+  <div class="kicker">YOUR FEEDBACK</div>
+  <h1>How was your order?</h1>
+  <p class="lede" id="rw-lede">Loading your delivered pieces&hellip;</p>
+</section>
+<section class="prose">
+<div class="rw-wrap">
+  <div id="rw-state" class="rw-state"></div>
+  <div id="rw-list"></div>
+</div>
+</section>
+</main>
+<x-footer></x-footer>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  };
+  var MAX = 600;
+
+  function token() { try { return localStorage.getItem('cc_token') || ''; } catch (e) { return ''; } }
+  function user() { try { return window.MPA ? window.MPA.getUser() : null; } catch (e) { return null; } }
+
+  /* Thumbnails go through Cloudflare image resizing, which accepts both shapes
+     the products.image column takes: a repo-relative path and an absolute R2
+     URL on the same zone. */
+  function thumb(src, w) {
+    var s = String(src || '').trim();
+    if (!s) return '';
+    return '/cdn-cgi/image/width=' + w + ',quality=78,format=auto/' +
+      (/^https?:\/\//i.test(s) ? s : s.replace(/^\/+/, ''));
+  }
+
+  function niceDate(s) {
+    if (!s) return '';
+    var d = new Date(String(s).replace(' ', 'T') + (String(s).indexOf('Z') < 0 ? 'Z' : ''));
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function starsHtml(v, locked) {
+    var h = '';
+    for (var i = 1; i <= 5; i++) h += '<span data-v="' + i + '"' + (i <= v ? ' class="on"' : '') + '>&#9733;</span>';
+    return '<div class="rw-stars' + (locked ? ' locked' : '') + '" role="group" aria-label="Rating">' + h + '</div>';
+  }
+
+  function show(state) { $('rw-state').innerHTML = state; }
+
+  /* A review is written once. Nothing here reopens a card that already has
+     one: the stars are locked, the words are shown back, and no form is
+     rendered at all, so there is no control that promises an edit the API
+     will refuse. */
+  function cardHtml(it, i) {
+    var t = thumb(it.image, 160);
+    var r = it.review;
+    var head = '' +
+      '<div class="rw-top">' +
+        (t ? '<img class="rw-th" src="' + esc(t) + '" alt="" width="74" height="74" loading="lazy" decoding="async">'
+           : '<div class="rw-th"></div>') +
+        '<div>' +
+          '<p class="rw-name">' + esc(it.name) +
+            (r ? '<span class="rw-done">Reviewed</span>' : '') + '</p>' +
+          '<p class="rw-meta">Order ' + esc(it.order_id) +
+            (it.delivered_at ? ' &middot; delivered ' + esc(niceDate(it.delivered_at)) : '') + '</p>' +
+          starsHtml(r ? r.rating : 0, !!r) +
+          (r
+            ? '<p class="rw-said">' + esc(r.review_text || '') + '</p>' +
+              (r.image_url ? '<img class="rw-shot" src="' + esc(thumb(r.image_url, 160)) + '" alt="Your photo" width="74" height="74" loading="lazy" decoding="async">' : '')
+            : '<p class="rw-hint">Tap a star to start</p>') +
+        '</div>' +
+      '</div>';
+
+    if (r) return '<div class="rw-card" data-i="' + i + '">' + head + '</div>';
+
+    return '' +
+      '<div class="rw-card" data-i="' + i + '">' + head +
+        '<div class="rw-body"><div><div class="rw-body-pad">' +
+          '<label class="rw-label" for="rw-ta-' + i + '">Your review</label>' +
+          '<textarea class="rw-ta" id="rw-ta-' + i + '" maxlength="' + MAX + '" placeholder="How is the finish, the weight, the occasion you wore it for?"></textarea>' +
+          '<div class="rw-count" id="rw-c-' + i + '">0 / ' + MAX + '</div>' +
+          '<label class="rw-label" for="rw-f-' + i + '">Add a photo <span style="text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label>' +
+          '<input class="rw-file" type="file" id="rw-f-' + i + '" accept="image/jpeg,image/png,image/webp">' +
+          '<div class="rw-prev" id="rw-p-' + i + '" hidden><img id="rw-pi-' + i + '" alt="Your photo"><button type="button" id="rw-px-' + i + '">Remove</button></div>' +
+          '<div class="rw-actions">' +
+            '<button class="rw-submit" id="rw-s-' + i + '">Submit review</button>' +
+            '<span class="rw-msg" id="rw-m-' + i + '"></span>' +
+          '</div>' +
+        '</div></div></div>' +
+      '</div>';
+  }
+
+  var ITEMS = [];
+  var picked = {};   // index -> rating
+
+  function wire(i) {
+    var card = document.querySelector('.rw-card[data-i="' + i + '"]');
+    if (!card) return;
+    // Already reviewed: the card is display only, so there is nothing to bind
+    // and every lookup below would return null.
+    if (ITEMS[i].review) return;
+    var stars = card.querySelector('.rw-stars');
+    var ta = $('rw-ta-' + i), cnt = $('rw-c-' + i), file = $('rw-f-' + i);
+
+    function paint(v) {
+      var sp = stars.querySelectorAll('span');
+      for (var k = 0; k < sp.length; k++) sp[k].className = (k < v) ? 'on' : '';
+    }
+    function countUp() { cnt.textContent = (ta.value || '').length + ' / ' + MAX; }
+    countUp();
+    ta.addEventListener('input', countUp);
+
+    stars.addEventListener('click', function (e) {
+      var s = e.target.closest('span[data-v]');
+      if (!s) return;
+      picked[i] = parseInt(s.getAttribute('data-v'), 10);
+      paint(picked[i]);
+      card.classList.add('is-open');
+      setTimeout(function () { ta.focus(); }, 180);
+    });
+
+    file.addEventListener('change', function () {
+      var f = file.files && file.files[0];
+      var prev = $('rw-p-' + i);
+      if (!f) { prev.hidden = true; return; }
+      if (f.size > 5 * 1024 * 1024) {
+        $('rw-m-' + i).style.color = '#A3342B';
+        $('rw-m-' + i).textContent = 'Photo must be under 5 MB.';
+        file.value = ''; prev.hidden = true; return;
+      }
+      $('rw-pi-' + i).src = URL.createObjectURL(f);
+      prev.hidden = false;
+    });
+    $('rw-px-' + i).addEventListener('click', function () {
+      file.value = '';
+      $('rw-pi-' + i).removeAttribute('src');
+      $('rw-p-' + i).hidden = true;
+    });
+
+    $('rw-s-' + i).addEventListener('click', function () { submit(i); });
+  }
+
+  function submit(i) {
+    var it = ITEMS[i], btn = $('rw-s-' + i), msg = $('rw-m-' + i);
+    var u = user() || {};
+    var rating = picked[i] || 0;
+    var text = ($('rw-ta-' + i).value || '').trim();
+    msg.style.color = '#A3342B';
+    if (!rating) { msg.textContent = 'Tap a star first.'; return; }
+    if (!text) { msg.textContent = 'Please add a few words.'; return; }
+
+    btn.disabled = true;
+    msg.style.color = '#6b6b6b';
+    msg.textContent = 'Sending…';
+
+    var file = $('rw-f-' + i).files && $('rw-f-' + i).files[0];
+
+    // Photo first: the review row should never exist without the image the
+    // customer expected to attach to it.
+    var step = Promise.resolve(null);
+    if (file) {
+      msg.textContent = 'Uploading photo…';
+      var fd = new FormData();
+      fd.append('file', file);
+      fd.append('product_sku', it.sku);
+      if (u.email) fd.append('email', u.email);
+      if (u.phone) fd.append('phone', u.phone);
+      step = fetch('/api/review-image', { method: 'POST', body: fd })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (!d || !d.success || !d.url) throw new Error(d && d.error ? d.error : 'Photo upload failed');
+          return d.url;
+        });
+    }
+
+    step.then(function (url) {
+      msg.textContent = 'Sending…';
+      return fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() },
+        body: JSON.stringify({
+          product_sku: it.sku,
+          order_id: it.order_id,
+          name: (u.name || '').trim() || 'Customer',
+          rating: rating,
+          review_text: text,
+          email: u.email || undefined,
+          phone: u.phone || undefined,
+          image_url: url || undefined,
+        }),
+      }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); });
+    }).then(function (res) {
+      if (!res.ok || !res.d || res.d.error) throw new Error((res.d && res.d.error) || 'Could not save your review');
+      msg.style.color = '#1F6B4A';
+      msg.textContent = 'Thank you. Your review is live.';
+      setTimeout(load, 1200);
+    }).catch(function (e) {
+      msg.style.color = '#A3342B';
+      msg.textContent = e.message || 'Something went wrong. Please try again.';
+      btn.disabled = false;
+    });
+  }
+
+  function load() {
+    var t = token();
+    if (!t) {
+      $('rw-lede').textContent = 'Sign in to review the pieces you have received.';
+      show('<p>Reviews come from customers we can verify, so please sign in with the phone number or email you used at checkout.</p>' +
+           '<a class="btn" href="signin.html">Sign in</a>');
+      $('rw-list').innerHTML = '';
+      return;
+    }
+    fetch('/api/reviews/mine', { headers: { 'Authorization': 'Bearer ' + t } })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (res.d && res.d.error) {
+          $('rw-lede').textContent = 'Sign in to review the pieces you have received.';
+          show('<p>' + esc(res.d.error) + '</p><a class="btn" href="signin.html">Sign in</a>');
+          $('rw-list').innerHTML = '';
+          return;
+        }
+        ITEMS = (res.d && res.d.items) || [];
+        var first = ((res.d && res.d.name) || '').split(' ')[0];
+        if (!ITEMS.length) {
+          $('rw-lede').textContent = first ? ('Hi ' + first + ' — nothing to review just yet.') : 'Nothing to review just yet.';
+          show('<p>Once an order is delivered it will appear here, ready to rate. If a piece reached you recently and is missing, give it a few hours to sync.</p>' +
+               '<a class="btn" href="categories.html">Browse the collection</a>');
+          $('rw-list').innerHTML = '';
+          return;
+        }
+        var n = res.d.reviewable;
+        $('rw-lede').textContent = (first ? 'Hi ' + first + ' — ' : '') +
+          (n ? (n === 1 ? '1 piece is waiting for your rating.' : n + ' pieces are waiting for your rating.')
+             : 'Thank you, you have reviewed everything.');
+        show('');
+        $('rw-list').innerHTML = ITEMS.map(cardHtml).join('');
+        for (var i = 0; i < ITEMS.length; i++) wire(i);
+      })
+      .catch(function () {
+        $('rw-lede').textContent = 'Could not load your orders.';
+        show('<p>Something went wrong on our side. Please refresh, or message us on WhatsApp and we will sort it out.</p>' +
+             '<a class="btn" href="https://wa.me/919987008435">Chat on WhatsApp</a>');
+      });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
+  else load();
+})();
+</script>
+</body>
+</html>

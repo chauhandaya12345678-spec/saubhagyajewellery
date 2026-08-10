@@ -53,7 +53,7 @@ const GUIDES_ALL = [
 async function relatedProducts(env, p) {
   try {
     const { results } = await env.DB.prepare(
-      'SELECT sku, name, price FROM products WHERE category = ? AND inStock = 1 ORDER BY sku'
+      'SELECT sku, name, price, image FROM products WHERE category = ? AND inStock = 1 ORDER BY sku'
     ).bind(p.category || '').all();
     const all = results || [];
     if (all.length < 2) return [];
@@ -68,19 +68,44 @@ async function relatedProducts(env, p) {
   } catch (e) { return []; }
 }
 
+/**
+ * Thumbnail through Cloudflare image resizing. Works for both shapes the
+ * `image` column takes: a repo-relative path on UAT and an absolute R2 URL on
+ * live — /cdn-cgi/image accepts a full URL as its source as long as it is on
+ * the same zone, which img.saubhagyajewellery.com is.
+ */
+function thumb(src, w) {
+  const s = String(src || '').trim();
+  if (!s) return '';
+  return `/cdn-cgi/image/width=${w},quality=78,format=auto/` +
+    (/^https?:\/\//i.test(s) ? s : s.replace(/^\/+/, ''));
+}
+
 function renderMore(related, p) {
   const guides = (GUIDES[p.category] || []).concat(GUIDES_ALL);
   let h = '';
   if (related.length) {
     h += `<h2>More ${esc(p.category === 'Earring' ? 'earrings' : 'necklaces')}</h2><ul class="pm-grid">` +
-      related.map(r =>
-        `<li><a href="/product/${encodeURIComponent(r.sku)}">` +
-        `<span class="n">${esc(r.name)}</span><span class="p">&#8377;${esc(r.price)}</span></a></li>`
-      ).join('') + '</ul>';
+      related.map(r => {
+        // The rail card shows the photo at ~150 CSS px in a 4:5 box; 320 covers
+        // it on a 2x screen. width/height reserve the box so the rail does not
+        // reflow as the lazy images land.
+        const t = thumb(r.image, 320);
+        return `<li><a href="/product/${encodeURIComponent(r.sku)}">` +
+          (t ? `<img class="pm-th" src="${esc(t)}" alt="" width="150" height="188" loading="lazy" decoding="async">` : '') +
+          `<span class="n">${esc(r.name)}</span><span class="p">&#8377;${esc(r.price)}</span></a></li>`;
+      }).join('') + '</ul>';
   }
-  h += '<h2>Read next</h2><ul class="pm-links">' +
+  // Folded shut. These guides are useful but they are not why anyone opened a
+  // product page, and an open list of six competed with the buy button. A
+  // closed <details> is still crawled, so the outbound links survive.
+  h += '<details class="pm-next"><summary class="pm-sum">' +
+      '<span class="pm-sum-t"><b>Read next</b>' +
+      `<em>${guides.length} short guides on buying and caring for these pieces.</em></span>` +
+      '<span class="pm-chev" aria-hidden="true">+</span>' +
+    '</summary><ul class="pm-links">' +
     guides.map(([href, label]) => `<li><a href="${esc(href)}">${esc(label)}</a></li>`).join('') +
-    '</ul>';
+    '</ul></details>';
   return h;
 }
 
@@ -242,6 +267,14 @@ export async function renderProductShell(html, p, env) {
     .replace(
       '<div class="pdp-desc" id="pdp-desc"></div>',
       `<div class="pdp-desc" id="pdp-desc">${esc(body)}</div>`
+    )
+    // Same reason as the H1: the keyword H2 shipped empty and was written by
+    // JS, so a crawler saw the page's only keyword heading as blank. The client
+    // recomputes and rewrites the identical string (product.html mirrors
+    // seoSubtitle from _seo.js), so this never flickers into different copy.
+    .replace(
+      '<h2 class="pdp-sub-seo" id="pdp-sub-seo"></h2>',
+      `<h2 class="pdp-sub-seo" id="pdp-sub-seo">${esc(subtitle)}</h2>`
     )
     .replace(
       '<section class="pdp-more" id="pdp-more"></section>',
