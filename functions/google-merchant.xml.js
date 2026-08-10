@@ -28,7 +28,7 @@ const GOOGLE_CATEGORY = {
   Earring: 'Apparel & Accessories > Jewelry > Earrings',
 };
 
-const COLOR_BY_SUFFIX = { GL: 'Gold', SGL: 'Gold', GR: 'Green', WH: 'White', MR: 'Maroon', MH: 'Mehndi Green' };
+const COLOR_BY_SUFFIX = { GL: 'Gold', SGL: 'Gold', GR: 'Green', WH: 'White', MR: 'Maroon', MH: 'Gold' };
 
 export async function onRequest(context) {
   const { env } = context;

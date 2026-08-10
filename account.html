@@ -120,7 +120,7 @@
   }
 
   function ordersUI(orders) {
-    if (!orders.length) { $('ac-orders').innerHTML = '<div class="ac-empty">No orders yet. <a href="index.html">Start shopping →</a></div>'; return; }
+    if (!orders.length) { $('ac-orders').innerHTML = '<div class="ac-empty">No orders yet. <a href="/">Start shopping →</a></div>'; return; }
     $('ac-orders').innerHTML = '<div class="ac-loading" style="font-family:Montserrat,sans-serif;font-size:12px;color:#3a3a3a;">Loading order status…</div>';
     Promise.all(orders.map(function(o) { return o.awb ? fetchShipPrimeStatus(o.awb) : Promise.resolve(null); }))
       .then(function(spResults) {

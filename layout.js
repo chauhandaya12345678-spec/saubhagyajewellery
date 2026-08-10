@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var APP = 'index.html';
+  var APP = '/';
   var SIGNIN = 'signin.html';
   var CART = 'cart.html';
   var WHATSAPP = 'https://wa.me/919987008435';

@@ -80,8 +80,31 @@ export async function onRequest(context) {
       return next(); // admin-*.html, /api/*, assets — served normally
     }
 
-    // ── Homepage edge cache (store host; the admin host returned above) ──
+    // ── Legacy deep links → canonical URLs ─────────────────────────────────
+    // The old site opened a product ON the homepage as /?product=<sku>, and
+    // /index.html served a second copy of the homepage. Both still answered
+    // 200 with homepage content, so Search Console filed them as soft 404s —
+    // and as one duplicate of the homepage per SKU crawled.
+    //
+    // 301 both onto the canonical shape. A SKU that still exists lands on its
+    // real PDP and keeps whatever equity the old URL had; a retired one (the
+    // CC-* catalogue) gets an honest 404 from functions/product/[sku].js,
+    // which is what makes Google drop it instead of re-crawling it forever.
     if (request.method === 'GET' && (path === '/' || path === '/index.html')) {
+      const legacySku = (url.searchParams.get('product') || '').trim();
+      if (legacySku) {
+        const to = new URL('/product/' + encodeURIComponent(legacySku), url);
+        return Response.redirect(to.toString(), 301);
+      }
+      if (path === '/index.html') {
+        const to = new URL('/', url);
+        to.search = url.search;   // keep utm_*, fbclid, gclid on the way through
+        return Response.redirect(to.toString(), 301);
+      }
+    }
+
+    // ── Homepage edge cache (store host; the admin host returned above) ──
+    if (request.method === 'GET' && path === '/') {
       const cached = await homepageFromCache(context, url);
       if (cached) return cached;
     }
