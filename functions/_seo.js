@@ -41,16 +41,22 @@ function detectRegion(s) {
   return '';
 }
 
-/* Piece type — drives both the noun and the occasion set. */
+/* Piece type — drives both the noun and the occasion set.
+   The earring shapes are gated on the category because a NECKLACE SET is
+   legitimately named "... Necklace Set with Jhumkas" and "... Pearl Drops";
+   without the gate those necklaces come back typed as earrings. */
 function detectType(s, cat) {
-  if (/jhumka|jhumki/.test(s)) return 'Jhumka Earrings';
-  if (/chandbali|chand ?bali/.test(s)) return 'Chandbali Earrings';
-  if (/stud/.test(s)) return 'Stud Earrings';
-  if (/drop|dangler/.test(s)) return 'Drop Earrings';
-  if (/hoop|bali/.test(s) && cat === 'earring') return 'Hoop Earrings';
-  if (cat === 'earring' || /earring/.test(s)) return 'Earrings';
+  if (cat !== 'necklace') {
+    if (/jhumka|jhumki/.test(s)) return 'Jhumka Earrings';
+    if (/chandbali|chand ?bali/.test(s)) return 'Chandbali Earrings';
+    if (/stud/.test(s)) return 'Stud Earrings';
+    if (/drop|dangler/.test(s)) return 'Drop Earrings';
+    if (/hoop|bali/.test(s) && cat === 'earring') return 'Hoop Earrings';
+    if (cat === 'earring' || /earring/.test(s)) return 'Earrings';
+  }
   if (/choker/.test(s)) return 'Choker Necklace';
-  if (/rani ?haar|haaram|long ?necklace|long ?haar|mala/.test(s)) return 'Long Necklace';
+  if (/rani ?haar|haaram|\bharam\b|long ?necklace|long ?haar|mala/.test(s)) return 'Long Necklace';
+  if (/temple|lakshmi|laxmi/.test(s) && /\bset\b/.test(s)) return 'Temple Jewellery Set';
   if (/mangalsutra/.test(s)) return 'Mangalsutra';
   if (/pendant/.test(s)) return 'Pendant Set';
   if (/bangle|kada|kangan/.test(s)) return 'Bangles';

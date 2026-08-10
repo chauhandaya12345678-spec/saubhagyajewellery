@@ -23,6 +23,17 @@ const EDGE_TTL = 60;    // seconds the colo keeps the rendered PDP
 const BROWSER_TTL = 60; // seconds the browser keeps it
 
 /**
+ * Old SKU -> current SKU, for products whose code has been corrected.
+ *
+ * This has to live here, not in _redirects: Pages Functions run BEFORE the
+ * static redirect rules, so a `/product/OLD /product/NEW 301` line in that file
+ * never fires — this route answers first and the rule is dead config.
+ */
+const RENAMED = {
+  'SJ-CY06-MR': 'SJ-CY06-GR', // shipped with green beads, never maroon
+};
+
+/**
  * The static product.html shell.
  * env.ASSETS bypasses Functions entirely, so there is no middleware re-entry
  * and no /product.html -> /product clean-URL redirect loop. The same-origin
@@ -48,6 +59,12 @@ export async function onRequest(context) {
   const sku = decodeURIComponent(params.sku || '').trim();
   if (!sku) return Response.redirect(new URL('/categories', request.url).toString(), 302);
 
+  // Permanent move, so the old URL's ranking transfers to the new one.
+  if (Object.prototype.hasOwnProperty.call(RENAMED, sku)) {
+    const to = new URL('/product/' + encodeURIComponent(RENAMED[sku]), request.url);
+    return Response.redirect(to.toString(), 301);
+  }
+
   // Cache key is the canonical path only — no query string, so ?fbclid= / utm_*
   // from Instagram, Facebook and ads all share one cached entry instead of
   // forcing a cold render per click.
@@ -68,15 +85,26 @@ export async function onRequest(context) {
   let html = await loadShell(request, env);
 
   let p = null;
+  let dbError = false;
   try {
     p = await env.DB.prepare('SELECT * FROM products WHERE sku = ?').bind(sku).first();
-  } catch (e) { /* fall through to the client "Product Not Found" state */ }
+  } catch (e) { dbError = true; }
 
-  // Unknown SKU: serve the un-rendered shell and do NOT cache it, so a product
-  // added in admin a second later isn't shadowed by a stale negative entry.
+  // No product: serve the un-rendered shell and do NOT cache it, so a product
+  // added in admin a second later isn't shadowed by a negative entry.
+  //
+  // The STATUS matters. This used to answer 200, which is a soft-404: Google
+  // reads a normal page whose body says "Product Not Found" and can index the
+  // dead URL. 404 says the SKU does not exist; 503 says D1 was unreachable and
+  // the crawler should come back rather than drop a product that does exist.
   if (!p) {
     return new Response(html, {
-      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=60' },
+      status: dbError ? 503 : 404,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': dbError ? 'no-store' : 'public, max-age=60',
+        ...(dbError ? { 'Retry-After': '60' } : {}),
+      },
     });
   }
 

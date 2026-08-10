@@ -24,12 +24,33 @@ export function cleanProductUrl(sku) {
   return SITE_URL + '/product/' + encodeURIComponent(sku);
 }
 
+/** Trim to n chars on a word boundary, for the <meta description> budget. */
+function clip(s, n) {
+  const t = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  if (t.length <= n) return t;
+  const cut = t.slice(0, n);
+  const sp = cut.lastIndexOf(' ');
+  return (sp > n * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s,;:.–—-]+$/, '') + '…';
+}
+
 export async function renderProductShell(html, p, env) {
   const subtitle = seoSubtitle(p);        // shared region/style-aware engine
   const keywords = productKeywords(p);
 
-  const title = `${p.name} - ${subtitle} | Saubhagya Jewellery`;
-  const desc = `Buy ${p.name} online at ₹${p.price}. ${subtitle}, handcrafted in Mumbai from skin-friendly Zamak alloy. Free insured shipping across India.`;
+  // Per-SKU copy from D1. Before this column existed every product page carried
+  // the same generated sentence with only the name and price swapped, so 44
+  // pages read as one page to a crawler. `body` is the real description; the
+  // template below is kept only for a SKU that has not been written yet.
+  const body = String(p.description || '').replace(/\s+/g, ' ').trim();
+
+  const title = `${p.name} | Saubhagya Jewellery`;
+  // The name has to lead the meta description. Colour variants share the same
+  // description body and differ only in its last sentence, so clipping the body
+  // alone produced one identical meta description for all three variants of a
+  // design — the exact duplication this work exists to remove.
+  const desc = body
+    ? `${p.name}: ${clip(body, Math.max(60, 148 - p.name.length))} ₹${p.price}.`
+    : `Buy ${p.name} online at ₹${p.price}. ${subtitle}, handcrafted in Mumbai from skin-friendly Zamak alloy. Free insured shipping across India.`;
   const canonical = cleanProductUrl(p.sku);
   const image = abs(p.image);
   const inStock = (p.inStock === 0 || p.inStock === false) ? false : true;
@@ -44,7 +65,8 @@ export async function renderProductShell(html, p, env) {
 
   const productLd = {
     '@context': 'https://schema.org', '@type': 'Product',
-    name: p.name, sku: p.sku, image: [image], description: desc,
+    // Schema gets the FULL description, not the clipped meta one.
+    name: p.name, sku: p.sku, image: [image], description: body || desc,
     brand: { '@type': 'Brand', name: 'Saubhagya Jewellery' },
     category: p.category || 'Imitation Jewellery',
     offers: {
@@ -143,8 +165,21 @@ export async function renderProductShell(html, p, env) {
       `<div class="pdp-loading" id="pdp-loading">` +
         `<p class="pdp-pre-name">${esc(p.name)}</p>` +
         `<p class="pdp-pre-price">&#8377;${esc(p.price)}</p>` +
+        (body ? `<p class="pdp-pre-desc">${esc(clip(body, 240))}</p>` : '') +
         `<p class="pdp-pre-dots">LOADING DETAILS&hellip;</p>` +
       `</div>`
+    )
+    // SSR the H1 and the description body. #pdp-content starts display:none and
+    // the client fills both from /api/products, but the raw HTML shipped an
+    // EMPTY <h1> — so a crawler that does not run JS saw a product page with no
+    // heading and no prose at all.
+    .replace(
+      '<h1 class="pdp-name" id="pdp-name"></h1>',
+      `<h1 class="pdp-name" id="pdp-name">${esc(p.name)}</h1>`
+    )
+    .replace(
+      '<div class="pdp-desc" id="pdp-desc"></div>',
+      `<div class="pdp-desc" id="pdp-desc">${esc(body)}</div>`
     )
     .replace(
       '<p class="pdp-error-title">Product Not Found</p>',

@@ -33,7 +33,7 @@
      browsers (Instagram/Facebook WebView) painted nothing for seconds. -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="site.css?v=20260810vt">
+<link rel="stylesheet" href="site.css?v=20260810seo">
 <!-- defer: layout.js only registers custom elements and catalog.js is an async
      fallback source - neither needs to block the parser. -->
 <script src="layout.js?v=20260808b" defer></script>
@@ -231,7 +231,10 @@
   /* SSR pre-paint: functions/_pdp.js drops the real name/price in here so a slow
      client (in-app browser, 4G) sees the product instantly instead of a blank page. */
   .pdp-pre-name { font-family:'Playfair Display',serif; font-size: 26px; font-weight: 500; color:#1A1A1A; letter-spacing: 0; margin: 0 0 10px; }
-  .pdp-pre-price { font-family:'Montserrat',sans-serif; font-size: 18px; font-weight: 600; color:#0B291C; letter-spacing: 0; margin: 0 0 22px; }
+  .pdp-pre-price { font-family:'Montserrat',sans-serif; font-size: 18px; font-weight: 600; color:#0B291C; letter-spacing: 0; margin: 0 0 14px; }
+  /* SSR'd product copy, visible during the first paint before the client fetch
+     resolves. Gives a crawler (and a slow in-app browser) real text to read. */
+  .pdp-pre-desc { font-family:'Montserrat',sans-serif; font-size: 13.5px; line-height: 1.7; color:#3a3a3a; letter-spacing: 0; max-width: 620px; margin: 0 auto 20px; }
   .pdp-pre-dots { font-size: 12px; letter-spacing: 1.5px; color:#6b6b6b; }
   .pdp-error { text-align: center; padding: 80px 24px; }
   .pdp-error-title { font-family:'Playfair Display',serif; font-weight: 600; font-size: 28px; color: #1A1A1A; margin: 0 0 14px; }
@@ -618,15 +621,19 @@
     else if (/bengali|bangla|chik|ratanchur|sita ?haar/.test(s)) region = 'Bengali';
     else if (/maharashtrian|thushi|kolhapuri|saaj|\bnath\b/.test(s)) region = 'Maharashtrian';
     else if (/gujarati/.test(s)) region = 'Gujarati';
+    /* Earring shapes gated on category: a necklace SET is named "... with
+       Jhumkas" / "... Pearl Drops" and would otherwise type as an earring. */
     var type = 'Imitation Jewellery';
-    if (/jhumka|jhumki/.test(s)) type = 'Jhumka Earrings';
-    else if (/chandbali|chand ?bali/.test(s)) type = 'Chandbali Earrings';
-    else if (/stud/.test(s)) type = 'Stud Earrings';
-    else if (/drop|dangler/.test(s)) type = 'Drop Earrings';
-    else if (/hoop|bali/.test(s) && cat === 'earring') type = 'Hoop Earrings';
-    else if (cat === 'earring' || /earring/.test(s)) type = 'Earrings';
+    var notNeck = cat !== 'necklace';
+    if (notNeck && /jhumka|jhumki/.test(s)) type = 'Jhumka Earrings';
+    else if (notNeck && /chandbali|chand ?bali/.test(s)) type = 'Chandbali Earrings';
+    else if (notNeck && /stud/.test(s)) type = 'Stud Earrings';
+    else if (notNeck && /drop|dangler/.test(s)) type = 'Drop Earrings';
+    else if (notNeck && /hoop|bali/.test(s) && cat === 'earring') type = 'Hoop Earrings';
+    else if (notNeck && (cat === 'earring' || /earring/.test(s))) type = 'Earrings';
     else if (/choker/.test(s)) type = 'Choker Necklace';
-    else if (/rani ?haar|haaram|long ?necklace|long ?haar|mala/.test(s)) type = 'Long Necklace';
+    else if (/rani ?haar|haaram|\bharam\b|long ?necklace|long ?haar|mala/.test(s)) type = 'Long Necklace';
+    else if (/temple|lakshmi|laxmi/.test(s) && /\bset\b/.test(s)) type = 'Temple Jewellery Set';
     else if (/mangalsutra/.test(s)) type = 'Mangalsutra';
     else if (/pendant/.test(s)) type = 'Pendant Set';
     else if (/bangle|kada|kangan/.test(s)) type = 'Bangles';
@@ -664,9 +671,29 @@
      and the copy carries the keywords shoppers actually search. Zero per-
      product maintenance: add a product, this writes its description. */
   function pdpDescription(p, seo) {
+    /* Prefer the copy written for this exact SKU (products.description in D1).
+       Everything below this guard is a template: it produced near-identical
+       prose on all 44 product pages, which is duplicate content as far as
+       Google is concerned. It stays only as the fallback for a SKU whose
+       description has not been written yet. */
+    if (p.description && String(p.description).trim()) {
+      var body = String(p.description).trim()
+        .replace(/[&<>"]/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+        });
+      var tail = '';
+      if (typeof p.weightGrams === 'number' && p.weightGrams > 0) {
+        tail = ' <strong>' + p.weightGrams + ' g</strong> approx., handcrafted in our Mumbai ' +
+               'workshop from skin-friendly <strong>Zamak alloy</strong> (lead- and nickel-free) ' +
+               'with long-lasting gold plating. Free insured shipping across India.';
+      }
+      return body + tail;
+    }
     var n = p.name || '';
-    var isJhumka = /jhumka/i.test(n), isEarring = p.category === 'Earring',
-        isCrystal = /crystal/i.test(n), isShort = /short/i.test(n);
+    var isEarring = p.category === 'Earring';
+    // "with Jhumkas" appears in necklace-SET names, so gate on the category.
+    var isJhumka = isEarring && /jhumka/i.test(n),
+        isCrystal = /crystal/i.test(n), isShort = /short|choker/i.test(n);
     var ci = activeColourInfo(p);
     var material = 'skin-friendly <strong>Zamak alloy</strong> (a lead- and nickel-free base metal)';
     var plating = ' finished in rich, long-lasting high gold plating';
@@ -723,11 +750,16 @@
       : 'Updating soon';
     var esc2 = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
     var nm = p.name || '';
-    var isJhumka = /jhumka/i.test(nm), isCrystal = /crystal/i.test(nm), isShort = /short/i.test(nm);
+    // Gate on category — necklace SETS carry "Jhumkas" in the name.
+    var isJhumka = p.category === 'Earring' && /jhumka/i.test(nm);
+    var isCrystal = /crystal/i.test(nm), isShort = /short|choker/i.test(nm);
+    var isHaram = /haram|haar\b/i.test(nm), isSet = /\bset\b/i.test(nm);
     var ci = activeColourInfo(p);
     var typeLabel = isJhumka ? 'Jhumka earrings'
       : (p.category === 'Earring' ? 'Earrings'
-      : (isCrystal ? 'Crystal necklace' : (isShort ? 'Short necklace' : 'Necklace')));
+      : (isHaram ? 'Long haram' + (isSet ? ' set' : '')
+      : (isSet ? 'Necklace set'
+      : (isCrystal ? 'Crystal necklace' : (isShort ? 'Short necklace' : 'Necklace')))));
     var bestFor = (p.category === 'Earring')
       ? (isJhumka ? 'Weddings, festive &amp; ethnic wear' : 'Everyday &amp; festive wear')
       : (isCrystal ? 'Weddings, receptions &amp; party wear' : 'Weddings, festive &amp; party wear');

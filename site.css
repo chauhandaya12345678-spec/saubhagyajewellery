@@ -124,6 +124,15 @@ body{padding-top:118px}
 .pill:hover{border-color:#C5A880}
 .back{margin-top:40px;border-top:1px solid #eae5d8;padding-top:22px;font-size:13px;letter-spacing:1px;color:#3a3a3a}
 .back a:hover{color:#0B291C}
+/* "Shop this look" list at the foot of each blog post. The posts used to link
+   to one product between all eleven of them, so no blog authority reached the
+   product pages at all. */
+.blog-shop{list-style:none;margin:14px 0 0;padding:0;max-width:680px}
+.blog-shop li{border-top:1px solid #eae5d8}
+.blog-shop li:last-child{border-bottom:1px solid #eae5d8}
+.blog-shop a{display:block;padding:13px 2px;font-size:15px;color:#0B291C;text-decoration:none}
+.blog-shop a::after{content:'\2192';float:right;color:#C5A880}
+.blog-shop a:hover{color:#C5A880}
 /* SEO FAQ accordion — used on about.html (moved off homepage) */
 .seo-faq{margin:24px 0 0}
 .seo-faq details{border-top:1px solid #eae5d8}
