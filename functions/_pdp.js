@@ -24,6 +24,66 @@ export function cleanProductUrl(sku) {
   return SITE_URL + '/product/' + encodeURIComponent(sku);
 }
 
+/**
+ * Editorial pages worth sending a product page to, by category.
+ * A product page used to have zero outbound links, which made all 44 of them
+ * dead ends for both a crawler and a reader.
+ */
+const GUIDES = {
+  Earring: [
+    ['/blogs/kundan-vs-polki', 'Kundan vs Polki: how to tell them apart'],
+    ['/blogs/punjabi-wedding-jewellery', 'Punjabi wedding jewellery, piece by piece'],
+  ],
+  Necklace: [
+    ['/blogs/south-indian-temple-jewellery', 'A guide to South Indian temple jewellery'],
+    ['/blogs/temple-jewellery-styling', 'How to style temple jewellery with a saree'],
+  ],
+};
+const GUIDES_ALL = [
+  ['/jewellery-guide', 'Make gold plating last for years'],
+  ['/blogs/care-tips-imitation-jewellery', 'Care tips for imitation jewellery'],
+];
+
+/**
+ * Six other products from the same category, starting just after this one in
+ * SKU order and wrapping around. A fixed "first six" would have funnelled every
+ * page in a category into the same six URLs; rotating spreads the internal
+ * links evenly across the catalogue.
+ */
+async function relatedProducts(env, p) {
+  try {
+    const { results } = await env.DB.prepare(
+      'SELECT sku, name, price FROM products WHERE category = ? AND inStock = 1 ORDER BY sku'
+    ).bind(p.category || '').all();
+    const all = results || [];
+    if (all.length < 2) return [];
+    const i = all.findIndex(r => r.sku === p.sku);
+    const start = i < 0 ? 0 : i + 1;
+    const out = [];
+    for (let k = 0; k < all.length - 1 && out.length < 6; k++) {
+      const row = all[(start + k) % all.length];
+      if (row.sku !== p.sku) out.push(row);
+    }
+    return out;
+  } catch (e) { return []; }
+}
+
+function renderMore(related, p) {
+  const guides = (GUIDES[p.category] || []).concat(GUIDES_ALL);
+  let h = '';
+  if (related.length) {
+    h += `<h2>More ${esc(p.category === 'Earring' ? 'earrings' : 'necklaces')}</h2><ul class="pm-grid">` +
+      related.map(r =>
+        `<li><a href="/product/${encodeURIComponent(r.sku)}">` +
+        `<span class="n">${esc(r.name)}</span><span class="p">&#8377;${esc(r.price)}</span></a></li>`
+      ).join('') + '</ul>';
+  }
+  h += '<h2>Read next</h2><ul class="pm-links">' +
+    guides.map(([href, label]) => `<li><a href="${esc(href)}">${esc(label)}</a></li>`).join('') +
+    '</ul>';
+  return h;
+}
+
 /** Trim to n chars on a word boundary, for the <meta description> budget. */
 function clip(s, n) {
   const t = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
@@ -54,6 +114,8 @@ export async function renderProductShell(html, p, env) {
   const canonical = cleanProductUrl(p.sku);
   const image = abs(p.image);
   const inStock = (p.inStock === 0 || p.inStock === false) ? false : true;
+
+  const related = await relatedProducts(env, p);
 
   let reviewStats = null;
   try {
@@ -180,6 +242,10 @@ export async function renderProductShell(html, p, env) {
     .replace(
       '<div class="pdp-desc" id="pdp-desc"></div>',
       `<div class="pdp-desc" id="pdp-desc">${esc(body)}</div>`
+    )
+    .replace(
+      '<section class="pdp-more" id="pdp-more"></section>',
+      `<section class="pdp-more" id="pdp-more">${renderMore(related, p)}</section>`
     )
     .replace(
       '<p class="pdp-error-title">Product Not Found</p>',

@@ -236,6 +236,21 @@
      resolves. Gives a crawler (and a slow in-app browser) real text to read. */
   .pdp-pre-desc { font-family:'Montserrat',sans-serif; font-size: 13.5px; line-height: 1.7; color:#3a3a3a; letter-spacing: 0; max-width: 620px; margin: 0 auto 20px; }
   .pdp-pre-dots { font-size: 12px; letter-spacing: 1.5px; color:#6b6b6b; }
+  /* Server-rendered related links. Text only on purpose — the images rail is
+     already handled by "Complete the Look"; this block exists so the page has
+     crawlable outbound links without adding another 6 thumbnails of weight. */
+  .pdp-more { max-width: 1180px; margin: 46px auto 0; padding: 0 40px 10px; }
+  .pdp-more:empty { display: none; }
+  .pdp-more h2 { font-family:'Playfair Display',serif; font-weight:500; font-size:22px; color:#1A1A1A; margin:28px 0 12px; }
+  .pm-grid, .pm-links { list-style:none; margin:0; padding:0; }
+  .pm-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0 26px; }
+  .pm-grid li, .pm-links li { border-top:1px solid #eae5d8; }
+  .pm-grid a, .pm-links a { display:flex; gap:12px; justify-content:space-between; align-items:baseline;
+    padding:12px 2px; font-family:'Montserrat',sans-serif; font-size:14px; color:#0B291C; text-decoration:none; }
+  .pm-grid a .p { color:#6b6b6b; white-space:nowrap; }
+  .pm-links a::after { content:'\2192'; color:#C5A880; }
+  .pm-grid a:hover, .pm-links a:hover { color:#C5A880; }
+  @media(max-width:900px){ .pdp-more { padding:0 18px 10px; } .pm-grid { grid-template-columns:1fr; } }
   .pdp-error { text-align: center; padding: 80px 24px; }
   .pdp-error-title { font-family:'Playfair Display',serif; font-weight: 600; font-size: 28px; color: #1A1A1A; margin: 0 0 14px; }
   .pdp-error a { color: #0B291C; text-decoration: none; border-bottom: 1px solid #C5A880; padding-bottom: 2px; }
@@ -415,6 +430,12 @@
       </div>
     </div>
   </div>
+  <!-- Related products + guides, server-rendered by functions/_pdp.js.
+       Deliberately OUTSIDE #pdp-content (which starts display:none): these are
+       the only outbound links on a product page, and a crawler that does not
+       run JS has to be able to see them. "Complete the Look" above stays
+       client-side because it is a merchandising rail, not a link surface. -->
+  <section class="pdp-more" id="pdp-more"></section>
   <div class="pdp-mobile-bar" id="pdp-mobile-bar" aria-hidden="true">
     <div class="price" id="pdp-mobile-price"></div>
     <button class="add" id="pdp-mobile-add" type="button">ADD TO BAG</button>

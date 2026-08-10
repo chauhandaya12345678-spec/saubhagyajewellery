@@ -36,7 +36,7 @@ export async function onRequest(context) {
   let rows = [];
   try {
     const { results } = await env.DB.prepare(
-      'SELECT sku, name, category, price, mrp, image, inStock, stock_count, variants FROM products WHERE inStock = 1 AND sku != \'TEST-RS1\' ORDER BY sku'
+      'SELECT sku, name, category, price, mrp, image, inStock, stock_count, variants, description FROM products WHERE inStock = 1 AND sku != \'TEST-RS1\' ORDER BY sku'
     ).all();
     rows = results || [];
   } catch (e) { /* DB down — return an empty but valid feed, never 500 */ }
@@ -48,8 +48,21 @@ export async function onRequest(context) {
     }
     const isMulti = Array.isArray(variants) && variants.length > 1;
 
-    const title = `${p.name} — ${seoSubtitle(p)}`.slice(0, 148);
-    const desc = `Buy ${p.name} online at ₹${p.price}. ${seoSubtitle(p)}. Handcrafted in Mumbai from skin-friendly, lead & nickel-free Zamak alloy with a high gold-plated (1 gram gold look) finish. Free insured shipping across India.`;
+    // Product names now carry the keywords themselves, so only append the
+    // generated subtitle when it still fits inside Google's 150-char title —
+    // truncating mid-word looked worse than simply shipping the name.
+    const subtitle = seoSubtitle(p);
+    const longTitle = `${p.name} — ${subtitle}`;
+    const title = longTitle.length <= 148 ? longTitle : p.name.slice(0, 148);
+
+    // The per-SKU copy, not a template. Every item used to ship the same
+    // sentence with the name and price swapped in, which is thin content in
+    // Shopping exactly as it was on the site.
+    const body = String(p.description || '').replace(/\s+/g, ' ').trim();
+    const spec = `Handcrafted in Mumbai from skin-friendly, lead & nickel-free Zamak alloy with a high gold-plated (1 gram gold look) finish. Free insured shipping across India.`;
+    const desc = body
+      ? `${body} ${spec}`
+      : `Buy ${p.name} online at ₹${p.price}. ${subtitle}. ${spec}`;
     const link = `${SITE_URL}/product/${encodeURIComponent(p.sku)}`;
     const img = absImg(p.image);
     const avail = (p.stock_count != null && p.stock_count <= 0) ? 'out_of_stock' : 'in_stock';

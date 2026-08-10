@@ -210,6 +210,36 @@
     .hero-bg-3 { background-image:url('images/models/hero-banner3-necklace-mobile.webp'); }
   }
 
+  /* ══ Category tiles — resized at the edge instead of shipped whole.
+     The source art is 86-250 KB of full-width WebP for a tile that is never
+     taller than 320px (200px on a phone), so four thumbnails cost 525 KB.
+     format=auto returns AVIF where the browser accepts it: 205 KB on mobile,
+     330 KB on desktop.
+
+     /cdn-cgi/image is a ZONE feature — it 404s on *.pages.dev, so these tiles
+     only resolve on saubhagyajewellery.com / uat.saubhagyajewellery.com. The
+     background-color below is what shows if they don't, which is brand green
+     rather than a broken image. Verify UAT on the custom domain, not the
+     pages.dev URL. ══ */
+  .ct-bridal    { background-image:url('/cdn-cgi/image/width=800,quality=78,format=auto/images/models/cat-bridal.webp'); }
+  .ct-earrings  { background-image:url('/cdn-cgi/image/width=800,quality=78,format=auto/images/models/cat-earrings.webp'); }
+  .ct-necklace  { background-image:url('/cdn-cgi/image/width=800,quality=78,format=auto/images/models/cat-necklace.webp'); }
+  .ct-pendant   { background-image:url('/cdn-cgi/image/width=800,quality=78,format=auto/images/models/cat-pendant.webp'); }
+  @media (max-width:900px) {
+    .ct-bridal    { background-image:url('/cdn-cgi/image/width=600,quality=78,format=auto/images/models/cat-bridal.webp'); }
+    .ct-earrings  { background-image:url('/cdn-cgi/image/width=600,quality=78,format=auto/images/models/cat-earrings.webp'); }
+    .ct-necklace  { background-image:url('/cdn-cgi/image/width=600,quality=78,format=auto/images/models/cat-necklace.webp'); }
+    .ct-pendant   { background-image:url('/cdn-cgi/image/width=600,quality=78,format=auto/images/models/cat-pendant.webp'); }
+  }
+
+  /* Journal link list — two columns on desktop, one on a phone. */
+  .hm-journal-list { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:0 32px; }
+  .hm-journal-list li { border-top:1px solid #eae5d8; }
+  .hm-journal-list a { display:block; padding:14px 2px; font-family:'Montserrat',sans-serif; font-size:15px; color:#0B291C; text-decoration:none; }
+  .hm-journal-list a::after { content:'\2192'; float:right; color:#C5A880; }
+  .hm-journal-list a:hover { color:#C5A880; }
+  @media(max-width:760px){ .hm-journal-list { grid-template-columns:1fr; } }
+
   /* ══ Shared rail: edge-to-edge horizontal snap scroll, desktop grid ══ */
   .rail { display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch; padding:4px 0 18px; scrollbar-width:none; }
@@ -381,24 +411,24 @@
   <section class="hm-section">
     <div class="cat2">
       <div class="cat-tile big coming-soon" aria-label="Bridal Sets — Coming Soon">
-        <div class="cat-bg" style="background-image:url('images/models/cat-bridal.webp');background-color:#0B291C;background-position:center 55%"></div>
+        <div class="cat-bg ct-bridal" style="background-color:#0B291C;background-position:center 55%"></div>
         <div class="cat-shade"></div>
         <div class="cat-text"><div class="k">COMING SOON</div><h3 class="t">Bridal Sets</h3><div class="s">Temple necklace &amp; matching jhumkas</div></div>
       </div>
       <a class="cat-tile big" href="categories.html?cat=earrings" aria-label="Shop Earrings - kundan chandbali and drops">
-        <div class="cat-bg" style="background-image:url('images/models/cat-earrings.webp');background-color:#0B291C"></div>
+        <div class="cat-bg ct-earrings" style="background-color:#0B291C"></div>
         <div class="cat-shade"></div>
         <div class="cat-text"><div class="k">SHOP NOW </div><h3 class="t">Earrings </h3><div class="s">Kundan chandbali &amp; drops</div></div>
       </a>
     </div>
     <div class="cat2" style="margin-top:16px">
       <a class="cat-tile big" href="categories.html?cat=necklaces" aria-label="Shop Necklaces">
-        <div class="cat-bg" style="background-image:url('images/models/cat-necklace.webp');background-color:#0B291C;background-position:center 70%"></div>
+        <div class="cat-bg ct-necklace" style="background-color:#0B291C;background-position:center 70%"></div>
         <div class="cat-shade"></div>
         <div class="cat-text"><div class="k">SHOP NOW </div><h3 class="t">Necklaces </h3><div class="s">Short, temple &amp; crystal necklaces</div></div>
       </a>
       <div class="cat-tile big coming-soon" aria-label="Pendants — Coming Soon">
-        <div class="cat-bg" style="background-image:url('images/models/cat-pendant.webp');background-color:#0B291C"></div>
+        <div class="cat-bg ct-pendant" style="background-color:#0B291C"></div>
         <div class="cat-shade"></div>
         <div class="cat-text"><div class="k">COMING SOON</div><h3 class="t">Pendants</h3><div class="s">Coming soon</div></div>
       </div>
@@ -493,6 +523,24 @@
       <h2 class="hm-sec-title">Fresh From Our Feed</h2>
     </div>
     <div id="ig-body"></div>
+  </section>
+
+  <!-- Journal links in raw HTML. The footer already links to /blogs, but that
+       is injected by layout.js at runtime, so the homepage shipped zero
+       crawlable links into eleven articles. -->
+  <section class="hm-section" id="hm-journal">
+    <div class="hm-sec-head">
+      <div class="hm-sec-kicker">THE JOURNAL</div>
+      <h2 class="hm-sec-title">Read Before You Buy</h2>
+    </div>
+    <ul class="hm-journal-list">
+      <li><a href="blogs/south-indian-temple-jewellery.html">A guide to South Indian temple jewellery</a></li>
+      <li><a href="blogs/kundan-vs-polki.html">Kundan vs Polki: how to tell them apart</a></li>
+      <li><a href="blogs/indian-bridal-jewellery-guide.html">The Indian bridal jewellery guide</a></li>
+      <li><a href="blogs/care-tips-imitation-jewellery.html">Care tips for imitation jewellery</a></li>
+      <li><a href="jewellery-guide.html">Make gold plating last for years</a></li>
+      <li><a href="blogs.html">All articles</a></li>
+    </ul>
   </section>
 
 </main>
