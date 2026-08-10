@@ -214,22 +214,25 @@ footer.site{background:#071B12;color:#fff;padding:60px 40px 30px}
   footer.site{padding-bottom:max(30px,env(safe-area-inset-bottom))}
 }
 /* ============================================================
- * Cross-Document View Transitions (Chrome 126+, Safari 18.2+)
- * Progressive enhancement — old browsers ignore the at-rule and
- * navigate normally. Nothing here can break Razorpay (modal, not
- * a page nav), Shiprocket (server-side), or checkout (form POST).
- * Wrapped in prefers-reduced-motion so a11y users get instant nav.
+ * Cross-Document View Transitions — REMOVED (Aug 2026)
+ *
+ * `@view-transition{navigation:auto}` used to live here. It broke the site
+ * inside the Instagram / Facebook in-app browser: EVERY same-origin navigation
+ * painted a blank white page, and only a manual reload recovered it.
+ *
+ * Confirmed from the device, not guessed. Telemetry from the real Instagram
+ * WebView showed, on every navigation:
+ *     "err": ["REJ AbortError: Transition was skipped"]
+ * while the destination page was fully built underneath —
+ *     /product/SJ-SN01-GL  kids:5  txt:2677  scrollHeight:3266  body 1/visible
+ * The DOM and layout were fine; the aborted transition left its
+ * ::view-transition overlay painted on top. Because that overlay is a
+ * pseudo-element it is invisible to elementFromPoint, which is why the page
+ * looked simultaneously "present" and blank.
+ *
+ * That in-app browser is where most of this store's traffic lands (the
+ * Instagram bio link), so a cosmetic crossfade is not worth it. There is no
+ * media query for "is a WebView", so the at-rule cannot be gated in CSS; if
+ * this is ever restored it must be injected from JS and skipped when
+ * navigator.userAgent contains "; wv)".
  * ============================================================ */
-@media (prefers-reduced-motion: no-preference){
-  @view-transition{navigation:auto}
-  /* Persistent header + footer: stay pinned during page swap */
-  header.site{view-transition-name:site-nav}
-  footer.site{view-transition-name:site-footer}
-  /* Smooth default crossfade */
-  ::view-transition-old(root),::view-transition-new(root){animation-duration:.45s;animation-timing-function:cubic-bezier(.25,1,.5,1)}
-  /* Persistent regions don't animate — they just stay */
-  ::view-transition-group(site-nav),::view-transition-group(site-footer){animation-duration:0s}
-  /* Shared product image: match by per-SKU name (set inline via JS) */
-  ::view-transition-group(*){animation-duration:.5s;animation-timing-function:cubic-bezier(.25,1,.5,1)}
-}
-/* Fallback: reduced-motion users + old browsers get plain nav — no rules needed */
