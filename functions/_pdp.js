@@ -230,6 +230,10 @@ export async function renderProductShell(html, p, env) {
       `<meta property="og:image" content="${esc(image)}">`
     )
     .replace(
+      /<meta name="twitter:image" content="[^"]*">/,
+      `<meta name="twitter:image" content="${esc(image)}">`
+    )
+    .replace(
       '</head>',
       `<link rel="preload" as="image" href="${esc(optImg(image))}" fetchpriority="high">` +
       `<meta property="og:url" content="${esc(canonical)}">` +
@@ -238,7 +242,6 @@ export async function renderProductShell(html, p, env) {
       `<meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` +
       `<meta name="twitter:title" content="${esc(title)}">` +
       `<meta name="twitter:description" content="${esc(desc)}">` +
-      `<meta name="twitter:image" content="${esc(image)}">` +
       `<meta name="keywords" content="${esc(keywords)}">` +
       `<script type="application/ld+json">${JSON.stringify(productLd)}</script>` +
       `<script type="application/ld+json">${JSON.stringify(breadcrumbLd)}</script>` +
