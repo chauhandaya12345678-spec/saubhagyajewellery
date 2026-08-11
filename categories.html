@@ -266,6 +266,13 @@
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  /* Serve product photos through Cloudflare image resizing (cards display at
+     ~303px, so 400px @ q78 is visually identical but ~90% lighter). */
+  function optImg(u) {
+    if (!u) return u;
+    if (u.indexOf('/cdn-cgi/image/') !== -1) return u;
+    return '/cdn-cgi/image/width=400,quality=78,format=auto/' + u;
+  }
   function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
 
   /* Subcategory definitions - each maps to a name/category matcher.
@@ -353,9 +360,9 @@
       var multi = vars.length > 1;
       var imgsHtml = multi
         ? vars.map(function (v, i) {
-            return '<img class="im sj-fade' + (i === 0 ? ' on' : '') + '" src="' + esc(v.image) + '" alt="' + altText + '" loading="lazy" decoding="async" width="400" height="500"' + (i === 0 ? ' style="view-transition-name:' + vtn + '"' : '') + '>';
+            return '<img class="im sj-fade' + (i === 0 ? ' on' : '') + '" src="' + esc(optImg(v.image)) + '" alt="' + altText + '" loading="lazy" decoding="async" width="400" height="500"' + (i === 0 ? ' style="view-transition-name:' + vtn + '"' : '') + '>';
           }).join('')
-        : '<img class="im" src="' + esc(img) + '" alt="' + altText + '" title="' + esc(p.name) + ' - Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500" style="view-transition-name:' + vtn + '">';
+        : '<img class="im" src="' + esc(optImg(img)) + '" alt="' + altText + '" title="' + esc(p.name) + ' - Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500" style="view-transition-name:' + vtn + '">';
       var hasOff = p.mrp && p.mrp > p.price;
       return '<a class="p-card" href="/product/' + encodeURIComponent(sku) + '" title="' + esc(p.name) + '">' +
         '<div class="p-img"' + (multi ? ' data-rot' : '') + '>' + imgsHtml +

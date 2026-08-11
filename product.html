@@ -629,6 +629,16 @@
   // the review composer block; when that was removed this went with it and
   // both renderers threw ReferenceError, so it lives up here now.
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  /* PDP hero serves at up to 560px (desktop column) and opens full-screen in
+     the lightbox, so resize to 900px @ q80: ~60% lighter than the 1000px
+     original while the 2.5x zoom still has enough pixels. The source is on
+     the zone (R2 on live / repo path on UAT) so /cdn-cgi/image can shrink
+     it at the edge. */
+  function optImg(u) {
+    if (!u) return u;
+    if (u.indexOf('/cdn-cgi/image/') !== -1) return u;
+    return '/cdn-cgi/image/width=900,quality=80,format=auto/' + u;
+  }
   var sku = new URLSearchParams(location.search).get('sku') || '';
   if (!sku) { var _pm = location.pathname.match(/\/product\/([^\/?#]+)/); if (_pm) sku = decodeURIComponent(_pm[1]); }
   if (!sku) { $('pdp-loading').style.display = 'none'; $('pdp-error').style.display = 'block'; return; }
@@ -669,7 +679,7 @@
     $('pdp-sub-seo').textContent = seo;
     $('pdp-region').textContent = '';
     $('pdp-region').style.display = 'none';
-    $('pdp-image').src = p.image || '';
+    $('pdp-image').src = optImg(p.image) || '';
     $('pdp-image').alt = p.name;
     /* Shared view-transition-name matches the catalog/home thumbnail so
        the browser expands that exact image into the PDP hero. */
@@ -1135,7 +1145,7 @@
   })();
 
   function switchMainImage(src) {
-    $('pdp-image').src = src;
+    $('pdp-image').src = optImg(src);
     var active = null;
     $('pdp-swatches').querySelectorAll('.pdp-swatch').forEach(function (b) {
       var on = b.getAttribute('data-img') === src;
@@ -1219,7 +1229,7 @@
       if (mob) { mob.style.display = 'none'; mob.innerHTML = ''; }
     }
     box.innerHTML = opts.map(function (o, i) {
-      return '<button type="button" class="pdp-swatch' + (i === act ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" title="' + (o.label || '') + '" aria-label="' + (o.label || ('View ' + (i + 1))) + '"><img src="' + o.image + '" alt="' + (o.label || '') + '" loading="lazy"></button>';
+      return '<button type="button" class="pdp-swatch' + (i === act ? ' on' : '') + '" data-img="' + o.image.replace(/"/g, '&quot;') + '" title="' + (o.label || '') + '" aria-label="' + (o.label || ('View ' + (i + 1))) + '"><img src="' + optImg(o.image) + '" alt="' + (o.label || '') + '" loading="lazy"></button>';
     }).join('');
     box.style.display = 'flex';
     box.querySelectorAll('.pdp-swatch').forEach(function (btn, i) {

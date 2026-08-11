@@ -32,13 +32,15 @@
 <link rel="preload" as="image" href="images/models/hero-banner3-mobile.webp" media="(max-width:900px)" fetchpriority="high">
 <link rel="preload" as="image" href="images/models/hero-banner3.webp" media="(min-width:901px)" fetchpriority="high">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en_IN">
 <meta property="og:site_name" content="Saubhagya">
 <meta property="og:title" content="Saubhagya Jewellery | Handcrafted Imitation Jewellery Online">
 <meta property="og:description" content="Handcrafted premium imitation jewellery: necklaces, chokers, earrings, bridal sets. Free insured shipping across India.">
 <meta property="og:url" content="https://saubhagyajewellery.com/">
 <meta property="og:image" content="https://saubhagyajewellery.com/images/banners/Website_hero_banner_concept_art._202606221611.webp">
 <meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:height" content="670">
+<meta property="og:image:alt" content="Handcrafted premium imitation jewellery from Saubhagya Jewellery - necklaces, chokers, earrings and bridal sets">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Saubhagya Jewellery | Handcrafted Imitation Jewellery Online">
 <meta name="twitter:description" content="Handcrafted premium imitation jewellery: necklaces, chokers, earrings, bridal sets. Free insured shipping across India.">
@@ -502,7 +504,7 @@
       <div class="v360">
         <div class="v360-card is-idle" tabindex="0" role="button" aria-label="Play Gold Necklace 360 view">
           <span class="v360-badge">360&deg;</span>
-          <video muted playsinline preload="none" poster="images/360/necklace-gold.webp"
+          <video muted playsinline preload="none" poster="/cdn-cgi/image/width=400,quality=78,format=auto/images/360/necklace-gold.webp"
                  data-src="images/360/necklace-gold.mp4"></video>
           <span class="v360-play"><span>&#9654;</span></span>
         </div>
@@ -512,7 +514,7 @@
       <div class="v360">
         <div class="v360-card is-idle" tabindex="0" role="button" aria-label="Play Temple Piece 360 view">
           <span class="v360-badge">360&deg;</span>
-          <video muted playsinline preload="none" poster="images/360/jewellery-turntable-1.webp"
+          <video muted playsinline preload="none" poster="/cdn-cgi/image/width=400,quality=78,format=auto/images/360/jewellery-turntable-1.webp"
                  data-src="images/360/jewellery-turntable-1.mp4"></video>
           <span class="v360-play"><span>&#9654;</span></span>
         </div>
@@ -522,7 +524,7 @@
       <div class="v360">
         <div class="v360-card is-idle" tabindex="0" role="button" aria-label="Play Kundan Set 360 view">
           <span class="v360-badge">360&deg;</span>
-          <video muted playsinline preload="none" poster="images/360/jewellery-turntable-2.webp"
+          <video muted playsinline preload="none" poster="/cdn-cgi/image/width=400,quality=78,format=auto/images/360/jewellery-turntable-2.webp"
                  data-src="images/360/jewellery-turntable-2.mp4"></video>
           <span class="v360-play"><span>&#9654;</span></span>
         </div>
@@ -532,7 +534,7 @@
       <div class="v360">
         <div class="v360-card is-idle" tabindex="0" role="button" aria-label="Play orbiting jewellery set view">
           <span class="v360-badge">360&deg;</span>
-          <video muted playsinline preload="none" poster="images/360/orbit-set.webp"
+          <video muted playsinline preload="none" poster="/cdn-cgi/image/width=400,quality=78,format=auto/images/360/orbit-set.webp"
                  data-src="images/360/orbit-set.mp4"></video>
           <span class="v360-play"><span>&#9654;</span></span>
         </div>
@@ -542,7 +544,7 @@
       <div class="v360">
         <div class="v360-card is-idle" tabindex="0" role="button" aria-label="Play Gold Choker on model">
           <span class="v360-badge">ON MODEL</span>
-          <video muted playsinline preload="none" poster="images/360/choker-model.webp"
+          <video muted playsinline preload="none" poster="/cdn-cgi/image/width=400,quality=78,format=auto/images/360/choker-model.webp"
                  data-src="images/360/choker-model.mp4"></video>
           <span class="v360-play"><span>&#9654;</span></span>
         </div>
@@ -644,6 +646,16 @@
   /* ---- trending grid (catalog.js: D1 API with static fallback) ---- */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmt(n) { return '₹' + Number(n || 0).toLocaleString('en-IN'); }
+  /* Serve product photos through Cloudflare image resizing: the source is
+     already on the zone (R2 via img.saubhagyajewellery.com on live, repo
+     path on UAT), so /cdn-cgi/image can shrink it on the fly. Cards display
+     at ~303px so 400px at q78 is visually identical while cutting ~90% of
+     the bytes. Skip URLs that already carry a /cdn-cgi/image/ prefix. */
+  function optImg(u) {
+    if (!u) return u;
+    if (u.indexOf('/cdn-cgi/image/') !== -1) return u;
+    return '/cdn-cgi/image/width=400,quality=78,format=auto/' + u;
+  }
 
   function renderTrending() {
     var cat = window.SAUBHAGYA_CATALOG || [];
@@ -660,9 +672,9 @@
       var multi = vars.length > 1;
       var imgsHtml = multi
         ? vars.map(function (v, i) {
-            return '<img class="im sj-fade' + (i === 0 ? ' on' : '') + '" src="' + esc(v.image) + '" alt="' + altText + '" loading="lazy" decoding="async" width="400" height="500"' + (i === 0 ? ' style="view-transition-name:' + vtn + '"' : '') + '>';
+            return '<img class="im sj-fade' + (i === 0 ? ' on' : '') + '" src="' + esc(optImg(v.image)) + '" alt="' + altText + '" loading="lazy" decoding="async" width="400" height="500"' + (i === 0 ? ' style="view-transition-name:' + vtn + '"' : '') + '>';
           }).join('')
-        : '<img class="im" src="' + esc(p.image) + '" alt="' + altText + '" title="' + esc(p.name) + ' - Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500" style="view-transition-name:' + vtn + '">';
+        : '<img class="im" src="' + esc(optImg(p.image)) + '" alt="' + altText + '" title="' + esc(p.name) + ' - Saubhagya Jewellery" loading="lazy" decoding="async" width="400" height="500" style="view-transition-name:' + vtn + '">';
       var hasOff = p.mrp && p.mrp > p.price;
       return '<a class="tr-card" href="/product/' + encodeURIComponent(p.id) + '" title="' + esc(p.name) + '">' +
         '<div class="tr-img"' + (multi ? ' data-rot' : '') + '>' + imgsHtml +

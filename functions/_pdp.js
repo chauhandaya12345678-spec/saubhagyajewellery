@@ -20,6 +20,15 @@ function abs(url) {
   if (/^https?:\/\//i.test(url)) return url;
   return SITE_URL + '/' + String(url).replace(/^\/+/, '');
 }
+/* PDP hero serves at up to 560px on desktop and opens in a 2.5x lightbox, so
+   900px @ q80 is the sweet spot: ~60% lighter than the 1000px original while
+   zoom still has enough pixels. Source is on the zone (R2 live / repo UAT),
+   so /cdn-cgi/image shrinks it at the edge. */
+function optImg(url) {
+  if (!url) return url;
+  if (url.indexOf('/cdn-cgi/image/') !== -1) return url;
+  return '/cdn-cgi/image/width=900,quality=80,format=auto/' + url;
+}
 export function cleanProductUrl(sku) {
   return SITE_URL + '/product/' + encodeURIComponent(sku);
 }
@@ -222,7 +231,7 @@ export async function renderProductShell(html, p, env) {
     )
     .replace(
       '</head>',
-      `<link rel="preload" as="image" href="${esc(image)}" fetchpriority="high">` +
+      `<link rel="preload" as="image" href="${esc(optImg(image))}" fetchpriority="high">` +
       `<meta property="og:url" content="${esc(canonical)}">` +
       `<meta property="product:price:amount" content="${p.price}">` +
       `<meta property="product:price:currency" content="INR">` +
@@ -256,7 +265,10 @@ export async function renderProductShell(html, p, env) {
         `<p class="pdp-pre-dots">LOADING DETAILS&hellip;</p>` +
       `</div>`
     )
-    // SSR the H1 and the description body. #pdp-content starts display:none and
+    .replace(
+      '<img class="pdp-img" id="pdp-image" src="" alt="" fetchpriority="high" decoding="async">',
+      `<img class="pdp-img" id="pdp-image" src="${esc(optImg(image))}" alt="${esc(p.name)}" fetchpriority="high" decoding="async">`
+    )
     // the client fills both from /api/products, but the raw HTML shipped an
     // EMPTY <h1> — so a crawler that does not run JS saw a product page with no
     // heading and no prose at all.
