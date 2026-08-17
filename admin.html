@@ -250,6 +250,40 @@ tr.ai-attention:hover td { background: #fbe4e2; }
             <textarea id="pb-desc" rows="3" placeholder="e.g. A short temple necklace built from mango (manga) motifs in matte antique gold, paired with matching jhumkas. Handcrafted for weddings and festive wear." style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px;font-family:inherit;resize:vertical"></textarea>
           </label>
         </div>
+        <details id="pb-calc" style="margin-top:12px;background:#fff;border:1px solid #ece4d4;border-radius:8px">
+          <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#0B291C;padding:9px 12px;list-style:none">🧮 Price Calculator — wholesale cost → Sell price &amp; MRP (tap)</summary>
+          <div style="padding:4px 14px 14px">
+            <div style="font-size:11px;color:#8a6d2f;margin-bottom:10px;line-height:1.5">Type a wholesale cost to get the suggested Sell + MRP. Edit the constants below to model new costs and hit <b>Save constants</b> — that updates the calculator for the future. (It doesn't change prices of products already added; you still set each product's own price.)</div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:#faf7f0;border:1px solid #ece4d4;border-radius:8px;padding:10px 12px">
+              <label style="font-size:11px;color:#6a6a6a">Wholesale cost ₹<br><input type="number" id="calc-cost" placeholder="e.g. 280" style="width:120px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:13px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Profit margin ₹<br><input type="number" id="calc-margin" placeholder="0" style="width:110px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:13px"></label>
+              <span style="display:flex;gap:4px;align-items:center;margin-bottom:2px">
+                <button class="ai-btn small ghost" id="calc-m-neck" type="button" title="Use the necklace default margin">necklace</button>
+                <button class="ai-btn small ghost" id="calc-m-ear" type="button" title="Use the earring/jhumka default margin">earring</button>
+              </span>
+              <div style="font-size:14px;margin-bottom:2px">→ Sell <b id="calc-sell" style="color:#23784a;font-size:16px">—</b> &nbsp;·&nbsp; MRP <s id="calc-mrp" style="color:#a8823f">—</s></div>
+              <button class="ai-btn small" id="calc-use" type="button" title="Fill the Price and MRP fields above with these values">Use ↑</button>
+            </div>
+            <div style="font-size:11px;color:#6a6a6a;margin:12px 0 6px">Constants — what goes into every price. Change &amp; Save:</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px 12px">
+              <label style="font-size:11px;color:#6a6a6a">Courier ₹ / order<br><input type="number" id="cc-courier" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Packaging ₹ / order<br><input type="number" id="cc-packaging" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">GST % (inclusive)<br><input type="number" id="cc-gstPct" step="0.01" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Payment gateway %<br><input type="number" id="cc-gatewayPct" step="0.01" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Round Sell to ₹<br><input type="number" id="cc-sellRound" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Discount shown % (MRP)<br><input type="number" id="cc-discountPct" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Round MRP to ₹<br><input type="number" id="cc-mrpRound" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Default margin — necklace ₹<br><input type="number" id="cc-marginNecklace" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Default margin — earring/jhumka ₹<br><input type="number" id="cc-marginEarring" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="ai-btn small" id="cc-save" type="button">Save constants</button>
+              <button class="ai-btn small ghost" id="cc-reset" type="button">Reset to defaults</button>
+              <span id="cc-status" style="font-size:11px;color:#6a6a6a"></span>
+            </div>
+            <div id="calc-breakdown" style="font-size:11px;color:#8a6d2f;margin-top:10px;line-height:1.6"></div>
+          </div>
+        </details>
         <div style="font-size:11px;color:#6a6a6a;margin:14px 0 6px">Colours <span style="color:#b02f33">*</span> — one block per colour. The <b>⭐ Main</b> colour is the one Google indexes; the others link to it. For a single-colour product, just leave one block.</div>
         <div id="pb-colours"></div>
         <button class="ai-btn small ghost" id="pb-add-colour" type="button" style="margin-top:2px">+ Add another colour</button>
@@ -986,6 +1020,75 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         btn.disabled = false; btn.textContent = 'ADD PRODUCT'; set('Error: ' + e.message, '#b02f33');
       });
     });
+  })();
+
+  // ── Price Calculator (ADD PRODUCT tab) ──
+  // Wholesale cost → suggested Sell + MRP, using editable constants persisted in
+  // D1 (functions/api/admin/pricing-settings.js holds the same formula server-side).
+  (function () {
+    var costEl = document.getElementById('calc-cost');
+    if (!costEl) return;
+    var CC = ['courier', 'packaging', 'gstPct', 'gatewayPct', 'sellRound', 'discountPct', 'mrpRound', 'marginNecklace', 'marginEarring'];
+    var DEFAULTS = { courier: 90, packaging: 25, gstPct: 3, gatewayPct: 2.36, sellRound: 5, discountPct: 25, mrpRound: 10, marginNecklace: 90, marginEarring: 0 };
+    var serverDefaults = DEFAULTS;
+    var last = { sell: null, mrp: null };
+
+    function num(id, d) { var el = document.getElementById(id); var v = el ? parseFloat(el.value) : NaN; return isFinite(v) ? v : d; }
+    function fillConstants(cfg) { CC.forEach(function (k) { var el = document.getElementById('cc-' + k); if (el) el.value = (cfg && cfg[k] != null) ? cfg[k] : DEFAULTS[k]; }); }
+    function readConstants() { var o = {}; CC.forEach(function (k) { o[k] = num('cc-' + k, DEFAULTS[k]); }); return o; }
+
+    function calc() {
+      var c = readConstants();
+      var pctCosts = c.gstPct / (100 + c.gstPct) + c.gatewayPct / 100;
+      var sr = c.sellRound >= 1 ? c.sellRound : 1;
+      var mr = c.mrpRound >= 1 ? c.mrpRound : 1;
+      var disc = (c.discountPct >= 0 && c.discountPct < 100) ? c.discountPct : 25;
+      var cost = num('calc-cost', NaN), margin = num('calc-margin', 0);
+      var sellEl = document.getElementById('calc-sell'), mrpEl = document.getElementById('calc-mrp'), bd = document.getElementById('calc-breakdown');
+      if (!isFinite(cost) || pctCosts >= 1) { sellEl.textContent = '—'; mrpEl.textContent = '—'; bd.textContent = ''; last = { sell: null, mrp: null }; return; }
+      var fixed = cost + c.courier + c.packaging;
+      var preRound = fixed / (1 - pctCosts) + margin;
+      var sell = Math.ceil(preRound / sr) * sr;
+      var mrp = Math.ceil((sell / (1 - disc / 100)) / mr) * mr;
+      last = { sell: sell, mrp: mrp };
+      sellEl.textContent = '₹' + sell;
+      mrpEl.textContent = '₹' + mrp;
+      bd.innerHTML = 'cost ₹' + cost + ' + courier ₹' + c.courier + ' + packaging ₹' + c.packaging +
+        ' = ₹' + fixed + ' &nbsp;→&nbsp; ÷(1 − ' + (pctCosts * 100).toFixed(2) + '% GST+gateway) + margin ₹' + margin +
+        ' = ₹' + preRound.toFixed(0) + ' &nbsp;→&nbsp; round ₹' + sr + ' = <b>Sell ₹' + sell + '</b>. ' +
+        'MRP = ₹' + sell + ' ÷ ' + ((100 - disc) / 100).toFixed(2) + ' → round ₹' + mr + ' = ₹' + mrp + ' (' + disc + '% off).';
+    }
+
+    CC.forEach(function (k) { var el = document.getElementById('cc-' + k); if (el) el.addEventListener('input', calc); });
+    costEl.addEventListener('input', calc);
+    document.getElementById('calc-margin').addEventListener('input', calc);
+    document.getElementById('calc-m-neck').addEventListener('click', function () { document.getElementById('calc-margin').value = num('cc-marginNecklace', DEFAULTS.marginNecklace); calc(); });
+    document.getElementById('calc-m-ear').addEventListener('click', function () { document.getElementById('calc-margin').value = num('cc-marginEarring', DEFAULTS.marginEarring); calc(); });
+    document.getElementById('calc-use').addEventListener('click', function () {
+      if (last.sell == null) { return; }
+      document.getElementById('pb-price').value = last.sell;
+      document.getElementById('pb-mrp').value = last.mrp;
+      var s = document.getElementById('cc-status'); s.style.color = '#23784a'; s.textContent = 'Filled Price ₹' + last.sell + ' / MRP ₹' + last.mrp + ' into the form above.';
+    });
+    document.getElementById('cc-reset').addEventListener('click', function () {
+      fillConstants(serverDefaults); calc();
+      var s = document.getElementById('cc-status'); s.style.color = '#6a6a6a'; s.textContent = 'Reset to defaults — not saved yet (hit Save constants to keep).';
+    });
+    document.getElementById('cc-save').addEventListener('click', function () {
+      var s = document.getElementById('cc-status'); s.style.color = '#6a6a6a'; s.textContent = 'Saving…';
+      apiFetch('/api/admin/pricing-settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(readConstants()) })
+        .then(function (d) {
+          if (d && d.success) { fillConstants(d.config); calc(); s.style.color = '#23784a'; s.textContent = '✓ Saved — the calculator will use these from now on.'; }
+          else { s.style.color = '#b02f33'; s.textContent = (d && d.error) || 'Save failed.'; }
+        })
+        .catch(function (e) { s.style.color = '#b02f33'; s.textContent = 'Error: ' + e.message; });
+    });
+
+    // Load saved constants (falls back to defaults on any error).
+    fillConstants(DEFAULTS);
+    apiFetch('/api/admin/pricing-settings', { method: 'GET' })
+      .then(function (d) { if (d && d.defaults) serverDefaults = d.defaults; if (d && d.config) fillConstants(d.config); calc(); })
+      .catch(function () { calc(); });
   })();
 
   // ================= CUSTOMERS =================
