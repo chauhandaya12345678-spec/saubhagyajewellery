@@ -14,6 +14,7 @@
  *    back through functions/_middleware.js on every single product view.
  */
 import { renderProductShell } from '../_pdp.js';
+import { SECURITY_HEADERS } from '../_sec.js';
 
 // Deliberately matched to /api/products (_headers: max-age=60). The visible price
 // and stock on the PDP always come from that API, so capping the SSR shell at the
@@ -101,6 +102,8 @@ export async function onRequest(context) {
     return new Response(html, {
       status: dbError ? 503 : 404,
       headers: {
+        ...SECURITY_HEADERS,
+        'X-Robots-Tag': 'noindex, follow',   // an error shell must not invite indexing
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': dbError ? 'no-store' : 'public, max-age=60',
         ...(dbError ? { 'Retry-After': '60' } : {}),
@@ -111,6 +114,7 @@ export async function onRequest(context) {
   html = await renderProductShell(html, p, env);
   const res = new Response(html, {
     headers: {
+      ...SECURITY_HEADERS,   // _headers doesn't reach Function responses; set them here
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': `public, max-age=${BROWSER_TTL}, s-maxage=${EDGE_TTL}`,
       'CDN-Cache-Control': `public, s-maxage=${EDGE_TTL}`,

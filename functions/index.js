@@ -16,6 +16,7 @@
  * bypasses Functions, so loading the shell here can never re-enter this handler.
  */
 import { fetchProducts, isVariantDup, productCard } from './_listing.js';
+import { SECURITY_HEADERS } from './_sec.js';
 
 const EDGE_TTL = 60;    // matches /api/products + the homepage middleware cache
 const BROWSER_TTL = 60;
@@ -55,6 +56,7 @@ export async function onRequest(context) {
 
   return new Response(html, {
     headers: {
+      ...SECURITY_HEADERS,   // _headers doesn't reach Function responses; set them here
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': `public, max-age=${BROWSER_TTL}, s-maxage=${EDGE_TTL}`,
       'X-SSR-Source': 'd1-listing',
