@@ -74,8 +74,13 @@
   .cs-more a { margin-right: 2px; }
   @media(max-width:760px){ .cs-cols { grid-template-columns: 1fr; gap: 16px; } }
   .cat-hub { max-width: 1440px; margin: 32px auto 0; padding: 0 40px; }
-  .cat-hub-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
-  .cat-card { position: relative; display: block; border-radius: 10px; overflow: hidden; text-decoration: none; aspect-ratio: 1/1; background: #eae5d8; }
+  /* Horizontal rectangle rail — same look as the home strip, but MANUAL scroll
+     only (no auto-motion). Swipe on mobile, drag/arrows on desktop. */
+  .cat-hub-grid { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch; padding-bottom: 10px; scrollbar-width: none; }
+  .cat-hub-grid::-webkit-scrollbar { display: none; }
+  .cat-card { position: relative; flex: 0 0 auto; width: min(360px, 82vw); aspect-ratio: 46/26;
+    scroll-snap-align: start; display: block; border-radius: 14px; overflow: hidden; text-decoration: none; background: #eae5d8; }
   .cat-card .bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .6s cubic-bezier(.25,1,.5,1); }
   @media(hover:hover) { .cat-card:hover .bg { transform: scale(1.05); } }
   .cat-card .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,41,28,.85) 0%, rgba(11,41,28,0) 55%); }
@@ -168,8 +173,8 @@
     .cat-sub { font-size: 13px; }
     .cat-hub, .cat-filterbar, .cat-search, .cat-list-wrap, .crumb { padding-left: 16px; padding-right: 16px; }
     .cat-hub { margin-top: 22px; }
-    .cat-hub-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .cat-card { border-radius: 12px; }
+    .cat-hub-grid { gap: 12px; }
+    .cat-card { width: min(300px, 80vw); border-radius: 12px; }
     .cat-card .lbl { font-size: 14px; left: 12px; right: 12px; bottom: 12px; }
     .cat-card .lbl .arr { font-size: 9px; margin-top: 3px; letter-spacing: 1.5px; }
     .cat-filterbar { margin-top: 28px; gap: 10px; }
@@ -179,7 +184,6 @@
   }
   @media (max-width: 480px) {
     .cat-title { font-size: 22px; }
-    .cat-card { aspect-ratio: 3/4; }
   }
   /* Scroll into cat-hub anchor on filter tap - offset for sticky header */
   .cat-filterbar { scroll-margin-top: 130px; }

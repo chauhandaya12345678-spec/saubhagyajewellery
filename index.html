@@ -295,23 +295,21 @@
   .rail::-webkit-scrollbar { display:none; }
   .rail > * { scroll-snap-align:start; flex:0 0 auto; }
 
-  /* ══ Category rail — PORTRAIT cards, manual horizontal scroll/swipe (home).
-     No auto-motion, no duplicate clones: each category shows once, side by side.
-     Reuses .cat-bg/.cat-shade/.cat-text; coming-soon is toggled live from the
-     catalog so a category flips to SHOP NOW the moment its first product ships. ══ */
-  .cat-rail { padding-bottom:6px; scroll-snap-type:x proximity; }
-  .cat-rail > * { scroll-snap-align:start; }
-  .cat-rail-card { position:relative; flex:0 0 auto; width:min(250px,64vw); aspect-ratio:3/4; border-radius:16px;
+  /* ══ Category rail (home) — RECTANGLE cards, auto-moving marquee (both mobile
+     + desktop), still swipeable. Snap OFF or the pixel drift snaps back. ══ */
+  .cat-rail { padding-bottom:6px; scroll-snap-type:none; }
+  .cat-rail > * { scroll-snap-align:none; }
+  .cat-rail-card { position:relative; flex:0 0 auto; width:min(460px,82vw); height:260px; border-radius:16px;
     overflow:hidden; text-decoration:none; display:block; background:#0B291C;
     box-shadow:0 2px 6px rgba(11,41,28,.10), 0 18px 40px -24px rgba(11,41,28,.55);
     transition:transform .45s cubic-bezier(.25,1,.5,1), box-shadow .45s; }
   @media(hover:hover){ .cat-rail-card:hover { transform:translateY(-5px); } }
-  .cat-rail-card .cat-text .t { font-size:26px; }
+  .cat-rail-card .cat-text .t { font-size:30px; }
   .cat-rail-card.coming-soon { pointer-events:none; }
   .cat-rail-card.coming-soon .cat-shade { background:linear-gradient(to top, rgba(11,41,28,.78) 0%, rgba(11,41,28,0) 46%); }
   .cat-rail-card.coming-soon .cat-text .k { color:#D4A853; }
-  @media (max-width:900px){ .cat-rail-card { width:min(185px,46vw); border-radius:12px; }
-    .cat-rail-card .cat-text .t { font-size:19px; } }
+  @media (max-width:900px){ .cat-rail-card { width:300px; height:190px; border-radius:12px; }
+    .cat-rail-card .cat-text .t { font-size:22px; } }
 
   /* ══ 360° showcase ══ */
   .v360 { width:232px; }
@@ -760,11 +758,10 @@
     var poll = setInterval(function () { if (renderTrending() || ++tries > 60) clearInterval(poll); }, 120);
   }
 
-  /* ══ Category rail: dynamic (from /api/categories) + live coming-soon sync ══
-     Each category shows ONCE (no duplicate clones), as a portrait card. The strip
-     does NOT auto-move — the shopper scrolls/swipes it left-right (arrows on
-     desktop). The 4 defaults stay in the raw HTML as the no-JS / SEO fallback and
-     as what paints before the fetch lands. */
+  /* ══ Category rail (home): dynamic + AUTO-MOVING marquee + coming-soon sync ══
+     Rectangle cards. The strip renders twice and drifts left forever (both mobile
+     and desktop), wrapping seamlessly at the first clone; still swipeable. Pauses
+     only while pressing/dragging (never on hover) so clicks stay reliable. */
   (function () {
     var rail = document.getElementById('cat-rail');
     if (!rail) return;
@@ -775,19 +772,23 @@
       { slug: 'bridal-set', label: 'Bridal Set', banner: 'images/models/cat-bridal.webp',   subtitle: 'Temple necklace & matching jhumkas',  bgpos: 'center 55%' }
     ];
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-    function cdn(u) { if (!u) return ''; if (u.indexOf('/cdn-cgi/image/') !== -1) return u; return '/cdn-cgi/image/width=600,quality=78,format=auto/' + String(u).replace(/^\/+/, ''); }
-    function cardHtml(cat) {
+    function cdn(u) { if (!u) return ''; if (u.indexOf('/cdn-cgi/image/') !== -1) return u; return '/cdn-cgi/image/width=700,quality=78,format=auto/' + String(u).replace(/^\/+/, ''); }
+    function cardHtml(cat, clone) {
       var href = 'categories.html?cat=' + encodeURIComponent(cat.slug);
       var bg = "background-image:url('" + cdn(cat.banner) + "');background-color:#0B291C" + (cat.bgpos ? ';background-position:' + cat.bgpos : '');
-      return '<a class="cat-rail-card" data-cat="' + esc(cat.label) + '" data-href="' + esc(href) + '" href="' + esc(href) + '" aria-label="Shop ' + esc(cat.label) + '">' +
+      return '<a class="cat-rail-card" data-cat="' + esc(cat.label) + '" data-href="' + esc(href) + '" href="' + esc(href) + '"' +
+        (clone ? ' aria-hidden="true" tabindex="-1"' : '') + ' aria-label="Shop ' + esc(cat.label) + '">' +
         '<div class="cat-bg" style="' + bg + '"></div><div class="cat-shade"></div>' +
         '<div class="cat-text"><div class="k">SHOP NOW</div><h3 class="t">' + esc(cat.label) + '</h3>' +
           (cat.subtitle ? '<div class="s">' + esc(cat.subtitle) + '</div>' : '') + '</div></a>';
     }
+    var cats = FALLBACK, wrapAt = 0;
+    function measure() { var all = rail.querySelectorAll('.cat-rail-card'); var fc = all[cats.length]; wrapAt = fc ? fc.offsetLeft : (rail.scrollWidth / 2); }
     function build(list) {
-      var cats = (list && list.length) ? list : FALLBACK;
-      rail.innerHTML = cats.map(cardHtml).join('');   // once, no clones
-      syncCats();
+      cats = (list && list.length) ? list : FALLBACK;
+      rail.innerHTML = cats.map(function (c) { return cardHtml(c, false); }).join('') +
+                       cats.map(function (c) { return cardHtml(c, true); }).join('');
+      syncCats(); measure();
     }
     function syncCats() {
       var cat = window.SAUBHAGYA_CATALOG || [];
@@ -795,22 +796,38 @@
       cat.forEach(function (p) { if (p.inStock !== 0 && p.inStock !== false && !p.isVariantDup) have[p.category] = 1; });
       rail.querySelectorAll('.cat-rail-card').forEach(function (a) {
         var name = a.getAttribute('data-cat');
-        var live = !cat.length || !!have[name];   // don't grey everything before the catalog loads
+        var live = !cat.length || !!have[name];
         a.classList.toggle('coming-soon', !live);
         var k = a.querySelector('.cat-text .k'); if (k) k.textContent = live ? 'SHOP NOW' : 'COMING SOON';
         if (live) a.setAttribute('href', a.dataset.href); else a.removeAttribute('href');
       });
     }
 
-    build(FALLBACK);   // paint immediately
+    build(FALLBACK);
     fetch('/api/categories').then(function (r) { return r.json(); })
       .then(function (d) { if (d && d.success && d.categories && d.categories.length) build(d.categories); })
-      .catch(function () { /* keep fallback */ });
+      .catch(function () {});
     window.addEventListener('catalog-ready', syncCats);
     var t = 0, sp = setInterval(function () { if ((window.SAUBHAGYA_CATALOG || []).length) syncCats(); if (++t > 60) clearInterval(sp); }, 200);
+    window.addEventListener('resize', measure);
 
-    // Manual scroll only. Desktop arrows nudge one card at a time.
-    function step() { var c = rail.querySelector('.cat-rail-card'); return (c ? c.getBoundingClientRect().width : 250) + 16; }
+    var paused = false, resumeT = null;
+    function pause() { paused = true; clearTimeout(resumeT); }
+    function resumeSoon() { clearTimeout(resumeT); resumeT = setTimeout(function () { paused = false; }, 700); }
+    ['pointerdown', 'touchstart'].forEach(function (ev) { rail.addEventListener(ev, pause, { passive: true }); });
+    ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(function (ev) { rail.addEventListener(ev, resumeSoon, { passive: true }); });
+    rail.addEventListener('wheel', function () { pause(); resumeSoon(); }, { passive: true });
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function tick() {
+      if (!reduce && !paused && !document.hidden && wrapAt > 0) {
+        rail.scrollLeft += 0.6;
+        if (rail.scrollLeft >= wrapAt) rail.scrollLeft -= wrapAt;
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    function step() { var c = rail.querySelector('.cat-rail-card'); return (c ? c.getBoundingClientRect().width : 460) + 16; }
     var prev = document.getElementById('cat-rail-prev'), next = document.getElementById('cat-rail-next');
     if (prev) prev.addEventListener('click', function () { rail.scrollBy({ left: -step(), behavior: 'smooth' }); });
     if (next) next.addEventListener('click', function () { rail.scrollBy({ left: step(), behavior: 'smooth' }); });
