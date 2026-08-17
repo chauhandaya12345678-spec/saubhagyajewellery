@@ -5,7 +5,9 @@
 //  Zero-deploy architecture - update prices, stock, images
 //  directly in D1, no push required.
 //
-//  For static SEO page regeneration, see build/site.js.
+//  The crawlable copy of these grids is server-rendered from D1 on '/' and
+//  '/categories' by functions/_listing.js — this script overwrites it on
+//  `catalog-ready` with the interactive version.
 // ============================================================
 (function () {
   "use strict";
