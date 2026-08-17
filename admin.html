@@ -725,6 +725,17 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     downloadCsv('saubhagya-inventory-' + new Date().toISOString().slice(0, 10) + '.csv', rows);
   });
 
+  // The 4 fixed website categories (must match SUBS in categories.html). Shown
+  // in every category dropdown even when a category has no products yet (e.g.
+  // Pendant / Bridal Set are "coming soon" on the site until the first upload).
+  var CANON_CATEGORIES = ['Bridal Set', 'Necklace', 'Earring', 'Pendant'];
+  function allCategories() {
+    var set = {};
+    CANON_CATEGORIES.forEach(function (c) { set[c] = 1; });
+    (lastProducts || []).forEach(function (p) { if (p.category) set[p.category] = 1; });
+    return Object.keys(set).sort();
+  }
+
   function loadProducts() {
     var status = document.getElementById('i-load-status');
     var tbody = document.getElementById('i-tbody');
@@ -736,7 +747,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         var list = Array.isArray(data) ? data : (data && data.products || []);
         lastProducts = list;
         // Populate the New-Product category dropdown from existing categories.
-        var cats = Array.from(new Set(list.map(function (p) { return p.category; }).filter(Boolean))).sort();
+        var cats = allCategories();
         var sel = document.getElementById('np-category');
         if (sel) {
           var cur = sel.value;
@@ -761,7 +772,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     });
     document.getElementById('i-count').textContent = list.length + ' product' + (list.length === 1 ? '' : 's') + (lowOnly ? ' (low stock)' : '');
     status.textContent = '';
-    var cats = Array.from(new Set(lastProducts.map(function (p) { return p.category; }).filter(Boolean))).sort();
+    var cats = allCategories();
     function catOpts(sel) { return cats.map(function (c) { return '<option value="' + esc(c) + '"' + (c === sel ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join(''); }
     function badgeOpts(sel) { return ['', 'BESTSELLER', 'NEW', 'TRENDING'].map(function (b) { return '<option value="' + b + '"' + (b === (sel || '') ? ' selected' : '') + '>' + (b || 'None') + '</option>'; }).join(''); }
     var inpS = 'padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px';
