@@ -76,7 +76,10 @@ body{padding-top:118px}
 /* ── Premium 3D product card (shared across home .tr-card, categories .p-card, legacy .card) */
 .card,.tr-card,.p-card{position:relative;display:block;background:#fff;border-radius:16px;padding:10px 10px 16px;box-shadow:0 1px 2px rgba(11,41,28,.04),0 6px 18px -12px rgba(11,41,28,.18);transition:transform .3s cubic-bezier(.25,1,.5,1),box-shadow .3s cubic-bezier(.25,1,.5,1);will-change:transform}
 .card:hover,.tr-card:hover,.p-card:hover{transform:scale(1.03);box-shadow:0 8px 30px rgba(11,41,28,.12)}
-.card-img,.tr-img,.p-img{position:relative;aspect-ratio:4/5;background:linear-gradient(135deg,#f5f2ea 0%,#eae5d8 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:12px;isolation:isolate}
+/* Card image box is 3:4 to match the product photos (≈800x1071 = 0.747), so
+   object-fit:cover trims almost nothing top/bottom. A 4:5 box was cropping the
+   taller shots. */
+.card-img,.tr-img,.p-img{position:relative;aspect-ratio:3/4;background:linear-gradient(135deg,#f5f2ea 0%,#eae5d8 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:12px;isolation:isolate}
 .card-img::after,.tr-img::after,.p-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0) 60%,rgba(11,41,28,.08) 100%);pointer-events:none;opacity:0;transition:opacity .5s ease}
 .card:hover .card-img::after,.tr-card:hover .tr-img::after,.p-card:hover .p-img::after{opacity:1}
 .prose img,.seo img{border-radius:12px;max-width:100%}
