@@ -34,7 +34,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, category, low_stock_threshold, new_sku, description, variants } = body || {};
+  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, category, low_stock_threshold, new_sku, description, variants, badge, inStock } = body || {};
   if (!sku) {
     return new Response(JSON.stringify({ error: 'sku required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -96,6 +96,14 @@ export async function onRequest(context) {
     if (typeof new_sku === 'string' && new_sku.trim() && new_sku.trim() !== sku) { setClauses.push('sku = ?'); params.push(new_sku.trim()); }
     // Unique SEO description — kills the thin-content fallback for a product row.
     if (typeof description === 'string') { setClauses.push('description = ?'); params.push(description); }
+    // Marketing badge (BESTSELLER / NEW / TRENDING / ''). Empty string clears it.
+    if (typeof badge === 'string') { setClauses.push('badge = ?'); params.push(badge.trim()); }
+    // Listed / delisted. inStock=0 hides the product from listings, the sitemap
+    // and marks it out of stock, without deleting the row.
+    if (inStock !== undefined) {
+      const ins = (inStock === 0 || inStock === '0' || inStock === false || inStock === 'false') ? 0 : 1;
+      setClauses.push('inStock = ?'); params.push(ins);
+    }
     // Colour-variant link. Accept a ready array/object or a JSON string; null/''
     // clears it (turns a row back into a standalone single-colour product).
     if (variants !== undefined) {

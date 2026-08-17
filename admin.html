@@ -246,6 +246,9 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           <label style="font-size:11px;color:#6a6a6a">Weight g
             <input type="number" id="pb-weight" placeholder="Weight" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
           </label>
+          <label style="font-size:11px;color:#6a6a6a">Badge (optional)
+            <select id="pb-badge" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"><option value="">None</option><option value="BESTSELLER">BESTSELLER</option><option value="NEW">NEW</option><option value="TRENDING">TRENDING</option></select>
+          </label>
           <label style="grid-column:1/4;font-size:11px;color:#6a6a6a">Description — 2 to 3 sentences, unique (material, motif, occasion). Used for Google.
             <textarea id="pb-desc" rows="3" placeholder="e.g. A short temple necklace built from mango (manga) motifs in matte antique gold, paired with matching jhumkas. Handcrafted for weddings and festive wear." style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px;font-family:inherit;resize:vertical"></textarea>
           </label>
@@ -277,8 +280,10 @@ tr.ai-attention:hover td { background: #fbe4e2; }
               <label style="font-size:11px;color:#6a6a6a">Default margin — earring/jhumka ₹<br><input type="number" id="cc-marginEarring" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
             </div>
             <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-              <button class="ai-btn small" id="cc-save" type="button">Save constants</button>
-              <button class="ai-btn small ghost" id="cc-reset" type="button">Reset to defaults</button>
+              <button class="ai-btn small" id="cc-edit" type="button">✎ Edit constants</button>
+              <button class="ai-btn small" id="cc-save" type="button" style="display:none">💾 Save</button>
+              <button class="ai-btn small ghost" id="cc-cancel" type="button" style="display:none">Cancel</button>
+              <button class="ai-btn small ghost" id="cc-reset" type="button" style="display:none">Reset to defaults</button>
               <span id="cc-status" style="font-size:11px;color:#6a6a6a"></span>
             </div>
             <div id="calc-breakdown" style="font-size:11px;color:#8a6d2f;margin-top:10px;line-height:1.6"></div>
@@ -756,13 +761,19 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     });
     document.getElementById('i-count').textContent = list.length + ' product' + (list.length === 1 ? '' : 's') + (lowOnly ? ' (low stock)' : '');
     status.textContent = '';
+    var cats = Array.from(new Set(lastProducts.map(function (p) { return p.category; }).filter(Boolean))).sort();
+    function catOpts(sel) { return cats.map(function (c) { return '<option value="' + esc(c) + '"' + (c === sel ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join(''); }
+    function badgeOpts(sel) { return ['', 'BESTSELLER', 'NEW', 'TRENDING'].map(function (b) { return '<option value="' + b + '"' + (b === (sel || '') ? ' selected' : '') + '>' + (b || 'None') + '</option>'; }).join(''); }
+    var inpS = 'padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px';
     tbody.innerHTML = list.map(function (p) {
       var threshold = p.low_stock_threshold != null ? p.low_stock_threshold : 3;
       var lowClass = (p.stock_count != null && p.stock_count <= threshold) ? ' ai-low' : '';
-      return '<tr data-sku="' + esc(p.sku) + '">' +
+      var listed = !(p.inStock === 0 || p.inStock === false);
+      var row = '<tr data-sku="' + esc(p.sku) + '"' + (listed ? '' : ' style="opacity:.55"') + '>' +
         '<td><div class="ai-cell-flex">' +
-          '<input class="ai-input ai-sku" style="width:110px;margin:0" type="text" value="' + esc(p.sku) + '" data-field="sku" disabled>' +
+          '<input class="ai-input ai-sku" style="width:92px;margin:0" type="text" value="' + esc(p.sku) + '" data-field="sku" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Rename SKU">✎</button>' +
+          '<button class="ai-btn small ghost i-detail-toggle" type="button" title="Edit description, badge, category, photo, listing">⋯</button>' +
           '<a href="/product/' + encodeURIComponent(p.sku) + '" target="_blank" rel="noopener" title="View live product page" style="text-decoration:none;font-size:14px">🔗</a>' +
         '</div></td>' +
         '<td><div class="ai-cell-flex">' +
@@ -784,6 +795,18 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         '<td><div class="ai-cell-flex"><input class="ai-num" style="margin:0" type="number" min="0" step="1" value="' + (p.packing_weight_grams != null ? p.packing_weight_grams : '') + '" data-field="packing_weight_grams" placeholder="40" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit box weight">✎</button></div></td>' +
         '</tr>';
+      var detail = '<tr class="i-detail" data-sku="' + esc(p.sku) + '" style="display:none"><td colspan="8" style="background:#faf7f0;padding:10px 14px">' +
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px 12px;align-items:end">' +
+          '<label style="font-size:11px;color:#6a6a6a">Category<br><select class="d-category" style="width:100%;' + inpS + '">' + catOpts(p.category) + '</select></label>' +
+          '<label style="font-size:11px;color:#6a6a6a">Badge<br><select class="d-badge" style="width:100%;' + inpS + '">' + badgeOpts(p.badge) + '</select></label>' +
+          '<label style="font-size:11px;color:#6a6a6a">Listed on site<br><span style="display:inline-flex;align-items:center;gap:6px;height:30px"><input type="checkbox" class="d-instock"' + (listed ? ' checked' : '') + '> <span class="d-instock-lbl">' + (listed ? 'visible' : 'hidden') + '</span></span></label>' +
+          '<label style="font-size:11px;color:#6a6a6a">Replace photo<br><span style="display:inline-flex;gap:6px;align-items:center"><input type="file" class="d-file" accept="image/*" style="font-size:11px;max-width:120px"><button class="ai-btn small ghost d-upload" type="button">upload</button></span></label>' +
+          '<label style="grid-column:1/-1;font-size:11px;color:#6a6a6a">Description — unique, 2 to 3 sentences (material, motif, occasion). Used for Google. Blank = auto template.<br><textarea class="d-desc" rows="3" style="width:100%;' + inpS + ';font-family:inherit;resize:vertical">' + esc(p.description || '') + '</textarea></label>' +
+          '<div style="grid-column:1/-1;font-size:11px;color:#8a6d2f">🔎 Google auto-preview (from the name — no SEO fields to fill) <button class="ai-btn small ghost d-seo-btn" type="button">refresh</button><div class="d-seo" style="margin-top:4px;color:#3a3a3a;line-height:1.5"></div></div>' +
+          '<div style="grid-column:1/-1;display:flex;gap:10px;align-items:center"><button class="ai-btn small d-save" type="button">💾 Save details</button><span class="d-status" style="font-size:11px;color:#6a6a6a"></span></div>' +
+        '</div>' +
+      '</td></tr>';
+      return row + detail;
     }).join('');
     tbody.querySelectorAll('.edit-toggle').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -792,6 +815,79 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         input.focus();
       });
     });
+    tbody.querySelectorAll('.i-detail-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var detail = btn.closest('tr').nextElementSibling;
+        if (!detail || !detail.classList.contains('i-detail')) return;
+        var show = detail.style.display === 'none';
+        detail.style.display = show ? '' : 'none';
+        if (show) loadSeoPreview(detail);
+      });
+    });
+    tbody.querySelectorAll('.i-detail').forEach(function (detail) {
+      detail.querySelector('.d-seo-btn').addEventListener('click', function () { loadSeoPreview(detail); });
+      detail.querySelector('.d-instock').addEventListener('change', function () { detail.querySelector('.d-instock-lbl').textContent = this.checked ? 'visible' : 'hidden'; });
+      detail.querySelector('.d-upload').addEventListener('click', function () { uploadDetailPhoto(detail); });
+      detail.querySelector('.d-save').addEventListener('click', function () { saveDetail(detail); });
+    });
+  }
+
+  // Show the Google title + keyword line the site auto-generates from the name
+  // (via /api/admin/seo-preview → functions/_seo.js). Reassures that no SEO field
+  // needs filling — a good NAME is the whole input.
+  function loadSeoPreview(detail) {
+    var main = detail.previousElementSibling;
+    var name = main ? (main.querySelector('[data-field="name"]').value || '') : '';
+    var category = detail.querySelector('.d-category').value || '';
+    var box = detail.querySelector('.d-seo');
+    box.textContent = 'Loading…';
+    apiFetch('/api/admin/seo-preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, category: category }) })
+      .then(function (d) {
+        if (d && d.success) { box.innerHTML = '<b>Title:</b> ' + esc(d.title) + '<br><b>Keyword line:</b> ' + esc(d.subtitle); }
+        else { box.textContent = (d && d.error) || 'preview unavailable'; }
+      })
+      .catch(function (e) { box.textContent = 'Error: ' + e.message; });
+  }
+
+  // Save the expander fields (category, badge, listed, description) for one SKU.
+  function saveDetail(detail) {
+    var sku = detail.getAttribute('data-sku');
+    var body = {
+      sku: sku,
+      category: detail.querySelector('.d-category').value || '',
+      badge: detail.querySelector('.d-badge').value || '',
+      description: detail.querySelector('.d-desc').value,
+      inStock: detail.querySelector('.d-instock').checked ? 1 : 0,
+    };
+    var st = detail.querySelector('.d-status'); st.style.color = '#6a6a6a'; st.textContent = 'Saving…';
+    apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (d) {
+        if (d && d.success) { st.style.color = '#23784a'; st.textContent = '✓ Saved.'; loadProducts(); }
+        else { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Save failed.'; }
+      })
+      .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+
+  // Replace a product's main photo: upload to R2, then point the row's image at it.
+  function uploadDetailPhoto(detail) {
+    var sku = detail.getAttribute('data-sku');
+    var file = detail.querySelector('.d-file').files[0];
+    var st = detail.querySelector('.d-status');
+    if (!file) { st.style.color = '#b02f33'; st.textContent = 'Choose a photo first.'; return; }
+    var main = detail.previousElementSibling;
+    var name = main ? (main.querySelector('[data-field="name"]').value || '') : '';
+    st.style.color = '#6a6a6a'; st.textContent = 'Uploading…';
+    var fd = new FormData(); fd.append('file', file); fd.append('sku', sku); if (name) fd.append('name', name);
+    apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
+      .then(function (d) {
+        if (!d || !d.success || !d.url) throw new Error((d && d.error) || 'upload failed');
+        return apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: sku, image: d.url }) });
+      })
+      .then(function (u) {
+        if (u && u.success) { st.style.color = '#23784a'; st.textContent = '✓ Photo updated.'; loadProducts(); }
+        else { st.style.color = '#b02f33'; st.textContent = (u && u.error) || 'could not set photo'; }
+      })
+      .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
   }
   document.getElementById('i-lowstock-only').addEventListener('change', renderInventoryRows);
 
@@ -1001,6 +1097,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           body: JSON.stringify({
             baseName: bn, category: category, description: description,
             price: price, mrp: mrp, weightGrams: weight,
+            badge: (document.getElementById('pb-badge') || {}).value || '',
             colours: rows.map(function (r) {
               return { label: r.label, sku: r.sku, nameSuffix: r.suffix, image: r.image, stock_count: r.stock };
             })
@@ -1010,7 +1107,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         btn.disabled = false; btn.textContent = 'ADD PRODUCT';
         if (d && d.success) {
           set('✓ Added ' + d.skus.join(', ') + ' — live on the website.', '#23784a');
-          ['pb-name', 'pb-basesku', 'pb-price', 'pb-mrp', 'pb-weight', 'pb-desc'].forEach(function (id) { document.getElementById(id).value = ''; });
+          ['pb-name', 'pb-basesku', 'pb-price', 'pb-mrp', 'pb-weight', 'pb-desc', 'pb-badge'].forEach(function (id) { document.getElementById(id).value = ''; });
           wrap.innerHTML = ''; addBlock();
           if (typeof loadProducts === 'function') loadProducts();
         } else {
@@ -1070,24 +1167,43 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       document.getElementById('pb-mrp').value = last.mrp;
       var s = document.getElementById('cc-status'); s.style.color = '#23784a'; s.textContent = 'Filled Price ₹' + last.sell + ' / MRP ₹' + last.mrp + ' into the form above.';
     });
+    // Constants are LOCKED by default (they change every future price). Edit
+    // unlocks the fields; Save persists + re-locks; Cancel reverts + re-locks.
+    var snapshot = null;
+    function setLocked(locked) {
+      CC.forEach(function (k) { var el = document.getElementById('cc-' + k); if (el) el.disabled = locked; });
+      document.getElementById('cc-edit').style.display = locked ? '' : 'none';
+      document.getElementById('cc-save').style.display = locked ? 'none' : '';
+      document.getElementById('cc-cancel').style.display = locked ? 'none' : '';
+      document.getElementById('cc-reset').style.display = locked ? 'none' : '';
+    }
+    document.getElementById('cc-edit').addEventListener('click', function () {
+      snapshot = readConstants(); setLocked(false);
+      var s = document.getElementById('cc-status'); s.style.color = '#a8823f'; s.textContent = 'Editing — change the values, then Save (or Cancel).';
+    });
+    document.getElementById('cc-cancel').addEventListener('click', function () {
+      if (snapshot) fillConstants(snapshot);
+      calc(); setLocked(true);
+      document.getElementById('cc-status').textContent = '';
+    });
     document.getElementById('cc-reset').addEventListener('click', function () {
       fillConstants(serverDefaults); calc();
-      var s = document.getElementById('cc-status'); s.style.color = '#6a6a6a'; s.textContent = 'Reset to defaults — not saved yet (hit Save constants to keep).';
+      var s = document.getElementById('cc-status'); s.style.color = '#6a6a6a'; s.textContent = 'Reset to defaults — not saved yet (hit Save to keep).';
     });
     document.getElementById('cc-save').addEventListener('click', function () {
       var s = document.getElementById('cc-status'); s.style.color = '#6a6a6a'; s.textContent = 'Saving…';
       apiFetch('/api/admin/pricing-settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(readConstants()) })
         .then(function (d) {
-          if (d && d.success) { fillConstants(d.config); calc(); s.style.color = '#23784a'; s.textContent = '✓ Saved — the calculator will use these from now on.'; }
+          if (d && d.success) { fillConstants(d.config); calc(); setLocked(true); s.style.color = '#23784a'; s.textContent = '✓ Saved — the calculator will use these from now on.'; }
           else { s.style.color = '#b02f33'; s.textContent = (d && d.error) || 'Save failed.'; }
         })
         .catch(function (e) { s.style.color = '#b02f33'; s.textContent = 'Error: ' + e.message; });
     });
 
-    // Load saved constants (falls back to defaults on any error).
-    fillConstants(DEFAULTS);
+    // Load saved constants — locked by default; falls back to defaults on error.
+    fillConstants(DEFAULTS); setLocked(true);
     apiFetch('/api/admin/pricing-settings', { method: 'GET' })
-      .then(function (d) { if (d && d.defaults) serverDefaults = d.defaults; if (d && d.config) fillConstants(d.config); calc(); })
+      .then(function (d) { if (d && d.defaults) serverDefaults = d.defaults; if (d && d.config) fillConstants(d.config); calc(); setLocked(true); })
       .catch(function () { calc(); });
   })();
 
