@@ -985,8 +985,8 @@
       ? (isJhumka ? 'Weddings, festive &amp; ethnic wear' : 'Everyday &amp; festive wear')
       : (isCrystal ? 'Weddings, receptions &amp; party wear' : 'Weddings, festive &amp; party wear');
     det.innerHTML =
-      row('Material', 'Skin-friendly Zamak alloy (lead &amp; nickel-free base metal)') +
-      row('Finish', 'High gold-plated, antique look' + (isCrystal ? ' with hand-set crystal stones' : '')) +
+      row('Material', p.material ? esc2(p.material) : 'Skin-friendly Zamak alloy (lead &amp; nickel-free base metal)') +
+      row('Finish', p.finish ? esc2(p.finish) : ('High gold-plated, antique look' + (isCrystal ? ' with hand-set crystal stones' : ''))) +
       (ci.label ? row('Colour', esc2(ci.label) + (ci.count > 1 ? ' (+' + (ci.count - 1) + ' more shade' + (ci.count - 1 > 1 ? 's' : '') + ')' : '')) : '') +
       row('Type', typeLabel) +
       row('Best for', bestFor) +

@@ -34,7 +34,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, category, low_stock_threshold, new_sku, description, variants, badge, inStock } = body || {};
+  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, category, low_stock_threshold, new_sku, description, variants, badge, inStock, material, finish } = body || {};
   if (!sku) {
     return new Response(JSON.stringify({ error: 'sku required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -98,6 +98,10 @@ export async function onRequest(context) {
     if (typeof description === 'string') { setClauses.push('description = ?'); params.push(description); }
     // Marketing badge (BESTSELLER / NEW / TRENDING / ''). Empty string clears it.
     if (typeof badge === 'string') { setClauses.push('badge = ?'); params.push(badge.trim()); }
+    // Spec overrides. Empty string → NULL so the product page reverts to the
+    // standard "Zamak alloy" / "high gold-plated" defaults.
+    if (typeof material === 'string') { setClauses.push('material = ?'); params.push(material.trim() || null); }
+    if (typeof finish === 'string') { setClauses.push('finish = ?'); params.push(finish.trim() || null); }
     // Listed / delisted. inStock=0 hides the product from listings, the sitemap
     // and marks it out of stock, without deleting the row.
     if (inStock !== undefined) {

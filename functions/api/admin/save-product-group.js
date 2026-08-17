@@ -53,6 +53,11 @@ export async function onRequest(context) {
   const baseName = String(b.baseName || '').trim();
   const category = String(b.category || '').trim();
   const description = String(b.description || '').trim();
+  // Optional spec overrides — blank means the product page shows the standard
+  // "Zamak alloy" / "high gold-plated" defaults. Set them for oxidised, silver,
+  // rose-gold etc.
+  const material = String(b.material || '').trim() || null;
+  const finish = String(b.finish || '').trim() || null;
   const price = parseInt(b.price, 10);
   const colours = Array.isArray(b.colours) ? b.colours : [];
 
@@ -118,13 +123,13 @@ export async function onRequest(context) {
     `INSERT INTO products
        (sku, name, region, regionLabel, category, price, mrp, city, badge, image, altImage,
         inStock, stock_count, weightGrams, packing_weight_grams, low_stock_threshold, variants,
-        description, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+        description, material, finish, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
   );
   const batch = norm.map(c => stmt.bind(
     c.sku, c.name, region, regionLabel, category, price, mrp, city, badge, c.image, c.image,
     1, c.stock_count, weightGrams, packing_weight_grams, low_stock_threshold, variantsJson,
-    description
+    description, material, finish
   ));
 
   try {

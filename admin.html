@@ -249,6 +249,12 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           <label style="font-size:11px;color:#6a6a6a">Badge (optional)
             <select id="pb-badge" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"><option value="">None</option><option value="BESTSELLER">BESTSELLER</option><option value="NEW">NEW</option><option value="TRENDING">TRENDING</option></select>
           </label>
+          <label style="grid-column:1/3;font-size:11px;color:#6a6a6a">Material (blank = default)
+            <input type="text" id="pb-material" placeholder="Default: Skin-friendly Zamak alloy (lead &amp; nickel-free)" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+          </label>
+          <label style="font-size:11px;color:#6a6a6a">Finish (blank = default)
+            <input type="text" id="pb-finish" placeholder="Default: High gold-plated" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+          </label>
           <label style="grid-column:1/4;font-size:11px;color:#6a6a6a">Description — 2 to 3 sentences, unique (material, motif, occasion). Used for Google.
             <textarea id="pb-desc" rows="3" placeholder="e.g. A short temple necklace built from mango (manga) motifs in matte antique gold, paired with matching jhumkas. Handcrafted for weddings and festive wear." style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px;font-family:inherit;resize:vertical"></textarea>
           </label>
@@ -813,6 +819,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           '<label style="font-size:11px;color:#6a6a6a">Listed on site<br><span style="display:inline-flex;align-items:center;gap:6px;height:30px"><input type="checkbox" class="d-instock"' + (listed ? ' checked' : '') + '> <span class="d-instock-lbl">' + (listed ? 'visible' : 'hidden') + '</span></span></label>' +
           '<label style="font-size:11px;color:#6a6a6a">Replace photo<br><span style="display:inline-flex;gap:6px;align-items:center"><input type="file" class="d-file" accept="image/*" style="font-size:11px;max-width:120px"><button class="ai-btn small ghost d-upload" type="button">upload</button></span></label>' +
           '<label style="grid-column:1/-1;font-size:11px;color:#6a6a6a">Description — unique, 2 to 3 sentences (material, motif, occasion). Used for Google. Blank = auto template.<br><textarea class="d-desc" rows="3" style="width:100%;' + inpS + ';font-family:inherit;resize:vertical">' + esc(p.description || '') + '</textarea></label>' +
+          '<label style="grid-column:1/3;font-size:11px;color:#6a6a6a">Material (blank = default Zamak alloy)<br><input type="text" class="d-material" value="' + esc(p.material || '') + '" placeholder="Skin-friendly Zamak alloy…" style="width:100%;' + inpS + '"></label>' +
+          '<label style="grid-column:3/-1;font-size:11px;color:#6a6a6a">Finish (blank = default gold-plated)<br><input type="text" class="d-finish" value="' + esc(p.finish || '') + '" placeholder="High gold-plated, antique look" style="width:100%;' + inpS + '"></label>' +
           '<div style="grid-column:1/-1;font-size:11px;color:#8a6d2f">🔎 Google auto-preview (from the name — no SEO fields to fill) <button class="ai-btn small ghost d-seo-btn" type="button">refresh</button><div class="d-seo" style="margin-top:4px;color:#3a3a3a;line-height:1.5"></div></div>' +
           '<div style="grid-column:1/-1;display:flex;gap:10px;align-items:center"><button class="ai-btn small d-save" type="button">💾 Save details</button><span class="d-status" style="font-size:11px;color:#6a6a6a"></span></div>' +
         '</div>' +
@@ -868,6 +876,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       category: detail.querySelector('.d-category').value || '',
       badge: detail.querySelector('.d-badge').value || '',
       description: detail.querySelector('.d-desc').value,
+      material: detail.querySelector('.d-material').value,
+      finish: detail.querySelector('.d-finish').value,
       inStock: detail.querySelector('.d-instock').checked ? 1 : 0,
     };
     var st = detail.querySelector('.d-status'); st.style.color = '#6a6a6a'; st.textContent = 'Saving…';
@@ -1109,6 +1119,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
             baseName: bn, category: category, description: description,
             price: price, mrp: mrp, weightGrams: weight,
             badge: (document.getElementById('pb-badge') || {}).value || '',
+            material: (document.getElementById('pb-material') || {}).value || '',
+            finish: (document.getElementById('pb-finish') || {}).value || '',
             colours: rows.map(function (r) {
               return { label: r.label, sku: r.sku, nameSuffix: r.suffix, image: r.image, stock_count: r.stock };
             })
@@ -1118,7 +1130,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         btn.disabled = false; btn.textContent = 'ADD PRODUCT';
         if (d && d.success) {
           set('✓ Added ' + d.skus.join(', ') + ' — live on the website.', '#23784a');
-          ['pb-name', 'pb-basesku', 'pb-price', 'pb-mrp', 'pb-weight', 'pb-desc', 'pb-badge'].forEach(function (id) { document.getElementById(id).value = ''; });
+          ['pb-name', 'pb-basesku', 'pb-price', 'pb-mrp', 'pb-weight', 'pb-desc', 'pb-badge', 'pb-material', 'pb-finish'].forEach(function (id) { document.getElementById(id).value = ''; });
           wrap.innerHTML = ''; addBlock();
           if (typeof loadProducts === 'function') loadProducts();
         } else {
