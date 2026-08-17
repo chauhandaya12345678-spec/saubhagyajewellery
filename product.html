@@ -56,16 +56,17 @@
      the first screen. Nothing is cropped here; the frame was extended around
      the piece when the photos were prepared. Detail goes to the tap-to-enlarge
      viewer rather than to a taller page. */
-  /* object-fit:cover fills the fixed 4:5 frame edge-to-edge like every other
-     product photo, WITHOUT stretching (the old `fill` distorted, `contain` left
-     ivory bars that did not match the 4:5 shots). A photo that is not exactly
-     4:5 is centre-cropped to fit; the tap-to-enlarge viewer still shows the whole
-     uncropped image, so nothing is truly lost. Upload 4:5 (portrait) or square
-     for zero crop. */
-  .pdp-img { display: block; width: 100%; max-width: 560px; height: auto; max-height: 68vh;
-    aspect-ratio: 4/5; object-fit: cover; border-radius: 12px; background: #f0ede5; cursor: zoom-in; }
+  /* Every product photo is now built to 4:5 with the piece filling the same
+     share of it, so this box is identical on every product page - which it was
+     not while each shot kept its own proportions: one product showed a wide
+     necklace, the next a narrow tall one, and on some the name was pushed off
+     the first screen. Nothing is cropped here; the frame was extended around
+     the piece when the photos were prepared. Detail goes to the tap-to-enlarge
+     viewer rather than to a taller page. */
+  .pdp-img { display: block; width: auto; height: auto; max-width: 100%; max-height: 68vh;
+    aspect-ratio: 4/5; border-radius: 12px; background: #f0ede5; cursor: zoom-in; }
   .pdp-img-wrap { position: relative; display: flex; align-items: center; justify-content: center;
-    width: 100%; max-width: 560px; min-height: 260px; margin: 0 auto; border-radius: 12px; }
+    width: fit-content; max-width: 100%; min-height: 260px; margin: 0 auto; border-radius: 12px; }
   /* Affordance: without it people do not know the photo opens. */
   .pdp-zoom-hint { position: absolute; left: 12px; bottom: 12px; z-index: 3; display: inline-flex;
     align-items: center; gap: 6px; padding: 6px 11px; border-radius: 20px; pointer-events: none;

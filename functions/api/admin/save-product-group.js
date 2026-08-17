@@ -126,8 +126,11 @@ export async function onRequest(context) {
         description, material, finish, created_at, updated_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
   );
+  // altImage starts NULL (was = image). A duplicate altImage showed up as a
+  // phantom "second photo" in the PDP gallery the moment the main image was
+  // replaced. The owner adds a real 2nd angle from the editor if they want one.
   const batch = norm.map(c => stmt.bind(
-    c.sku, c.name, region, regionLabel, category, price, mrp, city, badge, c.image, c.image,
+    c.sku, c.name, region, regionLabel, category, price, mrp, city, badge, c.image, null,
     1, c.stock_count, weightGrams, packing_weight_grams, low_stock_threshold, variantsJson,
     description, material, finish
   ));

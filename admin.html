@@ -868,12 +868,13 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           '<label style="font-size:11px;color:#6a6a6a">Category<br><select class="d-category" style="width:100%;' + inpS + '">' + catOpts(p.category) + '</select></label>' +
           '<label style="font-size:11px;color:#6a6a6a">Badge<br><select class="d-badge" style="width:100%;' + inpS + '">' + badgeOpts(p.badge) + '</select></label>' +
           '<label style="font-size:11px;color:#6a6a6a">Listed on site<br><span style="display:inline-flex;align-items:center;gap:6px;height:30px"><input type="checkbox" class="d-instock"' + (listed ? ' checked' : '') + '> <span class="d-instock-lbl">' + (listed ? 'visible' : 'hidden') + '</span></span></label>' +
-          '<label style="font-size:11px;color:#6a6a6a">Replace photo<br><span style="display:inline-flex;gap:6px;align-items:center"><input type="file" class="d-file" accept="image/*" style="font-size:11px;max-width:120px"><button class="ai-btn small ghost d-upload" type="button">upload</button></span></label>' +
+          '<label style="font-size:11px;color:#6a6a6a">Replace main photo<br><span style="display:inline-flex;gap:6px;align-items:center"><input type="file" class="d-file" accept="image/*" style="font-size:11px;max-width:120px"><button class="ai-btn small ghost d-upload" type="button">replace</button></span></label>' +
+          '<label style="font-size:11px;color:#6a6a6a">Second photo ' + (p.altImage ? '(added ✓)' : '(optional)') + '<br><span style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap"><input type="file" class="d2-file" accept="image/*" style="font-size:11px;max-width:110px"><button class="ai-btn small ghost d2-upload" type="button">' + (p.altImage ? 'change' : 'add') + '</button>' + (p.altImage ? '<button class="ai-btn small ghost d2-remove" type="button" style="color:#b02f33;border-color:#e0b4b4">remove</button>' : '') + '</span></label>' +
           '<label style="grid-column:1/-1;font-size:11px;color:#6a6a6a">Description — unique, 2 to 3 sentences (material, motif, occasion). Used for Google. Blank = auto template.<br><textarea class="d-desc" rows="3" style="width:100%;' + inpS + ';font-family:inherit;resize:vertical">' + esc(p.description || '') + '</textarea></label>' +
           '<label style="grid-column:1/3;font-size:11px;color:#6a6a6a">Material (blank = default Zamak alloy)<br><input type="text" class="d-material" value="' + esc(p.material || '') + '" placeholder="Skin-friendly Zamak alloy…" style="width:100%;' + inpS + '"></label>' +
           '<label style="grid-column:3/-1;font-size:11px;color:#6a6a6a">Finish (blank = default gold-plated)<br><input type="text" class="d-finish" value="' + esc(p.finish || '') + '" placeholder="High gold-plated, antique look" style="width:100%;' + inpS + '"></label>' +
           '<div style="grid-column:1/-1;font-size:11px;color:#8a6d2f">🔎 Google auto-preview (from the name — no SEO fields to fill) <button class="ai-btn small ghost d-seo-btn" type="button">refresh</button><div class="d-seo" style="margin-top:4px;color:#3a3a3a;line-height:1.5"></div></div>' +
-          '<div style="grid-column:1/-1;display:flex;gap:10px;align-items:center"><button class="ai-btn small d-save" type="button">💾 Save details</button><button class="ai-btn small ghost d-close" type="button" title="Close this editor (nothing is lost)">✕ Close editor</button><span class="d-status" style="font-size:11px;color:#6a6a6a"></span></div>' +
+          '<div style="grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="ai-btn small d-save" type="button">💾 Save details</button><button class="ai-btn small ghost d-close" type="button" title="Close this editor (nothing is lost)">✕ Close editor</button><span class="d-status" style="font-size:11px;color:#6a6a6a"></span><button class="ai-btn small ghost d-delete" type="button" data-colour="' + (isMulti ? '1' : '0') + '" style="color:#b02f33;border-color:#e0b4b4;margin-left:auto">🗑 ' + (isMulti ? 'Delete this colour' : 'Delete product') + '</button></div>' +
           acBlock +
         '</div>' +
       '</td></tr>';
@@ -899,6 +900,9 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       detail.querySelector('.d-seo-btn').addEventListener('click', function () { loadSeoPreview(detail); });
       detail.querySelector('.d-instock').addEventListener('change', function () { detail.querySelector('.d-instock-lbl').textContent = this.checked ? 'visible' : 'hidden'; });
       detail.querySelector('.d-upload').addEventListener('click', function () { uploadDetailPhoto(detail); });
+      var d2u = detail.querySelector('.d2-upload'); if (d2u) d2u.addEventListener('click', function () { uploadSecondPhoto(detail); });
+      var d2r = detail.querySelector('.d2-remove'); if (d2r) d2r.addEventListener('click', function () { removeSecondPhoto(detail); });
+      var dDel = detail.querySelector('.d-delete'); if (dDel) dDel.addEventListener('click', function () { deleteProductRow(detail, dDel); });
       detail.querySelector('.d-save').addEventListener('click', function () { saveDetail(detail); });
       detail.querySelector('.d-close').addEventListener('click', function () {
         detail.style.display = 'none';
@@ -979,7 +983,10 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
   }
 
-  // Replace a product's main photo: upload to R2, then point the row's image at it.
+  // Replace a product's MAIN photo. Sets image + clears any stale altImage (a
+  // duplicate altImage otherwise showed as a phantom "second photo"). For a
+  // colour of a multi-colour design it also rewrites that colour's image in the
+  // shared switcher on every sibling row, so the swatch matches the new photo.
   function uploadDetailPhoto(detail) {
     var sku = detail.getAttribute('data-sku');
     var file = detail.querySelector('.d-file').files[0];
@@ -992,11 +999,61 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
       .then(function (d) {
         if (!d || !d.success || !d.url) throw new Error((d && d.error) || 'upload failed');
-        return apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: sku, image: d.url }) });
+        var url = d.url;
+        var prod = (lastProducts || []).find(function (p) { return p.sku === sku; });
+        var vs = prod && Array.isArray(prod.variants) ? prod.variants : null;
+        var post = function (body) { return apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); };
+        if (vs && vs.length) {
+          var newVs = vs.map(function (v) { return v.sku === sku ? { sku: v.sku, label: v.label, image: url } : v; });
+          var calls = [post({ sku: sku, image: url, altImage: '', variants: newVs })];
+          vs.forEach(function (v) { if (v.sku !== sku) calls.push(post({ sku: v.sku, variants: newVs })); });
+          return Promise.all(calls);
+        }
+        return post({ sku: sku, image: url, altImage: '' });
       })
-      .then(function (u) {
-        if (u && u.success) { st.style.color = '#23784a'; st.textContent = '✓ Photo updated.'; loadProducts(); }
-        else { st.style.color = '#b02f33'; st.textContent = (u && u.error) || 'could not set photo'; }
+      .then(function () { st.style.color = '#23784a'; st.textContent = '✓ Photo updated.'; loadProducts(); })
+      .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+
+  // Second (extra) photo → altImage. Upload sets it; Remove clears it.
+  function uploadSecondPhoto(detail) {
+    var sku = detail.getAttribute('data-sku');
+    var file = detail.querySelector('.d2-file').files[0];
+    var st = detail.querySelector('.d-status');
+    if (!file) { st.style.color = '#b02f33'; st.textContent = 'Choose a second photo first.'; return; }
+    st.style.color = '#6a6a6a'; st.textContent = 'Uploading…';
+    var fd = new FormData(); fd.append('file', file); fd.append('sku', sku + '-2');
+    apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
+      .then(function (d) {
+        if (!d || !d.success || !d.url) throw new Error((d && d.error) || 'upload failed');
+        return apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: sku, altImage: d.url }) });
+      })
+      .then(function () { st.style.color = '#23784a'; st.textContent = '✓ Second photo added.'; loadProducts(); })
+      .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+  function removeSecondPhoto(detail) {
+    var sku = detail.getAttribute('data-sku');
+    var st = detail.querySelector('.d-status');
+    st.style.color = '#6a6a6a'; st.textContent = 'Removing…';
+    apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: sku, altImage: '' }) })
+      .then(function () { st.style.color = '#23784a'; st.textContent = '✓ Second photo removed.'; loadProducts(); })
+      .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+
+  // Delete a whole product, or one colour of a design (confirm + logged server-side).
+  function deleteProductRow(detail, btn) {
+    var sku = detail.getAttribute('data-sku');
+    var isColour = btn.getAttribute('data-colour') === '1';
+    var msg = isColour
+      ? 'Delete the colour "' + sku + '" from this design? The other colours stay. This cannot be undone.'
+      : 'Delete the whole product "' + sku + '"? Its page, listing and sitemap entry all go. Past orders are untouched. This cannot be undone.';
+    if (!confirm(msg)) return;
+    if (!confirm('Are you sure? Type of action: DELETE ' + sku + '. Press OK to remove for good.')) return;
+    var st = detail.querySelector('.d-status'); st.style.color = '#6a6a6a'; st.textContent = 'Deleting…';
+    apiFetch('/api/admin/delete-product', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: sku, confirm: true }) })
+      .then(function (d) {
+        if (d && d.success) { st.style.color = '#23784a'; st.textContent = '✓ Deleted ' + sku + '.'; loadProducts(); }
+        else { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Delete failed.'; }
       })
       .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
   }

@@ -295,27 +295,23 @@
   .rail::-webkit-scrollbar { display:none; }
   .rail > * { scroll-snap-align:start; flex:0 0 auto; }
 
-  /* ══ Category rail — auto-sliding, swipeable (home). Reuses .cat-bg/.cat-shade/
-     .cat-text from the old tiles; coming-soon state is toggled live from the
-     catalog by JS so a category flips to SHOP NOW the moment its first product
-     is in stock (the old 2×2 grid was hard-coded and never synced). ══ */
-  /* Snap OFF on this rail — scroll-snap:mandatory (inherited from .rail) fights
-     the pixel-by-pixel marquee drift and pins the tiles in place. This rail is a
-     continuous right-to-left marquee (JS), still free to swipe/drag. */
-  .cat-rail { padding-bottom:6px; scroll-snap-type:none; }
-  .cat-rail > * { scroll-snap-align:none; }
-  /* Wide, stretched banner rectangles. */
-  .cat-rail-card { position:relative; flex:0 0 auto; width:min(460px,82vw); height:260px; border-radius:16px;
+  /* ══ Category rail — PORTRAIT cards, manual horizontal scroll/swipe (home).
+     No auto-motion, no duplicate clones: each category shows once, side by side.
+     Reuses .cat-bg/.cat-shade/.cat-text; coming-soon is toggled live from the
+     catalog so a category flips to SHOP NOW the moment its first product ships. ══ */
+  .cat-rail { padding-bottom:6px; scroll-snap-type:x proximity; }
+  .cat-rail > * { scroll-snap-align:start; }
+  .cat-rail-card { position:relative; flex:0 0 auto; width:min(250px,64vw); aspect-ratio:3/4; border-radius:16px;
     overflow:hidden; text-decoration:none; display:block; background:#0B291C;
     box-shadow:0 2px 6px rgba(11,41,28,.10), 0 18px 40px -24px rgba(11,41,28,.55);
     transition:transform .45s cubic-bezier(.25,1,.5,1), box-shadow .45s; }
   @media(hover:hover){ .cat-rail-card:hover { transform:translateY(-5px); } }
-  .cat-rail-card .cat-text .t { font-size:30px; }
+  .cat-rail-card .cat-text .t { font-size:26px; }
   .cat-rail-card.coming-soon { pointer-events:none; }
   .cat-rail-card.coming-soon .cat-shade { background:linear-gradient(to top, rgba(11,41,28,.78) 0%, rgba(11,41,28,0) 46%); }
   .cat-rail-card.coming-soon .cat-text .k { color:#D4A853; }
-  @media (max-width:900px){ .cat-rail-card { width:300px; height:190px; border-radius:12px; }
-    .cat-rail-card .cat-text .t { font-size:22px; } }
+  @media (max-width:900px){ .cat-rail-card { width:min(185px,46vw); border-radius:12px; }
+    .cat-rail-card .cat-text .t { font-size:19px; } }
 
   /* ══ 360° showcase ══ */
   .v360 { width:232px; }
@@ -764,15 +760,11 @@
     var poll = setInterval(function () { if (renderTrending() || ++tries > 60) clearInterval(poll); }, 120);
   }
 
-  /* ══ Category rail: dynamic (from /api/categories) + continuous right-to-left
-     marquee + live coming-soon sync ══
-     - Cards are built from the categories table so a NEW category the owner adds
-       shows here with no code edit; the 4 defaults stay in the raw HTML as the
-       no-JS / SEO fallback and as what paints before the fetch lands.
-     - The strip is rendered TWICE and drifts left forever, wrapping seamlessly at
-       the first clone — so it visibly moves regardless of how many fit on screen.
-       Snap is off (see CSS) or the drift would be snapped back to a standstill.
-     - Still fully swipeable/draggable; the marquee pauses on hover/touch. */
+  /* ══ Category rail: dynamic (from /api/categories) + live coming-soon sync ══
+     Each category shows ONCE (no duplicate clones), as a portrait card. The strip
+     does NOT auto-move — the shopper scrolls/swipes it left-right (arrows on
+     desktop). The 4 defaults stay in the raw HTML as the no-JS / SEO fallback and
+     as what paints before the fetch lands. */
   (function () {
     var rail = document.getElementById('cat-rail');
     if (!rail) return;
@@ -783,31 +775,19 @@
       { slug: 'bridal-set', label: 'Bridal Set', banner: 'images/models/cat-bridal.webp',   subtitle: 'Temple necklace & matching jhumkas',  bgpos: 'center 55%' }
     ];
     function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-    function cdn(u) { if (!u) return ''; if (u.indexOf('/cdn-cgi/image/') !== -1) return u; return '/cdn-cgi/image/width=700,quality=78,format=auto/' + String(u).replace(/^\/+/, ''); }
-    function cardHtml(cat, clone) {
+    function cdn(u) { if (!u) return ''; if (u.indexOf('/cdn-cgi/image/') !== -1) return u; return '/cdn-cgi/image/width=600,quality=78,format=auto/' + String(u).replace(/^\/+/, ''); }
+    function cardHtml(cat) {
       var href = 'categories.html?cat=' + encodeURIComponent(cat.slug);
       var bg = "background-image:url('" + cdn(cat.banner) + "');background-color:#0B291C" + (cat.bgpos ? ';background-position:' + cat.bgpos : '');
-      // Clones are clickable too (so a "duplicate" a shopper taps still opens the
-      // category) but hidden from screen readers + keyboard to avoid double links.
-      return '<a class="cat-rail-card" data-cat="' + esc(cat.label) + '" data-href="' + esc(href) + '" href="' + esc(href) + '"' +
-        (clone ? ' aria-hidden="true" tabindex="-1"' : '') + ' aria-label="Shop ' + esc(cat.label) + '">' +
+      return '<a class="cat-rail-card" data-cat="' + esc(cat.label) + '" data-href="' + esc(href) + '" href="' + esc(href) + '" aria-label="Shop ' + esc(cat.label) + '">' +
         '<div class="cat-bg" style="' + bg + '"></div><div class="cat-shade"></div>' +
         '<div class="cat-text"><div class="k">SHOP NOW</div><h3 class="t">' + esc(cat.label) + '</h3>' +
           (cat.subtitle ? '<div class="s">' + esc(cat.subtitle) + '</div>' : '') + '</div></a>';
     }
-
-    var cats = FALLBACK, wrapAt = 0;
-    function measure() {
-      var all = rail.querySelectorAll('.cat-rail-card');
-      var firstClone = all[cats.length];
-      wrapAt = firstClone ? firstClone.offsetLeft : (rail.scrollWidth / 2);
-    }
     function build(list) {
-      cats = (list && list.length) ? list : FALLBACK;
-      rail.innerHTML = cats.map(function (c) { return cardHtml(c, false); }).join('') +
-                       cats.map(function (c) { return cardHtml(c, true); }).join('');
+      var cats = (list && list.length) ? list : FALLBACK;
+      rail.innerHTML = cats.map(cardHtml).join('');   // once, no clones
       syncCats();
-      measure();
     }
     function syncCats() {
       var cat = window.SAUBHAGYA_CATALOG || [];
@@ -828,30 +808,9 @@
       .catch(function () { /* keep fallback */ });
     window.addEventListener('catalog-ready', syncCats);
     var t = 0, sp = setInterval(function () { if ((window.SAUBHAGYA_CATALOG || []).length) syncCats(); if (++t > 60) clearInterval(sp); }, 200);
-    window.addEventListener('resize', measure);
 
-    // Pause ONLY while the shopper is actually pressing/dragging/scrolling the
-    // rail — NOT on plain hover (hover-pause is what made it look frozen on
-    // desktop the moment the cursor was over it). pointerdown pausing also keeps
-    // the card still at the instant of a click, so links open reliably.
-    var paused = false, resumeT = null;
-    function pause() { paused = true; clearTimeout(resumeT); }
-    function resumeSoon() { clearTimeout(resumeT); resumeT = setTimeout(function () { paused = false; }, 700); }
-    ['pointerdown', 'touchstart'].forEach(function (ev) { rail.addEventListener(ev, pause, { passive: true }); });
-    ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(function (ev) { rail.addEventListener(ev, resumeSoon, { passive: true }); });
-    rail.addEventListener('wheel', function () { pause(); resumeSoon(); }, { passive: true });
-    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var SPEED = 0.6;   // px/frame ≈ 36px/s, calm and continuous
-    function tick() {
-      if (!reduce && !paused && !document.hidden && wrapAt > 0) {
-        rail.scrollLeft += SPEED;
-        if (rail.scrollLeft >= wrapAt) rail.scrollLeft -= wrapAt;   // seamless wrap onto the clone set
-      }
-      requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-
-    function step() { var c = rail.querySelector('.cat-rail-card'); return (c ? c.getBoundingClientRect().width : 460) + 16; }
+    // Manual scroll only. Desktop arrows nudge one card at a time.
+    function step() { var c = rail.querySelector('.cat-rail-card'); return (c ? c.getBoundingClientRect().width : 250) + 16; }
     var prev = document.getElementById('cat-rail-prev'), next = document.getElementById('cat-rail-next');
     if (prev) prev.addEventListener('click', function () { rail.scrollBy({ left: -step(), behavior: 'smooth' }); });
     if (next) next.addEventListener('click', function () { rail.scrollBy({ left: step(), behavior: 'smooth' }); });
