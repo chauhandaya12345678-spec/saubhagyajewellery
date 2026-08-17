@@ -32,7 +32,7 @@ function optImg(u) {
   const s = String(u || '').trim();
   if (!s) return '';
   if (s.indexOf('/cdn-cgi/image/') !== -1) return s;
-  return '/cdn-cgi/image/width=400,quality=78,format=auto/' +
+  return '/cdn-cgi/image/width=560,quality=78,format=auto/' +
     (/^https?:\/\//i.test(s) ? s : s.replace(/^\/+/, ''));
 }
 
