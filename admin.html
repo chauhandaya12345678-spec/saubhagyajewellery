@@ -201,12 +201,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         <button class="ai-btn small ghost" id="i-export-btn" type="button">EXPORT CSV</button>
         <button class="ai-btn small" id="i-reload-btn" type="button">REFRESH</button>
         <label style="font-size:12px;color:#4a4a4a;display:flex;align-items:center;gap:6px;margin-left:8px"><input type="checkbox" id="i-lowstock-only"> Low stock only</label>
+        <input type="text" id="i-search" placeholder="Search SKU / name / category" style="width:230px;padding:6px 10px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
         <span class="ai-count" id="i-count"></span>
-        <span style="display:inline-flex;gap:6px;align-items:center;border-left:1px solid #ddd6c6;padding-left:10px;margin-left:4px">
-          <input type="text" id="i-up-sku" placeholder="SKU (e.g. SJ-SN06-GL)" style="width:150px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
-          <input type="file" id="i-up-file" accept="image/webp,image/jpeg,image/png" style="font-size:11px;max-width:150px">
-          <button class="ai-btn small" id="i-up-btn" type="button" title="Upload a photo to R2 and set it on this SKU - no deploy needed">UPLOAD IMG</button>
-        </span>
       </div>
       <div class="ai-table-wrap">
         <table>
@@ -226,7 +222,25 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <div id="panel-add" style="display:none">
       <div style="max-width:900px;background:#faf7f0;border:1px solid #ece4d4;border-radius:10px;padding:16px 18px">
         <strong style="font-size:13px;color:#a8823f;letter-spacing:.5px">+ ADD A PRODUCT</strong>
-        <div style="font-size:12px;color:#8a6d2f;margin:4px 0 14px;line-height:1.55">One product, or a design that comes in several colours. Fill the details once, then add a <b>colour block per colour</b> — the website links them, writes the Google listing and shows a colour switcher on its own. Nothing technical: no codes, no JSON.</div>
+        <div style="font-size:12px;color:#8a6d2f;margin:4px 0 14px;line-height:1.55">One product, or a design that comes in several colours. Fill the details once, then add a <b>colour block per colour</b> — the website links them, writes the Google listing and shows a colour switcher on its own.</div>
+        <details id="cm-wrap" style="margin:0 0 14px;background:#fff;border:1px solid #ece4d4;border-radius:8px">
+          <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#0B291C;padding:9px 12px;list-style:none">🗂 Manage categories — add new, rename, change banner (tap)</summary>
+          <div style="padding:4px 14px 14px">
+            <div style="font-size:11px;color:#8a6d2f;margin-bottom:10px;line-height:1.5">Categories drive the homepage strip, the Categories page and each product's <b>Type</b>. Renaming one moves all its products to the new name. A category that still has products can't be deleted. Banner = the tile photo.</div>
+            <div id="cm-list" style="display:grid;gap:8px"></div>
+            <div style="margin-top:12px;border-top:1px dashed #e3dccb;padding-top:10px">
+              <div style="font-size:11px;font-weight:600;color:#0B291C;margin-bottom:6px">＋ Add a new category</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end">
+                <label style="font-size:11px;color:#6a6a6a">Name <span style="color:#b02f33">*</span><br><input type="text" id="cm-new-label" placeholder="e.g. Bracelet" style="width:150px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+                <label style="font-size:11px;color:#6a6a6a">Tagline<br><input type="text" id="cm-new-sub" placeholder="e.g. Kada &amp; cuff bracelets" style="width:190px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+                <label style="font-size:11px;color:#6a6a6a">Banner photo<br><input type="file" id="cm-new-file" accept="image/*" style="font-size:11px;max-width:160px"></label>
+                <label style="font-size:11px;color:#6a6a6a">Order<br><input type="number" id="cm-new-pos" placeholder="100" style="width:70px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+                <button class="ai-btn small" id="cm-add-btn" type="button">Add category</button>
+              </div>
+              <span id="cm-status" style="font-size:11px;color:#6a6a6a;display:inline-block;margin-top:6px"></span>
+            </div>
+          </div>
+        </details>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 10px">
           <label style="grid-column:1/3;font-size:11px;color:#6a6a6a">Design name <span style="color:#b02f33">*</span>
             <input type="text" id="pb-name" placeholder="e.g. Lakshmi Mango Temple Necklace Set with Jhumkas" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
@@ -266,10 +280,6 @@ tr.ai-attention:hover td { background: #fbe4e2; }
             <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:#faf7f0;border:1px solid #ece4d4;border-radius:8px;padding:10px 12px">
               <label style="font-size:11px;color:#6a6a6a">Wholesale cost ₹<br><input type="number" id="calc-cost" placeholder="e.g. 280" style="width:120px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:13px"></label>
               <label style="font-size:11px;color:#6a6a6a">Profit margin ₹<br><input type="number" id="calc-margin" placeholder="0" style="width:110px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:13px"></label>
-              <span style="display:flex;gap:4px;align-items:center;margin-bottom:2px">
-                <button class="ai-btn small ghost" id="calc-m-neck" type="button" title="Use the necklace default margin">necklace</button>
-                <button class="ai-btn small ghost" id="calc-m-ear" type="button" title="Use the earring/jhumka default margin">earring</button>
-              </span>
               <div style="font-size:14px;margin-bottom:2px">→ Sell <b id="calc-sell" style="color:#23784a;font-size:16px">—</b> &nbsp;·&nbsp; MRP <s id="calc-mrp" style="color:#a8823f">—</s></div>
               <button class="ai-btn small" id="calc-use" type="button" title="Fill the Price and MRP fields above with these values">Use ↑</button>
             </div>
@@ -282,8 +292,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
               <label style="font-size:11px;color:#6a6a6a">Round Sell to ₹<br><input type="number" id="cc-sellRound" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
               <label style="font-size:11px;color:#6a6a6a">Discount shown % (MRP)<br><input type="number" id="cc-discountPct" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
               <label style="font-size:11px;color:#6a6a6a">Round MRP to ₹<br><input type="number" id="cc-mrpRound" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
-              <label style="font-size:11px;color:#6a6a6a">Default margin — necklace ₹<br><input type="number" id="cc-marginNecklace" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
-              <label style="font-size:11px;color:#6a6a6a">Default margin — earring/jhumka ₹<br><input type="number" id="cc-marginEarring" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
+              <label style="font-size:11px;color:#6a6a6a">Default profit margin ₹<br><input type="number" id="cc-marginDefault" step="1" style="width:100%;padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"></label>
             </div>
             <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
               <button class="ai-btn small" id="cc-edit" type="button">✎ Edit constants</button>
@@ -301,6 +310,14 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <button class="ai-btn" id="pb-submit" type="button">ADD PRODUCT</button>
           <span id="pb-status" style="font-size:12px;color:#6a6a6a"></span>
+        </div>
+        <div id="pb-recent-wrap" style="margin-top:20px;border-top:1px solid #ece4d4;padding-top:14px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+            <strong style="font-size:12px;color:#0B291C;letter-spacing:.5px">🕘 Recently added</strong>
+            <input type="text" id="pb-recent-q" placeholder="Search added products…" style="width:220px;padding:6px 9px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+            <span id="pb-recent-count" style="font-size:11px;color:#9a9a9a"></span>
+          </div>
+          <div id="pb-recent" style="display:grid;gap:8px"></div>
         </div>
         <details style="margin-top:12px;background:#fff;border:1px solid #ece4d4;border-radius:8px;padding:0">
           <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#0B291C;padding:9px 12px;list-style:none">💡 How to name a product for Google (tap to open)</summary>
@@ -404,6 +421,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   var sessionToken = '';
   var authRole = null;
   var lastOrders = [], lastProducts = [], lastCustomers = [], lastUsers = [];
+  var adminCatRecords = null;   // live categories from /api/categories (for dropdowns + manager)
   var orderStatusOverride = null, orderDateOverride = null;
 
   function esc(s) {
@@ -567,8 +585,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     document.getElementById('panel-users').style.display = tab === 'users' ? 'block' : 'none';
     if (tab === 'dashboard') loadDashboard();
     if (tab === 'orders' && !lastOrders.length) loadOrders();
-    if (tab === 'inventory' && !lastProducts.length) loadProducts();
-    if (tab === 'add' && !lastProducts.length) loadProducts();   // fills the category dropdown
+    if (tab === 'inventory') { if (!lastProducts.length) loadProducts(); if (!adminCatRecords) loadCategoriesAdmin(); }
+    if (tab === 'add') { if (!lastProducts.length) loadProducts(); else renderRecentUploads(); loadCategoriesAdmin(); }   // categories + recent list
     if (tab === 'customers' && !lastCustomers.length) loadCustomers();
     if (tab === 'activity') loadActivity();
     if (tab === 'reviews') loadReviews();
@@ -738,6 +756,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   function allCategories() {
     var set = {};
     CANON_CATEGORIES.forEach(function (c) { set[c] = 1; });
+    (adminCatRecords || []).forEach(function (c) { if (c.label) set[c.label] = 1; });
     (lastProducts || []).forEach(function (p) { if (p.category) set[p.category] = 1; });
     return Object.keys(set).sort();
   }
@@ -763,6 +782,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           sel.value = cur;
         }
         renderInventoryRows();
+        renderRecentUploads();
       })
       .catch(function (e) { status.textContent = 'Failed to load: ' + e.message; });
   }
@@ -771,12 +791,25 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var status = document.getElementById('i-load-status');
     var tbody = document.getElementById('i-tbody');
     var lowOnly = document.getElementById('i-lowstock-only').checked;
+    var q = ((document.getElementById('i-search') || {}).value || '').trim().toLowerCase();
     var list = lastProducts.filter(function (p) {
-      if (!lowOnly) return true;
-      var threshold = p.low_stock_threshold != null ? p.low_stock_threshold : 3;
-      return p.stock_count != null && p.stock_count <= threshold;
+      if (lowOnly) {
+        var threshold = p.low_stock_threshold != null ? p.low_stock_threshold : 3;
+        if (!(p.stock_count != null && p.stock_count <= threshold)) return false;
+      }
+      if (q) {
+        var hay = ((p.sku || '') + ' ' + (p.name || '') + ' ' + (p.category || '')).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
     });
-    document.getElementById('i-count').textContent = list.length + ' product' + (list.length === 1 ? '' : 's') + (lowOnly ? ' (low stock)' : '');
+    // Newest first — created_at desc, falling back to numeric id desc.
+    list.sort(function (a, b) {
+      var ca = a.created_at || '', cb = b.created_at || '';
+      if (ca !== cb) return ca < cb ? 1 : -1;
+      return (Number(b.id) || 0) - (Number(a.id) || 0);
+    });
+    document.getElementById('i-count').textContent = list.length + ' product' + (list.length === 1 ? '' : 's') + (lowOnly ? ' (low stock)' : '') + (q ? ' · "' + q + '"' : '');
     status.textContent = '';
     var cats = allCategories();
     function catOpts(sel) { return cats.map(function (c) { return '<option value="' + esc(c) + '"' + (c === sel ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join(''); }
@@ -812,6 +845,24 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         '<td><div class="ai-cell-flex"><input class="ai-num" style="margin:0" type="number" min="0" step="1" value="' + (p.packing_weight_grams != null ? p.packing_weight_grams : '') + '" data-field="packing_weight_grams" placeholder="40" disabled>' +
           '<button class="ai-btn small ghost edit-toggle" type="button" title="Edit box weight">✎</button></div></td>' +
         '</tr>';
+      // Add-colour is offered on the LEAD/single row only (a colour sibling would
+      // point at the wrong design); leadSku is the design's canonical sku.
+      var isMulti = Array.isArray(p.variants) && p.variants.length > 1;
+      var acLead = isMulti ? p.variants[0].sku : p.sku;
+      var canAddColour = !isVariantDupRow(p);
+      var acBlock = canAddColour
+        ? '<div style="grid-column:1/-1;border-top:1px dashed #e3dccb;margin-top:6px;padding-top:8px">' +
+            '<div style="font-size:11px;font-weight:600;color:#0B291C;margin-bottom:5px">＋ Add another colour to this design</div>' +
+            '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end">' +
+              (isMulti ? '' : '<label style="font-size:10px;color:#6a6a6a">This colour\'s name<br><input class="ac-leadlabel" type="text" placeholder="e.g. Gold" style="width:100px;' + inpS + '"></label>') +
+              '<label style="font-size:10px;color:#6a6a6a">New colour<br><input class="ac-label" type="text" placeholder="e.g. Green" style="width:100px;' + inpS + '"></label>' +
+              '<label style="font-size:10px;color:#6a6a6a">New SKU<br><input class="ac-sku" type="text" placeholder="' + esc(p.sku) + '-GR" style="width:120px;' + inpS + '"></label>' +
+              '<label style="font-size:10px;color:#6a6a6a">Photo<br><input class="ac-file" type="file" accept="image/*" style="font-size:10px;max-width:120px"></label>' +
+              '<label style="font-size:10px;color:#6a6a6a">Stock<br><input class="ac-stock" type="number" value="0" style="width:60px;' + inpS + '"></label>' +
+              '<button class="ai-btn small ac-add" type="button" data-lead="' + esc(acLead) + '" data-single="' + (isMulti ? '0' : '1') + '">Add colour</button>' +
+              '<span class="ac-status" style="font-size:10px;color:#6a6a6a"></span>' +
+            '</div></div>'
+        : '';
       var detail = '<tr class="i-detail" data-sku="' + esc(p.sku) + '" style="display:none"><td colspan="8" style="background:#faf7f0;padding:10px 14px">' +
         '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px 12px;align-items:end">' +
           '<label style="font-size:11px;color:#6a6a6a">Category<br><select class="d-category" style="width:100%;' + inpS + '">' + catOpts(p.category) + '</select></label>' +
@@ -823,6 +874,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           '<label style="grid-column:3/-1;font-size:11px;color:#6a6a6a">Finish (blank = default gold-plated)<br><input type="text" class="d-finish" value="' + esc(p.finish || '') + '" placeholder="High gold-plated, antique look" style="width:100%;' + inpS + '"></label>' +
           '<div style="grid-column:1/-1;font-size:11px;color:#8a6d2f">🔎 Google auto-preview (from the name — no SEO fields to fill) <button class="ai-btn small ghost d-seo-btn" type="button">refresh</button><div class="d-seo" style="margin-top:4px;color:#3a3a3a;line-height:1.5"></div></div>' +
           '<div style="grid-column:1/-1;display:flex;gap:10px;align-items:center"><button class="ai-btn small d-save" type="button">💾 Save details</button><span class="d-status" style="font-size:11px;color:#6a6a6a"></span></div>' +
+          acBlock +
         '</div>' +
       '</td></tr>';
       return row + detail;
@@ -848,7 +900,40 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       detail.querySelector('.d-instock').addEventListener('change', function () { detail.querySelector('.d-instock-lbl').textContent = this.checked ? 'visible' : 'hidden'; });
       detail.querySelector('.d-upload').addEventListener('click', function () { uploadDetailPhoto(detail); });
       detail.querySelector('.d-save').addEventListener('click', function () { saveDetail(detail); });
+      var acBtn = detail.querySelector('.ac-add');
+      if (acBtn) acBtn.addEventListener('click', function () { addColourToDesign(detail, acBtn); });
     });
+  }
+
+  // Append a colour to an existing design (single → multi, or multi → +1).
+  function addColourToDesign(detail, btn) {
+    var lead = btn.getAttribute('data-lead');
+    var single = btn.getAttribute('data-single') === '1';
+    var st = detail.querySelector('.ac-status');
+    var label = (detail.querySelector('.ac-label').value || '').trim();
+    var sku = (detail.querySelector('.ac-sku').value || '').trim();
+    var stock = (detail.querySelector('.ac-stock').value || '0').trim();
+    var file = detail.querySelector('.ac-file').files[0];
+    var llEl = detail.querySelector('.ac-leadlabel');
+    var leadLabel = (single && llEl) ? (llEl.value || '').trim() : '';
+    if (!label || !sku) { st.style.color = '#b02f33'; st.textContent = 'Colour name and SKU required.'; return; }
+    if (!file) { st.style.color = '#b02f33'; st.textContent = 'Add a photo.'; return; }
+    if (single && !leadLabel) { st.style.color = '#b02f33'; st.textContent = "Enter this product's current colour name."; return; }
+    btn.disabled = true; st.style.color = '#6a6a6a'; st.textContent = 'Uploading…';
+    var fd = new FormData(); fd.append('file', file); fd.append('sku', sku);
+    apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
+      .then(function (d) {
+        if (!d || !d.success || !d.url) throw new Error((d && d.error) || 'photo upload failed');
+        var body = { leadSku: lead, colour: { label: label, sku: sku, image: d.url, stock_count: stock } };
+        if (single) body.leadLabel = leadLabel;
+        return apiFetch('/api/admin/add-colour', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      })
+      .then(function (r) {
+        btn.disabled = false;
+        if (r && r.success) { st.style.color = '#23784a'; st.textContent = '✓ Added ' + r.newSku + ' (' + r.colours + ' colours). Reloading…'; loadProducts(); }
+        else { st.style.color = '#b02f33'; st.textContent = (r && r.error) || 'Failed.'; }
+      })
+      .catch(function (e) { btn.disabled = false; st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
   }
 
   // Show the Google title + keyword line the site auto-generates from the name
@@ -911,6 +996,184 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
   }
   document.getElementById('i-lowstock-only').addEventListener('change', renderInventoryRows);
+  (function () { var s = document.getElementById('i-search'); if (s) { var t; s.addEventListener('input', function () { clearTimeout(t); t = setTimeout(renderInventoryRows, 150); }); } })();
+
+  // ── Recently added panel (ADD PRODUCT tab) + jump-to-edit ──
+  function isVariantDupRow(p) {
+    var vs = p.variants;
+    if (typeof vs === 'string' && vs) { try { vs = JSON.parse(vs); } catch (e) { vs = null; } }
+    return !!(Array.isArray(vs) && vs.length && vs[0] && vs[0].sku && vs[0].sku !== p.sku);
+  }
+  function renderRecentUploads() {
+    var wrap = document.getElementById('pb-recent');
+    if (!wrap) return;
+    var q = ((document.getElementById('pb-recent-q') || {}).value || '').trim().toLowerCase();
+    var leads = (lastProducts || []).filter(function (p) { return !isVariantDupRow(p); }).slice();
+    leads.sort(function (a, b) {
+      var ca = a.created_at || '', cb = b.created_at || '';
+      if (ca !== cb) return ca < cb ? 1 : -1;
+      return (Number(b.id) || 0) - (Number(a.id) || 0);
+    });
+    if (q) leads = leads.filter(function (p) {
+      var hay = ((p.sku || '') + ' ' + (p.name || '') + ' ' + (p.category || '')).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+    var show = leads.slice(0, 40);
+    var cnt = document.getElementById('pb-recent-count');
+    if (cnt) cnt.textContent = show.length + (leads.length > show.length ? ' of ' + leads.length : '') + ' shown';
+    if (!show.length) { wrap.innerHTML = '<div style="font-size:12px;color:#9a9a9a">No products' + (q ? ' match that search.' : ' yet.') + '</div>'; return; }
+    wrap.innerHTML = show.map(function (p) {
+      var vs = p.variants; if (typeof vs === 'string' && vs) { try { vs = JSON.parse(vs); } catch (e) { vs = null; } }
+      var nCol = Array.isArray(vs) && vs.length ? vs.length : 1;
+      var when = (p.created_at || '').replace('T', ' ').slice(0, 16);
+      var priceLine = '₹' + (p.price != null ? p.price : '?') + (p.mrp && p.mrp > p.price ? ' <s style="color:#a8823f">₹' + p.mrp + '</s>' : '');
+      var desc = (p.description || '').trim();
+      var img = p.image ? '<img src="/cdn-cgi/image/width=90,quality=70,format=auto/' + esc(String(p.image).replace(/^\/+/, '')) + '" alt="" width="46" height="58" style="width:46px;height:58px;object-fit:cover;border-radius:6px;flex:none;background:#f0ede5">' : '';
+      return '<div style="display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #ece4d4;border-radius:8px;padding:9px 11px">' +
+        img +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-weight:600;font-size:12.5px;color:#1a1a1a">' + esc(p.name || p.sku) + '</div>' +
+          '<div style="font-size:11px;color:#6a6a6a;margin-top:2px">' +
+            '<span style="color:#a8823f;font-weight:600">' + esc(p.category || '—') + '</span> · ' + priceLine +
+            ' · ' + nCol + ' colour' + (nCol === 1 ? '' : 's') +
+            (p.badge ? ' · ' + esc(p.badge) : '') +
+            (when ? ' · <span style="color:#9a9a9a">' + esc(when) + '</span>' : '') +
+          '</div>' +
+          (desc ? '<div style="font-size:11px;color:#6a6a6a;margin-top:3px;line-height:1.45;max-height:2.9em;overflow:hidden">' + esc(desc) + '</div>'
+                : '<div style="font-size:11px;color:#c0392b;margin-top:3px">No description — add one via Edit.</div>') +
+          '<div style="font-family:monospace;font-size:10.5px;color:#9a9a9a;margin-top:3px">' + esc((Array.isArray(vs) && vs.length ? vs.map(function (v) { return v.sku; }).join(', ') : p.sku)) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:5px;flex:none">' +
+          '<button class="ai-btn small pb-recent-edit" data-sku="' + esc(p.sku) + '" type="button" title="Open this product in the inventory editor">Edit</button>' +
+          '<a class="ai-btn small ghost" href="/product/' + encodeURIComponent(p.sku) + '" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">View</a>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    wrap.querySelectorAll('.pb-recent-edit').forEach(function (btn) {
+      btn.addEventListener('click', function () { editInInventory(btn.getAttribute('data-sku')); });
+    });
+  }
+  (function () { var s = document.getElementById('pb-recent-q'); if (s) { var t; s.addEventListener('input', function () { clearTimeout(t); t = setTimeout(renderRecentUploads, 150); }); } })();
+
+  // Jump from "Recently added" straight into a SKU's inventory editor:
+  // switch to Inventory, search the SKU, expand its ⋯ detail row.
+  function editInInventory(sku) {
+    var tabBtn = document.querySelector('.ai-tab[data-tab="inventory"]');
+    if (tabBtn) tabBtn.click();
+    var s = document.getElementById('i-search'); if (s) s.value = sku;
+    loadProducts();
+    var tries = 0;
+    var poll = setInterval(function () {
+      var sel = (window.CSS && CSS.escape) ? CSS.escape(sku) : sku;
+      var row = document.querySelector('#i-tbody tr[data-sku="' + sel + '"]');
+      if (row) {
+        clearInterval(poll);
+        var tog = row.querySelector('.i-detail-toggle');
+        var detail = row.nextElementSibling;
+        if (tog && detail && detail.classList.contains('i-detail') && detail.style.display === 'none') tog.click();
+        row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      } else if (++tries > 25) { clearInterval(poll); }
+    }, 120);
+  }
+
+  // ── Category manager (ADD PRODUCT tab): data-driven categories ──
+  function loadCategoriesAdmin() {
+    return apiFetch('/api/categories').then(function (d) {
+      adminCatRecords = (d && d.success && d.categories) ? d.categories : null;
+      renderCatManager();
+      var sel = document.getElementById('np-category');
+      if (sel) {
+        var cur = sel.value, cats = allCategories();
+        sel.innerHTML = '<option value="">Category…</option>' +
+          cats.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('') +
+          '<option value="__new__">+ New category…</option>';
+        sel.value = cur;
+      }
+    }).catch(function () {});
+  }
+  function cmUploadBanner(file) {
+    if (!file) return Promise.resolve('');
+    var fd = new FormData(); fd.append('file', file);
+    return apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
+      .then(function (d) { if (d && d.success && d.url) return d.url; throw new Error((d && d.error) || 'banner upload failed'); });
+  }
+  function renderCatManager() {
+    var box = document.getElementById('cm-list');
+    if (!box) return;
+    var list = adminCatRecords || [];
+    if (!list.length) { box.innerHTML = '<div style="font-size:11px;color:#9a9a9a">No categories loaded.</div>'; return; }
+    var inp = 'padding:5px 7px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px';
+    box.innerHTML = list.map(function (c) {
+      var thumb = c.banner ? '/cdn-cgi/image/width=90,quality=70,format=auto/' + esc(String(c.banner).replace(/^\/+/, '')) : '';
+      return '<div class="cm-row" data-slug="' + esc(c.slug) + '" style="display:flex;gap:8px;align-items:center;background:#faf7f0;border:1px solid #ece4d4;border-radius:8px;padding:8px 10px;flex-wrap:wrap">' +
+        (thumb ? '<img src="' + thumb + '" alt="" width="40" height="40" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex:none;background:#eee">' : '<span style="width:40px;height:40px;border-radius:6px;background:#0B291C;flex:none;display:inline-block"></span>') +
+        '<label style="font-size:10px;color:#6a6a6a">Name<br><input class="cm-label" type="text" value="' + esc(c.label) + '" style="width:130px;' + inp + '"></label>' +
+        '<label style="font-size:10px;color:#6a6a6a">Tagline<br><input class="cm-sub" type="text" value="' + esc(c.subtitle || '') + '" style="width:170px;' + inp + '"></label>' +
+        '<label style="font-size:10px;color:#6a6a6a">Order<br><input class="cm-pos" type="number" value="' + (c.position != null ? c.position : 100) + '" style="width:60px;' + inp + '"></label>' +
+        '<label style="font-size:10px;color:#6a6a6a">New banner<br><input class="cm-file" type="file" accept="image/*" style="font-size:10px;max-width:130px"></label>' +
+        '<span style="font-family:monospace;font-size:10px;color:#9a9a9a">/' + esc(c.slug) + '</span>' +
+        '<button class="ai-btn small cm-save" type="button">Save</button>' +
+        '<button class="ai-btn small ghost cm-del" type="button" style="color:#b02f33;border-color:#e0b4b4">Delete</button>' +
+        '<span class="cm-rstatus" style="font-size:10px;color:#6a6a6a"></span>' +
+      '</div>';
+    }).join('');
+    box.querySelectorAll('.cm-row').forEach(function (row) {
+      row.querySelector('.cm-save').addEventListener('click', function () { cmSaveRow(row); });
+      row.querySelector('.cm-del').addEventListener('click', function () { cmDeleteRow(row); });
+    });
+  }
+  function cmSaveRow(row) {
+    var slug = row.getAttribute('data-slug');
+    var st = row.querySelector('.cm-rstatus'); st.style.color = '#6a6a6a'; st.textContent = 'Saving…';
+    var label = row.querySelector('.cm-label').value.trim();
+    var subtitle = row.querySelector('.cm-sub').value.trim();
+    var position = row.querySelector('.cm-pos').value;
+    var file = row.querySelector('.cm-file').files[0];
+    if (!label) { st.style.color = '#b02f33'; st.textContent = 'Name required.'; return; }
+    cmUploadBanner(file).then(function (url) {
+      var body = { oldSlug: slug, slug: slug, label: label, subtitle: subtitle, position: position };
+      if (url) body.banner = url;
+      return apiFetch('/api/admin/save-category', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    }).then(function (d) {
+      if (d && d.success) {
+        st.style.color = '#23784a'; st.textContent = '✓ Saved' + (d.renamedProducts ? ' (' + d.renamedProducts + ' products moved)' : '') + '.';
+        adminCatRecords = d.categories || adminCatRecords; renderCatManager(); loadProducts();
+      } else { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Save failed.'; }
+    }).catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+  function cmDeleteRow(row) {
+    var slug = row.getAttribute('data-slug');
+    if (!confirm('Delete this category? Only works if it has no products.')) return;
+    var st = row.querySelector('.cm-rstatus'); st.style.color = '#6a6a6a'; st.textContent = 'Deleting…';
+    apiFetch('/api/admin/delete-category', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug: slug }) })
+      .then(function (d) {
+        if (d && d.success) { adminCatRecords = d.categories || []; renderCatManager(); }
+        else { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Delete failed.'; }
+      }).catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+  (function () {
+    var addBtn = document.getElementById('cm-add-btn');
+    if (!addBtn) return;
+    addBtn.addEventListener('click', function () {
+      var st = document.getElementById('cm-status');
+      var label = (document.getElementById('cm-new-label').value || '').trim();
+      var sub = (document.getElementById('cm-new-sub').value || '').trim();
+      var pos = document.getElementById('cm-new-pos').value;
+      var file = document.getElementById('cm-new-file').files[0];
+      if (!label) { st.style.color = '#b02f33'; st.textContent = 'Name is required.'; return; }
+      st.style.color = '#6a6a6a'; st.textContent = 'Adding…'; addBtn.disabled = true;
+      cmUploadBanner(file).then(function (url) {
+        return apiFetch('/api/admin/save-category', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label: label, subtitle: sub, position: pos, banner: url || '' }) });
+      }).then(function (d) {
+        addBtn.disabled = false;
+        if (d && d.success) {
+          st.style.color = '#23784a'; st.textContent = '✓ Added "' + d.label + '". It shows on the site within a minute.';
+          ['cm-new-label', 'cm-new-sub', 'cm-new-pos', 'cm-new-file'].forEach(function (id) { document.getElementById(id).value = ''; });
+          adminCatRecords = d.categories || adminCatRecords; loadCategoriesAdmin();
+        } else { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Add failed.'; }
+      }).catch(function (e) { addBtn.disabled = false; st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+    });
+  })();
 
   // Build the update payload for one row from its ✎-unlocked, non-empty fields.
   // Locked (disabled) inputs are skipped, so untouched rows produce {sku} only.
@@ -955,39 +1218,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   }
   document.getElementById('i-saveall-btn').addEventListener('click', saveAllEdited);
 
-  // Upload a product photo straight to R2 and set it on the SKU - zero deploy.
-  document.getElementById('i-up-btn').addEventListener('click', function () {
-    var status = document.getElementById('i-load-status');
-    var fileEl = document.getElementById('i-up-file');
-    var sku = (document.getElementById('i-up-sku').value || '').trim();
-    var file = fileEl.files && fileEl.files[0];
-    if (!file) { status.textContent = 'Choose an image file first.'; return; }
-    var btn = document.getElementById('i-up-btn');
-    btn.disabled = true; btn.textContent = 'UPLOADING…'; status.textContent = 'Uploading ' + file.name + '…';
-    var fd = new FormData();
-    fd.append('file', file);
-    if (sku) fd.append('sku', sku);
-    apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
-      .then(function (d) {
-        if (!d || !d.success) { btn.disabled = false; btn.textContent = 'UPLOAD IMG'; status.textContent = 'Upload failed: ' + ((d && d.error) || 'error'); return; }
-        if (sku) {
-          // Point the product row at the new R2 URL (live, no deploy).
-          apiFetch('/api/admin/update-inventory', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: sku, image: d.url }) })
-            .then(function (u) {
-              btn.disabled = false; btn.textContent = 'UPLOAD IMG';
-              status.textContent = (u && u.success)
-                ? ('✓ Uploaded and set on ' + sku + ' → ' + d.url)
-                : ('Uploaded (' + d.url + ') but could not set on ' + sku + ': ' + ((u && u.error) || 'error'));
-              fileEl.value = '';
-              if (u && u.success) loadProducts();
-            });
-        } else {
-          btn.disabled = false; btn.textContent = 'UPLOAD IMG'; fileEl.value = '';
-          status.textContent = '✓ Uploaded → ' + d.url + '  (copy this URL into a product’s image field)';
-        }
-      })
-      .catch(function (e) { btn.disabled = false; btn.textContent = 'UPLOAD IMG'; status.textContent = 'Upload error: ' + e.message; });
-  });
+  // (Photo replace lives in each row's ⋯ editor now — the old toolbar
+  // "UPLOAD IMG" box was removed; use ⋯ → Replace photo per SKU.)
 
   // ── Product Builder: add a single product OR a multi-colour design ──
   // Each colour becomes its own SKU row; the backend links them (variants JSON,
@@ -1148,14 +1380,24 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   (function () {
     var costEl = document.getElementById('calc-cost');
     if (!costEl) return;
-    var CC = ['courier', 'packaging', 'gstPct', 'gatewayPct', 'sellRound', 'discountPct', 'mrpRound', 'marginNecklace', 'marginEarring'];
+    var CC = ['courier', 'packaging', 'gstPct', 'gatewayPct', 'sellRound', 'discountPct', 'mrpRound'];
+    var MARGIN_KEY = 'cc-marginDefault';   // single shop-wide margin (drives both server margin keys)
     var DEFAULTS = { courier: 90, packaging: 25, gstPct: 3, gatewayPct: 2.36, sellRound: 5, discountPct: 25, mrpRound: 10, marginNecklace: 90, marginEarring: 0 };
     var serverDefaults = DEFAULTS;
     var last = { sell: null, mrp: null };
 
     function num(id, d) { var el = document.getElementById(id); var v = el ? parseFloat(el.value) : NaN; return isFinite(v) ? v : d; }
-    function fillConstants(cfg) { CC.forEach(function (k) { var el = document.getElementById('cc-' + k); if (el) el.value = (cfg && cfg[k] != null) ? cfg[k] : DEFAULTS[k]; }); }
-    function readConstants() { var o = {}; CC.forEach(function (k) { o[k] = num('cc-' + k, DEFAULTS[k]); }); return o; }
+    function fillConstants(cfg) {
+      CC.forEach(function (k) { var el = document.getElementById('cc-' + k); if (el) el.value = (cfg && cfg[k] != null) ? cfg[k] : DEFAULTS[k]; });
+      var md = document.getElementById(MARGIN_KEY);
+      if (md) md.value = (cfg && cfg.marginNecklace != null) ? cfg.marginNecklace : DEFAULTS.marginNecklace;
+    }
+    function readConstants() {
+      var o = {}; CC.forEach(function (k) { o[k] = num('cc-' + k, DEFAULTS[k]); });
+      var m = num(MARGIN_KEY, DEFAULTS.marginNecklace);
+      o.marginNecklace = m; o.marginEarring = m;   // one shop-wide margin drives both server keys
+      return o;
+    }
 
     function calc() {
       var c = readConstants();
@@ -1163,7 +1405,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       var sr = c.sellRound >= 1 ? c.sellRound : 1;
       var mr = c.mrpRound >= 1 ? c.mrpRound : 1;
       var disc = (c.discountPct >= 0 && c.discountPct < 100) ? c.discountPct : 25;
-      var cost = num('calc-cost', NaN), margin = num('calc-margin', 0);
+      var cost = num('calc-cost', NaN), margin = num('calc-margin', num(MARGIN_KEY, 0));
       var sellEl = document.getElementById('calc-sell'), mrpEl = document.getElementById('calc-mrp'), bd = document.getElementById('calc-breakdown');
       if (!isFinite(cost) || pctCosts >= 1) { sellEl.textContent = '—'; mrpEl.textContent = '—'; bd.textContent = ''; last = { sell: null, mrp: null }; return; }
       var fixed = cost + c.courier + c.packaging;
@@ -1180,10 +1422,9 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     }
 
     CC.forEach(function (k) { var el = document.getElementById('cc-' + k); if (el) el.addEventListener('input', calc); });
+    var marginEl = document.getElementById(MARGIN_KEY); if (marginEl) marginEl.addEventListener('input', calc);
     costEl.addEventListener('input', calc);
     document.getElementById('calc-margin').addEventListener('input', calc);
-    document.getElementById('calc-m-neck').addEventListener('click', function () { document.getElementById('calc-margin').value = num('cc-marginNecklace', DEFAULTS.marginNecklace); calc(); });
-    document.getElementById('calc-m-ear').addEventListener('click', function () { document.getElementById('calc-margin').value = num('cc-marginEarring', DEFAULTS.marginEarring); calc(); });
     document.getElementById('calc-use').addEventListener('click', function () {
       if (last.sell == null) { return; }
       document.getElementById('pb-price').value = last.sell;
@@ -1195,6 +1436,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var snapshot = null;
     function setLocked(locked) {
       CC.forEach(function (k) { var el = document.getElementById('cc-' + k); if (el) el.disabled = locked; });
+      var md = document.getElementById(MARGIN_KEY); if (md) md.disabled = locked;
       document.getElementById('cc-edit').style.display = locked ? '' : 'none';
       document.getElementById('cc-save').style.display = locked ? 'none' : '';
       document.getElementById('cc-cancel').style.display = locked ? 'none' : '';

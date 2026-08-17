@@ -45,7 +45,7 @@ function detectRegion(s) {
    The earring shapes are gated on the category because a NECKLACE SET is
    legitimately named "... Necklace Set with Jhumkas" and "... Pearl Drops";
    without the gate those necklaces come back typed as earrings. */
-function detectType(s, cat) {
+function detectType(s, cat, catLabel) {
   if (cat !== 'necklace') {
     if (/jhumka|jhumki/.test(s)) return 'Jhumka Earrings';
     if (/chandbali|chand ?bali/.test(s)) return 'Chandbali Earrings';
@@ -54,6 +54,18 @@ function detectType(s, cat) {
     if (/hoop|bali/.test(s) && cat === 'earring') return 'Hoop Earrings';
     if (cat === 'earring' || /earring/.test(s)) return 'Earrings';
   }
+  // Category-authoritative: once the owner files a piece under Pendant or Bridal
+  // Set, that wins over words in the NAME. A "Pendant Pearl Mala Necklace" is a
+  // Pendant — without this it fell through to /mala|necklace/ below and typed as
+  // a necklace. The four site categories are Bridal Set / Necklace / Earring /
+  // Pendant, so this only pins the two that used to leak into necklace/earring.
+  if (cat === 'pendant') return /\bset\b/.test(s) ? 'Pendant Set' : 'Pendant';
+  if (cat === 'bridal set' || cat === 'bridal') return 'Bridal Jewellery Set';
+  // ANY other category the owner created (Bracelet, Bangles, Maang Tika, Anklet,
+  // Nath, Choker…): the CATEGORY is the type. Only Necklace + blank category fall
+  // through to the name-based refinement below. This is what makes "add a new
+  // category" give its products a correct type with zero extra config.
+  if (cat && cat !== 'necklace' && catLabel) return catLabel;
   if (/choker/.test(s)) return 'Choker Necklace';
   if (/rani ?haar|haaram|\bharam\b|long ?necklace|long ?haar|mala/.test(s)) return 'Long Necklace';
   if (/temple|lakshmi|laxmi/.test(s) && /\bset\b/.test(s)) return 'Temple Jewellery Set';
@@ -92,7 +104,7 @@ export function seoSubtitle(p) {
   const cat = (p.category || '').toLowerCase();
   const material = detectMaterial(s);
   const region = detectRegion(s);
-  const type = detectType(s, cat);
+  const type = detectType(s, cat, p.category);
   const occ = detectOccasion(s, material, type);
 
   const parts = [];
@@ -132,7 +144,7 @@ export function productKeywords(p) {
   const cat = (p.category || '').toLowerCase();
   const material = detectMaterial(s);
   const region = detectRegion(s);
-  const type = detectType(s, cat);
+  const type = detectType(s, cat, p.category);
   const base = [
     p.name,
     type + ' online India',

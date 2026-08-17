@@ -63,8 +63,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="site.css?v=20260810seo">
-<script src="layout.js?v=20260810d2c2"></script>
+<link rel="stylesheet" href="site.css?v=20260817fw">
+<script src="layout.js?v=20260817fw"></script>
 <script src="mpa.js?v=16" defer></script>
 <script src="catalog.js?v=20"></script>
 
@@ -87,7 +87,7 @@
    * aspect-ratio matches the banner files (1200x630) so the FULL image
    * shows on desktop instead of a center crop; slides are hard-clipped
    * so neighbouring banners can never bleed into view. */
-  .hm-hero-wrap { max-width: 1120px; margin: 24px auto 0; padding: 0 40px; }
+  .hm-hero-wrap { max-width: 1240px; margin: 24px auto 0; padding: 0 40px; }
   .hm-hero { position: relative; width: 100%; aspect-ratio: 1200 / 630; max-height: 460px; overflow: hidden; isolation: isolate; border-radius: 18px; background: #0B291C; border: 1px solid rgba(90,136,0,.35); box-shadow: 0 50px 90px -42px rgba(11,41,28,.5), 0 20px 48px -28px rgba(0,0,0,.28); animation: ccFadeUp 1.1s cubic-bezier(.25,1,.5,1) .15s both; }
   .hm-hero-track { display: flex; width: 100%; height: 100%; transition: transform 1.1s cubic-bezier(.65,0,.18,1); }
   .hm-hero-slide { position: relative; flex: 0 0 100%; min-width: 100%; height: 100%; overflow: hidden; }
@@ -116,7 +116,7 @@
   .hm-btn.ghost { background: transparent; color: #1A1A1A; border: 1px solid #C5A880; }
   .hm-btn.ghost:hover { background: #C5A880; color: #fff; }
 
-  .hm-section { max-width: 1280px; margin: 0 auto; padding: 46px 48px 10px; }
+  .hm-section { max-width: 1440px; margin: 0 auto; padding: 46px 48px 10px; }
   .hm-sec-head { text-align: center; margin-bottom: 40px; }
   .hm-sec-kicker { font-family: 'Montserrat',sans-serif; font-size:13px; font-weight: 600; letter-spacing: 4px; color: #8A6D2F; margin-bottom: 14px; }
   .hm-sec-title { font-family:'Playfair Display',serif; font-weight: 500; font-size: 36px; color: #1A1A1A; margin: 0; }
@@ -295,6 +295,28 @@
   .rail::-webkit-scrollbar { display:none; }
   .rail > * { scroll-snap-align:start; flex:0 0 auto; }
 
+  /* ══ Category rail — auto-sliding, swipeable (home). Reuses .cat-bg/.cat-shade/
+     .cat-text from the old tiles; coming-soon state is toggled live from the
+     catalog by JS so a category flips to SHOP NOW the moment its first product
+     is in stock (the old 2×2 grid was hard-coded and never synced). ══ */
+  /* Snap OFF on this rail — scroll-snap:mandatory (inherited from .rail) fights
+     the pixel-by-pixel marquee drift and pins the tiles in place. This rail is a
+     continuous right-to-left marquee (JS), still free to swipe/drag. */
+  .cat-rail { padding-bottom:6px; scroll-snap-type:none; }
+  .cat-rail > * { scroll-snap-align:none; }
+  /* Wide, stretched banner rectangles. */
+  .cat-rail-card { position:relative; flex:0 0 auto; width:min(460px,82vw); height:260px; border-radius:16px;
+    overflow:hidden; text-decoration:none; display:block; background:#0B291C;
+    box-shadow:0 2px 6px rgba(11,41,28,.10), 0 18px 40px -24px rgba(11,41,28,.55);
+    transition:transform .45s cubic-bezier(.25,1,.5,1), box-shadow .45s; }
+  @media(hover:hover){ .cat-rail-card:hover { transform:translateY(-5px); } }
+  .cat-rail-card .cat-text .t { font-size:30px; }
+  .cat-rail-card.coming-soon { pointer-events:none; }
+  .cat-rail-card.coming-soon .cat-shade { background:linear-gradient(to top, rgba(11,41,28,.78) 0%, rgba(11,41,28,0) 46%); }
+  .cat-rail-card.coming-soon .cat-text .k { color:#D4A853; }
+  @media (max-width:900px){ .cat-rail-card { width:300px; height:190px; border-radius:12px; }
+    .cat-rail-card .cat-text .t { font-size:22px; } }
+
   /* ══ 360° showcase ══ */
   .v360 { width:232px; }
   .v360-card { position:relative; width:100%; aspect-ratio:9/16; border-radius:22px; overflow:hidden;
@@ -344,7 +366,7 @@
   .rv-avg-sub { font-size:12px; color:#6B6257; letter-spacing:.4px; }
 
   /* ══ Instagram — post cards that read as Instagram, horizontal rail only ══ */
-  .ig-head { display:flex; align-items:center; gap:13px; max-width:1280px; margin:0 auto 20px; }
+  .ig-head { display:flex; align-items:center; gap:13px; max-width:1440px; margin:0 auto 20px; }
   .ig-avatar { width:52px; height:52px; border-radius:50%; flex:none; object-fit:cover; display:block;
     padding:2.5px; background:conic-gradient(from 200deg,#F5B840,#DD2A7B,#8134AF,#515BD4,#F5B840); }
   .ig-avatar-in { width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; border:2px solid #F0F5FA; }
@@ -456,31 +478,37 @@
     <a class="hm-btn ghost" href="gifting.html">GIFTING</a>
   </div>
 
-  <!-- CATEGORY BANNERS: original images -->
+  <!-- CATEGORY RAIL: auto-sliding + swipeable; coming-soon syncs from live catalog -->
   <section class="hm-section">
-    <div class="cat2">
-      <div class="cat-tile big coming-soon" aria-label="Bridal Sets — Coming Soon">
-        <div class="cat-bg ct-bridal" style="background-color:#0B291C;background-position:center 55%"></div>
-        <div class="cat-shade"></div>
-        <div class="cat-text"><div class="k">COMING SOON</div><h3 class="t">Bridal Sets</h3><div class="s">Temple necklace &amp; matching jhumkas</div></div>
-      </div>
-      <a class="cat-tile big" href="categories.html?cat=earrings" aria-label="Shop Earrings - kundan chandbali and drops">
-        <div class="cat-bg ct-earrings" style="background-color:#0B291C"></div>
-        <div class="cat-shade"></div>
-        <div class="cat-text"><div class="k">SHOP NOW </div><h3 class="t">Earrings </h3><div class="s">Kundan chandbali &amp; drops</div></div>
-      </a>
+    <div class="hm-sec-head">
+      <div class="hm-sec-kicker">SHOP BY CATEGORY</div>
+      <h2 class="hm-sec-title">Find Your Style</h2>
     </div>
-    <div class="cat2" style="margin-top:16px">
-      <a class="cat-tile big" href="categories.html?cat=necklaces" aria-label="Shop Necklaces">
-        <div class="cat-bg ct-necklace" style="background-color:#0B291C;background-position:center 70%"></div>
-        <div class="cat-shade"></div>
-        <div class="cat-text"><div class="k">SHOP NOW </div><h3 class="t">Necklaces </h3><div class="s">Short, temple &amp; crystal necklaces</div></div>
-      </a>
-      <div class="cat-tile big coming-soon" aria-label="Pendants — Coming Soon">
-        <div class="cat-bg ct-pendant" style="background-color:#0B291C"></div>
-        <div class="cat-shade"></div>
-        <div class="cat-text"><div class="k">COMING SOON</div><h3 class="t">Pendants</h3><div class="s">Coming soon</div></div>
+    <div class="rail-wrap">
+      <button class="rail-arrow prev" id="cat-rail-prev" type="button" aria-label="Previous">&lsaquo;</button>
+      <div class="rail cat-rail" id="cat-rail">
+        <a class="cat-rail-card" data-cat="Necklace" href="categories.html?cat=necklaces" aria-label="Shop Necklaces">
+          <div class="cat-bg ct-necklace" style="background-color:#0B291C;background-position:center 70%"></div>
+          <div class="cat-shade"></div>
+          <div class="cat-text"><div class="k">SHOP NOW</div><h3 class="t">Necklaces</h3><div class="s">Short, temple &amp; crystal necklaces</div></div>
+        </a>
+        <a class="cat-rail-card" data-cat="Earring" href="categories.html?cat=earrings" aria-label="Shop Earrings - kundan chandbali and drops">
+          <div class="cat-bg ct-earrings" style="background-color:#0B291C"></div>
+          <div class="cat-shade"></div>
+          <div class="cat-text"><div class="k">SHOP NOW</div><h3 class="t">Earrings</h3><div class="s">Kundan chandbali &amp; drops</div></div>
+        </a>
+        <a class="cat-rail-card" data-cat="Pendant" href="categories.html?cat=pendants" aria-label="Shop Pendants">
+          <div class="cat-bg ct-pendant" style="background-color:#0B291C"></div>
+          <div class="cat-shade"></div>
+          <div class="cat-text"><div class="k">SHOP NOW</div><h3 class="t">Pendants</h3><div class="s">Lakshmi temple pendant mala</div></div>
+        </a>
+        <a class="cat-rail-card" data-cat="Bridal Set" href="categories.html?cat=bridal-set" aria-label="Shop Bridal Sets">
+          <div class="cat-bg ct-bridal" style="background-color:#0B291C;background-position:center 55%"></div>
+          <div class="cat-shade"></div>
+          <div class="cat-text"><div class="k">SHOP NOW</div><h3 class="t">Bridal Sets</h3><div class="s">Temple necklace &amp; matching jhumkas</div></div>
+        </a>
       </div>
+      <button class="rail-arrow next" id="cat-rail-next" type="button" aria-label="Next">&rsaquo;</button>
     </div>
   </section>
 
@@ -735,6 +763,95 @@
     var tries = 0;
     var poll = setInterval(function () { if (renderTrending() || ++tries > 60) clearInterval(poll); }, 120);
   }
+
+  /* ══ Category rail: dynamic (from /api/categories) + continuous right-to-left
+     marquee + live coming-soon sync ══
+     - Cards are built from the categories table so a NEW category the owner adds
+       shows here with no code edit; the 4 defaults stay in the raw HTML as the
+       no-JS / SEO fallback and as what paints before the fetch lands.
+     - The strip is rendered TWICE and drifts left forever, wrapping seamlessly at
+       the first clone — so it visibly moves regardless of how many fit on screen.
+       Snap is off (see CSS) or the drift would be snapped back to a standstill.
+     - Still fully swipeable/draggable; the marquee pauses on hover/touch. */
+  (function () {
+    var rail = document.getElementById('cat-rail');
+    if (!rail) return;
+    var FALLBACK = [
+      { slug: 'necklaces',  label: 'Necklace',   banner: 'images/models/cat-necklace.webp', subtitle: 'Short, temple & crystal necklaces', bgpos: 'center 70%' },
+      { slug: 'earrings',   label: 'Earring',    banner: 'images/models/cat-earrings.webp', subtitle: 'Kundan chandbali & drops',            bgpos: '' },
+      { slug: 'pendants',   label: 'Pendant',    banner: 'images/models/cat-pendant.webp',  subtitle: 'Lakshmi temple pendant mala',         bgpos: '' },
+      { slug: 'bridal-set', label: 'Bridal Set', banner: 'images/models/cat-bridal.webp',   subtitle: 'Temple necklace & matching jhumkas',  bgpos: 'center 55%' }
+    ];
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function cdn(u) { if (!u) return ''; if (u.indexOf('/cdn-cgi/image/') !== -1) return u; return '/cdn-cgi/image/width=700,quality=78,format=auto/' + String(u).replace(/^\/+/, ''); }
+    function cardHtml(cat, clone) {
+      var href = 'categories.html?cat=' + encodeURIComponent(cat.slug);
+      var bg = "background-image:url('" + cdn(cat.banner) + "');background-color:#0B291C" + (cat.bgpos ? ';background-position:' + cat.bgpos : '');
+      return '<a class="cat-rail-card" data-cat="' + esc(cat.label) + '" data-href="' + esc(href) + '"' +
+        (clone ? ' aria-hidden="true" tabindex="-1"' : ' href="' + esc(href) + '"') + ' aria-label="Shop ' + esc(cat.label) + '">' +
+        '<div class="cat-bg" style="' + bg + '"></div><div class="cat-shade"></div>' +
+        '<div class="cat-text"><div class="k">SHOP NOW</div><h3 class="t">' + esc(cat.label) + '</h3>' +
+          (cat.subtitle ? '<div class="s">' + esc(cat.subtitle) + '</div>' : '') + '</div></a>';
+    }
+
+    var cats = FALLBACK, wrapAt = 0;
+    function measure() {
+      var all = rail.querySelectorAll('.cat-rail-card');
+      var firstClone = all[cats.length];
+      wrapAt = firstClone ? firstClone.offsetLeft : (rail.scrollWidth / 2);
+    }
+    function build(list) {
+      cats = (list && list.length) ? list : FALLBACK;
+      rail.innerHTML = cats.map(function (c) { return cardHtml(c, false); }).join('') +
+                       cats.map(function (c) { return cardHtml(c, true); }).join('');
+      syncCats();
+      measure();
+    }
+    function syncCats() {
+      var cat = window.SAUBHAGYA_CATALOG || [];
+      var have = {};
+      cat.forEach(function (p) { if (p.inStock !== 0 && p.inStock !== false && !p.isVariantDup) have[p.category] = 1; });
+      rail.querySelectorAll('.cat-rail-card').forEach(function (a) {
+        var name = a.getAttribute('data-cat');
+        var live = !cat.length || !!have[name];   // don't grey everything before the catalog loads
+        a.classList.toggle('coming-soon', !live);
+        var k = a.querySelector('.cat-text .k'); if (k) k.textContent = live ? 'SHOP NOW' : 'COMING SOON';
+        var isClone = a.getAttribute('aria-hidden') === 'true';
+        if (live && !isClone) a.setAttribute('href', a.dataset.href); else a.removeAttribute('href');
+      });
+    }
+
+    build(FALLBACK);   // paint immediately
+    fetch('/api/categories').then(function (r) { return r.json(); })
+      .then(function (d) { if (d && d.success && d.categories && d.categories.length) build(d.categories); })
+      .catch(function () { /* keep fallback */ });
+    window.addEventListener('catalog-ready', syncCats);
+    var t = 0, sp = setInterval(function () { if ((window.SAUBHAGYA_CATALOG || []).length) syncCats(); if (++t > 60) clearInterval(sp); }, 200);
+    window.addEventListener('resize', measure);
+
+    var paused = false, resumeT = null;
+    ['mouseenter', 'touchstart', 'pointerdown'].forEach(function (ev) {
+      rail.addEventListener(ev, function () { paused = true; clearTimeout(resumeT); }, { passive: true });
+    });
+    ['mouseleave', 'touchend', 'touchcancel'].forEach(function (ev) {
+      rail.addEventListener(ev, function () { clearTimeout(resumeT); resumeT = setTimeout(function () { paused = false; }, 1200); }, { passive: true });
+    });
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var SPEED = 0.6;   // px/frame ≈ 36px/s, calm and continuous
+    function tick() {
+      if (!reduce && !paused && !document.hidden && wrapAt > 0) {
+        rail.scrollLeft += SPEED;
+        if (rail.scrollLeft >= wrapAt) rail.scrollLeft -= wrapAt;   // seamless wrap onto the clone set
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    function step() { var c = rail.querySelector('.cat-rail-card'); return (c ? c.getBoundingClientRect().width : 460) + 16; }
+    var prev = document.getElementById('cat-rail-prev'), next = document.getElementById('cat-rail-next');
+    if (prev) prev.addEventListener('click', function () { rail.scrollBy({ left: -step(), behavior: 'smooth' }); });
+    if (next) next.addEventListener('click', function () { rail.scrollBy({ left: step(), behavior: 'smooth' }); });
+  })();
 
   /* ══════════ 360° showcase ══════════
      Plays ONE clip at a time, in order, looping back to the first. Only the

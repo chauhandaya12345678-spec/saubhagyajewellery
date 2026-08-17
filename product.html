@@ -33,10 +33,10 @@
      browsers (Instagram/Facebook WebView) painted nothing for seconds. -->
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
-<link rel="stylesheet" href="site.css?v=20260810seo">
+<link rel="stylesheet" href="site.css?v=20260817fw">
 <!-- defer: layout.js only registers custom elements and catalog.js is an async
      fallback source - neither needs to block the parser. -->
-<script src="layout.js?v=20260810d2c2" defer></script>
+<script src="layout.js?v=20260817fw" defer></script>
 <script src="mpa.js?v=16" defer></script>
 <script src="catalog.js?v=20" defer></script><style>
   * { box-sizing: border-box; }
@@ -56,8 +56,12 @@
      the first screen. Nothing is cropped here; the frame was extended around
      the piece when the photos were prepared. Detail goes to the tap-to-enlarge
      viewer rather than to a taller page. */
+  /* object-fit:contain so a photo that is not exactly 4:5 shows in full without
+     being stretched to fill the frame (default `fill` squished portrait uploads
+     — the hero then no longer matched the tap-to-enlarge view). Any spare space
+     sits on the ivory backdrop; nothing is cropped or distorted. */
   .pdp-img { display: block; width: auto; height: auto; max-width: 100%; max-height: 68vh;
-    aspect-ratio: 4/5; border-radius: 12px; background: #f0ede5; cursor: zoom-in; }
+    aspect-ratio: 4/5; object-fit: contain; border-radius: 12px; background: #f0ede5; cursor: zoom-in; }
   .pdp-img-wrap { position: relative; display: flex; align-items: center; justify-content: center;
     width: fit-content; max-width: 100%; min-height: 260px; margin: 0 auto; border-radius: 12px; }
   /* Affordance: without it people do not know the photo opens. */
@@ -843,6 +847,11 @@
     else if (notNeck && /drop|dangler/.test(s)) type = 'Drop Earrings';
     else if (notNeck && /hoop|bali/.test(s) && cat === 'earring') type = 'Hoop Earrings';
     else if (notNeck && (cat === 'earring' || /earring/.test(s))) type = 'Earrings';
+    // Category wins over name words for Pendant / Bridal Set (mirrors _seo.js).
+    else if (cat === 'pendant') type = /\bset\b/.test(s) ? 'Pendant Set' : 'Pendant';
+    else if (cat === 'bridal set' || cat === 'bridal') type = 'Bridal Jewellery Set';
+    // Any other owner-created category is its own type (mirrors _seo.js).
+    else if (cat && cat !== 'necklace') type = p.category;
     else if (/choker/.test(s)) type = 'Choker Necklace';
     else if (/rani ?haar|haaram|\bharam\b|long ?necklace|long ?haar|mala/.test(s)) type = 'Long Necklace';
     else if (/temple|lakshmi|laxmi/.test(s) && /\bset\b/.test(s)) type = 'Temple Jewellery Set';
@@ -976,11 +985,15 @@
     var isCrystal = /crystal/i.test(nm), isShort = /short|choker/i.test(nm);
     var isHaram = /haram|haar\b/i.test(nm), isSet = /\bset\b/i.test(nm);
     var ci = activeColourInfo(p);
-    var typeLabel = isJhumka ? 'Jhumka earrings'
-      : (p.category === 'Earring' ? 'Earrings'
-      : (isHaram ? 'Long haram' + (isSet ? ' set' : '')
-      : (isSet ? 'Necklace set'
-      : (isCrystal ? 'Crystal necklace' : (isShort ? 'Short necklace' : 'Necklace')))));
+    var typeLabel =
+        p.category === 'Pendant' ? (isSet ? 'Pendant set' : 'Pendant')
+      : p.category === 'Bridal Set' ? 'Bridal jewellery set'
+      : p.category === 'Earring' ? (isJhumka ? 'Jhumka earrings' : 'Earrings')
+      : (p.category && p.category !== 'Necklace') ? p.category
+      : isHaram ? 'Long haram' + (isSet ? ' set' : '')
+      : isSet ? 'Necklace set'
+      : isCrystal ? 'Crystal necklace'
+      : isShort ? 'Short necklace' : 'Necklace';
     var bestFor = (p.category === 'Earring')
       ? (isJhumka ? 'Weddings, festive &amp; ethnic wear' : 'Everyday &amp; festive wear')
       : (isCrystal ? 'Weddings, receptions &amp; party wear' : 'Weddings, festive &amp; party wear');

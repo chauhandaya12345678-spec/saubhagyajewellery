@@ -43,7 +43,7 @@
       'header.site{position:fixed;top:0;left:0;width:100%;z-index:1000;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(90,136,0,.20)}',
       'body{padding-top:118px}',
       '@media(max-width:900px){body{padding-top:70px}}',
-      '.nav{display:flex;align-items:center;gap:24px;max-width:1280px;margin:0 auto;padding:14px 40px}',
+      '.nav{display:flex;align-items:center;gap:24px;max-width:1440px;margin:0 auto;padding:14px 40px}',
       '.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;flex:none;order:0}',
       '.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}',
       '.brand-logo{height:44px;width:auto;object-fit:contain;display:block;background:none}',
@@ -188,7 +188,7 @@
          turns every trail on the site into raised chips with gold chevrons.
          Markup is normalised by normalizeCrumbs() below, so pages keep their
          existing <a>/<i>/<span> HTML and still get the new look. */
-      '.crumb{max-width:1280px;margin:0 auto;padding:16px 40px 0}',
+      '.crumb{max-width:1440px;margin:0 auto;padding:16px 40px 0}',
       '.crumb-trail{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0;padding:0;list-style:none}',
       '.crumb-trail li{display:flex;align-items:center;min-width:0}',
       /* chevron between items - drawn, never a literal "/" character */
