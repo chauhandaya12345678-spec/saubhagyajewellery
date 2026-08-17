@@ -1,6 +1,8 @@
 /**
  * PATCH /api/admin/update-inventory
- * Body: { sku, stock_count?, weightGrams?, packing_weight_grams?, price?, mrp?, image?, altImage?, name?, low_stock_threshold?, new_sku? }
+ * Body: { sku, stock_count?, weightGrams?, packing_weight_grams?, price?, mrp?, image?, altImage?, name?, category?, low_stock_threshold?, new_sku?, description?, variants? }
+ *   description : unique SEO copy for the row (removes the thin-content fallback)
+ *   variants    : colour-link JSON (array/object or JSON string); null/'' clears it
  * `sku` identifies the row to update; `new_sku` (optional) renames it. Renaming
  * does not touch past orders (they keep the SKU string as it was at purchase
  * time) but does break any bookmarked /product?sku=<old> link.
@@ -32,7 +34,7 @@ export async function onRequest(context) {
     });
   }
 
-  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, category, low_stock_threshold, new_sku } = body || {};
+  const { sku, stock_count, weightGrams, packing_weight_grams, price, mrp, image, altImage, name, category, low_stock_threshold, new_sku, description, variants } = body || {};
   if (!sku) {
     return new Response(JSON.stringify({ error: 'sku required' }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -92,6 +94,22 @@ export async function onRequest(context) {
     if (typeof name === 'string' && name.trim()) { setClauses.push('name = ?'); params.push(name.trim()); }
     if (typeof category === 'string' && category.trim()) { setClauses.push('category = ?'); params.push(category.trim()); }
     if (typeof new_sku === 'string' && new_sku.trim() && new_sku.trim() !== sku) { setClauses.push('sku = ?'); params.push(new_sku.trim()); }
+    // Unique SEO description — kills the thin-content fallback for a product row.
+    if (typeof description === 'string') { setClauses.push('description = ?'); params.push(description); }
+    // Colour-variant link. Accept a ready array/object or a JSON string; null/''
+    // clears it (turns a row back into a standalone single-colour product).
+    if (variants !== undefined) {
+      let vjson = null;
+      if (variants !== null && variants !== '') {
+        vjson = typeof variants === 'string' ? variants : JSON.stringify(variants);
+        try { if (typeof variants === 'string') JSON.parse(variants); } catch (e) {
+          return new Response(JSON.stringify({ error: 'variants must be valid JSON' }), {
+            status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          });
+        }
+      }
+      setClauses.push('variants = ?'); params.push(vjson);
+    }
     if (setClauses.length === 1) {
       return new Response(JSON.stringify({ error: 'Nothing to update' }), {
         status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders },

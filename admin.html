@@ -59,7 +59,7 @@ tr.ai-attention td { background: #fdf0ef; }
 tr.ai-attention:hover td { background: #fbe4e2; }
 .ai-attention-flag { display: inline-block; margin-top: 4px; font-size: 9px; letter-spacing: .5px; color: #c0392b; font-weight: 700; text-transform: uppercase; }
 .role-staff .pack-btn, .role-staff .ai-save, .role-staff .edit-toggle, .role-staff #users-tab-btn,
-  .role-staff .ai-tab[data-tab="reviews"] { display: none !important; }
+  .role-staff .ai-tab[data-tab="reviews"], .role-staff .ai-tab[data-tab="add"] { display: none !important; }
 .ai-toggle-link { font-size: 11px; color: #0B291C; text-decoration: underline; cursor: pointer; margin-top: 14px; display: inline-block; }
 .ai-role-badge { font-size: 9px; letter-spacing: 1px; color: #C5A880; margin-left: auto; padding: 4px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 20px; }
 .ai-form-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
@@ -87,6 +87,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <button class="ai-tab active" data-tab="dashboard" type="button">DASHBOARD</button>
     <button class="ai-tab" data-tab="orders" type="button">ORDERS</button>
     <button class="ai-tab" data-tab="inventory" type="button">INVENTORY</button>
+    <button class="ai-tab" data-tab="add" type="button">ADD PRODUCT</button>
     <button class="ai-tab" data-tab="customers" type="button">CUSTOMERS</button>
     <button class="ai-tab" data-tab="activity" type="button">ACTIVITY</button>
     <button class="ai-tab" data-tab="reviews" type="button">REVIEWS</button>
@@ -207,28 +208,59 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           <button class="ai-btn small" id="i-up-btn" type="button" title="Upload a photo to R2 and set it on this SKU - no deploy needed">UPLOAD IMG</button>
         </span>
       </div>
-      <!-- NEW PRODUCT -->
-      <div class="ai-toolbar" style="flex-wrap:wrap;gap:8px;background:#faf7f0;border:1px solid #ece4d4;border-radius:8px;padding:10px 12px;margin-bottom:10px">
-        <strong style="font-size:12px;color:#a8823f;letter-spacing:.5px">+ NEW PRODUCT</strong>
-        <input type="file" id="np-file" accept="image/*" title="Product photo" style="font-size:11px;max-width:150px">
-        <input type="text" id="np-name" placeholder="Name" style="width:170px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
-        <input type="text" id="np-sku" placeholder="SKU (unique)" style="width:130px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
-        <select id="np-category" title="Category" style="width:130px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"><option value="">Category…</option></select>
-        <input type="number" id="np-price" placeholder="Price ₹" style="width:90px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
-        <input type="number" id="np-mrp" placeholder="MRP ₹" style="width:90px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
-        <input type="number" id="np-weight" placeholder="Weight g" style="width:90px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
-        <input type="number" id="np-stock" placeholder="Stock" style="width:80px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
-        <button class="ai-btn small" id="np-add-btn" type="button">ADD PRODUCT</button>
-        <span id="np-status" style="font-size:12px;color:#6a6a6a"></span>
-        <!-- SEO naming guide: the site auto-writes each product's title, meta,
-             on-page keywords and Google Shopping listing FROM THE NAME. A good
-             name = free ranking; a vague one = generic keywords. -->
-        <details style="flex-basis:100%;margin-top:6px;background:#fff;border:1px solid #ece4d4;border-radius:8px;padding:0">
-          <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#0B291C;padding:9px 12px;list-style:none">
-            💡 How to name a product for Google (tap to open)
-          </summary>
+      <div class="ai-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th><th>Name</th><th>Price</th><th>MRP</th><th>Stock Count</th><th>Alert At</th>
+              <th>Weight (g)</th><th>Box Weight (g)</th>
+            </tr>
+          </thead>
+          <tbody id="i-tbody"></tbody>
+        </table>
+      </div>
+      <div class="ai-status" id="i-load-status"></div>
+    </div>
+
+    <!-- ADD PRODUCT PANEL -->
+    <div id="panel-add" style="display:none">
+      <div style="max-width:900px;background:#faf7f0;border:1px solid #ece4d4;border-radius:10px;padding:16px 18px">
+        <strong style="font-size:13px;color:#a8823f;letter-spacing:.5px">+ ADD A PRODUCT</strong>
+        <div style="font-size:12px;color:#8a6d2f;margin:4px 0 14px;line-height:1.55">One product, or a design that comes in several colours. Fill the details once, then add a <b>colour block per colour</b> — the website links them, writes the Google listing and shows a colour switcher on its own. Nothing technical: no codes, no JSON.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 10px">
+          <label style="grid-column:1/3;font-size:11px;color:#6a6a6a">Design name <span style="color:#b02f33">*</span>
+            <input type="text" id="pb-name" placeholder="e.g. Lakshmi Mango Temple Necklace Set with Jhumkas" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+          </label>
+          <label style="font-size:11px;color:#6a6a6a">Category <span style="color:#b02f33">*</span>
+            <select id="np-category" title="Category" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px"><option value="">Category…</option></select>
+          </label>
+          <label style="font-size:11px;color:#6a6a6a">Base SKU <span style="color:#b02f33">*</span>
+            <input type="text" id="pb-basesku" placeholder="e.g. SJ-SN06" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+          </label>
+          <label style="font-size:11px;color:#6a6a6a">Price ₹ <span style="color:#b02f33">*</span>
+            <input type="number" id="pb-price" placeholder="Price" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+          </label>
+          <label style="font-size:11px;color:#6a6a6a">MRP ₹
+            <input type="number" id="pb-mrp" placeholder="MRP (struck-through)" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+          </label>
+          <label style="font-size:11px;color:#6a6a6a">Weight g
+            <input type="number" id="pb-weight" placeholder="Weight" style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">
+          </label>
+          <label style="grid-column:1/4;font-size:11px;color:#6a6a6a">Description — 2 to 3 sentences, unique (material, motif, occasion). Used for Google.
+            <textarea id="pb-desc" rows="3" placeholder="e.g. A short temple necklace built from mango (manga) motifs in matte antique gold, paired with matching jhumkas. Handcrafted for weddings and festive wear." style="width:100%;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px;font-family:inherit;resize:vertical"></textarea>
+          </label>
+        </div>
+        <div style="font-size:11px;color:#6a6a6a;margin:14px 0 6px">Colours <span style="color:#b02f33">*</span> — one block per colour. The <b>⭐ Main</b> colour is the one Google indexes; the others link to it. For a single-colour product, just leave one block.</div>
+        <div id="pb-colours"></div>
+        <button class="ai-btn small ghost" id="pb-add-colour" type="button" style="margin-top:2px">+ Add another colour</button>
+        <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button class="ai-btn" id="pb-submit" type="button">ADD PRODUCT</button>
+          <span id="pb-status" style="font-size:12px;color:#6a6a6a"></span>
+        </div>
+        <details style="margin-top:12px;background:#fff;border:1px solid #ece4d4;border-radius:8px;padding:0">
+          <summary style="cursor:pointer;font-size:12px;font-weight:600;color:#0B291C;padding:9px 12px;list-style:none">💡 How to name a product for Google (tap to open)</summary>
           <div style="font-size:12px;line-height:1.7;color:#3a3a3a;padding:2px 14px 14px">
-            The website reads the <strong>Name</strong> you type and automatically writes the Google title, description, keywords and Shopping listing. So put the <strong>style words people actually search</strong> in the name.
+            The website reads the <strong>Design name</strong> you type and automatically writes the Google title, description, keywords and Shopping listing. So put the <strong>style words people actually search</strong> in the name.
             <div style="margin:8px 0 4px;font-weight:600;color:#14110A">Formula: [Style/Region] + [Material] + [Type]</div>
             <div style="display:grid;grid-template-columns:1fr;gap:4px;margin-top:4px">
               <div>✅ <strong>Kundan Bridal Choker Necklace</strong> &nbsp;&nbsp; ✅ <strong>Punjabi Jhumki Earrings</strong></div>
@@ -246,18 +278,6 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           </div>
         </details>
       </div>
-      <div class="ai-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>SKU</th><th>Name</th><th>Price</th><th>MRP</th><th>Stock Count</th><th>Alert At</th>
-              <th>Weight (g)</th><th>Box Weight (g)</th>
-            </tr>
-          </thead>
-          <tbody id="i-tbody"></tbody>
-        </table>
-      </div>
-      <div class="ai-status" id="i-load-status"></div>
     </div>
 
     <!-- CUSTOMERS PANEL -->
@@ -489,12 +509,13 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var btn = e.target.closest('.ai-tab');
     if (!btn) return;
     var tab = btn.getAttribute('data-tab');
-    if ((tab === 'users' || tab === 'reviews') && authRole !== 'owner') return;
+    if ((tab === 'users' || tab === 'reviews' || tab === 'add') && authRole !== 'owner') return;
     document.querySelectorAll('.ai-tab').forEach(function (t) { t.classList.remove('active'); });
     btn.classList.add('active');
     document.getElementById('panel-dashboard').style.display = tab === 'dashboard' ? 'block' : 'none';
     document.getElementById('panel-orders').style.display = tab === 'orders' ? 'block' : 'none';
     document.getElementById('panel-inventory').style.display = tab === 'inventory' ? 'block' : 'none';
+    document.getElementById('panel-add').style.display = tab === 'add' ? 'block' : 'none';
     document.getElementById('panel-customers').style.display = tab === 'customers' ? 'block' : 'none';
     document.getElementById('panel-activity').style.display = tab === 'activity' ? 'block' : 'none';
     document.getElementById('panel-reviews').style.display = tab === 'reviews' ? 'block' : 'none';
@@ -502,6 +523,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     if (tab === 'dashboard') loadDashboard();
     if (tab === 'orders' && !lastOrders.length) loadOrders();
     if (tab === 'inventory' && !lastProducts.length) loadProducts();
+    if (tab === 'add' && !lastProducts.length) loadProducts();   // fills the category dropdown
     if (tab === 'customers' && !lastCustomers.length) loadCustomers();
     if (tab === 'activity') loadActivity();
     if (tab === 'reviews') loadReviews();
@@ -816,41 +838,155 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       .catch(function (e) { btn.disabled = false; btn.textContent = 'UPLOAD IMG'; status.textContent = 'Upload error: ' + e.message; });
   });
 
-  // Add a brand-new product → D1 (uploads the photo first if one is chosen).
-  document.getElementById('np-add-btn').addEventListener('click', function () {
-    var st = document.getElementById('np-status');
-    var g = function (id) { return (document.getElementById(id).value || '').trim(); };
-    var name = g('np-name'), sku = g('np-sku'), category = g('np-category');
-    if (category === '__new__') { category = (window.prompt('New category name:') || '').trim(); }
-    var price = g('np-price'), mrp = g('np-mrp'), weight = g('np-weight'), stock = g('np-stock');
-    if (!name || !sku || !category || !price) { st.style.color = '#b02f33'; st.textContent = 'Name, SKU, category and price are required'; return; }
-    var fileEl = document.getElementById('np-file');
-    var file = fileEl.files && fileEl.files[0];
-    var btn = document.getElementById('np-add-btn');
-    btn.disabled = true; btn.textContent = 'ADDING…'; st.style.color = '#6a6a6a'; st.textContent = 'Saving…';
+  // ── Product Builder: add a single product OR a multi-colour design ──
+  // Each colour becomes its own SKU row; the backend links them (variants JSON,
+  // lead first) and writes the description, so the SEO is automatic and no one
+  // has to touch code or JSON. See functions/api/admin/save-product-group.js.
+  (function () {
+    var wrap = document.getElementById('pb-colours');
+    if (!wrap) return;
 
-    var doAdd = function (imageUrl) {
-      apiFetch('/api/admin/add-product', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sku: sku, name: name, category: category, price: price, mrp: mrp, weightGrams: weight, stock_count: stock, image: imageUrl || '' })
+    var COLOUR_CODES = { gold: 'GL', green: 'GR', white: 'WH', pearl: 'WH', maroon: 'MR', red: 'RD',
+      blue: 'BL', pink: 'PK', silver: 'SL', black: 'BK', rose: 'RO', ruby: 'RB', emerald: 'EM',
+      purple: 'PR', peach: 'PC', antique: 'AN', oxidised: 'OX', oxidized: 'OX' };
+    function guessCode(label) {
+      var k = String(label || '').trim().toLowerCase();
+      if (COLOUR_CODES[k]) return COLOUR_CODES[k];
+      var a = k.replace(/[^a-z0-9]/g, '');
+      return a ? a.slice(0, 2).toUpperCase() : '';
+    }
+    function base() { return (document.getElementById('pb-name').value || '').trim(); }
+    function baseSku() { return (document.getElementById('pb-basesku').value || '').trim(); }
+    function blocks() { return Array.prototype.slice.call(wrap.querySelectorAll('.pb-colour')); }
+
+    function refresh() {
+      var bs = blocks(), multi = bs.length > 1, bn = base();
+      bs.forEach(function (row) {
+        var label = row.querySelector('.pb-label').value.trim();
+        var suffix = row.querySelector('.pb-suffix').value.trim();
+        var skuEl = row.querySelector('.pb-sku');
+        if (!skuEl.dataset.touched) {
+          var code = guessCode(label);
+          skuEl.value = baseSku() ? (baseSku() + (code ? '-' + code : '')) : '';
+        }
+        var nm = multi && (suffix || label) ? bn + ' - ' + (suffix || label) : bn;
+        row.querySelector('.pb-preview').textContent = nm
+          ? ('Creates: “' + nm + '”' + (skuEl.value ? '  ·  ' + skuEl.value : ''))
+          : '';
+        // colour name / lead only matter when there is more than one colour
+        row.querySelector('.pb-label').style.display = multi ? '' : 'none';
+        row.querySelector('.pb-suffix').style.display = multi ? '' : 'none';
+        row.querySelector('.pb-lead').closest('label').style.display = multi ? '' : 'none';
+      });
+      if (!wrap.querySelector('.pb-lead:checked') && bs.length) bs[0].querySelector('.pb-lead').checked = true;
+    }
+
+    function addBlock() {
+      var div = document.createElement('div');
+      div.className = 'pb-colour';
+      div.style.cssText = 'border:1px solid #e3dccb;border-radius:8px;padding:8px 10px;margin-bottom:8px;background:#fff';
+      div.innerHTML =
+        '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">' +
+          '<label title="Main colour — the one Google indexes" style="display:flex;align-items:center;gap:3px;font-size:11px;color:#a8823f">' +
+            '<input type="radio" name="pb-lead" class="pb-lead"> ⭐ Main</label>' +
+          '<input type="text" class="pb-label" placeholder="Colour (e.g. Gold)" style="width:110px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">' +
+          '<input type="text" class="pb-suffix" placeholder="Name suffix (e.g. Gold Bead Drops)" style="width:180px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">' +
+          '<input type="text" class="pb-sku" placeholder="SKU" style="width:140px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">' +
+          '<input type="file" class="pb-file" accept="image/*" style="font-size:11px;max-width:150px">' +
+          '<input type="number" class="pb-stock" placeholder="Stock" value="0" style="width:70px;padding:6px 8px;border:1px solid #ddd6c6;border-radius:6px;font-size:12px">' +
+          '<button class="ai-btn small ghost pb-remove" type="button" title="Remove this colour">✕</button>' +
+        '</div>' +
+        '<div class="pb-preview" style="font-size:11px;color:#8a6d2f;margin-top:5px"></div>';
+      wrap.appendChild(div);
+      div.querySelector('.pb-sku').addEventListener('input', function () { this.dataset.touched = '1'; refresh(); });
+      div.querySelector('.pb-label').addEventListener('input', refresh);
+      div.querySelector('.pb-suffix').addEventListener('input', refresh);
+      div.querySelector('.pb-lead').addEventListener('change', refresh);
+      div.querySelector('.pb-remove').addEventListener('click', function () {
+        if (blocks().length <= 1) return;   // always keep at least one colour
+        div.remove(); refresh();
+      });
+      refresh();
+    }
+
+    document.getElementById('pb-add-colour').addEventListener('click', function () { addBlock(); });
+    document.getElementById('pb-name').addEventListener('input', refresh);
+    document.getElementById('pb-basesku').addEventListener('input', function () {
+      blocks().forEach(function (r) { var s = r.querySelector('.pb-sku'); if (!s.dataset.touched) s.value = ''; });
+      refresh();
+    });
+    addBlock();   // start with one colour block
+
+    // Upload one colour's photo → R2, resolve to its public URL ('' if no file).
+    function uploadPhoto(file, sku, name) {
+      if (!file) return Promise.resolve('');
+      var fd = new FormData(); fd.append('file', file); fd.append('sku', sku); if (name) fd.append('name', name);
+      return apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
+        .then(function (d) { if (d && d.success && d.url) return d.url; throw new Error((d && d.error) || 'photo upload failed'); });
+    }
+
+    document.getElementById('pb-submit').addEventListener('click', function () {
+      var st = document.getElementById('pb-status');
+      var set = function (msg, colour) { st.textContent = msg; st.style.color = colour || '#6a6a6a'; };
+      var bn = base();
+      var category = (document.getElementById('np-category').value || '').trim();
+      if (category === '__new__') category = (window.prompt('New category name:') || '').trim();
+      var price = (document.getElementById('pb-price').value || '').trim();
+      var mrp = (document.getElementById('pb-mrp').value || '').trim();
+      var weight = (document.getElementById('pb-weight').value || '').trim();
+      var description = (document.getElementById('pb-desc').value || '').trim();
+      if (!bn || !category || !price) { set('Design name, category and price are required.', '#b02f33'); return; }
+
+      var bs = blocks(), multi = bs.length > 1;
+      var rows = [], leadIdx = 0, err = null;
+      bs.forEach(function (row, i) {
+        if (row.querySelector('.pb-lead').checked) leadIdx = i;
+        var label = row.querySelector('.pb-label').value.trim();
+        var suffix = row.querySelector('.pb-suffix').value.trim();
+        var sku = row.querySelector('.pb-sku').value.trim();
+        var stock = row.querySelector('.pb-stock').value.trim();
+        var file = row.querySelector('.pb-file').files[0];
+        if (!sku) err = err || ('Colour #' + (i + 1) + ': SKU missing — fill Base SKU at the top.');
+        if (multi && !label) err = err || ('Colour #' + (i + 1) + ': enter the colour name.');
+        if (!file) err = err || ((multi ? (label || 'Colour #' + (i + 1)) : 'This product') + ': add a photo.');
+        rows.push({ i: i, label: label, suffix: suffix, sku: sku, stock: stock, file: file });
+      });
+      if (err) { set(err, '#b02f33'); return; }
+
+      rows.sort(function (a, b) { return (a.i === leadIdx ? -1 : b.i === leadIdx ? 1 : a.i - b.i); });   // lead first
+
+      var btn = document.getElementById('pb-submit');
+      btn.disabled = true; btn.textContent = 'UPLOADING…'; set('Uploading photos…');
+
+      Promise.all(rows.map(function (r) {
+        return uploadPhoto(r.file, r.sku, bn).then(function (url) { r.image = url; return r; });
+      })).then(function () {
+        set('Saving…');
+        return apiFetch('/api/admin/save-product-group', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            baseName: bn, category: category, description: description,
+            price: price, mrp: mrp, weightGrams: weight,
+            colours: rows.map(function (r) {
+              return { label: r.label, sku: r.sku, nameSuffix: r.suffix, image: r.image, stock_count: r.stock };
+            })
+          })
+        });
       }).then(function (d) {
         btn.disabled = false; btn.textContent = 'ADD PRODUCT';
         if (d && d.success) {
-          st.style.color = '#23784a'; st.textContent = '✓ Added ' + sku + ' - live on the website';
-          ['np-name', 'np-sku', 'np-category', 'np-price', 'np-mrp', 'np-weight', 'np-stock'].forEach(function (id) { document.getElementById(id).value = ''; });
-          fileEl.value = '';
+          set('✓ Added ' + d.skus.join(', ') + ' — live on the website.', '#23784a');
+          ['pb-name', 'pb-basesku', 'pb-price', 'pb-mrp', 'pb-weight', 'pb-desc'].forEach(function (id) { document.getElementById(id).value = ''; });
+          wrap.innerHTML = ''; addBlock();
           if (typeof loadProducts === 'function') loadProducts();
-        } else { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Failed to add'; }
-      }).catch(function (e) { btn.disabled = false; btn.textContent = 'ADD PRODUCT'; st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
-    };
-
-    if (file) {
-      var fd = new FormData(); fd.append('file', file); fd.append('sku', sku); fd.append('name', name);
-      apiFetch('/api/admin/upload-image', { method: 'POST', body: fd })
-        .then(function (d) { doAdd(d && d.url); })
-        .catch(function () { doAdd(''); });
-    } else { doAdd(''); }
-  });
+        } else {
+          set((d && d.error) || 'Failed to add.', '#b02f33');
+        }
+      }).catch(function (e) {
+        btn.disabled = false; btn.textContent = 'ADD PRODUCT'; set('Error: ' + e.message, '#b02f33');
+      });
+    });
+  })();
 
   // ================= CUSTOMERS =================
   document.getElementById('c-reload-btn').addEventListener('click', loadCustomers);
