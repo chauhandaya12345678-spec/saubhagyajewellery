@@ -4,6 +4,8 @@
  * Static pages + every in-stock product SKU straight from D1 — no
  * more manually re-generating sitemap.xml after a catalog change.
  */
+import { isVariantDup } from './_listing.js';
+
 const SITE_URL = 'https://saubhagyajewellery.com';
 
 const STATIC_PAGES = [
@@ -34,9 +36,12 @@ export async function onRequest(context) {
   let skus = [];
   try {
     const { results } = await env.DB.prepare(
-      'SELECT sku, name, image, updated_at FROM products WHERE inStock = 1 ORDER BY sku'
+      'SELECT sku, name, image, updated_at, variants FROM products WHERE inStock = 1 ORDER BY sku'
     ).all();
-    skus = results || [];
+    // Only canonical URLs belong in a sitemap. Colour siblings canonicalize onto
+    // their design's lead SKU (see functions/_pdp.js leadSku), so listing them
+    // here would just feed Google URLs it is told not to index.
+    skus = (results || []).filter(r => !isVariantDup(r));
   } catch (e) { /* DB unreachable — ship static pages only, never 500 */ }
 
   const urls = STATIC_PAGES.map(p => `${SITE_URL}${p}`).map(loc =>

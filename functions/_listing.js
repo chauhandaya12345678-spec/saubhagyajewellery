@@ -47,9 +47,9 @@ function parseVariants(v) {
 /**
  * A design's lead SKU is variants[0].sku. A row whose own sku is NOT that lead
  * is a colour sibling that listings collapse into the lead card — exactly the
- * isVariantDup flag catalog.js computes. The homepage rail hides these; the
- * /categories grid deliberately does NOT (see categories.js) so every SKU in
- * the sitemap gets at least one crawlable internal link.
+ * isVariantDup flag catalog.js computes. Both grids and the sitemap hide these:
+ * the lead SKU is the canonical URL (see functions/_pdp.js leadSku), so linking
+ * a sibling would point at a URL Google is told not to index.
  */
 export function isVariantDup(p) {
   const vs = parseVariants(p.variants);

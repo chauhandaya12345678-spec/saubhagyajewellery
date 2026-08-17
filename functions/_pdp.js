@@ -34,6 +34,21 @@ export function cleanProductUrl(sku) {
 }
 
 /**
+ * Colour variants share one design; variants[0].sku is the "lead" that the
+ * listing grids, the sitemap and the canonical URL all consolidate onto. A row
+ * whose own sku IS the lead (or that has no variants) is its own canonical.
+ * This collapses the near-duplicate colour pages — same description body, only
+ * the colour word differs — onto one indexable URL per design, so Google stops
+ * filing the siblings as "Duplicate / not indexed".
+ */
+export function leadSku(p) {
+  let vs = p && p.variants;
+  if (typeof vs === 'string' && vs) { try { vs = JSON.parse(vs); } catch (e) { vs = null; } }
+  if (Array.isArray(vs) && vs.length && vs[0] && vs[0].sku) return vs[0].sku;
+  return p.sku;
+}
+
+/**
  * Editorial pages worth sending a product page to, by category.
  * A product page used to have zero outbound links, which made all 44 of them
  * dead ends for both a crawler and a reader.
@@ -146,6 +161,9 @@ export async function renderProductShell(html, p, env) {
     ? `${p.name}: ${clip(body, Math.max(60, 148 - p.name.length))} ₹${p.price}.`
     : `Buy ${p.name} online at ₹${p.price}. ${subtitle}, handcrafted in Mumbai from skin-friendly Zamak alloy. Free insured shipping across India.`;
   const canonical = cleanProductUrl(p.sku);
+  // Colour siblings consolidate onto the design's lead SKU for indexing; a lead
+  // or single-colour product is its own canonical (canonicalUrl === canonical).
+  const canonicalUrl = cleanProductUrl(leadSku(p));
   const image = abs(p.image);
   const inStock = (p.inStock === 0 || p.inStock === false) ? false : true;
 
@@ -215,7 +233,7 @@ export async function renderProductShell(html, p, env) {
     )
     .replace(
       '<link rel="canonical" href="https://saubhagyajewellery.com/product">',
-      `<link rel="canonical" href="${esc(canonical)}">`
+      `<link rel="canonical" href="${esc(canonicalUrl)}">`
     )
     .replace(
       '<meta property="og:title" content="Saubhagya Jewellery">',
@@ -236,7 +254,7 @@ export async function renderProductShell(html, p, env) {
     .replace(
       '</head>',
       `<link rel="preload" as="image" href="${esc(optImg(image))}" fetchpriority="high">` +
-      `<meta property="og:url" content="${esc(canonical)}">` +
+      `<meta property="og:url" content="${esc(canonicalUrl)}">` +
       `<meta property="product:price:amount" content="${p.price}">` +
       `<meta property="product:price:currency" content="INR">` +
       `<meta property="product:availability" content="${inStock ? 'in stock' : 'out of stock'}">` +
