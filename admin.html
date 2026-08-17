@@ -873,7 +873,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           '<label style="grid-column:1/3;font-size:11px;color:#6a6a6a">Material (blank = default Zamak alloy)<br><input type="text" class="d-material" value="' + esc(p.material || '') + '" placeholder="Skin-friendly Zamak alloy…" style="width:100%;' + inpS + '"></label>' +
           '<label style="grid-column:3/-1;font-size:11px;color:#6a6a6a">Finish (blank = default gold-plated)<br><input type="text" class="d-finish" value="' + esc(p.finish || '') + '" placeholder="High gold-plated, antique look" style="width:100%;' + inpS + '"></label>' +
           '<div style="grid-column:1/-1;font-size:11px;color:#8a6d2f">🔎 Google auto-preview (from the name — no SEO fields to fill) <button class="ai-btn small ghost d-seo-btn" type="button">refresh</button><div class="d-seo" style="margin-top:4px;color:#3a3a3a;line-height:1.5"></div></div>' +
-          '<div style="grid-column:1/-1;display:flex;gap:10px;align-items:center"><button class="ai-btn small d-save" type="button">💾 Save details</button><span class="d-status" style="font-size:11px;color:#6a6a6a"></span></div>' +
+          '<div style="grid-column:1/-1;display:flex;gap:10px;align-items:center"><button class="ai-btn small d-save" type="button">💾 Save details</button><button class="ai-btn small ghost d-close" type="button" title="Close this editor (nothing is lost)">✕ Close editor</button><span class="d-status" style="font-size:11px;color:#6a6a6a"></span></div>' +
           acBlock +
         '</div>' +
       '</td></tr>';
@@ -900,6 +900,11 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       detail.querySelector('.d-instock').addEventListener('change', function () { detail.querySelector('.d-instock-lbl').textContent = this.checked ? 'visible' : 'hidden'; });
       detail.querySelector('.d-upload').addEventListener('click', function () { uploadDetailPhoto(detail); });
       detail.querySelector('.d-save').addEventListener('click', function () { saveDetail(detail); });
+      detail.querySelector('.d-close').addEventListener('click', function () {
+        detail.style.display = 'none';
+        var main = detail.previousElementSibling;
+        if (main && main.scrollIntoView) main.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      });
       var acBtn = detail.querySelector('.ac-add');
       if (acBtn) acBtn.addEventListener('click', function () { addColourToDesign(detail, acBtn); });
     });

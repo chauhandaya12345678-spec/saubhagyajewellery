@@ -787,8 +787,10 @@
     function cardHtml(cat, clone) {
       var href = 'categories.html?cat=' + encodeURIComponent(cat.slug);
       var bg = "background-image:url('" + cdn(cat.banner) + "');background-color:#0B291C" + (cat.bgpos ? ';background-position:' + cat.bgpos : '');
-      return '<a class="cat-rail-card" data-cat="' + esc(cat.label) + '" data-href="' + esc(href) + '"' +
-        (clone ? ' aria-hidden="true" tabindex="-1"' : ' href="' + esc(href) + '"') + ' aria-label="Shop ' + esc(cat.label) + '">' +
+      // Clones are clickable too (so a "duplicate" a shopper taps still opens the
+      // category) but hidden from screen readers + keyboard to avoid double links.
+      return '<a class="cat-rail-card" data-cat="' + esc(cat.label) + '" data-href="' + esc(href) + '" href="' + esc(href) + '"' +
+        (clone ? ' aria-hidden="true" tabindex="-1"' : '') + ' aria-label="Shop ' + esc(cat.label) + '">' +
         '<div class="cat-bg" style="' + bg + '"></div><div class="cat-shade"></div>' +
         '<div class="cat-text"><div class="k">SHOP NOW</div><h3 class="t">' + esc(cat.label) + '</h3>' +
           (cat.subtitle ? '<div class="s">' + esc(cat.subtitle) + '</div>' : '') + '</div></a>';
@@ -816,8 +818,7 @@
         var live = !cat.length || !!have[name];   // don't grey everything before the catalog loads
         a.classList.toggle('coming-soon', !live);
         var k = a.querySelector('.cat-text .k'); if (k) k.textContent = live ? 'SHOP NOW' : 'COMING SOON';
-        var isClone = a.getAttribute('aria-hidden') === 'true';
-        if (live && !isClone) a.setAttribute('href', a.dataset.href); else a.removeAttribute('href');
+        if (live) a.setAttribute('href', a.dataset.href); else a.removeAttribute('href');
       });
     }
 
@@ -829,13 +830,16 @@
     var t = 0, sp = setInterval(function () { if ((window.SAUBHAGYA_CATALOG || []).length) syncCats(); if (++t > 60) clearInterval(sp); }, 200);
     window.addEventListener('resize', measure);
 
+    // Pause ONLY while the shopper is actually pressing/dragging/scrolling the
+    // rail — NOT on plain hover (hover-pause is what made it look frozen on
+    // desktop the moment the cursor was over it). pointerdown pausing also keeps
+    // the card still at the instant of a click, so links open reliably.
     var paused = false, resumeT = null;
-    ['mouseenter', 'touchstart', 'pointerdown'].forEach(function (ev) {
-      rail.addEventListener(ev, function () { paused = true; clearTimeout(resumeT); }, { passive: true });
-    });
-    ['mouseleave', 'touchend', 'touchcancel'].forEach(function (ev) {
-      rail.addEventListener(ev, function () { clearTimeout(resumeT); resumeT = setTimeout(function () { paused = false; }, 1200); }, { passive: true });
-    });
+    function pause() { paused = true; clearTimeout(resumeT); }
+    function resumeSoon() { clearTimeout(resumeT); resumeT = setTimeout(function () { paused = false; }, 700); }
+    ['pointerdown', 'touchstart'].forEach(function (ev) { rail.addEventListener(ev, pause, { passive: true }); });
+    ['pointerup', 'pointercancel', 'touchend', 'touchcancel'].forEach(function (ev) { rail.addEventListener(ev, resumeSoon, { passive: true }); });
+    rail.addEventListener('wheel', function () { pause(); resumeSoon(); }, { passive: true });
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var SPEED = 0.6;   // px/frame ≈ 36px/s, calm and continuous
     function tick() {
