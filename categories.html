@@ -87,6 +87,18 @@
   .cat-card .lbl { position: absolute; left: 14px; right: 14px; bottom: 14px; color: #fff; font-family:'Playfair Display',serif; font-size: 18px; line-height: 1.15; }
   .cat-card .lbl .arr { display: block; margin-top: 4px; font-family: 'Montserrat',sans-serif; font-size: 10px; letter-spacing:1.5px; color: #C5A880; }
   .cat-card.is-active { outline: 3px solid #C5A880; outline-offset: 2px; }
+  /* Left/right scroll arrows for the category rail */
+  .cat-hub-wrap { position: relative; }
+  .cat-nav { position: absolute; top: 50%; transform: translateY(-50%); z-index: 6; width: 46px; height: 46px;
+    border-radius: 50%; border: 1px solid #e4ddcd; background: rgba(255,255,255,.96); color: #0B291C;
+    font-family: 'Montserrat', sans-serif; font-size: 30px; line-height: 1; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; box-shadow: 0 3px 14px rgba(0,0,0,.16);
+    transition: opacity .25s ease, transform .25s ease, background .25s ease; }
+  .cat-nav:hover { background: #fff; transform: translateY(-50%) scale(1.07); }
+  .cat-nav.prev { left: -8px; } .cat-nav.next { right: -8px; }
+  .cat-nav[disabled] { opacity: 0; pointer-events: none; }
+  @media (hover: none) and (pointer: coarse) { .cat-nav { display: none; } }  /* touch = swipe, hide arrows */
+  @media (max-width: 640px) { .cat-nav { width: 40px; height: 40px; font-size: 25px; } .cat-nav.prev { left: 2px; } .cat-nav.next { right: 2px; } }
   .cat-filterbar { max-width: 1440px; margin: 40px auto 12px; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
   .cat-filterbar h2 { font-family:'Playfair Display',serif; font-weight: 500; font-size: 24px; color: #1A1A1A; margin: 0; }
   .cat-filterbar .count { font-family: 'Montserrat',sans-serif; font-size: 12px; color: #3a3a3a; }
@@ -201,7 +213,11 @@
 </section>
 
 <section class="cat-hub">
-  <div class="cat-hub-grid" id="cat-hub-grid"></div>
+  <div class="cat-hub-wrap">
+    <button class="cat-nav prev" id="cat-nav-prev" type="button" aria-label="Scroll categories left">‹</button>
+    <div class="cat-hub-grid" id="cat-hub-grid"></div>
+    <button class="cat-nav next" id="cat-nav-next" type="button" aria-label="Scroll categories right">›</button>
+  </div>
 </section>
 
 <div class="cat-search"><input id="cat-search-in" type="search" placeholder="Search by name (e.g. Kasu, Kundan, jhumka, choker)…" autocomplete="off"></div>
@@ -332,6 +348,26 @@
         '</a>';
     }).join('');
   }
+
+  // Left/right arrows for the category rail. Desktop only (touch devices swipe,
+  // arrows hidden via CSS). Arrows disable at each end; MutationObserver keeps
+  // them in sync once renderHub() fills the rail.
+  (function () {
+    var grid = $('cat-hub-grid'), prev = $('cat-nav-prev'), next = $('cat-nav-next');
+    if (!grid || !prev || !next) return;
+    function step() { var c = grid.querySelector('.cat-card'); return c ? c.offsetWidth + 16 : 260; }
+    function update() {
+      var max = grid.scrollWidth - grid.clientWidth - 1;
+      prev.disabled = grid.scrollLeft <= 2;
+      next.disabled = max <= 0 || grid.scrollLeft >= max;
+    }
+    prev.addEventListener('click', function () { grid.scrollBy({ left: -step(), behavior: 'smooth' }); });
+    next.addEventListener('click', function () { grid.scrollBy({ left: step(), behavior: 'smooth' }); });
+    grid.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    new MutationObserver(update).observe(grid, { childList: true });
+    update();
+  })();
 
   function findSub(slug) { for (var i = 0; i < SUBS.length; i++) if (SUBS[i].slug === slug) return SUBS[i]; return null; }
 

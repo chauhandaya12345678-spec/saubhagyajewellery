@@ -178,6 +178,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           <option value="month">Last 30 days</option>
           <option value="year">Last 1 year</option>
         </select>
+        <label style="font-size:11px;color:#6a6a6a;display:inline-flex;align-items:center;gap:4px">From<input type="date" id="o-filter-from" style="font-size:12px"></label>
+        <label style="font-size:11px;color:#6a6a6a;display:inline-flex;align-items:center;gap:4px">To<input type="date" id="o-filter-to" style="font-size:12px"></label>
         <input type="text" id="o-filter-q" placeholder="Search order id / phone / name / email">
         <button class="ai-btn small" id="o-reload-btn" type="button">SEARCH</button>
         <button class="ai-btn small ghost" id="o-export-btn" type="button">EXPORT CSV</button>
@@ -451,6 +453,18 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           <span class="ai-status" id="tx-status"></span>
         </div>
       </div>
+
+      <div class="ai-table-wrap" style="padding:20px;max-width:920px;margin-top:18px">
+        <div style="font-size:13px;color:#0B291C;font-weight:700;margin-bottom:2px">Download invoices — date wise</div>
+        <div style="font-size:11.5px;color:#9a9a9a;margin-bottom:14px">GST invoice register (invoice no, date, taxable, CGST/SGST/IGST, total) for a date range — hand this to your CA for GSTR-1.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end">
+          <label class="tx-f">From<input id="ir-from" type="date"></label>
+          <label class="tx-f">To<input id="ir-to" type="date"></label>
+          <button class="ai-save" id="ir-invoice-btn" type="button">DOWNLOAD INVOICE REGISTER (CSV)</button>
+          <button class="ai-btn small ghost" id="ir-credit-btn" type="button">CREDIT-NOTE REGISTER</button>
+          <span class="ai-status" id="ir-status"></span>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -722,6 +736,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   document.getElementById('o-filter-q').addEventListener('keydown', function (e) { if (e.key === 'Enter') loadOrders(); });
   document.getElementById('o-filter-status').addEventListener('change', loadOrders);
   document.getElementById('o-filter-date').addEventListener('change', loadOrders);
+  document.getElementById('o-filter-from').addEventListener('change', loadOrders);
+  document.getElementById('o-filter-to').addEventListener('change', loadOrders);
   document.getElementById('o-export-btn').addEventListener('click', function () {
     var rows = [['Order ID', 'Date', 'Name', 'Phone', 'Email', 'Items', 'Address', 'Total', 'Status', 'AWB', 'Test']];
     lastOrders.forEach(function (o) {
@@ -742,10 +758,14 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var q = document.getElementById('o-filter-q').value.trim();
     status.textContent = 'Loading…';
     tbody.innerHTML = '';
+    var fromEl = document.getElementById('o-filter-from'), toEl = document.getElementById('o-filter-to');
+    var from = fromEl ? fromEl.value : '', to = toEl ? toEl.value : '';
     var params = new URLSearchParams();
     if (filterStatus) params.set('status', filterStatus);
-    if (filterDate) params.set('date', filterDate);
+    if (from || to) { if (from) params.set('from', from); if (to) params.set('to', to); }
+    else if (filterDate) params.set('date', filterDate);   // explicit range wins over the relative window
     if (q) params.set('q', q);
+    params.set('limit', '2000');
     apiFetch('/api/admin/orders-list?' + params.toString())
       .then(function (d) {
         if (!d || !d.success) { status.textContent = (d && d.error) || 'Failed to load'; return; }
@@ -956,6 +976,33 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
   }
   document.getElementById('tx-save-btn').addEventListener('click', saveTaxSettings);
+
+  // Invoice / credit-note register CSV for a date range (GSTR-1 feed for the CA).
+  function downloadRegister(kind) {
+    var from = document.getElementById('ir-from').value, to = document.getElementById('ir-to').value;
+    var st = document.getElementById('ir-status'); st.style.color = '#6a6a6a'; st.textContent = 'Preparing…';
+    var qp = new URLSearchParams();
+    if (from) qp.set('from', from); if (to) qp.set('to', to);
+    if (kind === 'credit') qp.set('doc', 'credit');
+    apiFetch('/api/admin/invoice-register?' + qp.toString())
+      .then(function (d) {
+        if (!d || !d.success) { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Failed'; return; }
+        var noun = kind === 'credit' ? 'credit notes' : 'invoices';
+        if (!d.count) { st.style.color = '#b02f33'; st.textContent = 'No ' + noun + ' in that range.'; return; }
+        var p = function (n) { return ((Number(n) || 0) / 100).toFixed(2); };
+        var rows = [[(kind === 'credit' ? 'Credit Note' : 'Invoice') + ' No', 'Date', 'Order', 'Customer', 'State', 'Supply', 'Taxable', 'CGST', 'SGST', 'IGST', 'Total', 'Payment']];
+        d.rows.forEach(function (r) {
+          rows.push([r.doc_no, r.doc_date, r.order_id, r.name, r.state, r.place, p(r.taxable), p(r.cgst), p(r.sgst), p(r.igst), p(r.total), r.payment]);
+        });
+        var t = d.totals;
+        rows.push(['TOTAL', '', '', '', '', '', p(t.taxable), p(t.cgst), p(t.sgst), p(t.igst), p(t.total), '']);
+        downloadCsv((kind === 'credit' ? 'credit-notes' : 'invoices') + '-' + (from || 'all') + '_to_' + (to || 'all') + '.csv', rows);
+        st.style.color = '#23784a'; st.textContent = '✓ ' + d.count + ' ' + noun + ' downloaded.';
+      })
+      .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+  document.getElementById('ir-invoice-btn').addEventListener('click', function () { downloadRegister('invoice'); });
+  document.getElementById('ir-credit-btn').addEventListener('click', function () { downloadRegister('credit'); });
 
   // ============ DAILY PICKUP MANIFEST ============
   document.getElementById('o-manifest-btn').addEventListener('click', function () {
