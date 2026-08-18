@@ -13,6 +13,8 @@ body { margin: 0; background: #F0F5FA; font-family: 'Montserrat', sans-serif; fo
 .ai-tabs { display: flex; gap: 4px; margin-left: 24px; }
 .ai-tab { padding: 8px 16px; border-radius: 8px 8px 0 0; font-size: 11px; letter-spacing: 1px; color: #cfd8d3; cursor: pointer; background: transparent; border: none; font-family: inherit; }
 .ai-tab.active { background: #F0F5FA; color: #0B291C; font-weight: 600; }
+.tx-f { display:flex; flex-direction:column; font-size:11px; color:#6a6a6a; gap:4px; }
+.tx-f input { padding:7px 9px; border:1px solid #ddd6c6; border-radius:6px; font-size:13px; font-family:inherit; }
 .ai-wrap { max-width: min(1680px, 96vw); margin: 32px auto; padding: 0 24px 80px; }
 .ai-auth { background: #fff; border: 1px solid #eae5d8; border-radius: 12px; padding: 32px; max-width: 400px; margin: 60px auto; }
 .ai-auth h2 { margin: 0 0 18px; font-size: 16px; }
@@ -59,7 +61,7 @@ tr.ai-attention td { background: #fdf0ef; }
 tr.ai-attention:hover td { background: #fbe4e2; }
 .ai-attention-flag { display: inline-block; margin-top: 4px; font-size: 9px; letter-spacing: .5px; color: #c0392b; font-weight: 700; text-transform: uppercase; }
 .role-staff .pack-btn, .role-staff .ai-save, .role-staff .edit-toggle, .role-staff #users-tab-btn,
-  .role-staff .ai-tab[data-tab="reviews"], .role-staff .ai-tab[data-tab="add"] { display: none !important; }
+  .role-staff .ai-tab[data-tab="reviews"], .role-staff .ai-tab[data-tab="add"], .role-staff .ai-tab[data-tab="tax"] { display: none !important; }
 .ai-toggle-link { font-size: 11px; color: #0B291C; text-decoration: underline; cursor: pointer; margin-top: 14px; display: inline-block; }
 .ai-role-badge { font-size: 9px; letter-spacing: 1px; color: #C5A880; margin-left: auto; padding: 4px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 20px; }
 .ai-form-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
@@ -92,6 +94,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <button class="ai-tab" data-tab="activity" type="button">ACTIVITY</button>
     <button class="ai-tab" data-tab="reviews" type="button">REVIEWS</button>
     <button class="ai-tab" data-tab="users" type="button" id="users-tab-btn">USERS</button>
+    <button class="ai-tab" data-tab="tax" type="button" id="tax-tab-btn">TAX / INVOICE</button>
   </div>
   <span class="ai-role-badge" id="ai-role-badge" style="display:none"></span>
   <button class="ai-tab" id="ai-logout-btn" type="button" style="display:none">LOGOUT</button>
@@ -178,6 +181,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         <input type="text" id="o-filter-q" placeholder="Search order id / phone / name / email">
         <button class="ai-btn small" id="o-reload-btn" type="button">SEARCH</button>
         <button class="ai-btn small ghost" id="o-export-btn" type="button">EXPORT CSV</button>
+        <button class="ai-btn small ghost" id="o-manifest-btn" type="button">MANIFEST</button>
         <span class="ai-count" id="o-count"></span>
       </div>
       <div class="ai-table-wrap">
@@ -412,6 +416,63 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       <div class="ai-status" id="u-load-status"></div>
     </div>
 
+    <div id="panel-tax" style="display:none">
+      <div class="ai-table-wrap" style="padding:20px;max-width:920px">
+        <div style="font-size:13px;color:#0B291C;font-weight:700;margin-bottom:2px">Business / Tax identity — printed on every legal GST invoice</div>
+        <div style="font-size:11.5px;color:#9a9a9a;margin-bottom:16px;line-height:1.6">This is the <b>supplier</b> on the tax invoice — the <b>GSTIN holder</b>, not the store brand. Independent of ShipPrime. When your own GSTIN is issued, change it here (a fresh invoice series starts automatically under the new financial year).</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 18px">
+          <label class="tx-f">Trade name (shown on invoice)<input id="tx-tradeName" type="text"></label>
+          <label class="tx-f">Legal name (kept on record, not printed)<input id="tx-legalName" type="text"></label>
+          <label class="tx-f">GSTIN<input id="tx-gstin" type="text" placeholder="27ABCDE1234F1Z5"></label>
+          <label class="tx-f">PAN<input id="tx-pan" type="text"></label>
+          <label class="tx-f">Address line 1<input id="tx-addr1" type="text"></label>
+          <label class="tx-f">Address line 2<input id="tx-addr2" type="text"></label>
+          <label class="tx-f">City<input id="tx-city" type="text"></label>
+          <label class="tx-f">State (seller / place of supply origin)<input id="tx-state" type="text"></label>
+          <label class="tx-f">Pincode<input id="tx-pincode" type="text"></label>
+          <label class="tx-f">Seller state for tax split<input id="tx-sellerState" type="text"></label>
+          <label class="tx-f">HSN code<input id="tx-hsn" type="text" placeholder="7117"></label>
+          <label class="tx-f">GST rate %<input id="tx-gstRate" type="number" step="0.01"></label>
+          <label class="tx-f" style="display:flex;flex-direction:row;align-items:center;gap:8px;padding-top:18px"><input id="tx-pricesIncludeGst" type="checkbox" style="width:auto"> Prices already include GST</label>
+          <div></div>
+          <label class="tx-f">Invoice number prefix<input id="tx-invoicePrefix" type="text" placeholder="SJ"></label>
+          <label class="tx-f">Credit-note prefix<input id="tx-creditPrefix" type="text" placeholder="SJ/CN"></label>
+          <label class="tx-f">Bank name<input id="tx-bankName" type="text"></label>
+          <label class="tx-f">Bank branch<input id="tx-bankBranch" type="text"></label>
+          <label class="tx-f">Account number<input id="tx-bankAcc" type="text"></label>
+          <label class="tx-f">IFSC<input id="tx-bankIfsc" type="text"></label>
+          <label class="tx-f">Contact phone<input id="tx-phone" type="text"></label>
+          <label class="tx-f">Contact email<input id="tx-email" type="text"></label>
+          <label class="tx-f" style="grid-column:1/3">Declaration<input id="tx-declaration" type="text"></label>
+          <label class="tx-f" style="grid-column:1/3">Footer note<input id="tx-footerNote" type="text"></label>
+        </div>
+        <div style="margin-top:18px;display:flex;gap:10px;align-items:center">
+          <button class="ai-save" id="tx-save-btn" type="button">SAVE TAX SETTINGS</button>
+          <span class="ai-status" id="tx-status"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="docs-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(10,15,12,.55);justify-content:center;align-items:flex-start;padding:36px 16px;overflow:auto">
+  <div style="background:#fff;border-radius:14px;max-width:560px;width:100%;padding:22px 24px;box-shadow:0 12px 40px rgba(0,0,0,.3)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:2px">
+      <div style="font:700 16px Georgia,serif;color:#0B291C" id="dm-title">Order</div>
+      <button class="ai-btn small ghost" id="dm-close" type="button">✕</button>
+    </div>
+    <div id="dm-sub" style="font-size:12px;color:#9a9a9a;margin-bottom:16px"></div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:10px;letter-spacing:1.5px;color:#C5A880;margin-bottom:8px">DOCUMENTS</div>
+      <div id="dm-doc-row" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:10px;letter-spacing:1.5px;color:#C5A880;margin-bottom:8px">FINANCE</div>
+      <div id="dm-fin-row" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+      <div id="dm-tax" style="font-size:11.5px;color:#6a6a6a;margin-top:10px;line-height:1.7"></div>
+    </div>
+    <div class="ai-status" id="dm-status"></div>
   </div>
 </div>
 
@@ -644,6 +705,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     document.getElementById('panel-activity').style.display = tab === 'activity' ? 'block' : 'none';
     document.getElementById('panel-reviews').style.display = tab === 'reviews' ? 'block' : 'none';
     document.getElementById('panel-users').style.display = tab === 'users' ? 'block' : 'none';
+    document.getElementById('panel-tax').style.display = tab === 'tax' ? 'block' : 'none';
+    if (tab === 'tax') loadTaxSettings();
     if (tab === 'dashboard') loadDashboard();
     if (tab === 'orders' && !lastOrders.length) loadOrders();
     if (tab === 'inventory') { if (!lastProducts.length) loadProducts(); if (!adminCatRecords) loadCategoriesAdmin(); }
@@ -703,7 +766,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
           } else if (o.status === 'packed') {
             actions += '<button class="ai-btn small ghost cancel-btn" data-id="' + esc(o.id) + '" type="button" style="color:#c0392b;border-color:#c0392b;">CANCEL</button>';
           }
-          actions += '<button class="ai-btn small ghost slip-btn" data-id="' + esc(o.id) + '" type="button">PRINT SLIP</button></div>';
+          actions += '<button class="ai-btn small ghost slip-btn" data-id="' + esc(o.id) + '" type="button">PRINT SLIP</button>';
+          actions += '<button class="ai-btn small docs-btn" data-id="' + esc(o.id) + '" type="button" style="background:#0B291C;color:#fff">DOCS</button></div>';
           var needsAttention = PRE_SHIP_STATUSES.indexOf(o.status) !== -1 && new Date() > dispatchDeadline(o.created_at, addr.pin);
           return '<tr class="' + (needsAttention ? 'ai-attention' : '') + '" data-order-row="' + esc(o.id) + '">' +
             '<td class="ai-oid">' + esc(o.id) + (o.test_mode ? '<span class="ai-test">TEST</span>' : '') + '</td>' +
@@ -727,6 +791,9 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         });
         tbody.querySelectorAll('.slip-btn').forEach(function (btn) {
           btn.addEventListener('click', function () { printSlip(btn.getAttribute('data-id')); });
+        });
+        tbody.querySelectorAll('.docs-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () { openOrderDocs(btn.getAttribute('data-id')); });
         });
         syncLiveStatuses(d.orders);
       })
@@ -799,6 +866,123 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     w.document.write(html);
     w.document.close();
     w.focus();
+    setTimeout(function () { w.print(); }, 250);
+  }
+
+  // ============ ORDER DOCUMENTS (label / invoice / credit note) ============
+  function openOrderDocs(orderId) {
+    var m = document.getElementById('docs-modal');
+    document.getElementById('dm-title').textContent = 'Order ' + orderId;
+    document.getElementById('dm-sub').textContent = 'Loading…';
+    document.getElementById('dm-doc-row').innerHTML = '';
+    document.getElementById('dm-fin-row').innerHTML = '';
+    document.getElementById('dm-tax').innerHTML = '';
+    document.getElementById('dm-status').textContent = '';
+    m.style.display = 'flex';
+    apiFetch('/api/admin/order-docs?id=' + encodeURIComponent(orderId))
+      .then(function (d) {
+        if (!d || !d.success) { document.getElementById('dm-sub').textContent = (d && d.error) || 'Failed to load'; return; }
+        renderDocsModal(d);
+      })
+      .catch(function (e) { document.getElementById('dm-sub').textContent = 'Error: ' + e.message; });
+  }
+  function renderDocsModal(d) {
+    var o = d.order;
+    document.getElementById('dm-sub').textContent = (o.name || '') + ' · ' + (o.status || '') + ' · ' + inr(o.total);
+    var doc = document.getElementById('dm-doc-row');
+    doc.innerHTML = d.labelUrl
+      ? '<a class="ai-btn small" href="' + esc(d.labelUrl) + '" target="_blank" rel="noopener" style="background:#0B291C;color:#fff;text-decoration:none">SHIPPING LABEL</a>'
+      : '<span style="font-size:11.5px;color:#9a9a9a">No label yet — order not shipped.</span>';
+    doc.innerHTML += '<button class="ai-btn small ghost dm-slip" type="button">PACKING SLIP</button>';
+    doc.querySelector('.dm-slip').addEventListener('click', function () { printSlip(o.id); });
+
+    var fin = document.getElementById('dm-fin-row');
+    fin.innerHTML = '';
+    fin.innerHTML += o.invoice_no
+      ? '<a class="ai-btn small" href="' + esc(d.invoiceUrl) + '" target="_blank" rel="noopener" style="background:#0B291C;color:#fff;text-decoration:none">INVOICE ' + esc(o.invoice_no) + '</a>'
+      : '<button class="ai-btn small dm-issue" data-type="invoice" type="button" style="background:#0B291C;color:#fff">GENERATE INVOICE</button>';
+    fin.innerHTML += o.credit_note_no
+      ? '<a class="ai-btn small ghost" href="' + esc(d.creditUrl) + '" target="_blank" rel="noopener" style="text-decoration:none">CREDIT NOTE ' + esc(o.credit_note_no) + '</a>'
+      : '<button class="ai-btn small ghost dm-issue" data-type="credit" type="button">GENERATE CREDIT NOTE</button>';
+    fin.querySelectorAll('.dm-issue').forEach(function (b) {
+      b.addEventListener('click', function () { issueDoc(o.id, b.getAttribute('data-type')); });
+    });
+    var tx = d.invoice;
+    var split = tx.interState ? ('IGST ' + inr(tx.igst)) : ('CGST ' + inr(tx.cgst) + ' + SGST ' + inr(tx.sgst));
+    document.getElementById('dm-tax').innerHTML =
+      'Taxable ' + inr(tx.taxable) + ' · ' + split + ' · Total ' + inr(tx.grandTotal) +
+      '<br>Supplier: ' + esc(d.business.tradeName || '') +
+      (d.business.gstin ? ' · GSTIN ' + esc(d.business.gstin) : ' · <span style="color:#c0392b">no GSTIN set</span>');
+  }
+  function issueDoc(orderId, type) {
+    var st = document.getElementById('dm-status'); st.style.color = '#6a6a6a'; st.textContent = 'Generating…';
+    apiFetch('/api/admin/order-docs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: orderId, issue: type }) })
+      .then(function (d) {
+        if (d && d.success) { st.style.color = '#23784a'; st.textContent = '✓ ' + d.number; openOrderDocs(orderId); }
+        else { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Failed'; }
+      })
+      .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+  document.getElementById('dm-close').addEventListener('click', function () { document.getElementById('docs-modal').style.display = 'none'; });
+  document.getElementById('docs-modal').addEventListener('click', function (e) { if (e.target === this) this.style.display = 'none'; });
+
+  // ============ TAX / BUSINESS SETTINGS ============
+  var TX_FIELDS = ['tradeName', 'legalName', 'gstin', 'pan', 'addr1', 'addr2', 'city', 'state',
+    'pincode', 'sellerState', 'hsn', 'gstRate', 'invoicePrefix', 'creditPrefix', 'bankName',
+    'bankBranch', 'bankAcc', 'bankIfsc', 'phone', 'email', 'declaration', 'footerNote'];
+  function loadTaxSettings() {
+    var st = document.getElementById('tx-status'); st.style.color = '#6a6a6a'; st.textContent = 'Loading…';
+    apiFetch('/api/admin/business-settings')
+      .then(function (d) {
+        if (!d || !d.success) { st.textContent = (d && d.error) || 'Failed'; return; }
+        var c = d.config || {};
+        TX_FIELDS.forEach(function (k) { var el = document.getElementById('tx-' + k); if (el) el.value = c[k] != null ? c[k] : ''; });
+        var pg = document.getElementById('tx-pricesIncludeGst'); if (pg) pg.checked = c.pricesIncludeGst !== false;
+        st.textContent = '';
+      })
+      .catch(function (e) { st.textContent = 'Error: ' + e.message; });
+  }
+  function saveTaxSettings() {
+    var body = {};
+    TX_FIELDS.forEach(function (k) { var el = document.getElementById('tx-' + k); if (el) body[k] = el.value; });
+    body.gstRate = Number(document.getElementById('tx-gstRate').value) || 0;
+    body.pricesIncludeGst = document.getElementById('tx-pricesIncludeGst').checked;
+    var st = document.getElementById('tx-status'); st.style.color = '#6a6a6a'; st.textContent = 'Saving…';
+    apiFetch('/api/admin/business-settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (d) {
+        if (d && d.success) { st.style.color = '#23784a'; st.textContent = '✓ Saved. Applies to invoices generated from now on.'; }
+        else { st.style.color = '#b02f33'; st.textContent = (d && d.error) || 'Save failed'; }
+      })
+      .catch(function (e) { st.style.color = '#b02f33'; st.textContent = 'Error: ' + e.message; });
+  }
+  document.getElementById('tx-save-btn').addEventListener('click', saveTaxSettings);
+
+  // ============ DAILY PICKUP MANIFEST ============
+  document.getElementById('o-manifest-btn').addEventListener('click', function () {
+    var today = new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
+    var date = window.prompt('Manifest date (YYYY-MM-DD):', today);
+    if (!date) return;
+    apiFetch('/api/admin/manifest?date=' + encodeURIComponent(date))
+      .then(function (d) { if (!d || !d.success) { alert((d && d.error) || 'Failed'); return; } printManifest(d); })
+      .catch(function (e) { alert(e.message); });
+  });
+  function printManifest(d) {
+    var b = d.business || {};
+    var pickup = [b.tradeName || b.legalName, b.addr1, b.addr2, b.city, b.state, b.pincode].filter(Boolean).map(esc).join(', ');
+    var rows = (d.rows || []).map(function (r, i) {
+      return '<tr><td>' + (i + 1) + '</td><td>' + esc(r.awb) + '</td><td>' + esc(r.id) + '</td><td>' + esc(r.name) + '</td>' +
+        '<td>' + esc(r.city) + ' - ' + esc(r.pin) + '</td><td style="text-align:right">' + (r.weightGrams || 0) + ' g</td>' +
+        '<td style="text-align:right">' + (r.codPaise ? '₹' + (r.codPaise / 100).toFixed(0) : '-') + '</td></tr>';
+    }).join('');
+    var html = '<!doctype html><html><head><meta charset="utf-8"><title>Manifest ' + esc(d.date) + '</title>' +
+      '<style>body{font-family:Arial;padding:30px;color:#111}h1{font-size:17px;margin:0 0 4px}table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}th,td{border:1px solid #ccc;padding:6px 8px;text-align:left}th{background:#f3f0e8}</style></head><body>' +
+      '<h1>PICKUP MANIFEST — ' + esc(d.date) + '</h1>' +
+      '<div style="font-size:12px;color:#555">Pickup: ' + pickup + '</div>' +
+      '<div style="font-size:12px;color:#555;margin-top:4px">Total shipments: <b>' + d.count + '</b></div>' +
+      '<table><thead><tr><th>#</th><th>AWB</th><th>Order</th><th>Consignee</th><th>Destination</th><th>Weight</th><th>COD</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<div style="margin-top:40px;font-size:12px">Handed over by: ____________________ &nbsp;&nbsp; Courier signature: ____________________</div>' +
+      '</body></html>';
+    var w = window.open('', '_blank'); w.document.write(html); w.document.close(); w.focus();
     setTimeout(function () { w.print(); }, 250);
   }
 

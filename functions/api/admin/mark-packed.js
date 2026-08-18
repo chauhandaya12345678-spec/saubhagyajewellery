@@ -5,7 +5,8 @@
  * Marks an order 'packed' — the warehouse-side signal that the SKU is
  * physically boxed, ahead of ShipPrime pickup. Only valid from 'confirmed'.
  */
-import { verifyAdminAccess, adminCorsHeaders, logOrderEvent, pushToShipPrime, recordShipprimeResult, sendWhatsAppMessage, orderProductLabel } from '../_lib.js';
+import { verifyAdminAccess, adminCorsHeaders, logOrderEvent, pushToShipPrime, recordShipprimeResult, sendWhatsAppMessage, orderProductLabel, sendInvoiceEmail } from '../_lib.js';
+import { issueDocNumber } from './_docs.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -54,7 +55,8 @@ export async function onRequest(context) {
 
     // Fetch full order data for ShipPrime push + WhatsApp
     const fullOrder = await db.prepare(
-      `SELECT id, name, email, phone, address, items, total, payment_method, test_mode
+      `SELECT id, name, email, phone, address, items, total, payment_method, test_mode,
+              track_token, created_at, invoice_no, invoice_date, credit_note_no
          FROM orders WHERE id = ?`
     ).bind(orderId).first();
     if (!fullOrder) {
@@ -91,10 +93,36 @@ export async function onRequest(context) {
       if (context.waitUntil) context.waitUntil(waJob);
     }
 
+    // Legal tax invoice: assign the FY-sequenced number now (at dispatch/removal,
+    // per GST Sec 31) and email the customer a secure link to the invoice page.
+    let invoiceNo = null;
+    if (shipprimeResult.pushed) {
+      try {
+        const issued = await issueDocNumber(env, {
+          id: fullOrder.id, created_at: fullOrder.created_at,
+          invoice_no: fullOrder.invoice_no, invoice_date: fullOrder.invoice_date,
+          credit_note_no: fullOrder.credit_note_no,
+        }, 'invoice');
+        invoiceNo = issued.number;
+        await logOrderEvent(db, orderId, 'invoice_issued', 1, invoiceNo);
+        if (fullOrder.email && fullOrder.track_token) {
+          const origin = new URL(request.url).origin;
+          const invoiceUrl = `${origin}/invoice?order=${encodeURIComponent(fullOrder.id)}&t=${encodeURIComponent(fullOrder.track_token)}`;
+          const mailJob = sendInvoiceEmail(env, { id: fullOrder.id, name: fullOrder.name, email: fullOrder.email }, invoiceNo, invoiceUrl)
+            .then(r => logOrderEvent(db, orderId, 'invoice_email', r && r.sent ? 1 : 0, r && r.sent ? ('id ' + (r.id || 'mock')) : (r && r.error) || 'unknown'))
+            .catch(() => {});
+          if (context.waitUntil) context.waitUntil(mailJob);
+        }
+      } catch (e) {
+        await logOrderEvent(db, orderId, 'invoice_issued', 0, String(e.message || e)).catch(() => {});
+      }
+    }
+
     return new Response(JSON.stringify({
       success: true,
       order_id: orderId,
       status: 'packed',
+      invoice_no: invoiceNo,
       shipprime: { pushed: shipprimeResult.pushed, awb: shipprimeResult.awb || null, courier: shipprimeResult.courier || null },
     }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders },

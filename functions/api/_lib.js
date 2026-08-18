@@ -785,12 +785,13 @@ export async function recordShipprimeResult(db, orderId, sp) {
     if (ok) {
       await db.prepare(
         `UPDATE orders SET shipprime_awb = ?, shipprime_order_id = ?,
+                            awb_url = COALESCE(?, awb_url),
                             shipprime_error = NULL,
                             shipprime_attempts = COALESCE(shipprime_attempts,0) + 1,
                             shipprime_last_attempt_at = datetime('now'),
                             updated_at = datetime('now')
           WHERE id = ?`
-      ).bind(sp.awb, sp.shipPrimeOrderId || sp.shipment_id || '', orderId).run();
+      ).bind(sp.awb, sp.shipPrimeOrderId || sp.shipment_id || '', sp.labelUrl || null, orderId).run();
     } else {
       await db.prepare(
         `UPDATE orders SET shipprime_error = ?,
@@ -916,6 +917,50 @@ export async function sendOrderEmail(env, order) {
         subject: `Order ${order.id} confirmed · Saubhagya Jewellery`,
         html,
       }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { sent: false, error: 'Resend error: ' + JSON.stringify(data).slice(0, 300) };
+    return { sent: true, id: data.id };
+  } catch (err) {
+    return { sent: false, error: 'Email error: ' + err.message };
+  }
+}
+
+/**
+ * Tax-invoice email sent at dispatch. Links to the token-gated /invoice page
+ * (view / print / download) — no PDF attachment. Same Resend plumbing as
+ * sendOrderEmail; no-ops without RESEND_API_KEY / no email; never throws.
+ * order = { id, name, email }, invoiceNo, invoiceUrl
+ */
+export async function sendInvoiceEmail(env, order, invoiceNo, invoiceUrl) {
+  if (env.UAT_MODE === 'true') return { sent: true, mock: true, id: 'UAT-MOCK', preview: { to: order && order.email, invoiceNo, invoiceUrl }, reason: 'UAT sandbox — invoice email simulated (not sent)' };
+  try {
+    const key = env.RESEND_API_KEY;
+    if (!key) return { sent: false, error: 'RESEND_API_KEY not configured' };
+    if (!order.email) return { sent: false, error: 'no customer email' };
+    if (!invoiceUrl) return { sent: false, error: 'no invoice url' };
+    const from = env.ORDER_EMAIL_FROM || 'Saubhagya Jewellery <care@saubhagyajewellery.com>';
+    const bcc = env.ORDER_EMAIL_BCC || 'care@saubhagyajewellery.com';
+    const html =
+`<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;color:#1A1A1A">
+  <div style="text-align:center;padding:26px 0 14px">
+    <div style="font:600 24px Georgia,serif;letter-spacing:2px;color:#0B291C">SAUBHAGYA</div>
+    <div style="font-size:9px;letter-spacing:5px;color:#C5A880;margin-top:3px">FINE JEWELLERY</div>
+  </div>
+  <div style="background:#0B291C;color:#fff;padding:22px 24px;text-align:center">
+    <div style="font:600 20px Georgia,serif">Your Tax Invoice</div>
+    <div style="font-size:13px;opacity:.85;margin-top:6px">Order <strong>${esc(order.id)}</strong>${invoiceNo ? ' · Invoice <strong>' + esc(invoiceNo) + '</strong>' : ''}</div>
+  </div>
+  <div style="padding:24px;text-align:center">
+    <p style="font-size:14px;line-height:1.6;color:#4a4a4a;margin:0 0 20px">Hi ${esc((order.name || 'there').split(' ')[0])}, your order has been dispatched. Your GST tax invoice is ready — view, print or save it as PDF below.</p>
+    <a href="${esc(invoiceUrl)}" style="display:inline-block;background:#0B291C;color:#fff;text-decoration:none;padding:13px 30px;border-radius:8px;font-size:14px">View / Download Invoice</a>
+    <p style="font-size:12px;color:#9a9a9a;margin-top:22px">A copy is also included with your parcel. Track your order anytime at <a href="https://saubhagyajewellery.com/track-orders.html" style="color:#0B291C">My Orders</a>.</p>
+  </div>
+</div>`;
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to: [order.email], bcc: [bcc], subject: `Tax Invoice ${invoiceNo || ''} · Order ${order.id}`.trim(), html }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return { sent: false, error: 'Resend error: ' + JSON.stringify(data).slice(0, 300) };
