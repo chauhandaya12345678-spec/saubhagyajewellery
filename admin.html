@@ -496,6 +496,67 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     return fetch(path, opts).then(function (r) { return r.json(); });
   }
 
+  // ---- Auto-WebP on upload ----------------------------------------------
+  // Every product/banner photo picker runs the chosen file through the browser
+  // canvas → WebP BEFORE it is uploaded, so the store never ships a heavy JPEG/
+  // PNG again (the server keys the R2 extension off the file's content-type, so
+  // a WebP File is stored as .webp automatically). A little chip under each
+  // picker previews the result + the size saved; the existing Save/Replace/Add
+  // buttons then upload the converted file. All reads go through sjPicked().
+  function sjKB(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+  function sjToWebp(file, opts) {
+    opts = opts || {};
+    var maxEdge = opts.maxEdge || 1200, quality = opts.quality != null ? opts.quality : 0.82;
+    return new Promise(function (resolve) {
+      if (!file || !/^image\//.test(file.type || '')) return resolve(null);
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var scale = Math.min(1, maxEdge / Math.max(w, h));
+        var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+        var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+        try { cv.getContext('2d').drawImage(img, 0, 0, cw, ch); } catch (e) { URL.revokeObjectURL(url); return resolve(null); }
+        URL.revokeObjectURL(url);
+        cv.toBlob(function (blob) {
+          if (!blob) return resolve(null);
+          var base = (file.name || 'image').replace(/\.[^.]+$/, '');
+          resolve({ file: new File([blob], base + '.webp', { type: 'image/webp' }), w: cw, h: ch, origSize: file.size, newSize: blob.size });
+        }, 'image/webp', quality);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+  // The file actually uploaded for a picker: the converted WebP if ready, else raw.
+  function sjPicked(inp) { return inp ? (inp.__webp || (inp.files && inp.files[0]) || null) : null; }
+  function sjChip(inp) {
+    if (inp.__chip && inp.__chip.parentNode) return inp.__chip;
+    var c = document.createElement('div');
+    c.className = 'sj-webp-chip';
+    c.style.cssText = 'font-size:10.5px;margin:3px 0 0;line-height:1.4';
+    inp.insertAdjacentElement('afterend', c); inp.__chip = c; return c;
+  }
+  document.addEventListener('change', function (e) {
+    var inp = e.target;
+    if (!inp || inp.tagName !== 'INPUT' || inp.type !== 'file') return;
+    if ((inp.accept || '').indexOf('image') === -1) return;
+    inp.__webp = null;
+    var chip = sjChip(inp), f = inp.files && inp.files[0];
+    if (!f) { chip.innerHTML = ''; return; }
+    if (f.type === 'image/webp') { inp.__webp = f; chip.innerHTML = '<b style="color:#23784a">Already WebP ✓</b> · ' + sjKB(f.size); return; }
+    chip.innerHTML = '<span style="color:#8a6d2f">Converting to WebP…</span>';
+    sjToWebp(f).then(function (r) {
+      if (!r) { chip.innerHTML = '<span style="color:#b02f33">Could not convert — will upload the original</span>'; return; }
+      inp.__webp = r.file;
+      var pct = r.origSize ? Math.round((1 - r.newSize / r.origSize) * 100) : 0;
+      chip.innerHTML =
+        '<img src="' + URL.createObjectURL(r.file) + '" width="34" height="34" style="width:34px;height:34px;object-fit:cover;border-radius:5px;vertical-align:middle;margin-right:6px;border:1px solid #e3dccb">' +
+        '<b style="color:#23784a">WebP ✓</b> ' + r.w + '×' + r.h + ' · ' +
+        '<s style="color:#b02f33">' + sjKB(r.origSize) + '</s> → <b>' + sjKB(r.newSize) + '</b>' +
+        (pct > 0 ? ' <span style="color:#6a6a6a">(' + pct + '% smaller)</span>' : '');
+    });
+  });
+
   // ---- Auth ----
   function enterAdmin() {
     document.getElementById('ai-auth-screen').style.display = 'none';
@@ -922,7 +983,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var label = (detail.querySelector('.ac-label').value || '').trim();
     var sku = (detail.querySelector('.ac-sku').value || '').trim();
     var stock = (detail.querySelector('.ac-stock').value || '0').trim();
-    var file = detail.querySelector('.ac-file').files[0];
+    var file = sjPicked(detail.querySelector('.ac-file'));
     var llEl = detail.querySelector('.ac-leadlabel');
     var leadLabel = (single && llEl) ? (llEl.value || '').trim() : '';
     if (!label || !sku) { st.style.color = '#b02f33'; st.textContent = 'Colour name and SKU required.'; return; }
@@ -989,7 +1050,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   // shared switcher on every sibling row, so the swatch matches the new photo.
   function uploadDetailPhoto(detail) {
     var sku = detail.getAttribute('data-sku');
-    var file = detail.querySelector('.d-file').files[0];
+    var file = sjPicked(detail.querySelector('.d-file'));
     var st = detail.querySelector('.d-status');
     if (!file) { st.style.color = '#b02f33'; st.textContent = 'Choose a photo first.'; return; }
     var main = detail.previousElementSibling;
@@ -1018,7 +1079,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
   // Second (extra) photo → altImage. Upload sets it; Remove clears it.
   function uploadSecondPhoto(detail) {
     var sku = detail.getAttribute('data-sku');
-    var file = detail.querySelector('.d2-file').files[0];
+    var file = sjPicked(detail.querySelector('.d2-file'));
     var st = detail.querySelector('.d-status');
     if (!file) { st.style.color = '#b02f33'; st.textContent = 'Choose a second photo first.'; return; }
     st.style.color = '#6a6a6a'; st.textContent = 'Uploading…';
@@ -1190,7 +1251,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     var label = row.querySelector('.cm-label').value.trim();
     var subtitle = row.querySelector('.cm-sub').value.trim();
     var position = row.querySelector('.cm-pos').value;
-    var file = row.querySelector('.cm-file').files[0];
+    var file = sjPicked(row.querySelector('.cm-file'));
     if (!label) { st.style.color = '#b02f33'; st.textContent = 'Name required.'; return; }
     cmUploadBanner(file).then(function (url) {
       var body = { oldSlug: slug, slug: slug, label: label, subtitle: subtitle, position: position };
@@ -1221,7 +1282,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       var label = (document.getElementById('cm-new-label').value || '').trim();
       var sub = (document.getElementById('cm-new-sub').value || '').trim();
       var pos = document.getElementById('cm-new-pos').value;
-      var file = document.getElementById('cm-new-file').files[0];
+      var file = sjPicked(document.getElementById('cm-new-file'));
       if (!label) { st.style.color = '#b02f33'; st.textContent = 'Name is required.'; return; }
       st.style.color = '#6a6a6a'; st.textContent = 'Adding…'; addBtn.disabled = true;
       cmUploadBanner(file).then(function (url) {
@@ -1390,7 +1451,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
         var suffix = row.querySelector('.pb-suffix').value.trim();
         var sku = row.querySelector('.pb-sku').value.trim();
         var stock = row.querySelector('.pb-stock').value.trim();
-        var file = row.querySelector('.pb-file').files[0];
+        var file = sjPicked(row.querySelector('.pb-file'));
         if (!sku) err = err || ('Colour #' + (i + 1) + ': SKU missing — fill Base SKU at the top.');
         if (multi && !label) err = err || ('Colour #' + (i + 1) + ': enter the colour name.');
         if (!file) err = err || ((multi ? (label || 'Colour #' + (i + 1)) : 'This product') + ': add a photo.');
