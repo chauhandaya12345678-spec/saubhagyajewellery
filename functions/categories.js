@@ -48,7 +48,12 @@ export async function onRequest(context) {
   let html = await loadShell(request, env);
 
   try {
-    const all = await fetchProducts(env);
+    // Timeout-bound the D1 read so a stalled query can't hang the Function into a
+    // 504 under crawler load; slow D1 → serve the shell (client still hydrates).
+    const all = await Promise.race([
+      fetchProducts(env),
+      new Promise((res) => setTimeout(() => res(null), 4000)),
+    ]) || [];
     // One card per design (colour siblings canonicalize onto their lead — see
     // functions/_pdp.js). This matches both the client grid (catalog.js hides
     // isVariantDup) and the sitemap, so every SSR link is a canonical URL.

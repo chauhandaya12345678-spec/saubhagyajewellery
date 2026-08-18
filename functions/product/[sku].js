@@ -88,7 +88,12 @@ export async function onRequest(context) {
   let p = null;
   let dbError = false;
   try {
-    p = await env.DB.prepare('SELECT * FROM products WHERE sku = ?').bind(sku).first();
+    // Timeout the read so a stalled D1 under crawler load can't hang into a 504;
+    // a timeout is treated like a D1 error → retryable 503 (never drops the SKU).
+    p = await Promise.race([
+      env.DB.prepare('SELECT * FROM products WHERE sku = ?').bind(sku).first(),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('d1 timeout')), 4000)),
+    ]);
   } catch (e) { dbError = true; }
 
   // No product: serve the un-rendered shell and do NOT cache it, so a product

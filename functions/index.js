@@ -36,8 +36,15 @@ export async function onRequest(context) {
   let html = await loadShell(request, env);
 
   try {
-    const all = await fetchProducts(env);
-    const picks = all.filter(p => !isVariantDup(p)).slice(0, 8);
+    // Bound the D1 read: under bursty crawler load a query can stall, and an
+    // un-timed await would hang the Function past the edge limit → 504. If D1 is
+    // slow (>4s) we skip injection and serve the shell — identical to the D1-error
+    // path below; catalog.js still hydrates the grid, so users see no difference.
+    const all = await Promise.race([
+      fetchProducts(env),
+      new Promise((res) => setTimeout(() => res(null), 4000)),
+    ]);
+    const picks = (all || []).filter(p => !isVariantDup(p)).slice(0, 8);
     if (picks.length) {
       const cards = picks.map(p => productCard(p, 'tr')).join('');
       html = html

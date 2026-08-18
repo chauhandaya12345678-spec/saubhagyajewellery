@@ -76,9 +76,10 @@ const GUIDES_ALL = [
  */
 async function relatedProducts(env, p) {
   try {
-    const { results } = await env.DB.prepare(
-      'SELECT sku, name, price, image FROM products WHERE category = ? AND inStock = 1 ORDER BY sku'
-    ).bind(p.category || '').all();
+    const { results } = await Promise.race([
+      env.DB.prepare('SELECT sku, name, price, image FROM products WHERE category = ? AND inStock = 1 ORDER BY sku').bind(p.category || '').all(),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('d1 timeout')), 3000)),
+    ]);
     const all = results || [];
     if (all.length < 2) return [];
     const i = all.findIndex(r => r.sku === p.sku);
@@ -171,9 +172,10 @@ export async function renderProductShell(html, p, env) {
 
   let reviewStats = null;
   try {
-    const rs = await env.DB.prepare(
-      'SELECT COUNT(*) AS count, AVG(rating) AS average FROM reviews WHERE product_sku = ?'
-    ).bind(p.sku).first();
+    const rs = await Promise.race([
+      env.DB.prepare('SELECT COUNT(*) AS count, AVG(rating) AS average FROM reviews WHERE product_sku = ?').bind(p.sku).first(),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('d1 timeout')), 3000)),
+    ]);
     if (rs && rs.count > 0) reviewStats = { count: rs.count, average: Math.round(rs.average * 10) / 10 };
   } catch (e) { /* reviews table not reachable */ }
 
