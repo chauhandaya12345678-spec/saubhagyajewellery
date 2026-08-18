@@ -36,11 +36,12 @@ export async function onRequest(context) {
     // reviews.image_url ships with build/migrate-review-images.sql. Until that
     // has been run the column doesn't exist, so every read falls back to the
     // pre-migration SELECT instead of 500ing the whole reviews block.
+    const T = (p) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('d1-timeout')), 4500))]);
     const q = async (sqlWith, sqlWithout, ...bind) => {
-      try { return await db.prepare(sqlWith).bind(...bind).all(); }
+      try { return await T(db.prepare(sqlWith).bind(...bind).all()); }
       catch (e) {
         if (!/no such column|has no column named/i.test(e.message || '')) throw e;
-        return await db.prepare(sqlWithout).bind(...bind).all();
+        return await T(db.prepare(sqlWithout).bind(...bind).all());
       }
     };
 

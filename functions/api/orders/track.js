@@ -17,12 +17,15 @@
  */
 import { rateLimitCheck } from '../_lib.js';
 
+// Timeout wrapper so a stalled D1 read fails fast instead of hanging → 504.
+const dbT = (p) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('d1-timeout')), 4500))]);
+
 async function resolveSessionUser(db, token) {
   if (!token || !token.startsWith('sess_')) return null;
   try {
-    const row = await db.prepare(
+    const row = await dbT(db.prepare(
       'SELECT s.user_id, u.email, u.phone FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ? LIMIT 1'
-    ).bind(token).first();
+    ).bind(token).first());
     return row || null;
   } catch (e) { return null; }
 }
@@ -64,7 +67,7 @@ export async function onRequest(context) {
     // Path 1: order_id + phone (unauthenticated single-order lookup, matches guest UX)
     if (orderId && phoneQ) {
       const phoneDigits = String(phoneQ).replace(/\D/g, '').slice(-10);
-      const order = await db.prepare('SELECT * FROM orders WHERE id = ?').bind(orderId).first();
+      const order = await dbT(db.prepare('SELECT * FROM orders WHERE id = ?').bind(orderId).first());
       if (!order) return json({ success: true, orders: [] });
       const rowPhone = String(order.phone || '').replace(/\D/g, '').slice(-10);
       if (rowPhone !== phoneDigits) {
@@ -74,7 +77,7 @@ export async function onRequest(context) {
     }
     // Path 1b: order_id + token (WhatsApp link, privacy-safe)
     else if (orderId && tokenQ) {
-      const order = await db.prepare('SELECT * FROM orders WHERE id = ?').bind(orderId).first();
+      const order = await dbT(db.prepare('SELECT * FROM orders WHERE id = ?').bind(orderId).first());
       if (!order || order.track_token !== tokenQ) {
         return json({ success: true, orders: [] });
       }
@@ -89,9 +92,9 @@ export async function onRequest(context) {
       // silently returned zero rows here while the phone+order_id path above
       // (which does normalize) found the same order fine.
       const sPhoneDigits = session.phone ? String(session.phone).replace(/\D/g, '').slice(-10) : null;
-      const rows = await db.prepare(
+      const rows = await dbT(db.prepare(
         `SELECT * FROM orders WHERE user_id = ? OR (email IS NOT NULL AND email = ?) OR (phone IS NOT NULL AND phone LIKE '%' || ?) ORDER BY created_at DESC LIMIT 100`
-      ).bind(session.user_id, sEmail, sPhoneDigits).all();
+      ).bind(session.user_id, sEmail, sPhoneDigits).all());
       results = rows.results || [];
     }
     // Path 3: order_id alone — must present phone or token

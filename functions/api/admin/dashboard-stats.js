@@ -28,7 +28,8 @@ export async function onRequest(context) {
       todayRow, weekRow, monthRow, yearRow,
       pendingRow, lowStockRow, customerRow, attentionRow,
       codTodayRow, onlineTodayRow, rtoRow,
-    ] = await Promise.all([
+    ] = await Promise.race([
+      Promise.all([
       periodSql("date(created_at) = date('now')"),
       periodSql("created_at >= date('now', '-6 days')"),
       periodSql("strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')"),
@@ -40,6 +41,8 @@ export async function onRequest(context) {
       db.prepare("SELECT COUNT(*) AS c FROM orders WHERE payment_method = 'cod' AND test_mode = 0 AND date(created_at) = date('now')").first(),
       db.prepare("SELECT COUNT(*) AS c FROM orders WHERE payment_method != 'cod' AND test_mode = 0 AND date(created_at) = date('now')").first(),
       db.prepare("SELECT COUNT(*) AS c FROM orders WHERE status = 'rto' AND test_mode = 0").first(),
+      ]),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('d1-timeout')), 6000)),
     ]);
 
     return new Response(JSON.stringify({

@@ -49,10 +49,12 @@ export async function onRequest(context) {
     sql += ' ORDER BY id ASC';
 
     const stmt = db.prepare(sql);
-    const { results } = await (params.length
-      ? stmt.bind(...params).all()
-      : stmt.all()
-    );
+    // Timeout the read so a stalled D1 under crawler load fails fast (→ the
+    // catch below) instead of hanging the Function into a 504.
+    const { results } = await Promise.race([
+      params.length ? stmt.bind(...params).all() : stmt.all(),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('d1-timeout')), 4500)),
+    ]);
 
     // variants is stored as a JSON string ([{image,label}]) — parse it so the
     // client's Array.isArray(p.variants) check works for color swatches.

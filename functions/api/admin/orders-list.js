@@ -56,7 +56,10 @@ export async function onRequest(context) {
     sql += ' ORDER BY created_at DESC LIMIT ?';
     params.push(limit);
 
-    const { results } = await db.prepare(sql).bind(...params).all();
+    const { results } = await Promise.race([
+      db.prepare(sql).bind(...params).all(),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('d1-timeout')), 4500)),
+    ]);
     const orders = (results || []).map(o => {
       let items = [];
       let address = {};
