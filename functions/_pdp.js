@@ -290,6 +290,13 @@ export async function renderProductShell(html, p, env) {
       '<img class="pdp-img" id="pdp-image" src="" alt="" fetchpriority="high" decoding="async">',
       `<img class="pdp-img" id="pdp-image" src="${esc(optImg(image))}" alt="${esc(p.name)}" fetchpriority="high" decoding="async">`
     )
+    // Necklaces are shot tall; frame the hero to a 3:4 cover window (product.html
+    // .is-necklace CSS). Emit the class in SSR too so the first paint is already
+    // framed — the client toggles the same class on render, so no flash.
+    .replace(
+      '<div class="pdp-img-wrap">',
+      p.category === 'Necklace' ? '<div class="pdp-img-wrap is-necklace">' : '<div class="pdp-img-wrap">'
+    )
     // the client fills both from /api/products, but the raw HTML shipped an
     // EMPTY <h1> — so a crawler that does not run JS saw a product page with no
     // heading and no prose at all.

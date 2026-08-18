@@ -67,6 +67,13 @@
     aspect-ratio: 4/5; border-radius: 12px; background: #f0ede5; cursor: zoom-in; }
   .pdp-img-wrap { position: relative; display: flex; align-items: center; justify-content: center;
     width: fit-content; max-width: 100%; min-height: 260px; margin: 0 auto; border-radius: 12px; }
+  /* Necklaces are shot tall (necklace + jhumkas stacked, no blank margin to trim),
+     so the shared 4:5 box squashes them. Frame category=Necklace to the same 3:4
+     crop the listing cards use: a consistent portrait window, no distortion. The
+     full photo stays available via tap-to-enlarge and the thumbnail strip. */
+  .pdp-img-wrap.is-necklace { width: auto; aspect-ratio: 3/4; height: min(68vh, 560px); }
+  .pdp-img-wrap.is-necklace .pdp-img { width: 100%; height: 100%; max-height: none;
+    aspect-ratio: auto; object-fit: cover; }
   /* Affordance: without it people do not know the photo opens. */
   .pdp-zoom-hint { position: absolute; left: 12px; bottom: 12px; z-index: 3; display: inline-flex;
     align-items: center; gap: 6px; padding: 6px 11px; border-radius: 20px; pointer-events: none;
@@ -439,6 +446,7 @@
        cropped - and tapping it opens the full-screen viewer. */
     .pdp-img-wrap { max-width: 100%; min-height: 200px; }
     .pdp-img { max-height: 46vh; }
+    .pdp-img-wrap.is-necklace { height: 52vh; }
     .pdp-zoom-hint { left: 8px; bottom: 8px; padding: 5px 10px; font-size: 10.5px; }
     /* Colour readout right under the image; the full label lower down is
        then redundant on mobile, so hide that one instead of showing both. */
@@ -679,6 +687,9 @@
     // Breadcrumb - points to Categories hub (regional pages retired)
     $('pdp-crumb').innerHTML = '<a href="/">Home</a><i>/</i><a href="categories.html">Categories</a><i>/</i><span>' + p.name + '</span>';
     $('pdp-cat').textContent = p.category || '';
+    // Necklace photos are tall; frame the hero to a 3:4 cover window (see CSS).
+    var _iw = document.querySelector('.pdp-img-wrap');
+    if (_iw) _iw.classList.toggle('is-necklace', (p.category || '') === 'Necklace');
     $('pdp-name').textContent = p.name;
     // H1 = brand/design name; H2 = keyword-rich SEO line (material + style +
     // use-case). Mirrors the strategy top jewellery sites use.
