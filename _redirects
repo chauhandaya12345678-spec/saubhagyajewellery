@@ -17,10 +17,12 @@
 # served publicly. Pages deploys the whole repo since there's no build step,
 # so these were reachable at yourdomain.com/<filename> with no auth. Blocking
 # doesn't touch functions/, sitemap.xml, robots.txt, or any real page route.
-/wrangler.toml /404.html 404
-/CLAUDE.md /404.html 404
-/HANDOVER.md /404.html 404
-/README.md /404.html 404
-/.gitignore /404.html 404
-/build/schema-d1.sql /404.html 404
-/build/seed-d1.sql /404.html 404
+# Trailing "!" forces the rule even though these are real files that exist in
+# the deploy — without it Cloudflare lets the actual static file win.
+/wrangler.toml /404.html 404!
+/CLAUDE.md /404.html 404!
+/HANDOVER.md /404.html 404!
+/README.md /404.html 404!
+/.gitignore /404.html 404!
+/build/schema-d1.sql /404.html 404!
+/build/seed-d1.sql /404.html 404!
