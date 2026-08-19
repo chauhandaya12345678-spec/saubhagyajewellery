@@ -12,3 +12,15 @@
 # Shop All replaced by category hub
 /shop-all /categories.html 301
 /shop-all.html /categories.html 301
+
+# Repo-only files (dev docs / DB scripts / deploy config) — belong in git, not
+# served publicly. Pages deploys the whole repo since there's no build step,
+# so these were reachable at yourdomain.com/<filename> with no auth. Blocking
+# doesn't touch functions/, sitemap.xml, robots.txt, or any real page route.
+/wrangler.toml /404.html 404
+/CLAUDE.md /404.html 404
+/HANDOVER.md /404.html 404
+/README.md /404.html 404
+/.gitignore /404.html 404
+/build/schema-d1.sql /404.html 404
+/build/seed-d1.sql /404.html 404
