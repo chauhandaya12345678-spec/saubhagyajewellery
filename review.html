@@ -267,9 +267,7 @@
       var fd = new FormData();
       fd.append('file', file);
       fd.append('product_sku', it.sku);
-      if (u.email) fd.append('email', u.email);
-      if (u.phone) fd.append('phone', u.phone);
-      step = fetch('/api/review-image', { method: 'POST', body: fd })
+      step = fetch('/api/review-image', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token() }, body: fd })
         .then(function (r) { return r.json(); })
         .then(function (d) {
           if (!d || !d.success || !d.url) throw new Error(d && d.error ? d.error : 'Photo upload failed');
@@ -288,8 +286,6 @@
           name: (u.name || '').trim() || 'Customer',
           rating: rating,
           review_text: text,
-          email: u.email || undefined,
-          phone: u.phone || undefined,
           image_url: url || undefined,
         }),
       }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); });

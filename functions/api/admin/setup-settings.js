@@ -2,8 +2,15 @@
  * Warehouse/settings table for pickup address.
  * Run once to create table + seed with default address.
  */
+import { verifyAdminAccess, adminCorsHeaders } from '../_lib.js';
+
 export async function onRequest(context) {
-  const { env } = context;
+  const { env, request } = context;
+  const corsHeaders = adminCorsHeaders(request);
+  if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  const auth = await verifyAdminAccess(request, env, corsHeaders, { requireOwner: true });
+  if (auth.response) return auth.response;
+
   const db = env.DB;
 
   // Create settings table
@@ -31,6 +38,6 @@ export async function onRequest(context) {
   }
 
   return new Response(JSON.stringify({ ok: true, message: 'Settings table created and seeded' }), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders },
   });
 }

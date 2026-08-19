@@ -157,7 +157,9 @@
           <h2 id="co-form-heading">Shipping details</h2>
           <div class="form-grid">
             <div class="form-row form-full"><label>Full name<span class="req">*</span></label><input id="f-name" type="text" autocomplete="name" placeholder="As on the doorbell"></div>
-            <div class="form-row"><label>Mobile number<span class="req">*</span></label><input id="f-phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" placeholder="10-digit number"></div>
+            <div class="form-row"><label>Mobile number<span class="req">*</span></label><input id="f-phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" placeholder="10-digit number">
+              <div id="phone-verify-box" style="display:none;margin-top:6px;font-size:12.5px"></div>
+            </div>
             <div class="form-row"><label>Email (for order updates)</label><input id="f-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
             <div class="form-row form-full"><label>Flat / House no. / Building<span class="req">*</span></label><input id="f-address1" type="text" autocomplete="address-line1" placeholder="e.g. 4-B, Vishnu Apartments"></div>
             <div class="form-row form-full"><label>Street / Area / Locality<span class="req">*</span></label><input id="f-address2" type="text" autocomplete="address-line2" placeholder="e.g. Tanaji Nagar Road, Kandivali East"></div>
@@ -492,13 +494,11 @@
     if (user.email && !$('f-email').value) $('f-email').value = user.email;
   }
 
+  // Saved addresses only ever come back for a signed-in session — the server
+  // no longer accepts a bare phone number as proof of who you are. See
+  // startPhoneVerify() below for how a returning guest unlocks this inline.
   function loadSavedAddresses(autoSelect) {
-    var phone = ($('f-phone').value || '').replace(/\D/g, '').slice(-10);
-    var user = null;
-    try { user = JSON.parse(localStorage.getItem('cc_user') || 'null'); } catch(e) {}
-    if (!phone && (!user || !user.phone)) return Promise.resolve();
-    var lookupPhone = phone || String(user.phone || '').replace(/\D/g, '').slice(-10);
-    return fetch('/api/addresses/list?phone=' + encodeURIComponent(lookupPhone), authOpts())
+    return fetch('/api/addresses/list', authOpts())
       .then(function(r){ return r.json(); })
       .then(function(d) {
         if (d && d.success && d.addresses && d.addresses.length) {
@@ -517,12 +517,78 @@
       }).catch(function(){});
   }
 
+  function hasSession() {
+    try { return !!localStorage.getItem('cc_token'); } catch(e) { return false; }
+  }
+
+  // Returning customer, new device/browser: no session yet, so we can't show
+  // their saved address just because they typed a phone number (that used to
+  // be an open lookup — anyone could pull anyone's saved address that way).
+  // Instead offer a quick inline "verify to see it" using the same WhatsApp
+  // OTP system signin.html already uses. Skippable — checkout works fine
+  // without ever touching this box, exactly like a first-time customer today.
+  var verifiedPhone = null;
+  function renderPhoneVerifyBox(state, phone) {
+    var box = $('phone-verify-box');
+    if (state === 'hidden') { box.style.display = 'none'; box.innerHTML = ''; return; }
+    box.style.display = 'block';
+    if (state === 'prompt') {
+      box.innerHTML = 'Ordered with us before? <a href="#" id="pv-start" style="color:#0B291C;text-decoration:underline">Verify to load your saved address</a>';
+      $('pv-start').addEventListener('click', function(e) { e.preventDefault(); startPhoneVerify(phone); });
+    } else if (state === 'sent') {
+      box.innerHTML = 'Code sent on WhatsApp. <input id="pv-otp" maxlength="6" inputmode="numeric" placeholder="000000" style="width:80px;text-align:center;letter-spacing:3px;padding:4px 6px;border:1px solid #ddd6c6;border-radius:6px;margin:0 4px">' +
+        '<button type="button" id="pv-verify" style="border:none;background:#0B291C;color:#fff;border-radius:6px;padding:4px 10px;font-size:11.5px;cursor:pointer">Verify</button>' +
+        '<div id="pv-msg" style="margin-top:4px;min-height:14px"></div>';
+      $('pv-verify').addEventListener('click', function() { submitPhoneVerify(phone); });
+      var otpEl = $('pv-otp'); if (otpEl) otpEl.focus();
+    } else if (state === 'verified') {
+      box.innerHTML = '<span style="color:#1F6B4A">Verified — loading your saved address…</span>';
+    }
+  }
+
+  function startPhoneVerify(phone) {
+    renderPhoneVerifyBox('sent', phone);
+    fetch('/api/auth/otp-send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone })
+    }).then(function(r){ return r.json(); }).then(function(d) {
+      if (d && d.uat && d.otp) { var el = $('pv-otp'); if (el) el.value = d.otp; }
+    }).catch(function(){});
+  }
+
+  function submitPhoneVerify(phone) {
+    var otp = ($('pv-otp') && $('pv-otp').value || '').trim();
+    var msg = $('pv-msg');
+    if (!/^\d{6}$/.test(otp)) { if (msg) { msg.textContent = 'Enter the 6-digit code.'; msg.style.color = '#c0392b'; } return; }
+    fetch('/api/auth/otp-verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, otp: otp })
+    }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res) {
+        if (!res.ok || !res.d || !res.d.token) {
+          if (msg) { msg.textContent = (res.d && res.d.error) || 'Incorrect code.'; msg.style.color = '#c0392b'; }
+          return;
+        }
+        try { localStorage.setItem('cc_token', res.d.token); } catch(e) {}
+        verifiedPhone = phone;
+        renderPhoneVerifyBox('verified');
+        loadSavedAddresses(true).then(function() { renderPhoneVerifyBox('hidden'); });
+      }).catch(function() {
+        if (msg) { msg.textContent = 'Something went wrong. Try again.'; msg.style.color = '#c0392b'; }
+      });
+  }
+
   var phoneTimer = null;
   $('f-phone').addEventListener('input', function() {
     var ph = ($('f-phone').value || '').replace(/\D/g, '').slice(0, 10);
     $('f-phone').value = ph;
     clearTimeout(phoneTimer);
-    if (ph.length === 10) phoneTimer = setTimeout(function(){ loadSavedAddresses(false); }, 400);
+    if (ph.length !== 10) { renderPhoneVerifyBox('hidden'); return; }
+    phoneTimer = setTimeout(function() {
+      if (hasSession()) { loadSavedAddresses(false); return; }
+      if (ph === verifiedPhone) return; // already verified this number this session
+      renderPhoneVerifyBox('prompt', ph);
+    }, 400);
   });
 
   function collectAddress() {

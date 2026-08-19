@@ -1,10 +1,15 @@
 /**
  * Saubhagya – List saved addresses
- * GET /api/addresses/list?phone=9999999999
- *   OR Header: Authorization: Bearer <session>
+ * GET /api/addresses/list
+ * Header: Authorization: Bearer <session>  (required)
  *
- * Returns addresses saved for this phone / signed-in user, most-recent first.
- * Used by checkout.html to render the "use previous address" chooser.
+ * Returns addresses saved for the signed-in user, most-recent first, or an
+ * empty list when not signed in (not an error — checkout.html just shows no
+ * suggestions until the customer verifies via the inline OTP prompt).
+ *
+ * A bare ?phone= lookup with no session used to work here — removed. It let
+ * anyone pull any customer's name/email/saved addresses by guessing a phone
+ * number, no proof of ownership required.
  */
 async function resolveSessionUser(db, token) {
   if (!token || !token.startsWith('sess_')) return null;
@@ -31,32 +36,20 @@ export async function onRequest(context) {
 
   try {
     const db = env.DB;
-    const url = new URL(request.url);
-    const phoneQ = String(url.searchParams.get('phone') || '').replace(/\D/g, '').slice(-10);
 
     const authHeader = request.headers.get('authorization') || '';
     const token = authHeader.replace(/^Bearer\s+/i, '').trim();
     const session = token ? await resolveSessionUser(db, token) : null;
+    if (!session) return json({ success: true, addresses: [] });
 
     let rows;
     try {
-      if (session) {
-        const sPhone = String(session.phone || '').replace(/\D/g, '').slice(-10);
-        rows = await db.prepare(
-          `SELECT * FROM addresses
-            WHERE user_id = ? OR (phone = ? AND ? != '')
-            ORDER BY last_used_at DESC LIMIT 10`
-        ).bind(session.user_id, sPhone, sPhone).all();
-      } else if (phoneQ && phoneQ.length === 10) {
-        rows = await db.prepare(
-          `SELECT id, full_name, phone, email, address1, address2, landmark, city, state, pincode, is_default, label, last_used_at, usage_count
-             FROM addresses
-            WHERE phone = ?
-            ORDER BY last_used_at DESC LIMIT 5`
-        ).bind(phoneQ).all();
-      } else {
-        return json({ error: 'Provide phone or sign in' }, 400);
-      }
+      const sPhone = String(session.phone || '').replace(/\D/g, '').slice(-10);
+      rows = await db.prepare(
+        `SELECT * FROM addresses
+          WHERE user_id = ? OR (phone = ? AND ? != '')
+          ORDER BY last_used_at DESC LIMIT 10`
+      ).bind(session.user_id, sPhone, sPhone).all();
     } catch (e) {
       // Table not migrated yet — return empty list so checkout can still proceed
       if (/no such table/i.test(e.message)) {

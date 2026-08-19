@@ -1,23 +1,33 @@
 /**
- * POST /api/review-image   (PUBLIC — gated by the same verified-buyer check as
- * POST /api/reviews, NOT by an admin key)
+ * POST /api/review-image   (gated by session, same as POST /api/reviews)
  *
+ * Header: Authorization: Bearer <session token>
  * Multipart form-data:
  *   file        : the photo (jpeg/png/webp, ≤5 MB)
  *   product_sku : SKU the review is for
- *   email/phone : at least one — must match a real order containing that SKU
  *
  * → 200 { success: true, url }   url is always ${base}/reviews/<uuid>.<ext>
+ * → 401 when not signed in
  * → 403 same error shape as reviews.js when the buyer can't be verified
  *
- * SECURITY: this endpoint is unauthenticated, so it must never behave like an
- * open file host. Three things keep it closed:
- *   1. the order lookup below (no order → no upload),
+ * SECURITY: this endpoint must never behave like an open file host. Four
+ * things keep it closed:
+ *   1. the session check + order lookup below (no verified buyer → no upload),
  *   2. a hard jpeg/png/webp allowlist (no svg — svg carries script; no avif),
  *   3. a server-generated R2 key — no client "key"/filename field is ever read,
  *      so nothing can be written outside reviews/ or overwrite an existing object.
  */
+
 import { normEmail, normPhone } from './_lib.js';
+
+async function resolveSessionUser(db, token) {
+  if (!token || !token.startsWith('sess_')) return null;
+  try {
+    return await db.prepare(
+      'SELECT s.user_id, u.email, u.phone FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ? LIMIT 1'
+    ).bind(token).first();
+  } catch (e) { return null; }
+}
 
 const PUBLIC_BASE_DEFAULT = 'https://img.saubhagyajewellery.com';
 const ALLOWED = new Map([['image/jpeg', 'jpg'], ['image/png', 'png'], ['image/webp', 'webp']]);
@@ -29,7 +39,7 @@ export async function onRequest(context) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
   const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
     status, headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -42,6 +52,14 @@ export async function onRequest(context) {
     if (!db) return json({ error: 'DB not bound' }, 501);
     if (!env.IMAGES) return json({ error: 'R2 bucket (IMAGES) not bound' }, 501);
 
+    // Identity comes from the session, never from the request — see reviews.js.
+    const authHeader = request.headers.get('Authorization') || '';
+    const sessToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+    const session = await resolveSessionUser(db, sessToken);
+    if (!session) return json({ error: 'Sign in to leave a review' }, 401);
+    const email = normEmail(session.email);
+    const phone = normPhone(session.phone);
+
     // Reject oversized bodies BEFORE parsing — formData() materialises the
     // entire request in memory, so the cap has to come first or this public
     // endpoint is a memory-exhaustion lever for anyone, order or not.
@@ -52,12 +70,9 @@ export async function onRequest(context) {
     try { form = await request.formData(); } catch { return json({ error: 'Expected multipart/form-data' }, 400); }
 
     const product_sku = String(form.get('product_sku') || '').trim();
-    const email = normEmail(form.get('email'));
-    const phone = normPhone(form.get('phone'));
     const file = form.get('file');
     if (!file || typeof file === 'string') return json({ error: 'file field required' }, 400);
     if (!product_sku) return json({ error: 'product_sku required' }, 400);
-    if (!email && !phone) return json({ error: 'email or phone required so we can verify your order' }, 400);
 
     // Same gate as POST /api/reviews — verify the buyer BEFORE touching R2.
     const rows = await db.prepare(
@@ -65,7 +80,7 @@ export async function onRequest(context) {
     ).bind(email || '', phone || '').all();
     const skuTag = `"id":"${product_sku}"`;
     const bought = (rows.results || []).some(o => String(o.items || '').includes(skuTag));
-    if (!bought) return json({ error: 'Only verified buyers can review this product. Sign in with the email or phone you used at checkout.' }, 403);
+    if (!bought) return json({ error: 'Only verified buyers can review this product.' }, 403);
 
     // Strip any ";charset=..." and normalise before the lookup.
     const ct = String(file.type || 'application/octet-stream').split(';')[0].trim().toLowerCase();

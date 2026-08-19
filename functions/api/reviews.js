@@ -7,16 +7,28 @@
  * GET  /api/reviews?latest=1&limit=12   (no sku — homepage feed)
  *   → { success, reviews:[{product_sku, name, rating, review_text, image_url, created_at, verified:1}], count }
  *
- * POST /api/reviews  { product_sku, email?, phone?, name, rating, review_text, image_url? }
+ * POST /api/reviews  { product_sku, name, rating, review_text, image_url? }
+ *   Auth: Bearer session token (same as /api/reviews/mine, /api/orders/track).
+ *   Identity comes from the session, never from the request body.
  *   → 200 { success } iff:
- *     - a confirmed order exists for this email/phone that contains product_sku
+ *     - a confirmed order exists for the signed-in customer's email/phone that contains product_sku
  *     - user hasn't already reviewed this product
+ *   → 401 { error: "Sign in to leave a review" }
  *   → 403 { error: "Only verified buyers can review this product." }
  *   → 409 { error: "You have already reviewed this product." }
  *
- * No admin approval loop, no rate-limit escape: identity is the order row.
+ * No admin approval loop, no rate-limit escape: identity is the session + order row.
  */
 import { normEmail, normPhone } from './_lib.js';
+
+async function resolveSessionUser(db, token) {
+  if (!token || !token.startsWith('sess_')) return null;
+  try {
+    return await db.prepare(
+      'SELECT s.user_id, u.name, u.email, u.phone FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ? LIMIT 1'
+    ).bind(token).first();
+  } catch (e) { return null; }
+}
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -77,15 +89,24 @@ export async function onRequest(context) {
     }
 
     if (request.method === 'POST') {
+      // Identity comes from the signed-in session, never from the request
+      // body — email/phone typed into a POST body proves nothing (anyone
+      // could type anyone else's). review.html only ever shows this form to
+      // a signed-in customer, so this matches what the page already does;
+      // it just makes the server actually enforce it too.
+      const authHeader = request.headers.get('Authorization') || '';
+      const sessToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+      const session = await resolveSessionUser(db, sessToken);
+      if (!session) return json({ error: 'Sign in to leave a review' }, 401);
+
       const body = await request.json();
       const { product_sku, name, rating, review_text } = body;
       const orderId = typeof body.order_id === 'string' ? body.order_id.trim().slice(0, 40) : null;
-      const email = normEmail(body.email);
-      const phone = normPhone(body.phone);
+      const email = normEmail(session.email);
+      const phone = normPhone(session.phone);
       if (!product_sku || !name || !rating || !review_text) {
         return json({ error: 'product_sku, name, rating, review_text required' }, 400);
       }
-      if (!email && !phone) return json({ error: 'email or phone required so we can verify your order' }, 400);
       if (rating < 1 || rating > 5) return json({ error: 'rating must be 1-5' }, 400);
       if (String(review_text).length > 2000) return json({ error: 'review too long' }, 400);
 
@@ -102,32 +123,20 @@ export async function onRequest(context) {
         imageUrl = body.image_url;
       }
 
-      // Match confirmed orders for this email/phone; check items JSON contains the sku
+      // Match confirmed orders for the SESSION's email/phone; check items JSON contains the sku
       const rows = await db.prepare(
         `SELECT items FROM orders WHERE (lower(email) = ? OR phone = ?) AND status IN ('confirmed','processing','shipped','delivered')`
       ).bind(email || '', phone || '').all();
       const skuTag = `"id":"${product_sku}"`;
       const bought = (rows.results || []).some(o => String(o.items || '').includes(skuTag));
-      if (!bought) return json({ error: 'Only verified buyers can review this product. Sign in with the email or phone you used at checkout.' }, 403);
+      if (!bought) return json({ error: 'Only verified buyers can review this product.' }, 403);
 
       // One review per buyer per product
-      const dupe = await db.prepare(
-        `SELECT r.id FROM reviews r LEFT JOIN users u ON r.user_id = u.id
-         WHERE r.product_sku = ? AND (lower(u.email) = ? OR u.phone = ?)`
-      ).bind(product_sku, email || '', phone || '').first().catch(() => null);
+      const dupe = await db.prepare('SELECT id FROM reviews WHERE product_sku = ? AND user_id = ?')
+        .bind(product_sku, session.user_id).first().catch(() => null);
       if (dupe) return json({ error: 'You have already reviewed this product.' }, 409);
 
-      // Look up the customer's user id if we have one on file (best-effort; not required to insert)
-      let userId = null;
-      if (email) {
-        const u = await db.prepare('SELECT id FROM users WHERE lower(email) = ?').bind(email).first().catch(() => null);
-        if (u) userId = u.id;
-      }
-      if (!userId && phone) {
-        const u = await db.prepare('SELECT id FROM users WHERE phone = ?').bind(phone).first().catch(() => null);
-        if (u) userId = u.id;
-      }
-
+      const userId = session.user_id;
       const safeName = String(name).slice(0, 60);
       try {
         // image_status is stamped 'approved' at insert so the column never
