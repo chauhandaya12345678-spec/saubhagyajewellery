@@ -11,6 +11,18 @@
  */
 const ADMIN_HOST = 'admin.saubhagyajewellery.com';
 
+// Repo-only files (dev docs / DB scripts / deploy config) — belong in git,
+// not served publicly. Pages deploys the whole repo since there's no build
+// step, so these are otherwise reachable at yourdomain.com/<filename> with
+// no auth. _redirects can't block them (Cloudflare Pages always lets a real
+// static asset win over a _redirects rule at the same path — unlike Netlify,
+// there's no override syntax for it), so this has to happen in a Function,
+// which runs before static-asset serving.
+const BLOCKED_PATHS = new Set([
+  '/wrangler.toml', '/CLAUDE.md', '/HANDOVER.md', '/README.md', '/.gitignore',
+  '/build/schema-d1.sql', '/build/seed-d1.sql',
+]);
+
 // Matched to /api/products (_headers: max-age=60). The homepage rail hydrates from
 // that API, so capping the shell at the same 60s adds no staleness the site didn't
 // already have, and a deploy reaches everyone within a minute.
@@ -68,6 +80,10 @@ export async function onRequest(context) {
     const url = new URL(request.url);
     const host = url.hostname;
     const path = url.pathname;
+
+    if (request.method === 'GET' && BLOCKED_PATHS.has(path)) {
+      return new Response('Not found', { status: 404 });
+    }
 
     // ── Admin subdomain: the desktop admin ──
     if (host === ADMIN_HOST) {

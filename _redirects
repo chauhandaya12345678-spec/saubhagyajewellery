@@ -13,16 +13,7 @@
 /shop-all /categories.html 301
 /shop-all.html /categories.html 301
 
-# Repo-only files (dev docs / DB scripts / deploy config) — belong in git, not
-# served publicly. Pages deploys the whole repo since there's no build step,
-# so these were reachable at yourdomain.com/<filename> with no auth. Blocking
-# doesn't touch functions/, sitemap.xml, robots.txt, or any real page route.
-# Trailing "!" forces the rule even though these are real files that exist in
-# the deploy — without it Cloudflare lets the actual static file win.
-/wrangler.toml /404.html 404!
-/CLAUDE.md /404.html 404!
-/HANDOVER.md /404.html 404!
-/README.md /404.html 404!
-/.gitignore /404.html 404!
-/build/schema-d1.sql /404.html 404!
-/build/seed-d1.sql /404.html 404!
+# Repo-only files (wrangler.toml, docs, DB scripts) are blocked in
+# functions/_middleware.js, not here — Cloudflare Pages always lets a real
+# static asset at the same path win over a _redirects rule, so this file
+# can't do it (unlike Netlify, there's no override syntax).
