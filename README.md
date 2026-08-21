@@ -219,7 +219,11 @@ A few pages still have placeholder boilerplate marked "This is placeholder boile
 
 Get these reviewed by someone familiar with Indian e-commerce and the Consumer Protection (E-commerce) Rules 2020 before you launch.
 
-Also update placeholder contact details across `contact.html`, `trust.html`, the footer, and the JSON-LD in `index.html`:
-- WhatsApp/phone (currently `+91 22 0000 0000`)
-- Email (`care@saubhagyajewellery.com`)
-- GSTIN (`27ABCDE1234F1Z5`)
+Contact details are live, not placeholders: WhatsApp/phone `+91 99870 08435`,
+email `care@saubhagyajewellery.com`, GSTIN `27BKBPC3154K1ZC` (HSN 7117, GST 3%,
+charged inclusively). They appear in `contact.html`, the footer in `layout.js`,
+and the JSON-LD in `index.html`.
+
+The GSTIN that prints on the invoice is NOT any of those copies -- it is read
+from D1 (`settings` / `business_config`) and edited in Admin -> Tax Settings.
+Change it there; the page copies are display only.

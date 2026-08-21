@@ -7,7 +7,7 @@
  * key 'business_config'. Independent of ShipPrime.
  */
 import { verifyAdminAccess, adminCorsHeaders } from '../_lib.js';
-import { BUSINESS_DEFAULTS, loadBusinessConfig, cleanBusinessConfig } from './_docs.js';
+import { BUSINESS_DEFAULTS, loadBusinessConfig, cleanBusinessConfig, isValidGstin } from './_docs.js';
 
 const j = (o, s, cors) => new Response(JSON.stringify(o), {
   status: s || 200, headers: { 'Content-Type': 'application/json', ...cors },
@@ -30,6 +30,12 @@ export async function onRequest(context) {
     let b;
     try { b = await request.json(); } catch { return j({ error: 'Invalid JSON' }, 400, cors); }
     const clean = cleanBusinessConfig(b);
+    // Blank is allowed and means "not registered" — the invoice then prints as
+    // a Bill of Supply. A non-blank value has to be a real GSTIN, because it
+    // goes on a document the buyer files an input-credit claim against.
+    if (clean.gstin && !isValidGstin(clean.gstin)) {
+      return j({ error: `"${clean.gstin}" is not a valid GSTIN — check for a typo (15 characters, and the last one is a check digit).` }, 400, cors);
+    }
     try {
       await env.DB.prepare(
         `INSERT INTO settings (key, value, updated_at) VALUES (?, ?, datetime('now'))

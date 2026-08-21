@@ -49,6 +49,31 @@ export function cleanBusinessConfig(b) {
   return out;
 }
 
+const GSTIN_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const GSTIN_SHAPE = /^[0-3][0-9][A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
+/**
+ * A GSTIN carries its own check digit, so a typo is catchable before it is
+ * printed on a legal document. Worth the twelve lines: the invoice is filed
+ * with the buyer's ITC claim, and a wrong GSTIN there is the seller's problem
+ * to unwind, not a cosmetic defect.
+ *
+ * Weighted mod-36: each of the first 14 characters is valued by its index in
+ * the 0-9A-Z alphabet, multiplied by 1 or 2 alternately, and the quotient and
+ * remainder of that product over 36 are both added. The 15th character is
+ * whatever brings the total to a multiple of 36.
+ */
+export function isValidGstin(g) {
+  const s = String(g || '').toUpperCase().replace(/\s+/g, '');
+  if (!GSTIN_SHAPE.test(s)) return false;
+  let sum = 0;
+  for (let i = 0; i < 14; i++) {
+    const p = GSTIN_CHARS.indexOf(s[i]) * (i % 2 ? 2 : 1);
+    sum += Math.floor(p / 36) + (p % 36);
+  }
+  return GSTIN_CHARS[(36 - (sum % 36)) % 36] === s[14];
+}
+
 /** Indian financial year label for a date (Apr 1 – Mar 31), e.g. "25-26". */
 export function financialYear(d) {
   const dt = d ? new Date(d) : new Date();
@@ -122,7 +147,17 @@ export async function issueDocNumber(env, order, type) {
 
   const cfg = await loadBusinessConfig(env);
   const fy = financialYear(order.created_at);
-  const counter = (type === 'credit' ? 'credit_' : 'invoice_') + fy;
+  const prefix = type === 'credit' ? (cfg.creditPrefix || 'SJ/CN') : (cfg.invoicePrefix || 'SJ');
+  // The counter is scoped to the PREFIX as well as the financial year, because
+  // the prefix is what changes when the supplier identity changes. Rule 46(b)
+  // wants a series that is consecutive and unique per financial year, and a
+  // series belongs to one GSTIN — when the invoice moves from one registration
+  // to another mid-year, the new one has to start at 0001, not continue the
+  // old one's count. Keyed on FY alone, the first invoice under the new GSTIN
+  // inherited the previous holder's sequence and left 0001..000n missing from
+  // its GSTR-1 forever. Legacy `invoice_<fy>` rows are left alone.
+  const counter = (type === 'credit' ? 'credit_' : 'invoice_')
+    + prefix.toUpperCase().replace(/[^A-Z0-9]+/g, '') + '_' + fy;
 
   let seq = null;
   try {
@@ -137,7 +172,6 @@ export async function issueDocNumber(env, order, type) {
     seq = (r2 && r2.next_no) || 1;
   }
 
-  const prefix = type === 'credit' ? (cfg.creditPrefix || 'SJ/CN') : (cfg.invoicePrefix || 'SJ');
   const number = `${prefix}/${fy}/${String(seq).padStart(4, '0')}`;
   const date = new Date().toISOString().slice(0, 10);
   const col = type === 'credit' ? 'credit_note' : 'invoice';

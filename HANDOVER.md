@@ -443,7 +443,7 @@ If you decide to move to Shopify, here's what you need to migrate:
 | Owner (Daya) | WhatsApp: +91 99870 08435 |
 | Customer Support | care@saubhagyajewellery.com |
 | Store Address | Mumbai, Maharashtra |
-| GSTIN | (update in footer before launch) |
+| GSTIN | 27BKBPC3154K1ZC (HSN 7117 @ 3%, inclusive) -- edit in Admin -> Tax Settings |
 
 ### Quick Reference: "How Do I..."
 
