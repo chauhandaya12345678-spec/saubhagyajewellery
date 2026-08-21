@@ -228,3 +228,89 @@
     }
   });
 })();
+
+/* ── Web push opt-in ─────────────────────────────────────────────────────────
+ * Registers the service worker and, only after the shopper has shown intent,
+ * offers notifications.
+ *
+ * The prompt is deliberately NOT shown on first paint. A permission request
+ * fired on page load is the single fastest way to get permanently blocked by
+ * a browser (Chrome auto-denies sites with low accept rates), and a denial is
+ * unrecoverable without the visitor digging through site settings. So: the
+ * bar appears only on a repeat visit, and the real browser prompt is raised
+ * only from the click on our own button.
+ */
+(function () {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+  var VISITS = 'sj_visits', ASKED = 'sj_push_asked';
+  var reg = null;
+
+  function b64ToU8(base64) {
+    var pad = '='.repeat((4 - base64.length % 4) % 4);
+    var raw = atob((base64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from(raw, function (c) { return c.charCodeAt(0); });
+  }
+
+  navigator.serviceWorker.register('/sw.js').then(function (r) {
+    reg = r;
+    maybeOffer();
+  }).catch(function () { /* push simply stays unavailable */ });
+
+  function bumpVisits() {
+    var n = 0;
+    try { n = parseInt(localStorage.getItem(VISITS) || '0', 10) || 0; } catch (e) { return 0; }
+    n++;
+    try { localStorage.setItem(VISITS, String(n)); } catch (e) {}
+    return n;
+  }
+
+  function maybeOffer() {
+    var visits = bumpVisits();
+    if (Notification.permission !== 'default') return;   // already granted or blocked
+    try { if (localStorage.getItem(ASKED)) return; } catch (e) { return; }
+    if (visits < 2) return;                              // not on the very first visit
+    showBar();
+  }
+
+  function showBar() {
+    var bar = document.createElement('div');
+    bar.setAttribute('role', 'dialog');
+    bar.setAttribute('aria-label', 'Get notified about new arrivals');
+    bar.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;' +
+      'background:#0B291C;color:#fff;border-radius:14px;padding:14px 16px;' +
+      'box-shadow:0 10px 30px rgba(0,0,0,.28);display:flex;gap:12px;align-items:center;' +
+      'font-size:13.5px;line-height:1.5;max-width:520px;margin:0 auto;';
+    bar.innerHTML =
+      '<div style="flex:1">Want to hear about new arrivals and festive offers?</div>' +
+      '<button type="button" data-no style="background:none;border:none;color:#C5A880;font:inherit;cursor:pointer;padding:6px">Not now</button>' +
+      '<button type="button" data-yes style="background:#C5A880;border:none;color:#0B291C;font:inherit;font-weight:700;border-radius:9px;padding:8px 14px;cursor:pointer">Yes</button>';
+
+    function close() { try { localStorage.setItem(ASKED, '1'); } catch (e) {} bar.remove(); }
+    bar.querySelector('[data-no]').addEventListener('click', close);
+    bar.querySelector('[data-yes]').addEventListener('click', function () {
+      close();
+      subscribe();
+    });
+    document.body.appendChild(bar);
+  }
+
+  function subscribe() {
+    if (!reg) return;
+    fetch('/api/push/subscribe').then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.publicKey) throw new Error('push not configured');
+      // Raised from a user gesture, so the browser shows the real prompt.
+      return reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: b64ToU8(d.publicKey),
+      });
+    }).then(function (sub) {
+      var j = sub.toJSON();
+      return fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: j.endpoint, keys: j.keys }),
+      });
+    }).catch(function () { /* denied or unsupported — nothing to do */ });
+  }
+})();

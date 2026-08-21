@@ -81,5 +81,12 @@ export async function onRequest(context) {
   }
 
   const base = (env.R2_PUBLIC_BASE || PUBLIC_BASE_DEFAULT).replace(/\/+$/, '');
-  return json({ success: true, key, url: base + '/' + key, bytes: buf.byteLength, contentType: ct });
+  // Cache-bust. Replacing a photo re-uses the SAME R2 key (same name slug +
+  // same SKU), so the public URL came back byte-identical to the one already
+  // stored — and R2 serves it with a one-year immutable cache-control. The new
+  // bytes were in the bucket but every browser and the CDN kept showing the old
+  // picture, which is what "replace main photo does nothing" actually was.
+  // A per-upload version makes each replacement a genuinely new URL.
+  const v = Date.now().toString(36);
+  return json({ success: true, key, url: base + '/' + key + '?v=' + v, bytes: buf.byteLength, contentType: ct });
 }

@@ -1,0 +1,58 @@
+name: Daily database backup
+
+# Takes a dated snapshot of the store database into the private R2 backups
+# bucket. The endpoint itself is idempotent and does the real work; this is
+# only the clock.
+#
+# A second, independent watchdog on cron-job.org calls the same endpoint with
+# ?ifStale=26 every few hours. That call is a no-op while a recent backup
+# exists, so the two schedulers cannot produce duplicate snapshots — but if
+# this workflow is disabled, fails, or GitHub has an outage, the watchdog
+# still gets a backup taken.
+#
+# Setup (once per repo):
+#   Settings → Secrets and variables → Actions → New repository secret
+#     BACKUP_KEY  = the same value as the Cloudflare Pages BACKUP_KEY secret
+#     BACKUP_URL  = https://saubhagyajewellery.com
+
+on:
+  schedule:
+    - cron: '30 19 * * *'   # 01:00 IST daily (GitHub cron is UTC)
+  workflow_dispatch:         # manual "Run workflow" button
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger backup
+        env:
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
+          BACKUP_URL: ${{ secrets.BACKUP_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BACKUP_KEY:-}" ] || [ -z "${BACKUP_URL:-}" ]; then
+            echo "::error::BACKUP_KEY and BACKUP_URL repository secrets must both be set."
+            exit 1
+          fi
+
+          # --fail-with-body so a non-2xx still prints the JSON reason before exiting.
+          http=$(curl -sS --fail-with-body \
+            -X POST "${BACKUP_URL%/}/api/admin/backup-db" \
+            -H "x-backup-key: ${BACKUP_KEY}" \
+            -o response.json -w '%{http_code}') || {
+              echo "::error::Backup request failed (HTTP ${http:-000})"
+              cat response.json 2>/dev/null || true
+              exit 1
+            }
+
+          cat response.json
+
+          # The endpoint answers 200 with success:false on a handled failure,
+          # so the status code alone is not enough to call this a success.
+          node -e '
+            const r = require("./response.json");
+            if (!r.success) { console.error("::error::Backup reported failure: " + (r.error || "unknown")); process.exit(1); }
+            if (r.skipped) { console.log("Skipped - a recent backup already exists."); process.exit(0); }
+            console.log(`Backed up ${r.rows} rows across ${r.tables} tables -> ${r.key}`);
+          '

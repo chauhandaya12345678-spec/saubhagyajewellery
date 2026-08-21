@@ -12,6 +12,7 @@
     "/catalog.js",
     "/layout.js",
     "/mpa.js",
+    "/sw.js",
     "/products.json",
     "/manifest.json",
     "/favicon.svg",

@@ -61,7 +61,7 @@ tr.ai-attention td { background: #fdf0ef; }
 tr.ai-attention:hover td { background: #fbe4e2; }
 .ai-attention-flag { display: inline-block; margin-top: 4px; font-size: 9px; letter-spacing: .5px; color: #c0392b; font-weight: 700; text-transform: uppercase; }
 .role-staff .pack-btn, .role-staff .ai-save, .role-staff .edit-toggle, .role-staff #users-tab-btn,
-  .role-staff .ai-tab[data-tab="reviews"], .role-staff .ai-tab[data-tab="add"], .role-staff .ai-tab[data-tab="tax"] { display: none !important; }
+  .role-staff .ai-tab[data-tab="reviews"], .role-staff .ai-tab[data-tab="add"], .role-staff .ai-tab[data-tab="tax"], .role-staff .ai-tab[data-tab="backup"] { display: none !important; }
 .ai-toggle-link { font-size: 11px; color: #0B291C; text-decoration: underline; cursor: pointer; margin-top: 14px; display: inline-block; }
 .ai-role-badge { font-size: 9px; letter-spacing: 1px; color: #C5A880; margin-left: auto; padding: 4px 10px; border: 1px solid rgba(255,255,255,.3); border-radius: 20px; }
 .ai-form-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
@@ -95,6 +95,7 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     <button class="ai-tab" data-tab="reviews" type="button">REVIEWS</button>
     <button class="ai-tab" data-tab="users" type="button" id="users-tab-btn">USERS</button>
     <button class="ai-tab" data-tab="tax" type="button" id="tax-tab-btn">TAX / INVOICE</button>
+    <button class="ai-tab" data-tab="backup" type="button" id="backup-tab-btn">BACKUP / PUSH</button>
   </div>
   <span class="ai-role-badge" id="ai-role-badge" style="display:none"></span>
   <button class="ai-tab" id="ai-logout-btn" type="button" style="display:none">LOGOUT</button>
@@ -418,6 +419,54 @@ tr.ai-attention:hover td { background: #fbe4e2; }
       <div class="ai-status" id="u-load-status"></div>
     </div>
 
+    <div id="panel-backup" style="display:none">
+      <div class="ai-table-wrap" style="padding:20px;max-width:920px">
+        <div style="font-size:13px;color:#0B291C;font-weight:700;margin-bottom:2px">Database backups</div>
+        <div style="font-size:11.5px;color:#9a9a9a;margin-bottom:16px;line-height:1.6">
+          A dated snapshot of the store database, written to a <b>private</b> R2 bucket (never the public image bucket).
+          A GitHub Action takes one daily; a cron watchdog re-runs it if a day passes without one.
+          Live sessions, OTPs and password-reset rows are deliberately excluded — they restore to nothing useful.
+        </div>
+        <div id="bk-status" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px"></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
+          <button class="ai-btn" id="bk-run" type="button">💾 Back up now</button>
+          <button class="ai-btn ghost" id="bk-refresh" type="button">↻ Refresh</button>
+          <span id="bk-msg" style="font-size:11.5px;color:#6a6a6a"></span>
+        </div>
+        <div style="border-top:1px dashed #e3dccb;margin:6px 0 18px;padding-top:18px">
+          <div style="font-size:13px;color:#0B291C;font-weight:700;margin-bottom:2px">Web push notification</div>
+          <div style="font-size:11.5px;color:#9a9a9a;margin-bottom:12px;line-height:1.6">
+            Goes to every shopper who opted in on the website. It reaches a lock screen and <b>cannot be recalled</b> — read it twice before sending.
+          </div>
+          <div id="pn-status" style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;max-width:760px">
+            <label class="tx-f" style="grid-column:1/-1">Title (max 80)<input id="pn-title" type="text" maxlength="80" placeholder="New festive arrivals ✨"></label>
+            <label class="tx-f" style="grid-column:1/-1">Message (max 200)<input id="pn-body" type="text" maxlength="200" placeholder="Temple sets just added — free shipping across India."></label>
+            <label class="tx-f" style="grid-column:1/-1">Opens (site path or full saubhagyajewellery.com link)<input id="pn-url" type="text" value="/categories" placeholder="/categories"></label>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">
+            <button class="ai-btn" id="pn-send" type="button">🔔 Send to all subscribers</button>
+            <span id="pn-msg" style="font-size:11.5px;color:#6a6a6a"></span>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:#0B291C;margin:16px 0 6px">Recent broadcasts</div>
+          <div style="max-height:220px;overflow:auto;border:1px solid #e3dccb;border-radius:8px">
+            <table class="ai-table" style="width:100%;font-size:12px">
+              <thead><tr><th style="text-align:left">Sent</th><th style="text-align:left">Title</th><th style="text-align:right">Delivered</th></tr></thead>
+              <tbody id="pn-rows"><tr><td colspan="3" style="padding:12px;color:#9a9a9a">—</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="font-size:12px;font-weight:700;color:#0B291C;margin-bottom:6px">Snapshots (newest first)</div>
+        <div style="max-height:420px;overflow:auto;border:1px solid #e3dccb;border-radius:8px">
+          <table class="ai-table" style="width:100%;font-size:12px">
+            <thead><tr><th style="text-align:left">Taken</th><th style="text-align:left">File</th><th style="text-align:right">Size</th></tr></thead>
+            <tbody id="bk-rows"><tr><td colspan="3" style="padding:14px;color:#9a9a9a">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <div id="panel-tax" style="display:none">
       <div class="ai-table-wrap" style="padding:20px;max-width:920px">
         <div style="font-size:13px;color:#0B291C;font-weight:700;margin-bottom:2px">Business / Tax identity — printed on every legal GST invoice</div>
@@ -720,6 +769,8 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     document.getElementById('panel-reviews').style.display = tab === 'reviews' ? 'block' : 'none';
     document.getElementById('panel-users').style.display = tab === 'users' ? 'block' : 'none';
     document.getElementById('panel-tax').style.display = tab === 'tax' ? 'block' : 'none';
+    document.getElementById('panel-backup').style.display = tab === 'backup' ? 'block' : 'none';
+    if (tab === 'backup') { loadBackups(); loadPushStatus(); }
     if (tab === 'tax') loadTaxSettings();
     if (tab === 'dashboard') loadDashboard();
     if (tab === 'orders' && !lastOrders.length) loadOrders();
@@ -730,6 +781,104 @@ tr.ai-attention:hover td { background: #fbe4e2; }
     if (tab === 'reviews') loadReviews();
     if (tab === 'users' && !lastUsers.length) loadUsers();
   });
+
+  // ================= DATABASE BACKUP =================
+  function bkSize(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+  function bkPill(text, colour) {
+    return '<div style="border:1px solid ' + colour + '55;background:' + colour + '11;border-radius:8px;padding:8px 12px">' +
+      '<div style="font-size:9.5px;letter-spacing:1.2px;color:#9a9a9a;text-transform:uppercase">' + text[0] + '</div>' +
+      '<div style="font-size:14px;font-weight:700;color:' + colour + ';margin-top:2px">' + text[1] + '</div></div>';
+  }
+  function loadBackups() {
+    var st = document.getElementById('bk-status');
+    var rows = document.getElementById('bk-rows');
+    st.innerHTML = '<span style="font-size:12px;color:#9a9a9a">Loading…</span>';
+    apiFetch('/api/admin/backup-db')
+      .then(function (d) {
+        if (!d || !d.success) throw new Error((d && d.error) || 'could not load');
+        var healthy = !!d.healthy;
+        var age = d.ageHours == null ? '—'
+          : d.ageHours < 1 ? Math.round(d.ageHours * 60) + ' min ago'
+          : d.ageHours < 48 ? d.ageHours + ' h ago'
+          : Math.round(d.ageHours / 24) + ' days ago';
+        st.innerHTML =
+          bkPill(['Status', healthy ? 'HEALTHY' : (d.count ? 'STALE' : 'NONE YET')], healthy ? '#23784a' : '#b02f33') +
+          bkPill(['Last backup', age], healthy ? '#23784a' : '#b02f33') +
+          bkPill(['Snapshots kept', d.count + ' / ' + d.retain], '#8a6d2f') +
+          bkPill(['Considered late after', d.staleAfterHours + ' h'], '#8a6d2f');
+        rows.innerHTML = (d.backups || []).length
+          ? d.backups.map(function (b) {
+              var when = new Date(b.uploaded);
+              return '<tr><td style="padding:8px 10px">' + when.toLocaleString() + '</td>' +
+                '<td style="padding:8px 10px;color:#6a6a6a">' + esc(b.key.replace('db/', '')) + '</td>' +
+                '<td style="padding:8px 10px;text-align:right">' + bkSize(b.size) + '</td></tr>';
+            }).join('')
+          : '<tr><td colspan="3" style="padding:14px;color:#9a9a9a">No backups yet — press “Back up now”.</td></tr>';
+      })
+      .catch(function (e) {
+        st.innerHTML = '<span style="font-size:12px;color:#b02f33">' + esc(e.message) + '</span>';
+        rows.innerHTML = '<tr><td colspan="3" style="padding:14px;color:#b02f33">' + esc(e.message) + '</td></tr>';
+      });
+  }
+  function loadPushStatus() {
+    var st = document.getElementById('pn-status');
+    var rows = document.getElementById('pn-rows');
+    apiFetch('/api/admin/push-send')
+      .then(function (d) {
+        if (!d || !d.success) throw new Error((d && d.error) || 'unavailable');
+        st.innerHTML = bkPill(['Subscribers', String(d.subscribers)], d.subscribers ? '#23784a' : '#8a6d2f');
+        rows.innerHTML = (d.broadcasts || []).length
+          ? d.broadcasts.map(function (b) {
+              return '<tr><td style="padding:7px 10px">' + new Date(b.created_at + 'Z').toLocaleString() + '</td>' +
+                '<td style="padding:7px 10px">' + esc(b.title) + '</td>' +
+                '<td style="padding:7px 10px;text-align:right">' + b.sent + (b.failed ? ' <span style="color:#b02f33">(' + b.failed + ' failed)</span>' : '') + '</td></tr>';
+            }).join('')
+          : '<tr><td colspan="3" style="padding:12px;color:#9a9a9a">Nothing sent yet.</td></tr>';
+      })
+      .catch(function (e) {
+        st.innerHTML = '<span style="font-size:12px;color:#b02f33">' + esc(e.message) + '</span>';
+      });
+  }
+  document.getElementById('pn-send').addEventListener('click', function () {
+    var btn = this, msg = document.getElementById('pn-msg');
+    var title = document.getElementById('pn-title').value.trim();
+    var body = document.getElementById('pn-body').value.trim();
+    var url = document.getElementById('pn-url').value.trim() || '/';
+    if (!title || !body) { msg.style.color = '#b02f33'; msg.textContent = 'Title and message are both required.'; return; }
+    if (!confirm('Send this notification to EVERY subscriber?\n\n' + title + '\n' + body + '\n\nIt appears on their lock screen and cannot be recalled.')) return;
+    btn.disabled = true; msg.style.color = '#6a6a6a'; msg.textContent = 'Sending…';
+    apiFetch('/api/admin/push-send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: title, body: body, url: url, confirm: true }),
+    })
+      .then(function (d) {
+        if (!d || !d.success) throw new Error((d && d.error) || 'send failed');
+        msg.style.color = '#23784a';
+        msg.textContent = '✓ Delivered to ' + d.sent + ' of ' + d.subscribers +
+          (d.failed ? ' · ' + d.failed + ' failed' : '') + (d.pruned ? ' · ' + d.pruned + ' dead removed' : '');
+        document.getElementById('pn-title').value = '';
+        document.getElementById('pn-body').value = '';
+        loadPushStatus();
+      })
+      .catch(function (e) { msg.style.color = '#b02f33'; msg.textContent = 'Error: ' + e.message; })
+      .finally(function () { btn.disabled = false; });
+  });
+
+  document.getElementById('bk-refresh').addEventListener('click', loadBackups);
+  document.getElementById('bk-run').addEventListener('click', function () {
+    var btn = this, msg = document.getElementById('bk-msg');
+    btn.disabled = true; msg.style.color = '#6a6a6a'; msg.textContent = 'Backing up… (a few seconds)';
+    apiFetch('/api/admin/backup-db', { method: 'POST' })
+      .then(function (d) {
+        if (!d || !d.success) throw new Error((d && d.error) || 'backup failed');
+        msg.style.color = '#23784a';
+        msg.textContent = '✓ Saved ' + d.rows + ' rows from ' + d.tables + ' tables (' + bkSize(d.bytes) + ') in ' + (d.tookMs / 1000).toFixed(1) + 's.';
+        loadBackups();
+      })
+      .catch(function (e) { msg.style.color = '#b02f33'; msg.textContent = 'Error: ' + e.message; })
+      .finally(function () { btn.disabled = false; });
+  });
+
 
   // ================= ORDERS =================
   document.getElementById('o-reload-btn').addEventListener('click', loadOrders);

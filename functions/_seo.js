@@ -163,3 +163,33 @@ export function productKeywords(p) {
   ];
   return base.filter(Boolean).join(', ');
 }
+
+/**
+ * SERP <title> for a product page — target <= 60 characters.
+ *
+ * The full product name is deliberately NOT shortened in the database: Google
+ * Shopping and Meta match on the feed title, so the long descriptive form earns
+ * impressions there, and past orders keep the name they were bought under. Only
+ * the <title> tag is compressed, because that is the one place a long string is
+ * actively harmful — Google truncates the SERP link at roughly 600px (~60
+ * chars) and the tail is wasted.
+ *
+ * Two lossless cuts do almost all the work:
+ *   - " with Jhumkas" is implied by "Necklace Set" and repeats a word already
+ *     in the H1 and the feed title.
+ *   - "Bead Drops" -> "Beads" keeps the colour, which is what distinguishes
+ *     one variant page from its siblings and must survive.
+ * The " | Saubhagya Jewellery" suffix is dropped entirely: it cost 22 chars on
+ * every page to repeat a brand already shown as the SERP domain.
+ */
+export function seoTitle(p) {
+  let t = String((p && p.name) || '').replace(/\s+/g, ' ').trim();
+  t = t.replace(/\s+with\s+(jhumkas?|jhumkis?|earrings)\b/i, '');
+  t = t.replace(/\bBead Drops\b/i, 'Beads');
+  if (t.length <= 60) return t;
+  // Last resort: trim whole words off the FRONT descriptor, never the tail —
+  // the tail carries the colour that separates variant pages from each other.
+  const cut = t.slice(0, 60);
+  const sp = cut.lastIndexOf(' ');
+  return sp > 40 ? cut.slice(0, sp) : cut;
+}

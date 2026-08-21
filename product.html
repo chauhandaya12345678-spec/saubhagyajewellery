@@ -666,11 +666,14 @@
 
   function render() {
     var p = product;
-    document.title = p.name + ' | Saubhagya';
+    // Mirrors seoTitle() in functions/_seo.js. The SSR shell already sets the
+    // short title; without this the client re-wrote it to the long form on
+    // hydration, so the fix only held until the page's own JS ran.
+    document.title = seoTitle(p);
     // OG tags
     var ogTitle = document.querySelector('meta[property="og:title"]');
     if (!ogTitle) { ogTitle = document.createElement('meta'); ogTitle.setAttribute('property','og:title'); document.head.appendChild(ogTitle); }
-    ogTitle.setAttribute('content', p.name + ' | Saubhagya');
+    ogTitle.setAttribute('content', seoTitle(p));
     var ogImg = document.querySelector('meta[property="og:image"]');
     if (!ogImg) { ogImg = document.createElement('meta'); ogImg.setAttribute('property','og:image'); document.head.appendChild(ogImg); }
     var absImg = (p.image || '').startsWith('http') ? p.image : 'https://saubhagyajewellery.com/' + (p.image || '');
@@ -824,6 +827,20 @@
         setTimeout(function () { btn.textContent = old; }, 1500);
       });
     }
+  }
+
+  /* SERP title, <= 60 chars. MIRRORS seoTitle() in functions/_seo.js VERBATIM
+     (browser copy — no build step to share edge code). Keep the two in step:
+     if they drift, the SSR title and the hydrated title disagree and only the
+     shorter one is ever seen by a crawler that does not run JS. */
+  function seoTitle(p) {
+    var t = String((p && p.name) || '').replace(/s+/g, ' ').trim();
+    t = t.replace(/s+withs+(jhumkas?|jhumkis?|earrings)/i, '');
+    t = t.replace(/Bead Drops/i, 'Beads');
+    if (t.length <= 60) return t;
+    var cut = t.slice(0, 60);
+    var sp = cut.lastIndexOf(' ');
+    return sp > 40 ? cut.slice(0, sp) : cut;
   }
 
   /* Keyword-rich H2 line: Material + Style + Region + Use-case. MIRRORS

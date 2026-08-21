@@ -7,7 +7,7 @@
  * Canonical is ALWAYS the clean /product/<sku> URL so Google indexes one
  * URL per product (query-string URLs are poorly indexed for e-commerce).
  */
-import { seoSubtitle, productKeywords } from './_seo.js';
+import { seoSubtitle, productKeywords, seoTitle } from './_seo.js';
 
 const SITE_URL = 'https://saubhagyajewellery.com';
 
@@ -153,7 +153,9 @@ export async function renderProductShell(html, p, env) {
   // template below is kept only for a SKU that has not been written yet.
   const body = String(p.description || '').replace(/\s+/g, ' ').trim();
 
-  const title = `${p.name} | Saubhagya Jewellery`;
+  // Compressed for the SERP only — p.name stays full everywhere else (H1,
+  // meta description, Shopping/Meta feeds, order lines). See seoTitle().
+  const title = seoTitle(p);
   // The name has to lead the meta description. Colour variants share the same
   // description body and differ only in its last sentence, so clipping the body
   // alone produced one identical meta description for all three variants of a

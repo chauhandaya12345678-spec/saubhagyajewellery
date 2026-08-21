@@ -25,3 +25,20 @@ database_id = "e0b5e020-eb86-445d-baae-09a949dd4c0e"
 [[r2_buckets]]
 binding = "IMAGES"
 bucket_name = "saubhagya-images"
+
+# ── R2 Bucket (Database backups) ─────────────────────────────
+# Deliberately a SEPARATE bucket from IMAGES. IMAGES is public (served at
+# img.saubhagyajewellery.com), and a D1 dump contains customer PII — writing
+# backups there would publish the whole customer table. This bucket has no
+# public domain and must never be given one.
+[[r2_buckets]]
+binding = "BACKUPS"
+bucket_name = "saubhagya-backups"
+
+# ── Web push ─────────────────────────────────────────────────
+# The public key is genuinely public — every browser receives it to build its
+# subscription — so it lives here rather than as a secret. Its pair,
+# VAPID_PRIVATE_KEY, is a Pages secret and must never appear in the repo.
+[vars]
+VAPID_PUBLIC_KEY = "BJcaDE6TOjwxBEspWcxsOyz5tw0jmqyAvnpVfXcEzDpAi44Oe2uPXKzvPQLwMmGU_Xgb_ujSGs6ysfT8UdOSOrk"
+VAPID_SUBJECT = "mailto:care@saubhagyajewellery.com"
