@@ -834,13 +834,27 @@
      if they drift, the SSR title and the hydrated title disagree and only the
      shorter one is ever seen by a crawler that does not run JS. */
   function seoTitle(p) {
-    var t = String((p && p.name) || '').replace(/s+/g, ' ').trim();
-    t = t.replace(/s+withs+(jhumkas?|jhumkis?|earrings)/i, '');
-    t = t.replace(/Bead Drops/i, 'Beads');
+    var t = String((p && p.name) || '').replace(/\s+/g, ' ').trim();
+    t = t.replace(/\s+with\s+(jhumkas?|jhumkis?|earrings)\b/i, '');
+    t = t.replace(/\bBead Drops\b/i, 'Beads');
     if (t.length <= 60) return t;
-    var cut = t.slice(0, 60);
-    var sp = cut.lastIndexOf(' ');
-    return sp > 40 ? cut.slice(0, sp) : cut;
+    function tidyTail(s) {
+      return s.replace(/[\s,\-–—]+$/, '').replace(/\s+(and|with|for|the|of|in|a|&)$/i, '');
+    }
+    // Keep the trailing " - Colour"; trim the descriptive head instead.
+    var dash = t.lastIndexOf(' - ');
+    if (dash > 0) {
+      var tail = t.slice(dash);
+      var room = 60 - tail.length;
+      if (room > 12) {
+        var cut = t.slice(0, dash).slice(0, room);
+        var sp = cut.lastIndexOf(' ');
+        return tidyTail(sp > 8 ? cut.slice(0, sp) : cut) + tail;
+      }
+    }
+    var c2 = t.slice(0, 60);
+    var s2 = c2.lastIndexOf(' ');
+    return tidyTail(s2 > 40 ? c2.slice(0, s2) : c2);
   }
 
   /* Keyword-rich H2 line: Material + Style + Region + Use-case. MIRRORS

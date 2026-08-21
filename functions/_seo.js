@@ -187,9 +187,28 @@ export function seoTitle(p) {
   t = t.replace(/\s+with\s+(jhumkas?|jhumkis?|earrings)\b/i, '');
   t = t.replace(/\bBead Drops\b/i, 'Beads');
   if (t.length <= 60) return t;
-  // Last resort: trim whole words off the FRONT descriptor, never the tail —
-  // the tail carries the colour that separates variant pages from each other.
+
+  // Over-long names keep their trailing " - Colour" and lose words off the
+  // FRONT. Slicing the first 60 characters instead dropped the colour, which
+  // is the only thing separating one variant page's title from its siblings.
+  const dash = t.lastIndexOf(' - ');
+  if (dash > 0) {
+    const tail = t.slice(dash);
+    const room = 60 - tail.length;
+    if (room > 12) {
+      const cut = t.slice(0, dash).slice(0, room);
+      const sp = cut.lastIndexOf(' ');
+      return tidyTail(sp > 8 ? cut.slice(0, sp) : cut) + tail;
+    }
+  }
   const cut = t.slice(0, 60);
   const sp = cut.lastIndexOf(' ');
-  return sp > 40 ? cut.slice(0, sp) : cut;
+  return tidyTail(sp > 40 ? cut.slice(0, sp) : cut);
+}
+
+/** Truncation must not leave trailing punctuation or a dangling connector. */
+function tidyTail(s) {
+  return s
+    .replace(/[\s,\-–—]+$/, '')
+    .replace(/\s+(and|with|for|the|of|in|a|&)$/i, '');
 }
