@@ -189,6 +189,11 @@ export async function renderProductShell(html, p, env) {
     category: p.category || 'Imitation Jewellery',
     offers: {
       '@type': 'Offer', url: canonical, priceCurrency: 'INR', price: String(p.price),
+      // Google's Merchant listing spec wants the window the price is valid FOR,
+      // not just when it expires. validFrom is the date this price last changed
+      // (the row's updated_at), so it is a real statement rather than a guess.
+      validFrom: String(p.updated_at || p.created_at || '').slice(0, 10)
+        || new Date().toISOString().slice(0, 10),
       priceValidUntil: new Date(Date.now() + 60 * 86400000).toISOString().slice(0, 10),
       availability: inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       itemCondition: 'https://schema.org/NewCondition',
@@ -207,7 +212,12 @@ export async function renderProductShell(html, p, env) {
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
         applicableCountry: 'IN',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnUnspecified',
+        // MerchantReturnUnspecified is valid schema.org but Google does NOT
+        // accept it for Merchant listings — hence "invalid enum value". It also
+        // contradicted merchantReturnDays: stating a 7-day window and calling
+        // the policy unspecified cannot both be true. A finite window is what
+        // the returns page actually promises.
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
         merchantReturnDays: 7,
         returnMethod: 'https://schema.org/ReturnByMail',
         returnFees: 'https://schema.org/FreeReturn',
