@@ -188,6 +188,22 @@ export function seoTitle(p) {
   t = t.replace(/\bBead Drops\b/i, 'Beads');
   if (t.length <= 60) return t;
 
+  // Still too long: drop the least valuable words before resorting to cutting.
+  // Truncation is what loses meaning — one product came out as "...Goddess
+  // Lakshmi Temple" with the word "Pendant" chopped off, ending on an
+  // adjective. Removing filler first keeps the nouns people actually search.
+  // Ordered least-valuable first, re-checking after each step.
+  const REDUCTIONS = [
+    [/\b(exquisite|elegant|beautiful|stunning|gorgeous|premium|classic|charming|lovely|fancy|designer|traditional)\s+/gi, ''],
+    [/\bgoddess\s+/gi, ''],          // "Goddess Lakshmi" — Lakshmi is the search term
+    [/\bgold finish\b/gi, 'Gold'],
+    [/\s+with\s+/gi, ' - '],         // shorter connector, same meaning
+  ];
+  for (const [re, to] of REDUCTIONS) {
+    t = t.replace(re, to).replace(/\s*-\s*-\s*/g, ' - ').replace(/\s+/g, ' ').trim();
+    if (t.length <= 60) return t;
+  }
+
   // Over-long names keep their trailing " - Colour" and lose words off the
   // FRONT. Slicing the first 60 characters instead dropped the colour, which
   // is the only thing separating one variant page's title from its siblings.

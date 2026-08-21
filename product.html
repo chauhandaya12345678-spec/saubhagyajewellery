@@ -838,6 +838,17 @@
     t = t.replace(/\s+with\s+(jhumkas?|jhumkis?|earrings)\b/i, '');
     t = t.replace(/\bBead Drops\b/i, 'Beads');
     if (t.length <= 60) return t;
+    // Same progressive reduction as seoTitle() in functions/_seo.js.
+    var REDUCTIONS = [
+      [/\b(exquisite|elegant|beautiful|stunning|gorgeous|premium|classic|charming|lovely|fancy|designer|traditional)\s+/gi, ''],
+      [/\bgoddess\s+/gi, ''],
+      [/\bgold finish\b/gi, 'Gold'],
+      [/\s+with\s+/gi, ' - '],
+    ];
+    for (var ri = 0; ri < REDUCTIONS.length; ri++) {
+      t = t.replace(REDUCTIONS[ri][0], REDUCTIONS[ri][1]).replace(/\s*-\s*-\s*/g, ' - ').replace(/\s+/g, ' ').trim();
+      if (t.length <= 60) return t;
+    }
     function tidyTail(s) {
       return s.replace(/[\s,\-–—]+$/, '').replace(/\s+(and|with|for|the|of|in|a|&)$/i, '');
     }
