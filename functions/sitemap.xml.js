@@ -8,17 +8,26 @@ import { isVariantDup } from './_listing.js';
 
 const SITE_URL = 'https://saubhagyajewellery.com';
 
+// [path, lastmod] — lastmod is the real date that file was last edited (git
+// log), NOT today's date. Google explicitly downweights/ignores <lastmod> it
+// catches lying (every URL "changed" on every crawl teaches Google the tag
+// is noise, which makes it re-crawl on its own heuristics instead — slower
+// to pick up real changes, not faster). When you actually edit one of these
+// pages, update its date here too — that's the whole point of the tag.
 const STATIC_PAGES = [
-  '/', '/categories', '/gifting', '/track-orders', '/about', '/contact',
-  '/faq', '/jewellery-guide',
-  '/trust', '/blogs', '/shipping-and-returns', '/es-policy', '/grievances',
-  '/terms', '/offer-terms', '/privacy-policy', '/cookie-policy', '/review',
-  '/blogs/temple-jewellery-styling', '/blogs/kundan-vs-polki',
-  '/blogs/caring-matte-gold', '/blogs/bridal-set-6-hour-event',
-  '/blogs/real-vs-fake-gold-plated', '/blogs/indian-bridal-jewellery-guide',
-  '/blogs/care-tips-imitation-jewellery',
-  '/blogs/punjabi-wedding-jewellery', '/blogs/bengali-bride-jewellery',
-  '/blogs/maharashtrian-jewellery', '/blogs/south-indian-temple-jewellery',
+  ['/', '2026-08-17'], ['/categories', '2026-08-18'], ['/gifting', '2026-08-17'],
+  ['/track-orders', '2026-08-17'], ['/about', '2026-08-17'], ['/contact', '2026-08-17'],
+  ['/faq', '2026-08-17'], ['/jewellery-guide', '2026-08-17'],
+  ['/trust', '2026-08-17'], ['/blogs', '2026-08-17'], ['/shipping-and-returns', '2026-08-17'],
+  ['/es-policy', '2026-08-17'], ['/grievances', '2026-08-17'],
+  ['/terms', '2026-08-17'], ['/offer-terms', '2026-08-17'], ['/privacy-policy', '2026-08-17'],
+  ['/cookie-policy', '2026-08-17'], ['/review', '2026-08-19'],
+  ['/blogs/temple-jewellery-styling', '2026-08-17'], ['/blogs/kundan-vs-polki', '2026-08-17'],
+  ['/blogs/caring-matte-gold', '2026-08-17'], ['/blogs/bridal-set-6-hour-event', '2026-08-17'],
+  ['/blogs/real-vs-fake-gold-plated', '2026-08-17'], ['/blogs/indian-bridal-jewellery-guide', '2026-08-17'],
+  ['/blogs/care-tips-imitation-jewellery', '2026-08-17'],
+  ['/blogs/punjabi-wedding-jewellery', '2026-08-17'], ['/blogs/bengali-bride-jewellery', '2026-08-17'],
+  ['/blogs/maharashtrian-jewellery', '2026-08-17'], ['/blogs/south-indian-temple-jewellery', '2026-08-17'],
 ];
 
 function esc(s) {
@@ -44,8 +53,8 @@ export async function onRequest(context) {
     skus = (results || []).filter(r => !isVariantDup(r));
   } catch (e) { /* DB unreachable — ship static pages only, never 500 */ }
 
-  const urls = STATIC_PAGES.map(p => `${SITE_URL}${p}`).map(loc =>
-    `  <url><loc>${esc(loc)}</loc><lastmod>${today}</lastmod></url>`
+  const urls = STATIC_PAGES.map(([p, lastmod]) =>
+    `  <url><loc>${esc(SITE_URL + p)}</loc><lastmod>${lastmod}</lastmod></url>`
   ).concat(
     skus.map(p => {
       const lastmod = p.updated_at ? String(p.updated_at).slice(0, 10) : today;
